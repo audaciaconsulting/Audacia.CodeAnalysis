@@ -1,0 +1,350 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="My Rules" ToolsVersion="15.0">
+	
+	<Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp.Analyzers">
+		<Rule Id="RCS1001" Action="Warning"/><!-- [STYLE] Add braces (when expression spans over multiple lines) -->
+		<Rule Id="RCS1002" Action="None"/><!-- [STYLE] Remove braces -->
+		<Rule Id="RCS1003" Action="None"/><!-- [STYLE] Add braces to if-else (when expression spans over multiple lines) -->
+		<Rule Id="RCS1004" Action="None"/><!-- [STYLE] Remove braces from if-else -->
+		<Rule Id="RCS1005" Action="Warning"/><!-- [SIMPLIFICATION] Simplify nested using statement -->
+		<Rule Id="RCS1006" Action="Warning"/><!-- [SIMPLIFICATION] Merge else clause with nested if statement -->
+		<Rule Id="RCS1007" Action="None"/><!-- [STYLE] Add braces -->
+		<Rule Id="RCS1008" Action="None"/><!-- [READABILITY] Use explicit type instead of 'var' (when the type is not obvious) -->
+		<Rule Id="RCS1009" Action="None"/><!-- [READABILITY] Use explicit type instead of 'var' (foreach variable) -->
+		<Rule Id="RCS1010" Action="Warning"/><!-- [SIMPLIFICATION] Use 'var' instead of explicit type (when the type is obvious) -->
+		<Rule Id="RCS1012" Action="None"/><!-- [READABILITY] Use explicit type instead of 'var' (when the type is obvious) -->
+		<Rule Id="RCS1013" Action="Warning"/><!-- [USAGE] Use predefined type -->
+		<Rule Id="RCS1014" Action="None"/><!-- [READABILITY] Avoid implicitly-typed array -->
+		<Rule Id="RCS1015" Action="Warning"/><!-- [MAINTAINABILITY] Use nameof operator -->
+		<Rule Id="RCS1016" Action="Info"/><!-- [USAGE] Use expression-bodied member -->
+		<Rule Id="RCS1017" Action="Hidden"/><!-- [STYLE] Avoid multiline expression body -->
+		<Rule Id="RCS1018" Action="Warning"/><!-- [READABILITY] Add default access modifier -->
+		<Rule Id="RCS1019" Action="Warning"/><!-- [READABILITY] Order modifiers -->
+		<Rule Id="RCS1020" Action="Warning"/><!-- [SIMPLIFICATION] Simplify Nullable\<T> to T? -->
+		<Rule Id="RCS1021" Action="Warning"/><!-- [SIMPLIFICATION] Simplify lambda expression -->
+		<Rule Id="RCS1023" Action="None"/><!-- [FORMATTING] Format empty block -->
+		<Rule Id="RCS1024" Action="Warning"/><!-- [FORMATTING] Format accessor list -->
+		<Rule Id="RCS1025" Action="None"/><!-- [FORMATTING] Add new line before enum member -->
+		<Rule Id="RCS1026" Action="Warning"/><!-- [FORMATTING] Add new line before statement -->
+		<Rule Id="RCS1027" Action="None"/><!-- [FORMATTING] Add new line before embedded statement -->
+		<Rule Id="RCS1028" Action="None"/><!-- [FORMATTING] Add new line after switch label -->
+		<Rule Id="RCS1029" Action="None"/><!-- [FORMATTING] Format binary operator on next line -->
+		<Rule Id="RCS1030" Action="Warning"/><!-- [FORMATTING] Add empty line after embedded statement -->
+		<Rule Id="RCS1031" Action="Info"/><!-- [REDUNDANCY] Remove unnecessary braces -->
+		<Rule Id="RCS1032" Action="Warning"/><!-- [REDUNDANCY] Remove redundant parentheses -->
+		<Rule Id="RCS1033" Action="Warning"/><!-- [REDUNDANCY] Remove redundant boolean literal -->
+		<Rule Id="RCS1034" Action="Warning"/><!-- [REDUNDANCY] Remove redundant 'sealed' modifier -->
+		<Rule Id="RCS1035" Action="Warning"/><!-- [REDUNDANCY] Remove redundant comma in initializer -->
+		<Rule Id="RCS1036" Action="Warning"/><!-- [REDUNDANCY] Remove redundant empty line -->
+		<Rule Id="RCS1037" Action="Warning"/><!-- [REDUNDANCY] Remove trailing white-space -->
+		<Rule Id="RCS1038" Action="Warning"/><!-- [REDUNDANCY] Remove empty statement -->
+		<Rule Id="RCS1039" Action="Warning"/><!-- [REDUNDANCY] Remove argument list from attribute -->
+		<Rule Id="RCS1040" Action="Warning"/><!-- [REDUNDANCY] Remove empty else clause -->
+		<Rule Id="RCS1041" Action="Warning"/><!-- [REDUNDANCY] Remove empty initializer -->
+		<Rule Id="RCS1042" Action="Warning"/><!-- [REDUNDANCY] Remove enum default underlying type -->
+		<Rule Id="RCS1043" Action="Warning"/><!-- [REDUNDANCY] Remove 'partial' modifier from type with a single part -->
+		<Rule Id="RCS1044" Action="Warning"/><!-- [MAINTAINABILITY] Remove original exception from throw statement -->
+		<Rule Id="RCS1045" Action="Warning"/><!-- [NAMING] Rename private field according to camel case with underscore -->
+		<Rule Id="RCS1046" Action="Warning"/><!-- [NAMING] Asynchronous method name should end with 'Async' -->
+		<Rule Id="RCS1047" Action="Warning"/><!-- [NAMING] Non-asynchronous method name should not end with 'Async' -->
+		<Rule Id="RCS1048" Action="Warning"/><!-- [USAGE] Use lambda expression instead of anonymous method -->
+		<Rule Id="RCS1049" Action="Warning"/><!-- [SIMPLIFICATION] Simplify boolean comparison -->
+		<Rule Id="RCS1050" Action="None"/><!-- [STYLE] Add argument list to object creation expression -->
+		<Rule Id="RCS1051" Action="None"/><!-- [STYLE] Parenthesize condition in conditional expression -->
+		<Rule Id="RCS1052" Action="None"/><!-- [READABILITY] Declare each attribute separately -->
+		<Rule Id="RCS1055" Action="Warning"/><!-- [REDUNDANCY] Avoid semicolon at the end of declaration -->
+		<Rule Id="RCS1056" Action="None"/><!-- [READABILITY] Avoid usage of using alias directive -->
+		<Rule Id="RCS1057" Action="Warning"/><!-- [FORMATTING] Add empty line between declarations -->
+		<Rule Id="RCS1058" Action="Warning"/><!-- [SIMPLIFICATION] Use compound assignment -->
+		<Rule Id="RCS1059" Action="Warning"/><!-- [DESIGN] Avoid locking on publicly accessible instance -->
+		<Rule Id="RCS1060" Action="None"/><!-- [MAINTAINABILITY] Declare each type in separate file -->
+		<Rule Id="RCS1061" Action="Warning"/><!-- [SIMPLIFICATION] Merge if statement with nested if statement -->
+		<Rule Id="RCS1062" Action="Warning"/><!-- [REDUNDANCY] Avoid interpolated string with no interpolation -->
+		<Rule Id="RCS1063" Action="Warning"/><!-- [STYLE] Avoid usage of do statement to create an infinite loop -->
+		<Rule Id="RCS1064" Action="Warning"/><!-- [STYLE] Avoid usage of for statement to create an infinite loop -->
+		<Rule Id="RCS1065" Action="None"/><!-- [STYLE] Avoid usage of while statement to create an inifinite loop -->
+		<Rule Id="RCS1066" Action="Warning"/><!-- [REDUNDANCY] Remove empty finally clause -->
+		<Rule Id="RCS1067" Action="Warning"/><!-- [STYLE] Remove argument list from object creation expression -->
+		<Rule Id="RCS1068" Action="Warning"/><!-- [SIMPLIFICATION] Simplify logical negation -->
+		<Rule Id="RCS1069" Action="Warning"/><!-- [REDUNDANCY] Remove unnecessary case label -->
+		<Rule Id="RCS1070" Action="Warning"/><!-- [REDUNDANCY] Remove redundant default switch section -->
+		<Rule Id="RCS1071" Action="Warning"/><!-- [REDUNDANCY] Remove redundant base constructor call -->
+		<Rule Id="RCS1072" Action="Warning"/><!-- [REDUNDANCY] Remove empty namespace declaration -->
+		<Rule Id="RCS1073" Action="Warning"/><!-- [SIMPLIFICATION] Replace if statement with return statement -->
+		<Rule Id="RCS1074" Action="Warning"/><!-- [REDUNDANCY] Remove redundant constructor -->
+		<Rule Id="RCS1075" Action="Warning"/><!-- [DESIGN] Avoid empty catch clause that catches System.Exception -->
+		<Rule Id="RCS1076" Action="None"/><!-- [FORMATTING] Format declaration braces -->
+		<Rule Id="RCS1077" Action="Warning"/><!-- [PERFORMANCE] Optimize LINQ method call -->
+		<Rule Id="RCS1078" Action="None"/><!-- [GENERAL] Use " instead of string.Empty -->
+		<Rule Id="RCS1079" Action="Info"/><!-- [GENERAL] Throwing of new Not Implemented Exception -->
+		<Rule Id="RCS1080" Action="None"/><!-- [PERFORMANCE] Use 'Count/Length' property instead of 'Any' method -->
+		<Rule Id="RCS1081" Action="None"/><!-- [READABILITY] Split variable declaration -->
+		<Rule Id="RCS1084" Action="Warning"/><!-- [SIMPLIFICATION] Use coalesce expression instead of conditional expression -->
+		<Rule Id="RCS1085" Action="Warning"/><!-- [SIMPLIFICATION] Use auto-implemented property -->
+		<Rule Id="RCS1086" Action="Hidden"/><!-- [GENERAL] Use linefeed as newline -->
+		<Rule Id="RCS1087" Action="Warning"/><!-- [GENERAL] Use carriage return + linefeed as newline -->
+		<Rule Id="RCS1088" Action="None"/><!-- [GENERAL] Use space(s) instead of tab -->
+		<Rule Id="RCS1089" Action="Warning"/><!-- [SIMPLIFICATION] Use -/++ operator instead of assignment -->
+		<Rule Id="RCS1090" Action="Info"/><!-- [DESIGN] Call 'ConfigureAwait(false)' -->
+		<Rule Id="RCS1091" Action="Warning"/><!-- [REDUNDANCY] Remove empty region -->
+		<Rule Id="RCS1092" Action="Warning"/><!-- [FORMATTING] Add empty line before 'while' keyword in 'do' statement -->
+		<Rule Id="RCS1093" Action="Warning"/><!-- [REDUNDANCY] Remove file with no code -->
+		<Rule Id="RCS1094" Action="Warning"/><!-- [READABILITY] Declare using directive on top level -->
+		<Rule Id="RCS1096" Action="Warning"/><!-- [PERFORMANCE] Use bitwise operation instead of calling 'HasFlag' -->
+		<Rule Id="RCS1097" Action="Warning"/><!-- [REDUNDANCY] Remove redundant 'ToString' call -->
+		<Rule Id="RCS1098" Action="Warning"/><!-- [READABILITY] Avoid 'null' on the left side of a binary expression -->
+		<Rule Id="RCS1099" Action="Warning"/><!-- [READABILITY] Default label should be the last label in a switch section -->
+		<Rule Id="RCS1100" Action="Warning"/><!-- [FORMATTING] Format documentation summary on a single line -->
+		<Rule Id="RCS1101" Action="None"/><!-- [FORMATTING] Format documentation summary on multiple lines -->
+		<Rule Id="RCS1102" Action="Warning"/><!-- [DESIGN] Make class static -->
+		<Rule Id="RCS1103" Action="Warning"/><!-- [SIMPLIFICATION] Replace if statement with assignment -->
+		<Rule Id="RCS1104" Action="Warning"/><!-- [SIMPLIFICATION] Simplify conditional expression -->
+		<Rule Id="RCS1105" Action="Warning"/><!-- [SIMPLIFICATION] Unncessary interpolation -->
+		<Rule Id="RCS1106" Action="Warning"/><!-- [REDUNDANCY] Remove empty destructor -->
+		<Rule Id="RCS1107" Action="Warning"/><!-- [REDUNDANCY] Remove redundant 'ToCharArray' call -->
+		<Rule Id="RCS1108" Action="Warning"/><!-- [READABILITY] Add 'static' modifier to all partial class declarations -->
+		<Rule Id="RCS1110" Action="Warning"/><!-- [DESIGN] Declare type inside namespace -->
+	</Rules>
+
+	<Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+		<Rule Id="CA1000" Action="Warning" /><!-- [DESIGN] Do not declare static members on generic types -->
+		<Rule Id="CA1001" Action="Warning" /><!-- [DESIGN] Types that own disposable fields should be disposable -->
+		<Rule Id="CA1003" Action="Warning" /><!-- [DESIGN] Use generic event handler instances -->
+		<Rule Id="CA1008" Action="Warning" /><!-- [DESIGN] Enums should have zero value -->
+		<Rule Id="CA1010" Action="Warning" /><!-- [DESIGN] Collections should implement generic interface -->
+		<Rule Id="CA1012" Action="Warning" /><!-- [DESIGN] Abstract types should not have constructors -->
+		<Rule Id="CA1014" Action="Info" /><!-- [DESIGN] Mark assemblies with CLSCompliant -->
+		<Rule Id="CA1016" Action="None" /><!-- [DESIGN] Mark assemblies with assembly version -->
+		<Rule Id="CA1017" Action="None" /><!-- [DESIGN] Mark assemblies with ComVisible -->
+		<Rule Id="CA1018" Action="Warning" /><!-- [DESIGN] Mark attributes with AttributeUsageAttribute -->
+		<Rule Id="CA1019" Action="Warning" /><!-- [DESIGN] Define accessors for attribute arguments -->
+		<Rule Id="CA1024" Action="Warning" /><!-- [DESIGN] Use properties where appropriate -->
+		<Rule Id="CA1027" Action="None" /><!-- [DESIGN] Mark enums with FlagsAttribute -->
+		<Rule Id="CA1028" Action="None" /><!-- [DESIGN] Enum Storage should be Int32 -->
+		<Rule Id="CA1030" Action="None" /><!-- [DESIGN] Use events where appropriate -->
+		<Rule Id="CA1031" Action="Warning" /><!-- [DESIGN] Do not catch general exception types -->
+		<Rule Id="CA1032" Action="Warning" /><!-- [DESIGN] Implement standard exception constructors -->
+		<Rule Id="CA1033" Action="Warning" /><!-- [DESIGN] Interface methods should be callable by child types -->
+		<Rule Id="CA1034" Action="Warning" /><!-- [DESIGN] Nested types should not be visible -->
+		<Rule Id="CA1036" Action="Warning" /><!-- [DESIGN] Override methods on comparable types -->
+		<Rule Id="CA1040" Action="None" /><!-- [DESIGN] Avoid empty interfaces -->
+		<Rule Id="CA1041" Action="Warning" /><!-- [DESIGN] Provide ObsoleteAttribute message -->
+		<Rule Id="CA1043" Action="None" /><!-- [DESIGN] Use Integral Or String Argument For Indexers -->
+		<Rule Id="CA1044" Action="Warning" /><!-- [DESIGN] Properties should not be write only -->
+		<Rule Id="CA1050" Action="Warning" /><!-- [DESIGN] Declare types in namespaces -->
+		<Rule Id="CA1051" Action="Warning" /><!-- [DESIGN] Do not declare visible instance fields -->
+		<Rule Id="CA1052" Action="None" /><!-- [DESIGN] Static holder types should be Static or NotInheritable -->
+		<Rule Id="CA1054" Action="Warning" /><!-- [DESIGN] Uri parameters should not be strings -->
+		<Rule Id="CA1055" Action="Warning" /><!-- [DESIGN] Uri return values should not be strings -->
+		<Rule Id="CA1056" Action="Warning" /><!-- [DESIGN] Uri properties should not be strings -->
+		<Rule Id="CA1060" Action="None" /><!-- [DESIGN] Move pinvokes to native methods class -->
+		<Rule Id="CA1061" Action="Warning" /><!-- [DESIGN] Do not hide base class methods -->
+		<Rule Id="CA1062" Action="Warning" /><!-- [DESIGN] Validate arguments of public methods -->
+		<Rule Id="CA1063" Action="Warning" /><!-- [DESIGN] Implement IDisposable Correctly -->
+		<Rule Id="CA1064" Action="Warning" /><!-- [DESIGN] Exceptions should be public -->
+		<Rule Id="CA1065" Action="Warning" /><!-- [DESIGN] Do not raise exceptions in unexpected locations -->
+		<Rule Id="CA1066" Action="Warning" /><!-- [DESIGN] Type {0} should implement IEquatable<T> because it overrides Equals -->
+		<Rule Id="CA1067" Action="Warning" /><!-- [DESIGN] Override Object.Equals(object) when implementing IEquatable<T> -->
+		<Rule Id="CA1068" Action="Warning" /><!-- [DESIGN] CancellationToken parameters must come last -->
+		<Rule Id="CA1200" Action="Warning" /><!-- [DOCUMENTATION] Avoid using cref tags with a prefix -->
+		<Rule Id="CA1501" Action="Warning" /><!-- [MAINTAINABILITY] Avoid excessive inheritance -->
+		<Rule Id="CA1502" Action="Warning" /><!-- [MAINTAINABILITY] Avoid excessive complexity -->
+		<Rule Id="CA1505" Action="Warning" /><!-- [MAINTAINABILITY] Avoid unmaintainable code -->
+		<Rule Id="CA1506" Action="Warning" /><!-- [MAINTAINABILITY] Avoid excessive class coupling -->
+		<Rule Id="CA1507" Action="Warning" /><!-- [MAINTAINABILITY] Use nameof to express symbol names -->
+		<Rule Id="CA1508" Action="Warning" /><!-- [MAINTAINABILITY] Avoid dead conditional code -->
+		<Rule Id="CA1509" Action="Warning" /><!-- [MAINTAINABILITY] Invalid entry in code metrics rule specification file -->
+		<Rule Id="CA1707" Action="Warning" /><!-- [NAMING] Identifiers should not contain underscores -->
+		<Rule Id="CA1708" Action="Warning" /><!-- [NAMING] Identifiers should differ by more than case -->
+		<Rule Id="CA1710" Action="Warning" /><!-- [NAMING] Identifiers should have correct suffix -->
+		<Rule Id="CA1711" Action="Warning" /><!-- [NAMING] Identifiers should not have incorrect suffix -->
+		<Rule Id="CA1712" Action="Warning" /><!-- [NAMING] Do not prefix enum values with type name -->
+		<Rule Id="CA1714" Action="Warning" /><!-- [NAMING] Flags enums should have plural names -->
+		<Rule Id="CA1715" Action="Warning" /><!-- [NAMING] Identifiers should have correct prefix -->
+		<Rule Id="CA1716" Action="Warning" /><!-- [NAMING] Identifiers should not match keywords -->
+		<Rule Id="CA1717" Action="Warning" /><!-- [NAMING] Only FlagsAttribute enums should have plural names -->
+		<Rule Id="CA1720" Action="Warning" /><!-- [NAMING] Identifier contains type name -->
+		<Rule Id="CA1721" Action="Warning" /><!-- [NAMING] Property names should not match get methods -->
+		<Rule Id="CA1724" Action="Warning" /><!-- [NAMING] Type names should not match namespaces -->
+		<Rule Id="CA1725" Action="Warning" /><!-- [NAMING] Parameter names should match base declaration -->
+		<Rule Id="CA1801" Action="Warning" /><!-- [USAGE] Review unused parameters -->
+		<Rule Id="CA1802" Action="Warning" /><!-- [PERFORMANCE] Use literals where appropriate -->
+		<Rule Id="CA1806" Action="Warning" /><!-- [PERFORMANCE] Do not ignore method results -->
+		<Rule Id="CA1812" Action="Warning" /><!-- [PERFORMANCE] Avoid uninstantiated internal classes -->
+		<Rule Id="CA1814" Action="None" /><!-- [PERFORMANCE] Prefer jagged arrays over multidimensional -->
+		<Rule Id="CA1815" Action="Warning" /><!-- [PERFORMANCE] Override equals and operator equals on value types -->
+		<Rule Id="CA1819" Action="Warning" /><!-- [PERFORMANCE] Properties should not return arrays -->
+		<Rule Id="CA1821" Action="Warning" /><!-- [PERFORMANCE] Remove empty Finalizers -->
+		<Rule Id="CA1822" Action="Warning" /><!-- [PERFORMANCE] Mark members as static -->
+		<Rule Id="CA1823" Action="Warning" /><!-- [PERFORMANCE] Avoid unused private fields -->
+		<Rule Id="CA2007" Action="Warning" /><!-- [RELIABILITY] Consider calling ConfigureAwait on the awaited task -->
+		<Rule Id="CA2119" Action="Warning" /><!-- [SECURITY] Seal methods that satisfy private interfaces -->
+		<Rule Id="CA2200" Action="Warning" /><!-- [USAGE] Rethrow to preserve stack details. -->
+		<Rule Id="CA2211" Action="Warning" /><!-- [USAGE] Non-constant fields should not be visible -->
+		<Rule Id="CA2214" Action="Warning" /><!-- [USAGE] Do not call overridable methods in constructors -->
+		<Rule Id="CA2217" Action="None" /><!-- [USAGE] Do not mark enums with FlagsAttribute -->
+		<Rule Id="CA2218" Action="Warning" /><!-- [USAGE] Override GetHashCode on overriding Equals -->
+		<Rule Id="CA2219" Action="Warning" /><!-- [USAGE] Do not raise exceptions in finally clauses -->
+		<Rule Id="CA2224" Action="Warning" /><!-- [USAGE] Override Equals on overloading operator equals -->
+		<Rule Id="CA2225" Action="Warning" /><!-- [USAGE] Operator overloads have named alternates -->
+		<Rule Id="CA2226" Action="Warning" /><!-- [USAGE] Operators should have symmetrical overloads -->
+		<Rule Id="CA2227" Action="Warning" /><!-- [USAGE] Collection properties should be read only -->
+		<Rule Id="CA2231" Action="Warning" /><!-- [USAGE] Overload operator equals on overriding value type Equals -->
+		<Rule Id="CA2234" Action="Warning" /><!-- [USAGE] Pass system uri objects instead of strings -->
+		<Rule Id="CA2244" Action="Warning" /><!-- [USAGE] Do not duplicate indexed element initializations -->
+		<Rule Id="CA2245" Action="Warning" /><!-- [USAGE] Do not assign a property to itself. -->
+		<Rule Id="CA2246" Action="Warning" /><!-- [USAGE] Assigning symbol and its member in the same statement. -->
+	</Rules>
+
+	<Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
+		<Rule Id="CA1303" Action="None" /><!-- [GLOBALIZATION] Do not pass literals as localized parameters -->
+		<Rule Id="CA1304" Action="Warning" /><!-- [GLOBALIZATION] Specify CultureInfo -->
+		<Rule Id="CA1305" Action="Warning" /><!-- [GLOBALIZATION] Specify IFormatProvider -->
+		<Rule Id="CA1307" Action="Warning" /><!-- [GLOBALIZATION] Specify StringComparison -->
+		<Rule Id="CA1308" Action="Warning" /><!-- [GLOBALIZATION] Normalize strings to uppercase -->
+		<Rule Id="CA1309" Action="Warning" /><!-- [GLOBALIZATION] Use ordinal stringcomparison -->
+		<Rule Id="CA1401" Action="Warning" /><!-- [INTEROPERABILITY] P/Invokes should not be visible -->
+		<Rule Id="CA1810" Action="Warning" /><!-- [PERFORMANCE] Initialize reference type static fields inline -->
+		<Rule Id="CA1813" Action="Warning" /><!-- [PERFORMANCE] Avoid unsealed attributes -->
+		<Rule Id="CA1816" Action="Warning" /><!-- [USAGE] Dispose methods should call SuppressFinalize -->
+		<Rule Id="CA1820" Action="Warning" /><!-- [PERFORMANCE] Test for empty strings using string length -->
+		<Rule Id="CA1824" Action="None" /><!-- [PERFORMANCE] Mark assemblies with NeutralResourcesLanguageAttribute -->
+		<Rule Id="CA1825" Action="Warning" /><!-- [PERFORMANCE] Avoid zero-length array allocations. -->
+		<Rule Id="CA1826" Action="Warning" /><!-- [PERFORMANCE] Do not use Enumerable methods on indexable collections. Instead use the collection directly -->
+		<Rule Id="CA1827" Action="Warning" /><!-- [PERFORMANCE] Do not use Count() or LongCount() when Any() can be used -->
+		<Rule Id="CA1828" Action="Warning" /><!-- [PERFORMANCE] Do not use CountAsync() or LongCountAsync() when AnyAsync() can be used -->
+		<Rule Id="CA1829" Action="Warning" /><!-- [PERFORMANCE] Use Length/Count property instead of Count() when available -->
+		<Rule Id="CA2000" Action="Warning" /><!-- [RELIABILITY] Dispose objects before losing scope -->
+		<Rule Id="CA2002" Action="Warning" /><!-- [RELIABILITY] Do not lock on objects with weak identity -->
+		<Rule Id="CA2008" Action="None" /><!-- [RELIABILITY] Do not create tasks without passing a TaskScheduler -->
+		<Rule Id="CA2009" Action="Warning" /><!-- [RELIABILITY] Do not call ToImmutableCollection on an ImmutableCollection value -->
+		<Rule Id="CA2010" Action="Warning" /><!-- [RELIABILITY] Always consume the value returned by methods marked with PreserveSigAttribute -->
+		<Rule Id="CA2100" Action="Warning" /><!-- [SECURITY] Review SQL queries for security vulnerabilities -->
+		<Rule Id="CA2101" Action="Warning" /><!-- [GLOBALIZATION] Specify marshaling for P/Invoke string arguments -->
+		<Rule Id="CA2201" Action="Warning" /><!-- [USAGE] Do not raise reserved exception types -->
+		<Rule Id="CA2207" Action="Warning" /><!-- [USAGE] Initialize value type static fields inline -->
+		<Rule Id="CA2208" Action="Warning" /><!-- [USAGE] Instantiate argument exceptions correctly -->
+		<Rule Id="CA2213" Action="Warning" /><!-- [USAGE] Disposable fields should be disposed -->
+		<Rule Id="CA2216" Action="Warning" /><!-- [USAGE] Disposable types should declare finalizer -->
+		<Rule Id="CA2229" Action="Warning" /><!-- [USAGE] Implement serialization constructors -->
+		<Rule Id="CA2235" Action="Warning" /><!-- [USAGE] Mark all non-serializable fields -->
+		<Rule Id="CA2237" Action="Warning" /><!-- [USAGE] Mark ISerializable types with serializable -->
+		<Rule Id="CA2241" Action="Warning" /><!-- [USAGE] Provide correct arguments to formatting methods -->
+		<Rule Id="CA2242" Action="Warning" /><!-- [USAGE] Test for NaN correctly -->
+		<Rule Id="CA2243" Action="Warning" /><!-- [USAGE] Attribute string literals should parse correctly -->
+		<Rule Id="CA2300" Action="Warning" /><!-- [SECURITY] Do not use insecure deserializer BinaryFormatter -->
+		<Rule Id="CA2301" Action="Warning" /><!-- [SECURITY] Do not call BinaryFormatter.Deserialize without first setting BinaryFormatter.Binder -->
+		<Rule Id="CA2302" Action="Warning" /><!-- [SECURITY] Ensure BinaryFormatter.Binder is set before calling BinaryFormatter.Deserialize -->
+		<Rule Id="CA2305" Action="Warning" /><!-- [SECURITY] Do not use insecure deserializer LosFormatter -->
+		<Rule Id="CA2310" Action="Warning" /><!-- [SECURITY] Do not use insecure deserializer NetDataContractSerializer -->
+		<Rule Id="CA2311" Action="Warning" /><!-- [SECURITY] Do not deserialize without first setting NetDataContractSerializer.Binder -->
+		<Rule Id="CA2312" Action="Warning" /><!-- [SECURITY] Ensure NetDataContractSerializer.Binder is set before deserializing -->
+		<Rule Id="CA2315" Action="Warning" /><!-- [SECURITY] Do not use insecure deserializer ObjectStateFormatter -->
+		<Rule Id="CA2321" Action="Warning" /><!-- [SECURITY] Do not deserialize with JavaScriptSerializer using a SimpleTypeResolver -->
+		<Rule Id="CA2322" Action="Warning" /><!-- [SECURITY] Ensure JavaScriptSerializer is not initialized with SimpleTypeResolver before deserializing -->
+		<Rule Id="CA2326" Action="Warning" /><!-- [SECURITY] Do not use TypeNameHandling values other than None -->
+		<Rule Id="CA2327" Action="Warning" /><!-- [SECURITY] Do not use insecure JsonSerializerSettings -->
+		<Rule Id="CA2328" Action="Warning" /><!-- [SECURITY] Ensure that JsonSerializerSettings are secure -->
+		<Rule Id="CA2329" Action="Warning" /><!-- [SECURITY] Do not deserialize with JsonSerializer using an insecure configuration -->
+		<Rule Id="CA2330" Action="Warning" /><!-- [SECURITY] Ensure that JsonSerializer has a secure configuration when deserializing -->
+		<Rule Id="CA3001" Action="Warning" /><!-- [SECURITY] Review code for SQL injection vulnerabilities -->
+		<Rule Id="CA3002" Action="Warning" /><!-- [SECURITY] Review code for XSS vulnerabilities -->
+		<Rule Id="CA3003" Action="Warning" /><!-- [SECURITY] Review code for file path injection vulnerabilities -->
+		<Rule Id="CA3004" Action="Warning" /><!-- [SECURITY] Review code for information disclosure vulnerabilities -->
+		<Rule Id="CA3005" Action="Warning" /><!-- [SECURITY] Review code for LDAP injection vulnerabilities -->
+		<Rule Id="CA3006" Action="Warning" /><!-- [SECURITY] Review code for process command injection vulnerabilities -->
+		<Rule Id="CA3007" Action="Warning" /><!-- [SECURITY] Review code for open redirect vulnerabilities -->
+		<Rule Id="CA3008" Action="Warning" /><!-- [SECURITY] Review code for XPath injection vulnerabilities -->
+		<Rule Id="CA3009" Action="Warning" /><!-- [SECURITY] Review code for XML injection vulnerabilities -->
+		<Rule Id="CA3010" Action="Warning" /><!-- [SECURITY] Review code for XAML injection vulnerabilities -->
+		<Rule Id="CA3011" Action="Warning" /><!-- [SECURITY] Review code for DLL injection vulnerabilities -->
+		<Rule Id="CA3012" Action="Warning" /><!-- [SECURITY] Review code for regex injection vulnerabilities -->
+		<Rule Id="CA3061" Action="Warning" /><!-- [SECURITY] Do Not Add Schema By URL -->
+		<Rule Id="CA5350" Action="Warning" /><!-- [SECURITY] Do Not Use Weak Cryptographic Algorithms -->
+		<Rule Id="CA5351" Action="Warning" /><!-- [SECURITY] Do Not Use Broken Cryptographic Algorithms -->
+		<Rule Id="CA5358" Action="Warning" /><!-- [SECURITY] Do Not Use Unsafe Cipher Modes -->
+		<Rule Id="CA5359" Action="Warning" /><!-- [SECURITY] Do Not Disable Certificate Validation -->
+		<Rule Id="CA5360" Action="Warning" /><!-- [SECURITY] Do Not Call Dangerous Methods In Deserialization -->
+		<Rule Id="CA5361" Action="Warning" /><!-- [SECURITY] Do Not Disable SChannel Use of Strong Crypto -->
+		<Rule Id="CA5362" Action="Warning" /><!-- [SECURITY] Do Not Refer Self In Serializable Class -->
+		<Rule Id="CA5363" Action="Warning" /><!-- [SECURITY] Do Not Disable Request Validation -->
+		<Rule Id="CA5364" Action="Warning" /><!-- [SECURITY] Do Not Use Deprecated Security Protocols -->
+		<Rule Id="CA5365" Action="Warning" /><!-- [SECURITY] Do Not Disable HTTP Header Checking -->
+		<Rule Id="CA5366" Action="Warning" /><!-- [SECURITY] Use XmlReader For DataSet Read Xml -->
+		<Rule Id="CA5367" Action="Warning" /><!-- [SECURITY] Do Not Serialize Types With Pointer Fields -->
+		<Rule Id="CA5368" Action="Warning" /><!-- [SECURITY] Set ViewStateUserKey For Classes Derived From Page -->
+		<Rule Id="CA5369" Action="Warning" /><!-- [SECURITY] Use XmlReader For Deserialize -->
+		<Rule Id="CA5370" Action="Warning" /><!-- [SECURITY] Use XmlReader For Validating Reader -->
+		<Rule Id="CA5371" Action="Warning" /><!-- [SECURITY] Use XmlReader For Schema Read -->
+		<Rule Id="CA5372" Action="Warning" /><!-- [SECURITY] Use XmlReader For XPathDocument -->
+		<Rule Id="CA5373" Action="Warning" /><!-- [SECURITY] Do not use obsolete key derivation function -->
+		<Rule Id="CA5374" Action="Warning" /><!-- [SECURITY] Do Not Use XslTransform -->
+		<Rule Id="CA5375" Action="Warning" /><!-- [SECURITY] Do Not Use Account Shared Access Signature -->
+		<Rule Id="CA5376" Action="Warning" /><!-- [SECURITY] Use SharedAccessProtocol HttpsOnly -->
+		<Rule Id="CA5377" Action="Warning" /><!-- [SECURITY] Use Container Level Access Policy -->
+		<Rule Id="CA5378" Action="Warning" /><!-- [SECURITY] Do not disable ServicePointManagerSecurityProtocols -->
+		<Rule Id="CA5379" Action="Warning" /><!-- [SECURITY] Do Not Use Weak Key Derivation Function Algorithm -->
+		<Rule Id="CA5380" Action="Warning" /><!-- [SECURITY] Do Not Add Certificates To Root Store -->
+		<Rule Id="CA5381" Action="Warning" /><!-- [SECURITY] Ensure Certificates Are Not Added To Root Store -->
+		<Rule Id="CA5382" Action="Warning" /><!-- [SECURITY] Use Secure Cookies In ASP.Net Core -->
+		<Rule Id="CA5383" Action="Warning" /><!-- [SECURITY] Ensure Use Secure Cookies In ASP.Net Core -->
+		<Rule Id="CA5384" Action="Warning" /><!-- [SECURITY] Do Not Use Digital Signature Algorithm (DSA) -->
+		<Rule Id="CA5385" Action="Warning" /><!-- [SECURITY] Use Rivestâ€“Shamirâ€“Adleman (RSA) Algorithm With Sufficient Key Size -->
+		<Rule Id="CA5386" Action="Warning" /><!-- [SECURITY] Avoid hardcoding SecurityProtocolType value -->
+		<Rule Id="CA5387" Action="Warning" /><!-- [SECURITY] Do Not Use Weak Key Derivation Function With Insufficient Iteration Count -->
+		<Rule Id="CA5388" Action="Warning" /><!-- [SECURITY] Ensure Sufficient Iteration Count When Using Weak Key Derivation Function -->
+		<Rule Id="CA5389" Action="Warning" /><!-- [SECURITY] Do Not Add Archive Item's Path To The Target File System Path -->
+		<Rule Id="CA5390" Action="Warning" /><!-- [SECURITY] Do Not Hard Code Encryption Key -->
+		<Rule Id="CA5391" Action="Warning" /><!-- [SECURITY] Use antiforgery tokens in ASP.NET Core MVC controllers -->
+		<Rule Id="CA5392" Action="Warning" /><!-- [SECURITY] Use DefaultDllImportSearchPaths attribute for P/Invokes -->
+		<Rule Id="CA5393" Action="Warning" /><!-- [SECURITY] Do not use unsafe DllImportSearchPath value -->
+		<Rule Id="CA5394" Action="None" /><!-- [SECURITY] Do not use insecure randomness -->
+		<Rule Id="CA5395" Action="Warning" /><!-- [SECURITY] Miss HttpVerb attribute for action methods -->
+		<Rule Id="CA5396" Action="Warning" /><!-- [SECURITY] Set HttpOnly to true for HttpCookie -->
+		<Rule Id="CA5397" Action="Warning" /><!-- [SECURITY] Do not use deprecated SslProtocols values -->
+		<Rule Id="CA5398" Action="Warning" /><!-- [SECURITY] Avoid hardcoded SslProtocols values -->
+		<Rule Id="CA5399" Action="Warning" /><!-- [SECURITY] Definitely disable HttpClient certificate revocation list check -->
+		<Rule Id="CA5400" Action="Warning" /><!-- [SECURITY] Ensure HttpClient certificate revocation list check is not disabled -->
+	</Rules>
+
+	<Rules AnalyzerId="SecurityCodeScan" RuleNamespace="SecurityCodeScan.Analyzers">
+		<!-- Injection -->
+		<Rule Id="SCS0001" Action="Warning" /><!-- [SECURITY] The dynamic value passed to the command execution should be validated. -->
+		<Rule Id="SCS0003" Action="Warning" /><!-- [SECURITY] The dynamic value passed to the XPath query should be validated. -->
+		<Rule Id="SCS0007" Action="Warning" /><!-- [SECURITY] The XML parser is configured incorrectly. The operation could be vulnerable to XML eXternal Entity (XXE) processing. -->
+		<Rule Id="SCS0018" Action="Warning" /><!-- [SECURITY] A path traversal attack (also known as directory traversal) aims to access files and directories that are stored outside the expected directory.By manipulating variables that reference files with “dot-dot-slash (../)” sequences and its variations or by using absolute file paths, it may be possible to access arbitrary files and directories stored on file system including application source code or configuration and critical system files. -->
+		<Rule Id="SCS0029" Action="Warning" /><!-- [SECURITY] A potential XSS was found. The endpoint returns a variable from the client input that has not been encoded. To protect against stored XSS attacks, make sure any dynamic content coming from user or data store cannot be used to inject JavaScript on a page. Most modern frameworks will escape dynamic content by default automatically (Razor for example) or by using special syntax (<%: content %>, <%= HttpUtility.HtmlEncode(content) %>). -->
+		<Rule Id="SCS0031" Action="Warning" /><!-- [SECURITY] The dynamic value passed to the LDAP query should be validated. -->
+		<!-- SQL Injection -->
+		<Rule Id="SCS0002" Action="Warning" /><!-- [SECURITY] Unsafe usage of System.Web.UI.WebControls.SqlDataSource, System.Web.UI.WebControls.SqlDataSourceView or Microsoft.Whos.Framework.Data.SqlUtility. -->
+		<Rule Id="SCS0014" Action="Warning" /><!-- [SECURITY] Unsafe usage of System.Web.UI.WebControls.SqlDataSource, System.Web.UI.WebControls.SqlDataSourceView or Microsoft.Whos.Framework.Data.SqlUtility. -->
+		<Rule Id="SCS0020" Action="Warning" /><!-- [SECURITY] Use parametrized queries to mitigate SQL injection. -->
+		<Rule Id="SCS0025" Action="Warning" /><!-- [SECURITY] Use parametrized queries to mitigate SQL injection. -->
+		<Rule Id="SCS0026" Action="Warning" /><!-- [SECURITY] Use parametrized queries to mitigate SQL injection. -->
+		<Rule Id="SCS0035" Action="Warning" /><!-- [SECURITY] Use parametrized queries to mitigate SQL injection. -->
+		<Rule Id="SCS0036" Action="Warning" /><!-- [SECURITY] Use parametrized queries to mitigate SQL injection. -->
+		<!-- Cryptography -->
+		<Rule Id="SCS0004" Action="Warning" /><!-- [SECURITY] Certificate Validation has been disabled. The communication could be intercepted. -->
+		<Rule Id="SCS0005" Action="None" /><!-- [SECURITY] The random numbers generated could be predicted. -->
+		<Rule Id="SCS0006" Action="Warning" /><!-- [SECURITY] MD5 or SHA1 have known collision weaknesses and are no longer considered strong hashing algorithms. -->
+		<Rule Id="SCS0010" Action="Warning" /><!-- [SECURITY] DES and 3DES are not considered a strong cipher for modern applications. Currently, NIST recommends the usage of AES block ciphers instead. -->
+		<Rule Id="SCS0011" Action="Warning" /><!-- [SECURITY] The CBC mode alone is susceptible to padding oracle attack. -->
+		<Rule Id="SCS0012" Action="Warning" /><!-- [SECURITY] ECB mode will produce the same result for identical blocks (ie: 16 bytes for AES). An attacker could be able to guess the encrypted message. The use of AES in CBC mode with a HMAC is recommended guaranteeing integrity and confidentiality. -->
+		<Rule Id="SCS0013" Action="Warning" /><!-- [SECURITY] The cipher text produced is susceptible to alteration by an adversary. -->
+		<!-- Cookies -->
+		<Rule Id="SCS0008" Action="Warning" /><!-- [SECURITY] It is recommended to specify the Secure flag to new cookie. -->
+		<Rule Id="SCS0009" Action="Warning" /><!-- [SECURITY] It is recommended to specify the HttpOnly flag to new cookie. -->
+		<!-- View State -->
+		<Rule Id="SCS0023" Action="Warning" /><!-- [SECURITY] The viewStateEncryptionMode is not set to Always in configuration file. -->
+		<Rule Id="SCS0024" Action="Warning" /><!-- [SECURITY] The enableViewStateMac is disabled in configuration file. (This feature cannot be disabled starting .NET 4.5.1) -->
+		<!-- Request Valudation -->
+		<Rule Id="SCS0017" Action="Warning" /><!-- [SECURITY] Request validation is disabled. Request validation allows the filtering of some XSS patterns submitted to the application. -->
+		<Rule Id="SCS0021" Action="Warning" /><!-- [SECURITY] The validateRequest which provides additional protection against XSS is disabled in configuration file. -->
+		<Rule Id="SCS0030" Action="Warning" /><!-- [SECURITY] The requestValidationMode which provides additional protection against XSS is enabled only for pages, not for all HTTP requests in configuration file. -->
+		<!-- Password Management -->
+		<Rule Id="SCS0015" Action="Warning" /><!-- [SECURITY] The password configuration to this API appears to be hardcoded. -->
+		<Rule Id="SCS0034" Action="Warning" /><!-- [SECURITY] The RequiredLength property must be set with a minimum value of 8. -->
+		<Rule Id="SCS0032" Action="Warning" /><!-- [SECURITY] The minimal length of a password is recommended to be set at least to 8. -->
+		<Rule Id="SCS0033" Action="Warning" /><!-- [SECURITY] PasswordValidator should have at least two requirements for better security (RequiredLength, RequireDigit, RequireLowercase, RequireUppercase and/or RequireNonLetterOrDigit). -->
+	</Rules>
+</RuleSet>
