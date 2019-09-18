@@ -1,6 +1,6 @@
 name: $(Build.BuildId).$(Year:yy)$(DayOfYear)
 trigger: { branches: { include: [master] } }
-pr: { branches: { include: [master] }, paths: { include: "Audacia.Templates.ClassLibrary" } }
+pr: { branches: { include: [master] } }
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build.Templates } ] }
 
 schedules:
