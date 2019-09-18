@@ -13,31 +13,9 @@ stages:
   - stage: Build
     displayName: Build
     jobs:
-    - job: Build
-      pool: { vmImage: windows-latest }
-      steps:
-      - template: /steps/netcore/version.yaml@templates
-
-      - template: /steps/netcore/restore.yaml@templates
-        parameters: { projects: '**/*.csproj' }
-
-      - template: /steps/netcore/build.yaml@templates
-        parameters: { projects: '**/*.csproj' }
-
-      - template: /steps/netcore/test.yaml@templates
-        parameters: { projects: '**/*.csproj' }
-
-      - task: NuGetCommand@2
-        displayName: Pack
-        inputs:
-          command: 'pack'
-          configuration: 'release'
-          packagesToPack: '$(Build.SourcesDirectory)/**/*.csproj'
-          versioningScheme: 'off'
-
-      - template: /steps/package/publish.yaml@templates
+    - template: jobs/build/netcore/package.yaml@templates
 
   - stage:
     displayName: Release
     jobs:
-      - template: jobs/release/netcore/internal-package.yaml@templates
+    - template: jobs/release/netcore/internal-package.yaml@templates
