@@ -30,7 +30,7 @@ stages:
       - task: NuGetCommand@2
         displayName: Pack
         inputs:
-          command: 'pack -IncludeReferencedProjects'
+          command: 'pack'
           configuration: 'release'
           packagesToPack: '$(Build.SourcesDirectory)/**/*.csproj'
           versioningScheme: 'off'
