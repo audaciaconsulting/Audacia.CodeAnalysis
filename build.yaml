@@ -13,7 +13,28 @@ stages:
   - stage: Build
     displayName: Build
     jobs:
-      - template: jobs/build/netcore/package.yaml@templates
+    - job: Build
+      steps:
+      - template: /steps/netcore/version.yaml@templates
+
+      - template: /steps/netcore/restore.yaml@templates
+        parameters: { projects: '**/*.csproj' }
+
+      - template: /steps/netcore/build.yaml@templates
+        parameters: { projects: '**/*.csproj' }
+
+      - template: /steps/netcore/test.yaml@templates
+        parameters: { projects: '**/*.csproj' }
+
+      - task: NuGetCommand@2
+        displayName: Pack
+        inputs:
+          command: 'pack -IncludeReferencedProjects'
+          configuration: 'release'
+          packagesToPack: '$(Build.SourcesDirectory)/**/*.csproj'
+          versioningScheme: 'off'
+
+      - template: /steps/package/publish.yaml@templates
 
   - stage:
     displayName: Release
