@@ -12,9 +12,9 @@ stages:
 
   - stage: Build
     displayName: Build
-    pool: { vmImage: windows-latest }
     jobs:
     - job: Build
+      pool: { vmImage: windows-latest }
       steps:
       - template: /steps/netcore/version.yaml@templates
 
@@ -39,6 +39,5 @@ stages:
 
   - stage:
     displayName: Release
-    pool: { vmImage: windows-latest }
     jobs:
       - template: jobs/release/netcore/internal-package.yaml@templates
