@@ -6,15 +6,19 @@
     <Description>Code analysis packages and .</Description>
     <Copyright>Copyright © Audacia 2019</Copyright>
     <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
-    <CodeAnalysisRuleSet>Audacia.Seed.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59" />
+    <PackageReference Include="IDisposableAnalyzers" Version="2.1.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4" />
+    <PackageReference Include="ReflectionAnalyzers" Version="0.1.20-dev" />
     <PackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="1.0.0-beta" />
     <PackageReference Include="SecurityCodeScan" Version="3.3.0" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.66" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Audacia.CodeAnalysis.ruleset" />
+    <Content Include="CodeAnalysis.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assemblies\Roslynator.Common.dll">
