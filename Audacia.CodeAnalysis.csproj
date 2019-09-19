@@ -17,6 +17,40 @@
     <Content Include="Audacia.CodeAnalysis.ruleset" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assemblies\Roslynator.Common.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="Assemblies\Roslynator.Core.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="Assemblies\Roslynator.CSharp.Analyzers.CodeFixes.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="Assemblies\Roslynator.CSharp.Analyzers.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="Assemblies\Roslynator.CSharp.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="Assemblies\Roslynator.CSharp.Workspaces.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="Assemblies\Roslynator.Workspaces.Common.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="Assemblies\Roslynator.Workspaces.Core.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Roslynator.Common, Version=2.1.2.0, Culture=neutral, PublicKeyToken=c84d3703b9146940">
       <HintPath>Assemblies\Roslynator.Common.dll</HintPath>
     </Reference>
