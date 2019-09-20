@@ -347,4 +347,319 @@
 		<Rule Id="SCS0032" Action="Warning" /><!-- [SECURITY] The minimal length of a password is recommended to be set at least to 8. -->
 		<Rule Id="SCS0033" Action="Warning" /><!-- [SECURITY] PasswordValidator should have at least two requirements for better security (RequiredLength, RequireDigit, RequireLowercase, RequireUppercase and/or RequireNonLetterOrDigit). -->
 	</Rules>
+
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+		<Rule Id="SA1000" Action="Warning" /><!-- The spacing around a C# keyword is incorrect. -->
+		<Rule Id="SA1001" Action="Warning" /><!-- The spacing around a comma is incorrect, within a C# code file. -->
+		<Rule Id="SA1002" Action="Warning" /><!-- The spacing around a semicolon is incorrect, within a C# code file. -->
+		<Rule Id="SA1003" Action="Warning" /><!-- The spacing around an operator symbol is incorrect, within a C# code file. -->
+		<Rule Id="SA1004" Action="Warning" /><!-- A line within a documentation header above a C# element does not begin with a single space. -->
+		<Rule Id="SA1005" Action="Warning" /><!-- A single-line comment within a C# code file does not begin with a single space. -->
+		<Rule Id="SA1006" Action="Warning" /><!-- A C# preprocessor-type keyword is preceded by space. -->
+		<Rule Id="SA1007" Action="Warning" /><!-- The operator keyword within a C# operator overload method is not followed by any whitespace. -->
+		<Rule Id="SA1008" Action="Warning" /><!-- An opening parenthesis within a C# statement is not spaced correctly. -->
+		<Rule Id="SA1009" Action="Warning" /><!-- A closing parenthesis within a C# statement is not spaced correctly. -->
+		<Rule Id="SA1010" Action="Warning" /><!-- An opening square bracket within a C# statement is not spaced correctly. -->
+		<Rule Id="SA1011" Action="Warning" /><!-- A closing square bracket within a C# statement is not spaced correctly. -->
+		<Rule Id="SA1012" Action="Warning" /><!-- An opening brace within a C# element is not spaced correctly. -->
+		<Rule Id="SA1013" Action="Warning" /><!-- A closing brace within a C# element is not spaced correctly. -->
+		<Rule Id="SA1014" Action="Warning" /><!-- An opening generic bracket within a C# element is not spaced correctly. -->
+		<Rule Id="SA1015" Action="Warning" /><!-- A closing generic bracket within a C# element is not spaced correctly. -->
+		<Rule Id="SA1016" Action="Warning" /><!-- An opening attribute bracket within a C# element is not spaced correctly. -->
+		<Rule Id="SA1017" Action="Warning" /><!-- A closing attribute bracket within a C# element is not spaced correctly. -->
+		<Rule Id="SA1018" Action="Warning" /><!-- A nullable type symbol within a C# element is not spaced correctly. -->
+		<Rule Id="SA1019" Action="Warning" /><!-- The spacing around a member access symbol is incorrect, within a C# code file. -->
+		<Rule Id="SA1020" Action="Warning" /><!-- An increment or decrement symbol within a C# element is not spaced correctly. -->
+		<Rule Id="SA1021" Action="Warning" /><!-- A negative sign within a C# element is not spaced correctly. -->
+		<Rule Id="SA1022" Action="Warning" /><!-- A positive sign within a C# element is not spaced correctly. -->
+		<Rule Id="SA1023" Action="Warning" /><!-- A dereference symbol or an access-of symbol within a C# element is not spaced correctly. -->
+		<Rule Id="SA1024" Action="Warning" /><!-- A colon within a C# element is not spaced correctly. -->
+		<Rule Id="SA1025" Action="Warning" /><!-- The code contains multiple whitespace characters in a row. -->
+		<Rule Id="SA1026" Action="Warning" /><!-- An implicitly typed new array allocation within a C# code file is not spaced correctly. -->
+		<Rule Id="SA1027" Action="Warning" /><!-- The code contains a tab or space character which is not consistent with the current project settings. -->
+		<Rule Id="SA1028" Action="Warning" /><!-- A line of code ends with a space, tab, or other whitespace characters before the end of line character(s). -->
+	</Rules>
+
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+		<Rule Id="SA1100" Action="Warning" /><!-- A call to a member from an inherited class begins with `base.`, and the local class does not contain an override or implementation of the member. -->
+		<Rule Id="SA1101" Action="Hidden" /><!-- A call to an instance member of the local class or a base class is not prefixed with 'this.', within a C# code file. -->
+		<Rule Id="SA1102" Action="Warning" /><!-- A C# query clause does not begin on the same line as the previous clause, or on the next line. -->
+		<Rule Id="SA1103" Action="Warning" /><!-- The clauses within a C# query expression are not all placed on the same line, and each clause is not placed on its own line. -->
+		<Rule Id="SA1104" Action="Warning" /><!-- A clause within a C# query expression begins on the same line as the previous clause, when the previous clause spans across multiple lines. -->
+		<Rule Id="SA1105" Action="Warning" /><!-- A clause within a C# query expression spans across multiple lines, and does not begin on its own line. -->
+		<Rule Id="SA1106" Action="Warning" /><!-- The C# code contains an extra semicolon. -->
+		<Rule Id="SA1107" Action="Warning" /><!-- The C# code contains more than one statement on a single line. -->
+		<Rule Id="SA1108" Action="Warning" /><!-- A C# statement contains a comment between the declaration of the statement and the opening brace of the statement. -->
+		<Rule Id="SA1109" Action="Warning" /><!-- A C# statement contains a region tag between the declaration of the statement and the opening brace of the statement. -->
+		<Rule Id="SA1110" Action="Warning" /><!-- The opening parenthesis or bracket in a call to a C# method or indexer, or the declaration of a method or indexer, is not placed on the same line as the method or indexer name. -->
+		<Rule Id="SA1111" Action="Warning" /><!-- The closing parenthesis or bracket in a call to a C# method or indexer, or the declaration of a method or indexer, is not placed on the same line as the last parameter. -->
+		<Rule Id="SA1112" Action="Warning" /><!-- The closing parenthesis or bracket in a call to a C# method or indexer, or the declaration of a method or indexer, is not placed on the same line as the opening bracket when the element does not take any parameters. -->
+		<Rule Id="SA1113" Action="Warning" /><!-- A comma between two parameters in a call to a C# method or indexer, or in the declaration of a method or indexer, is not placed on the same line as the previous parameter. -->
+		<Rule Id="SA1114" Action="Warning" /><!-- The start of the parameter list for a method or indexer call or declaration does not begin on the same line as the opening bracket, or on the line after the opening bracket. -->
+		<Rule Id="SA1115" Action="Warning" /><!-- A parameter within a C# method or indexer call or declaration does not begin on the same line as the previous parameter, or on the next line. -->
+		<Rule Id="SA1116" Action="Warning" /><!-- The parameters to a C# method or indexer call or declaration span across multiple lines, but the first parameter does not start on the line after the opening bracket. -->
+		<Rule Id="SA1117" Action="Warning" /><!-- The parameters to a C# method or indexer call or declaration are not all on the same line or each on a separate line. -->
+		<Rule Id="SA1118" Action="Warning" /><!-- A parameter to a C# method or indexer, other than the first parameter, spans across multiple lines. -->
+		<Rule Id="SA1120" Action="Warning" /><!-- The C# comment does not contain any comment text. -->
+		<Rule Id="SA1121" Action="Warning" /><!-- The code uses one of the basic C# types, but does not use the built-in alias for the type. -->
+		<Rule Id="SA1122" Action="Warning" /><!-- The C# code includes an empty string, written as `"`. -->
+		<Rule Id="SA1123" Action="Warning" /><!-- The C# code contains a region within the body of a code element. -->
+		<Rule Id="SA1124" Action="Warning" /><!-- The C# code contains a region. -->
+		<Rule Id="SA1125" Action="Warning" /><!-- The Nullable type has been defined not using the C# shorthand. -->
+		<Rule Id="SA1126" Action="Hidden" /><!-- A call to a member is not prefixed with the 'this.', 'base.', 'object.' or 'typename.' prefix to indicate the intended method call, within a C# code file. -->
+		<Rule Id="SA1127" Action="Hidden" /><!-- A generic constraint on a type or method declaration is on the same line as the declaration, within a C# code file. -->
+		<Rule Id="SA1128" Action="Hidden" /><!-- A constructor initializer is on the same line as the constructor declaration, within a C# code file. -->
+		<Rule Id="SA1129" Action="Warning" /><!-- A value type was constructed using the syntax `new T()`. -->
+		<Rule Id="SA1130" Action="Warning" /><!-- An anonymous method was declared using the form `delegate (parameters) { }`, when a lambda expression would provide equivalent behavior with the syntax `(parameters) => { }`. -->
+		<Rule Id="SA1131" Action="Warning" /><!-- A comparison was made between a variable and a literal or constant value, and the variable appeared on the right-hand side of the expression. -->
+		<Rule Id="SA1132" Action="Warning" /><!-- Two or more fields were declared in the same field declaration syntax. -->
+		<Rule Id="SA1133" Action="Hidden" /><!-- Two or more attributes appeared within the same set of square brackets. -->
+		<Rule Id="SA1134" Action="Warning" /><!-- An attribute is placed on the same line of code as another attribute or element. -->
+		<Rule Id="SA1135" Action="Hidden" /><!-- A using directive is not qualified. -->
+		<Rule Id="SA1136" Action="Hidden" /><!-- Multiple enum values are placed on the same line of code. -->
+		<Rule Id="SA1137" Action="Warning" /><!-- Two sibling elements which each start on their own line have different levels of indentation. -->
+		<Rule Id="SA1139" Action="Warning" /><!-- Use literal suffix notation instead of casting. -->
+		<Rule Id="SA1141" Action="Warning" /><!-- Use tuple syntax instead of the underlying ValueTuple implementation type. -->
+		<Rule Id="SA1142" Action="Warning" /><!-- An element of a tuple was referenced by its metadata name when an element name is available. -->
+	</Rules>
+
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+		<Rule Id="SA1200" Action="Hidden" /><!-- A C# using directive is placed outside of a namespace element. -->
+		<Rule Id="SA1201" Action="Warning" /><!-- An element within a C# code file is out of order in relation to the other elements in the code. -->
+		<Rule Id="SA1202" Action="Warning" /><!-- An element within a C# code file is out of order within regard to access level, in relation to other elements in the code. -->
+		<Rule Id="SA1203" Action="Warning" /><!-- A constant field is placed beneath a non-constant field. -->
+		<Rule Id="SA1204" Action="Warning" /><!-- A static element is positioned beneath an instance element of the same type. -->
+		<Rule Id="SA1205" Action="Warning" /><!-- The partial element does not have an access modifier defined. -->
+		<Rule Id="SA1206" Action="Warning" /><!-- The keywords within the declaration of an element do not follow a standard ordering scheme. -->
+		<Rule Id="SA1207" Action="Warning" /><!-- The keyword *protected* is positioned after the keyword *internal* within the declaration of a protected internal C# element. -->
+		<Rule Id="SA1208" Action="Warning" /><!-- A using directive which declares a member of the *System* namespace appears after a using directive which declares a member of a different namespace, within a C# code file. -->
+		<Rule Id="SA1209" Action="Warning" /><!-- A using-alias directive is positioned before a regular using directive. -->
+		<Rule Id="SA1210" Action="Warning" /><!-- The using directives within a C# code file are not sorted alphabetically by namespace. -->
+		<Rule Id="SA1211" Action="Warning" /><!-- The using-alias directives within a C# code file are not sorted alphabetically by alias name. -->
+		<Rule Id="SA1212" Action="Warning" /><!-- A get accessor appears after a set accessor within a property or indexer. -->
+		<Rule Id="SA1213" Action="Warning" /><!-- An add accessor appears after a remove accessor within an event. -->
+		<Rule Id="SA1214" Action="Warning" /><!-- A readonly field is positioned beneath a non-readonly field. -->
+		<Rule Id="SA1215" Action="Warning" /><!-- An instance readonly element is positioned beneath an instance non-readonly element of the same type. -->
+		<Rule Id="SA1216" Action="Warning" /><!-- A `using static` directive is positioned at the wrong location (before a regular using directive or after an alias using directive). -->
+		<Rule Id="SA1217" Action="Warning" /><!-- The `using static` directives within a C# code file are not sorted alphabetically by full type name. -->
+	</Rules>
+
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+		<Rule Id="SA1300" Action="Warning" /><!-- The name of a C# element does not begin with an upper-case letter. -->
+		<Rule Id="SA1301" Action="Hidden" /><!-- There are currently no situations in which this rule will fire. -->
+		<Rule Id="SA1302" Action="Warning" /><!-- The name of a C# interface does not begin with the capital letter I. -->
+		<Rule Id="SA1303" Action="Warning" /><!-- The name of a constant C# field should begin with an upper-case letter. -->
+		<Rule Id="SA1304" Action="Warning" /><!-- The name of a non-private readonly C# field should being with an upper-case letter. -->
+		<Rule Id="SA1305" Action="Warning" /><!-- The name of a field or variable in C# uses Hungarian notation. -->
+		<Rule Id="SA1306" Action="Warning" /><!-- The name of a field in C# does not begin with a lower-case letter. -->
+		<Rule Id="SA1307" Action="Warning" /><!-- The name of a public or internal field in C# does not begin with an upper-case letter. -->
+		<Rule Id="SA1308" Action="Warning" /><!-- A field name in C# is prefixed with *m_* or *s_*. -->
+		<Rule Id="SA1309" Action="Hidden" /><!-- A field name in C# begins with an underscore. -->
+		<Rule Id="SA1310" Action="Warning" /><!-- A field name in C# contains an underscore. -->
+		<Rule Id="SA1311" Action="Warning" /><!-- The name of a static readonly field does not begin with an upper-case letter. -->
+		<Rule Id="SA1312" Action="Warning" /><!-- The name of a variable in C# does not begin with a lower-case letter. -->
+		<Rule Id="SA1313" Action="Warning" /><!-- The name of a parameter in C# does not begin with a lower-case letter. -->
+		<Rule Id="SA1314" Action="Warning" /><!-- The name of a C# type parameter does not begin with the capital letter T. -->
+		<Rule Id="SA1316" Action="Warning" /><!-- Element names within a tuple type should have the correct casing. -->
+	</Rules>
+
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+		<Rule Id="SA1119" Action="Warning" /><!-- A C# statement contains parenthesis which are unnecessary and should be removed. -->
+		<Rule Id="SA1400" Action="Warning" /><!-- The access modifier for a C# element has not been explicitly defined. -->
+		<Rule Id="SA1401" Action="Warning" /><!-- A field within a C# class has an access modifier other than private. -->
+		<Rule Id="SA1402" Action="Warning" /><!-- A C# code file contains more than one unique type. -->
+		<Rule Id="SA1403" Action="Warning" /><!-- A C# code file contains more than one namespace. -->
+		<Rule Id="SA1404" Action="Warning" /><!-- A Code Analysis SuppressMessage attribute does not include a justification. -->
+		<Rule Id="SA1405" Action="Warning" /><!-- A call to Debug.Assert in C# code does not include a descriptive message. -->
+		<Rule Id="SA1406" Action="Warning" /><!-- A call to Debug.Fail in C# code does not include a descriptive message. -->
+		<Rule Id="SA1407" Action="Hidden" /><!-- A C# statement contains a complex arithmetic expression which omits parenthesis around operators. -->
+		<Rule Id="SA1408" Action="Hidden" /><!-- A C# statement contains a complex conditional expression which omits parenthesis around operators. -->
+		<Rule Id="SA1409" Action="Warning" /><!-- A C# file contains code which is unnecessary and can be removed without changing the overall logic of the code. -->
+		<Rule Id="SA1410" Action="Warning" /><!-- A call to a C# anonymous method does not contain any method parameters, yet the statement still includes parenthesis. -->
+		<Rule Id="SA1411" Action="Warning" /><!-- An attribute declaration does not contain any parameters, yet it still includes parenthesis. -->
+		<Rule Id="SA1412" Action="Hidden" /><!-- The encoding of the file is not UTF-8 with byte order mark. -->
+		<Rule Id="SA1413" Action="Hidden" /><!-- A multi-line initializer should use a comma on the last item. -->
+		<Rule Id="SA1414" Action="Warning" /><!-- Tuple types appearing in member declarations should have explicitly named tuple elements. -->
+	</Rules>
+
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+		<Rule Id="SA1500" Action="Warning" /><!-- The opening or closing brace within a C# statement, element, or expression is not placed on its own line. -->
+		<Rule Id="SA1501" Action="Hidden" /><!-- A C# statement containing opening and closing braces is written completely on a single line. -->
+		<Rule Id="SA1502" Action="Hidden" /><!-- A C# element containing opening and closing braces is written completely on a single line. -->
+		<Rule Id="SA1503" Action="Hidden" /><!-- The opening and closing braces for a C# statement have been omitted. -->
+		<Rule Id="SA1504" Action="Hidden" /><!-- Within a C# property, indexer or event, at least one of the child accessors is written on a single line, and at least one of the child accessors is written across multiple lines. -->
+		<Rule Id="SA1505" Action="Warning" /><!-- An opening brace within a C# element, statement, or expression is followed by a blank line. -->
+		<Rule Id="SA1506" Action="Warning" /><!-- An element documentation header above a C# element is followed by a blank line. -->
+		<Rule Id="SA1507" Action="Warning" /><!-- The C# code contains multiple blank lines in a row. -->
+		<Rule Id="SA1508" Action="Warning" /><!-- A closing brace within a C# element, statement, or expression is preceded by a blank line. -->
+		<Rule Id="SA1509" Action="Warning" /><!-- An opening brace within a C# element, statement, or expression is preceded by a blank line. -->
+		<Rule Id="SA1510" Action="Warning" /><!-- Chained C# statements are separated by a blank line. -->
+		<Rule Id="SA1511" Action="Warning" /><!-- The while footer at the bottom of a do-while statement is separated from the statement by a blank line. -->
+		<Rule Id="SA1512" Action="Warning" /><!-- A single-line comment within C# code is followed by a blank line. -->
+		<Rule Id="SA1513" Action="Warning" /><!-- A closing brace within a C# element, statement, or expression is not followed by a blank line. -->
+		<Rule Id="SA1514" Action="Warning" /><!-- An element documentation header above a C# element is not preceded by a blank line. -->
+		<Rule Id="SA1515" Action="Warning" /><!-- A single-line comment within C# code is not preceded by a blank line. -->
+		<Rule Id="SA1516" Action="Warning" /><!-- Adjacent C# elements are not separated by a blank line. -->
+		<Rule Id="SA1517" Action="Warning" /><!-- The code file has blank lines at the start. -->
+		<Rule Id="SA1518" Action="Warning" /><!-- The line endings at the end of a file do not match the settings for the project. -->
+		<Rule Id="SA1519" Action="Warning" /><!-- The opening and closing braces for a multi-line C# statement have been omitted. -->
+		<Rule Id="SA1520" Action="Warning" /><!-- The opening and closing braces of a chained `if`/`else if`/`else` construct were included for some clauses, but omitted for others. -->
+	</Rules>
+
+	<Rules AnalyzerId="CompleteMe" RuleNamespace="CompleteMe">
+		<Rule Id="SA1600" Action="Warning" /><!-- A C# code element is missing a documentation header. -->
+		<Rule Id="SA1601" Action="Warning" /><!-- A C# partial element is missing a documentation header. -->
+		<Rule Id="SA1602" Action="Warning" /><!-- An item within a C# enumeration is missing an Xml documentation header. -->
+		<Rule Id="SA1603" Action="Warning" /><!-- The Xml within a C# element's document header is badly formed. -->
+		<Rule Id="SA1604" Action="Warning" /><!-- The Xml header documentation for a C# element is missing a `<summary>` tag. -->
+		<Rule Id="SA1605" Action="Warning" /><!-- The `<summary>` or `<content>` tag within the documentation header for a C# code element is missing or empty. -->
+		<Rule Id="SA1606" Action="Warning" /><!-- The `<summary>` tag within the documentation header for a C# code element is empty. -->
+		<Rule Id="SA1607" Action="Warning" /><!-- The `<summary>` or `<content>` tag within the documentation header for a C# code element is empty. -->
+		<Rule Id="SA1608" Action="Warning" /><!-- The `<summary>` tag within an element's Xml header documentation contains the default text generated by Visual Studio during the creation of the element. -->
+		<Rule Id="SA1609" Action="Hidden" /><!-- The Xml header documentation for a C# property does not contain a `<value>` tag. -->
+		<Rule Id="SA1610" Action="Hidden" /><!-- The Xml header documentation for a C# property contains an empty `<value>` tag. -->
+		<Rule Id="SA1611" Action="Hidden" /><!-- A C# method, constructor, delegate or indexer element is missing documentation for one or more of its parameters. -->
+		<Rule Id="SA1612" Action="Warning" /><!-- The documentation describing the parameters to a C# method, constructor, delegate or indexer element does not match the actual parameters on the element. -->
+		<Rule Id="SA1613" Action="Warning" /><!-- A `<param>` tag within a C# element's documentation header is missing a name attribute containing the name of the parameter. -->
+		<Rule Id="SA1614" Action="Warning" /><!-- A `<param>` tag within a C# element's documentation header is empty. -->
+		<Rule Id="SA1615" Action="Hidden" /><!-- A C# element is missing documentation for its return value. -->
+		<Rule Id="SA1616" Action="Warning" /><!-- The `<returns>` tag within a C# element's documentation header is empty. -->
+		<Rule Id="SA1617" Action="Warning" /><!-- A C# code element does not contain a return value, or returns void, but the documentation header for the element contains a `<returns>` tag. -->
+		<Rule Id="SA1618" Action="Hidden" /><!-- A generic C# element is missing documentation for one or more of its generic type parameters. -->
+		<Rule Id="SA1619" Action="Hidden" /><!-- A generic, partial C# element is missing documentation for one or more of its generic type parameters, and the documentation for the element contains a `<summary>` tag. -->
+		<Rule Id="SA1620" Action="Warning" /><!-- The `<typeparam>` tags within the Xml header documentation for a generic C# element do not match the generic type parameters on the element. -->
+		<Rule Id="SA1621" Action="Warning" /><!-- A `<typeparam>` tag within the Xml header documentation for a generic C# element is missing a name attribute, or contains an empty name attribute. -->
+		<Rule Id="SA1622" Action="Warning" /><!-- A `<typeparam>` tag within the Xml header documentation for a generic C# element is empty. -->
+		<Rule Id="SA1623" Action="Hidden" /><!-- The documentation text within a C# property's `<summary>` tag does not match the accessors within the property. -->
+		<Rule Id="SA1624" Action="Hidden" /><!-- The documentation text within a C# property's `<summary>` tag takes into account all of the accessors within the property, but one of the accessors has limited access. -->
+		<Rule Id="SA1625" Action="Warning" /><!-- The Xml documentation for a C# element contains two or more identical entries, indicating that the documentation has been copied and pasted. -->
+		<Rule Id="SA1626" Action="Warning" /><!-- The C# code contains a single-line comment which begins with three forward slashes in a row. -->
+		<Rule Id="SA1627" Action="Warning" /><!-- The Xml header documentation for a C# code element contains an empty tag. -->
+		<Rule Id="SA1628" Action="Warning" /><!-- A section of the Xml header documentation for a C# element does not begin with a capital letter. -->
+		<Rule Id="SA1629" Action="Warning" /><!-- A section of the Xml header documentation for a C# element does not end with a period (also known as a full stop). -->
+		<Rule Id="SA1630" Action="Warning" /><!-- A section of the Xml header documentation for a C# element does not contain any whitespace between words. -->
+		<Rule Id="SA1631" Action="Warning" /><!-- A section of the Xml header documentation for a C# element does not contain enough alphabetic characters. -->
+		<Rule Id="SA1632" Action="Hidden" /><!-- From StyleCop 4.5 this rule is disabled by default. -->
+		<Rule Id="SA1633" Action="Hidden" /><!-- A C# code file is missing a standard file header. -->
+		<Rule Id="SA1634" Action="Hidden" /><!-- The file header at the top of a C# code file is missing a copyright tag. -->
+		<Rule Id="SA1635" Action="Hidden" /><!-- The file header at the top of a C# code file is missing copyright text. -->
+		<Rule Id="SA1636" Action="Hidden" /><!-- The file header at the top of a C# code file does not contain the appropriate copyright text. -->
+		<Rule Id="SA1637" Action="Hidden" /><!-- The file header at the top of a C# code file is missing the file name. -->
+		<Rule Id="SA1638" Action="Hidden" /><!-- The file tag within the file header at the top of a C# code file does not contain the name of the file. -->
+		<Rule Id="SA1639" Action="Hidden" /><!-- The file header at the top of a C# code file does not contain a filled-in summary tag. -->
+		<Rule Id="SA1640" Action="Hidden" /><!-- The file header at the top of a C# code file does not contain company name text. -->
+		<Rule Id="SA1641" Action="Hidden" /><!-- The file header at the top of a C# code file does not contain the appropriate company name text. -->
+		<Rule Id="SA1642" Action="Warning" /><!-- The XML documentation header for a C# constructor does not contain the appropriate summary text. -->
+		<Rule Id="SA1643" Action="Warning" /><!-- The Xml documentation header for a C# finalizer does not contain the appropriate summary text. -->
+		<Rule Id="SA1644" Action="Warning" /><!-- A section within the Xml documentation header for a C# element contains blank lines. -->
+		<Rule Id="SA1645" Action="Warning" /><!-- An included Xml documentation file does not exist. -->
+		<Rule Id="SA1646" Action="Warning" /><!-- An included Xml documentation link contains an invalid path. -->
+		<Rule Id="SA1647" Action="Warning" /><!-- An include tag within an Xml documentation header does not contain valid file and path attribute. -->
+		<Rule Id="SA1648" Action="Warning" /><!-- `<inheritdoc>` has been used on an element that doesn't inherit from a base class or implement an interface. -->
+		<Rule Id="SA1649" Action="Warning" /><!-- The file name of a C# code file does not match the first type declared in the file. -->
+		<Rule Id="SA1650" Action="Warning" /><!-- The element documentation for the element contains one or more spelling mistakes or unrecognized words. -->
+		<Rule Id="SA1651" Action="Warning" /><!-- The documentation for the element contains one or more `<placeholder>` elements. -->
+		<Rule Id="SA1652" Action="Hidden" /><!-- This rule was moved to [SA0001](SA0001.md) -->
+	</Rules>
+	
+	<Rules AnalyzerId="ReflectionAnalyzers" RuleNamespace="ReflectionAnalyzers">
+		<Rule Id="REFL001" Action="Warning" /><!-- Cast return value to the correct type. -->
+		<Rule Id="REFL002" Action="Warning" /><!-- Discard the return value. -->
+		<Rule Id="REFL003" Action="Warning" /><!-- The member does not exist. -->
+		<Rule Id="REFL004" Action="Warning" /><!-- More than one member is matching the criteria. -->
+		<Rule Id="REFL005" Action="Warning" /><!-- There is no member matching the filter. -->
+		<Rule Id="REFL006" Action="Warning" /><!-- The binding flags can be more precise. -->
+		<Rule Id="REFL007" Action="Warning" /><!-- The binding flags are not in the expected order. -->
+		<Rule Id="REFL008" Action="Warning" /><!-- Specify binding flags for better performance and less fragile code. -->
+		<Rule Id="REFL009" Action="Warning" /><!-- The referenced member is not known to exist. -->
+		<Rule Id="REFL010" Action="Warning" /><!-- Prefer the generic extension method GetCustomAttribute<T>. -->
+		<Rule Id="REFL011" Action="Warning" /><!-- Duplicate BindingFlag. -->
+		<Rule Id="REFL012" Action="Warning" /><!-- Prefer Attribute.IsDefined(). -->
+		<Rule Id="REFL013" Action="Warning" /><!-- The member is of the wrong type. -->
+		<Rule Id="REFL014" Action="Warning" /><!-- Prefer GetMember().AccessorMethod. -->
+		<Rule Id="REFL015" Action="Warning" /><!-- Use the containing type. -->
+		<Rule Id="REFL016" Action="Warning" /><!-- Use nameof. -->
+		<Rule Id="REFL017" Action="Warning" /><!-- Don't use name of wrong member. -->
+		<Rule Id="REFL018" Action="Warning" /><!-- The member is explicitly implemented. -->
+		<Rule Id="REFL019" Action="Warning" /><!-- No member matches the types. -->
+		<Rule Id="REFL020" Action="Warning" /><!-- More than one interface is matching the name. -->
+		<Rule Id="REFL022" Action="Warning" /><!-- Use fully qualified name. -->
+		<Rule Id="REFL023" Action="Warning" /><!-- The type does not implement the interface. -->
+		<Rule Id="REFL024" Action="Warning" /><!-- Prefer null over empty array. -->
+		<Rule Id="REFL025" Action="Warning" /><!-- Use correct arguments. -->
+		<Rule Id="REFL026" Action="Warning" /><!-- No parameterless constructor defined for this object. -->
+		<Rule Id="REFL027" Action="Warning" /><!-- Prefer Type.EmptyTypes. -->
+		<Rule Id="REFL028" Action="Warning" /><!-- Cast return value to correct type. -->
+		<Rule Id="REFL029" Action="Warning" /><!-- Specify types in case an overload is added in the future. -->
+		<Rule Id="REFL030" Action="Warning" /><!-- Use correct obj parameter. -->
+		<Rule Id="REFL031" Action="Warning" /><!-- Use generic arguments that satisfies the type parameters. -->
+		<Rule Id="REFL032" Action="Warning" /><!-- The dependency does not exist. -->
+		<Rule Id="REFL033" Action="Warning" /><!-- Use the same type as the parameter. -->
+		<Rule Id="REFL034" Action="Warning" /><!-- Don't call MakeGeneric when not a generic definition. -->
+		<Rule Id="REFL035" Action="Warning" /><!-- Don't call Invoke on a generic definition. -->
+		<Rule Id="REFL036" Action="Warning" /><!-- Pass 'throwOnError: true' or check if null. -->
+		<Rule Id="REFL037" Action="Warning" /><!-- The type does not exist. -->
+		<Rule Id="REFL038" Action="Warning" /><!-- Prefer RuntimeHelpers.RunClassConstructor. -->
+		<Rule Id="REFL039" Action="Warning" /><!-- Prefer typeof(...) over instance.GetType when the type is sealed. -->
+		<Rule Id="REFL040" Action="Warning" /><!-- Prefer type.IsInstanceOfType(...). -->
+		<Rule Id="REFL041" Action="Warning" /><!-- Delegate type is not matching. -->
+		<Rule Id="REFL042" Action="Warning" /><!-- First argument must be reference type. -->
+		<Rule Id="REFL043" Action="Warning" /><!-- First argument must match type. -->
+		<Rule Id="REFL044" Action="Warning" /><!-- Expected attribute type. -->
+		<Rule Id="REFL045" Action="Warning" /><!-- These flags are insufficient to match any members. -->
+		<Rule Id="REFL046" Action="Warning" /><!-- The specified default member does not exist. -->
+	</Rules>
+
+	<Rules AnalyzerId="IDisposableAnalyzers" RuleNamespace="IDisposableAnalyzers">
+		<Rule Id="IDISP001" Action="Warning" /><!-- Dispose created. -->
+		<Rule Id="IDISP002" Action="Warning" /><!-- Dispose member. -->
+		<Rule Id="IDISP003" Action="Warning" /><!-- Dispose previous before re-assigning. -->
+		<Rule Id="IDISP004" Action="Warning" /><!-- Don't ignore created IDisposable. -->
+		<Rule Id="IDISP005" Action="Warning" /><!-- Return type should indicate that the value should be disposed. -->
+		<Rule Id="IDISP006" Action="Warning" /><!-- Implement IDisposable. -->
+		<Rule Id="IDISP007" Action="Warning" /><!-- Don't dispose injected. -->
+		<Rule Id="IDISP008" Action="Warning" /><!-- Don't assign member with injected and created disposables. -->
+		<Rule Id="IDISP009" Action="Warning" /><!-- Add IDisposable interface. -->
+		<Rule Id="IDISP010" Action="Warning" /><!-- Call base.Dispose(disposing) -->
+		<Rule Id="IDISP011" Action="Warning" /><!-- Don't return disposed instance. -->
+		<Rule Id="IDISP012" Action="Warning" /><!-- Property should not return created disposable. -->
+		<Rule Id="IDISP013" Action="Warning" /><!-- Await in using. -->
+		<Rule Id="IDISP014" Action="Warning" /><!-- Use a single instance of HttpClient. -->
+		<Rule Id="IDISP015" Action="Warning" /><!-- Member should not return created and cached instance. -->
+		<Rule Id="IDISP016" Action="Warning" /><!-- Don't use disposed instance. -->
+		<Rule Id="IDISP017" Action="Warning" /><!-- Prefer using. -->
+		<Rule Id="IDISP018" Action="Warning" /><!-- Call SuppressFinalize. -->
+		<Rule Id="IDISP019" Action="Warning" /><!-- Call SuppressFinalize. -->
+		<Rule Id="IDISP020" Action="Warning" /><!-- Call SuppressFinalize with this. -->
+		<Rule Id="IDISP021" Action="Warning" /><!-- Call this.Dispose(true). -->
+		<Rule Id="IDISP022" Action="Warning" /><!-- Call this.Dispose(false). -->
+		<Rule Id="IDISP023" Action="Warning" /><!-- Don't use reference types in finalizer context. -->
+	</Rules>
+
+	<Rules AnalyzerId="DocumentationAnalyzers" RuleNamespace="DocumentationAnalyzers">
+		<Rule Id="DOC200" Action="Warning" /><!-- The documentation for the element an HTML element equivalent to a known XML documentation element. -->
+		<Rule Id="DOC201" Action="Warning" /><!-- The documentation for an `<item>` within a `<list>` did not include the required `<term>` and/or `<description>` elements. -->
+		<Rule Id="DOC202" Action="Warning" /><!-- The documentation contains a section element where a block or inline element was expected. -->
+		<Rule Id="DOC203" Action="Warning" /><!-- The documentation contains a block element where a section or inline element was expected. -->
+		<Rule Id="DOC204" Action="Warning" /><!-- The documentation contains an inline element where a section or block element was expected. -->
+		<Rule Id="DOC207" Action="Warning" /><!-- The documentation contains a `<see langword="..."/>` element with an unrecognized keyword. -->
+		<Rule Id="DOC209" Action="Warning" /><!-- The documentation contains a `<see href="..."/>` element with an unrecognized URI. -->
+	</Rules>
+
+	<Rules AnalyzerId="AspNetCoreAnalyzers" RuleNamespace="AspNetCoreAnalyzers">
+		<Rule Id="ASP001" Action="Warning" /><!-- Parameter name does not match the name specified by the route parameter. -->
+		<Rule Id="ASP002" Action="Warning" /><!-- Route parameter name does not match the method parameter name. -->
+		<Rule Id="ASP003" Action="Warning" /><!-- Parameter type does not match the type specified by the name specified by the route parameter. -->
+		<Rule Id="ASP004" Action="Warning" /><!-- Route parameter type does not match the method parameter type. -->
+		<Rule Id="ASP005" Action="Warning" /><!-- Syntax error in parameter. -->
+		<Rule Id="ASP006" Action="Warning" /><!-- Escape constraint regex. -->
+		<Rule Id="ASP007" Action="Warning" /><!-- The method has no corresponding parameter. -->
+		<Rule Id="ASP008" Action="Warning" /><!-- Invalid route parameter name. -->
+		<Rule Id="ASP009" Action="Warning" /><!-- Use kebab-cased urls. -->
+		<Rule Id="ASP010" Action="Warning" /><!-- Unexpected character in url. -->
+		<Rule Id="ASP011" Action="Warning" /><!-- Route parameter appears more than once. -->
+		<Rule Id="ASP012" Action="Warning" /><!-- Don't use [controller]. -->
+		<Rule Id="ASP013" Action="Warning" /><!-- Name the controller to match the route. -->
+	</Rules>
+	
 </RuleSet>
