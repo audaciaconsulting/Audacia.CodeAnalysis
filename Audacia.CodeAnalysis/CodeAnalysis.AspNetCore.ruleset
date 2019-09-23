@@ -6,28 +6,20 @@
 		<Rule Id="RCS1090" Action="Info"/><!-- [DESIGN] Call 'ConfigureAwait(false)' -->
 	</Rules>
 
-	<Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
-	</Rules>
-
-	<Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
-	</Rules>
-
-	<Rules AnalyzerId="SecurityCodeScan" RuleNamespace="SecurityCodeScan.Analyzers">
-	</Rules>
-
-	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
-	</Rules>
-
-	<Rules AnalyzerId="ReflectionAnalyzers" RuleNamespace="ReflectionAnalyzers">
-	</Rules>
-
-	<Rules AnalyzerId="IDisposableAnalyzers" RuleNamespace="IDisposableAnalyzers">
-	</Rules>
-
-	<Rules AnalyzerId="DocumentationAnalyzers" RuleNamespace="DocumentationAnalyzers">
-	</Rules>
-
 	<Rules AnalyzerId="AspNetCoreAnalyzers" RuleNamespace="AspNetCoreAnalyzers">
+		<Rule Id="ASP001" Action="Warning" /><!-- Parameter name does not match the name specified by the route parameter. -->
+		<Rule Id="ASP002" Action="Warning" /><!-- Route parameter name does not match the method parameter name. -->
+		<Rule Id="ASP003" Action="Warning" /><!-- Parameter type does not match the type specified by the name specified by the route parameter. -->
+		<Rule Id="ASP004" Action="Warning" /><!-- Route parameter type does not match the method parameter type. -->
+		<Rule Id="ASP005" Action="Warning" /><!-- Syntax error in parameter. -->
+		<Rule Id="ASP006" Action="Warning" /><!-- Escape constraint regex. -->
+		<Rule Id="ASP007" Action="Warning" /><!-- The method has no corresponding parameter. -->
+		<Rule Id="ASP008" Action="Warning" /><!-- Invalid route parameter name. -->
+		<Rule Id="ASP009" Action="Warning" /><!-- Use kebab-cased urls. -->
+		<Rule Id="ASP010" Action="Warning" /><!-- Unexpected character in url. -->
+		<Rule Id="ASP011" Action="Warning" /><!-- Route parameter appears more than once. -->
+		<Rule Id="ASP012" Action="Warning" /><!-- Don't use [controller]. -->
+		<Rule Id="ASP013" Action="Warning" /><!-- Name the controller to match the route. -->
 	</Rules>
 
 </RuleSet>
