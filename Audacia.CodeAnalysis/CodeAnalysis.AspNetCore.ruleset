@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Unit Test Rules" ToolsVersion="15.0">
+	<Include Path="CodeAnalysis.ruleset" Action="Default" />
+	
+	<Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp.Analyzers">
+		<Rule Id="RCS1090" Action="Info"/><!-- [DESIGN] Call 'ConfigureAwait(false)' -->
+	</Rules>
+
+	<Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+	</Rules>
+
+	<Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
+	</Rules>
+
+	<Rules AnalyzerId="SecurityCodeScan" RuleNamespace="SecurityCodeScan.Analyzers">
+	</Rules>
+
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+	</Rules>
+
+	<Rules AnalyzerId="ReflectionAnalyzers" RuleNamespace="ReflectionAnalyzers">
+	</Rules>
+
+	<Rules AnalyzerId="IDisposableAnalyzers" RuleNamespace="IDisposableAnalyzers">
+	</Rules>
+
+	<Rules AnalyzerId="DocumentationAnalyzers" RuleNamespace="DocumentationAnalyzers">
+	</Rules>
+
+	<Rules AnalyzerId="AspNetCoreAnalyzers" RuleNamespace="AspNetCoreAnalyzers">
+	</Rules>
+
+</RuleSet>
