@@ -378,9 +378,6 @@
 		<Rule Id="SA1026" Action="Warning" /><!-- An implicitly typed new array allocation within a C# code file is not spaced correctly. -->
 		<Rule Id="SA1027" Action="Warning" /><!-- The code contains a tab or space character which is not consistent with the current project settings. -->
 		<Rule Id="SA1028" Action="Warning" /><!-- A line of code ends with a space, tab, or other whitespace characters before the end of line character(s). -->
-	</Rules>
-
-	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
 		<Rule Id="SA1100" Action="Warning" /><!-- A call to a member from an inherited class begins with `base.`, and the local class does not contain an override or implementation of the member. -->
 		<Rule Id="SA1101" Action="Hidden" /><!-- A call to an instance member of the local class or a base class is not prefixed with 'this.', within a C# code file. -->
 		<Rule Id="SA1102" Action="Warning" /><!-- A C# query clause does not begin on the same line as the previous clause, or on the next line. -->
@@ -400,6 +397,7 @@
 		<Rule Id="SA1116" Action="Warning" /><!-- The parameters to a C# method or indexer call or declaration span across multiple lines, but the first parameter does not start on the line after the opening bracket. -->
 		<Rule Id="SA1117" Action="Warning" /><!-- The parameters to a C# method or indexer call or declaration are not all on the same line or each on a separate line. -->
 		<Rule Id="SA1118" Action="Warning" /><!-- A parameter to a C# method or indexer, other than the first parameter, spans across multiple lines. -->
+		<Rule Id="SA1119" Action="Warning" /><!-- A C# statement contains parenthesis which are unnecessary and should be removed. -->
 		<Rule Id="SA1120" Action="Warning" /><!-- The C# comment does not contain any comment text. -->
 		<Rule Id="SA1121" Action="Warning" /><!-- The code uses one of the basic C# types, but does not use the built-in alias for the type. -->
 		<Rule Id="SA1122" Action="Warning" /><!-- The C# code includes an empty string, written as `"`. -->
@@ -421,9 +419,6 @@
 		<Rule Id="SA1139" Action="Warning" /><!-- Use literal suffix notation instead of casting. -->
 		<Rule Id="SA1141" Action="Warning" /><!-- Use tuple syntax instead of the underlying ValueTuple implementation type. -->
 		<Rule Id="SA1142" Action="Warning" /><!-- An element of a tuple was referenced by its metadata name when an element name is available. -->
-	</Rules>
-
-	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
 		<Rule Id="SA1200" Action="Hidden" /><!-- A C# using directive is placed outside of a namespace element. -->
 		<Rule Id="SA1201" Action="Warning" /><!-- An element within a C# code file is out of order in relation to the other elements in the code. -->
 		<Rule Id="SA1202" Action="Warning" /><!-- An element within a C# code file is out of order within regard to access level, in relation to other elements in the code. -->
@@ -442,9 +437,6 @@
 		<Rule Id="SA1215" Action="Warning" /><!-- An instance readonly element is positioned beneath an instance non-readonly element of the same type. -->
 		<Rule Id="SA1216" Action="Warning" /><!-- A `using static` directive is positioned at the wrong location (before a regular using directive or after an alias using directive). -->
 		<Rule Id="SA1217" Action="Warning" /><!-- The `using static` directives within a C# code file are not sorted alphabetically by full type name. -->
-	</Rules>
-
-	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
 		<Rule Id="SA1300" Action="Warning" /><!-- The name of a C# element does not begin with an upper-case letter. -->
 		<Rule Id="SA1301" Action="Hidden" /><!-- There are currently no situations in which this rule will fire. -->
 		<Rule Id="SA1302" Action="Warning" /><!-- The name of a C# interface does not begin with the capital letter I. -->
@@ -461,10 +453,6 @@
 		<Rule Id="SA1313" Action="Warning" /><!-- The name of a parameter in C# does not begin with a lower-case letter. -->
 		<Rule Id="SA1314" Action="Warning" /><!-- The name of a C# type parameter does not begin with the capital letter T. -->
 		<Rule Id="SA1316" Action="Warning" /><!-- Element names within a tuple type should have the correct casing. -->
-	</Rules>
-
-	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
-		<Rule Id="SA1119" Action="Warning" /><!-- A C# statement contains parenthesis which are unnecessary and should be removed. -->
 		<Rule Id="SA1400" Action="Warning" /><!-- The access modifier for a C# element has not been explicitly defined. -->
 		<Rule Id="SA1401" Action="Warning" /><!-- A field within a C# class has an access modifier other than private. -->
 		<Rule Id="SA1402" Action="Warning" /><!-- A C# code file contains more than one unique type. -->
@@ -480,9 +468,6 @@
 		<Rule Id="SA1412" Action="Hidden" /><!-- The encoding of the file is not UTF-8 with byte order mark. -->
 		<Rule Id="SA1413" Action="Hidden" /><!-- A multi-line initializer should use a comma on the last item. -->
 		<Rule Id="SA1414" Action="Warning" /><!-- Tuple types appearing in member declarations should have explicitly named tuple elements. -->
-	</Rules>
-
-	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
 		<Rule Id="SA1500" Action="Warning" /><!-- The opening or closing brace within a C# statement, element, or expression is not placed on its own line. -->
 		<Rule Id="SA1501" Action="Hidden" /><!-- A C# statement containing opening and closing braces is written completely on a single line. -->
 		<Rule Id="SA1502" Action="Hidden" /><!-- A C# element containing opening and closing braces is written completely on a single line. -->
@@ -504,9 +489,6 @@
 		<Rule Id="SA1518" Action="Warning" /><!-- The line endings at the end of a file do not match the settings for the project. -->
 		<Rule Id="SA1519" Action="Warning" /><!-- The opening and closing braces for a multi-line C# statement have been omitted. -->
 		<Rule Id="SA1520" Action="Warning" /><!-- The opening and closing braces of a chained `if`/`else if`/`else` construct were included for some clauses, but omitted for others. -->
-	</Rules>
-
-	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
 		<Rule Id="SA1600" Action="Warning" /><!-- A C# code element is missing a documentation header. -->
 		<Rule Id="SA1601" Action="Warning" /><!-- A C# partial element is missing a documentation header. -->
 		<Rule Id="SA1602" Action="Warning" /><!-- An item within a C# enumeration is missing an Xml documentation header. -->
