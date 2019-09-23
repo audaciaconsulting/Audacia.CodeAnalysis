@@ -376,7 +376,7 @@
 		<Rule Id="SA1024" Action="Warning" /><!-- A colon within a C# element is not spaced correctly. -->
 		<Rule Id="SA1025" Action="Warning" /><!-- The code contains multiple whitespace characters in a row. -->
 		<Rule Id="SA1026" Action="Warning" /><!-- An implicitly typed new array allocation within a C# code file is not spaced correctly. -->
-		<Rule Id="SA1027" Action="Warning" /><!-- The code contains a tab or space character which is not consistent with the current project settings. -->
+		<Rule Id="SA1027" Action="Hidden" /><!-- The code contains a tab or space character which is not consistent with the current project settings. -->
 		<Rule Id="SA1028" Action="Warning" /><!-- A line of code ends with a space, tab, or other whitespace characters before the end of line character(s). -->
 		<Rule Id="SA1100" Action="Warning" /><!-- A call to a member from an inherited class begins with `base.`, and the local class does not contain an override or implementation of the member. -->
 		<Rule Id="SA1101" Action="Hidden" /><!-- A call to an instance member of the local class or a base class is not prefixed with 'this.', within a C# code file. -->
