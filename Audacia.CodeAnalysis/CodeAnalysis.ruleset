@@ -4,11 +4,11 @@
 	<Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp.Analyzers">
 		<Rule Id="RCS1001" Action="Warning"/><!-- [STYLE] Add braces (when expression spans over multiple lines) -->
 		<Rule Id="RCS1002" Action="None"/><!-- [STYLE] Remove braces -->
-		<Rule Id="RCS1003" Action="None"/><!-- [STYLE] Add braces to if-else (when expression spans over multiple lines) -->
+		<Rule Id="RCS1003" Action="Warning"/><!-- [STYLE] Add braces to if-else (when expression spans over multiple lines) -->
 		<Rule Id="RCS1004" Action="None"/><!-- [STYLE] Remove braces from if-else -->
 		<Rule Id="RCS1005" Action="Warning"/><!-- [SIMPLIFICATION] Simplify nested using statement -->
 		<Rule Id="RCS1006" Action="Warning"/><!-- [SIMPLIFICATION] Merge else clause with nested if statement -->
-		<Rule Id="RCS1007" Action="None"/><!-- [STYLE] Add braces -->
+		<Rule Id="RCS1007" Action="Warning"/><!-- [STYLE] Add braces -->
 		<Rule Id="RCS1008" Action="None"/><!-- [READABILITY] Use explicit type instead of 'var' (when the type is not obvious) -->
 		<Rule Id="RCS1009" Action="None"/><!-- [READABILITY] Use explicit type instead of 'var' (foreach variable) -->
 		<Rule Id="RCS1010" Action="Warning"/><!-- [SIMPLIFICATION] Use 'var' instead of explicit type (when the type is obvious) -->
@@ -78,7 +78,7 @@
 		<Rule Id="RCS1078" Action="None"/><!-- [GENERAL] Use " instead of string.Empty -->
 		<Rule Id="RCS1079" Action="Info"/><!-- [GENERAL] Throwing of new Not Implemented Exception -->
 		<Rule Id="RCS1080" Action="None"/><!-- [PERFORMANCE] Use 'Count/Length' property instead of 'Any' method -->
-		<Rule Id="RCS1081" Action="None"/><!-- [READABILITY] Split variable declaration -->
+		<Rule Id="RCS1081" Action="Warning"/><!-- [READABILITY] Split variable declaration -->
 		<Rule Id="RCS1084" Action="Warning"/><!-- [SIMPLIFICATION] Use coalesce expression instead of conditional expression -->
 		<Rule Id="RCS1085" Action="Warning"/><!-- [SIMPLIFICATION] Use auto-implemented property -->
 		<Rule Id="RCS1086" Action="None"/><!-- [GENERAL] Use linefeed as newline -->
@@ -90,11 +90,11 @@
 		<Rule Id="RCS1092" Action="Warning"/><!-- [FORMATTING] Add empty line before 'while' keyword in 'do' statement -->
 		<Rule Id="RCS1093" Action="Warning"/><!-- [REDUNDANCY] Remove file with no code -->
 		<Rule Id="RCS1094" Action="Warning"/><!-- [READABILITY] Declare using directive on top level -->
-		<Rule Id="RCS1096" Action="Warning"/><!-- [PERFORMANCE] Use bitwise operation instead of calling 'HasFlag' -->
+		<Rule Id="RCS1096" Action="Info"/><!-- [PERFORMANCE] Use bitwise operation instead of calling 'HasFlag' -->
 		<Rule Id="RCS1097" Action="Warning"/><!-- [REDUNDANCY] Remove redundant 'ToString' call -->
 		<Rule Id="RCS1098" Action="Warning"/><!-- [READABILITY] Avoid 'null' on the left side of a binary expression -->
 		<Rule Id="RCS1099" Action="Warning"/><!-- [READABILITY] Default label should be the last label in a switch section -->
-		<Rule Id="RCS1100" Action="Warning"/><!-- [FORMATTING] Format documentation summary on a single line -->
+		<Rule Id="RCS1100" Action="None"/><!-- [FORMATTING] Format documentation summary on a single line -->
 		<Rule Id="RCS1101" Action="None"/><!-- [FORMATTING] Format documentation summary on multiple lines -->
 		<Rule Id="RCS1102" Action="Warning"/><!-- [DESIGN] Make class static -->
 		<Rule Id="RCS1103" Action="Warning"/><!-- [SIMPLIFICATION] Replace if statement with assignment -->
@@ -422,8 +422,8 @@
 		<Rule Id="SA1200" Action="None" /><!-- A C# using directive is placed outside of a namespace element. -->
 		<Rule Id="SA1201" Action="None" /><!-- An element within a C# code file is out of order in relation to the other elements in the code. -->
 		<Rule Id="SA1202" Action="None" /><!-- An element within a C# code file is out of order within regard to access level, in relation to other elements in the code. -->
-		<Rule Id="SA1203" Action="None" /><!-- A constant field is placed beneath a non-constant field. -->
-		<Rule Id="SA1204" Action="Warning" /><!-- A static element is positioned beneath an instance element of the same type. -->
+		<Rule Id="SA1203" Action="Warning" /><!-- A constant field is placed beneath a non-constant field. -->
+		<Rule Id="SA1204" Action="None" /><!-- A static element is positioned beneath an instance element of the same type. -->
 		<Rule Id="SA1205" Action="Warning" /><!-- The partial element does not have an access modifier defined. -->
 		<Rule Id="SA1206" Action="Warning" /><!-- The keywords within the declaration of an element do not follow a standard ordering scheme. -->
 		<Rule Id="SA1207" Action="Warning" /><!-- The keyword *protected* is positioned after the keyword *internal* within the declaration of a protected internal C# element. -->
