@@ -19,4 +19,19 @@ This ruleset provides extra configuration for ASP.NET core analyzers, and disabl
 
 Now you need to set the ruleset in your `.csproj` files. This is done by adding a `<CodeAnalysisRuleset>` element in the first property group with a path to the relevant `.ruleset`.
 
+You also need to make the following modification to your project file in order to prevent analyzers from being packed into a nuget package and deployed:
+
+The package reference for `Audacia.CodeAnalysis` in your `.csproj` file will look like this:
+```xml
+<PackageReference Include="Audacia.CodeAnalysis" Version="0.0.47183.19267" />
+```
+and should be altered to include the following information:
+```xml
+<PackageReference Include="Audacia.CodeAnalysis" Version="0.0.47183.19267" >
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+</PackageReference>
+```
+
+
 Finally, build your solution! You will probably notice a lot of inspection warnings that were not present before.
