@@ -17,9 +17,9 @@ This ruleset overrides certain rules in the base configuration specifically to a
 [CodeAnalysis.AspNetCore.ruleset](https://audacia.visualstudio.com/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis%2FCodeAnalysis.AspNetCore.ruleset):
 This ruleset provides extra configuration for ASP.NET core analyzers, and disables the requirement for `.ConfigureAwait(false)` as ASP.NET core does not have a synchronization context.
 
-Now you need to set the ruleset in your `.csproj` files. This is done by adding a `<CodeAnalysisRuleset>` element in the first property group with a path to the relevant `.ruleset`.
+Now you need to set the ruleset in your `.csproj` files. This is done by adding a `<CodeAnalysisRuleset>` element in the first property group with a path to the relevant `.ruleset` relative to the project file. If the ruleset is in the same folder as project, don't forget to prepend the filename with `./`, for example `<CodeAnalysisRuleset>./CodeAnalysis.ruleset</CodeAnalysisRuleset>`.
 
-You also need to make the following modification to your project file in order to prevent analyzers from being packed into a nuget package and deployed:
+#### You also need to make the following modification to your project file in order to prevent analyzers from being packed into a nuget package and deployed:
 
 The package reference for `Audacia.CodeAnalysis` in your `.csproj` file will look like this:
 ```xml
