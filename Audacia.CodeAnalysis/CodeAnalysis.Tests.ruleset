@@ -8,7 +8,7 @@
 	</Rules>
 
 	<Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
-		<Rule Id="CA2007" Action="Info" /><!-- [RELIABILITY] Consider calling ConfigureAwait on the awaited task -->
+		<Rule Id="CA2007" Action="None" /><!-- [RELIABILITY] Consider calling ConfigureAwait on the awaited task -->
 	</Rules>
 
 </RuleSet>
