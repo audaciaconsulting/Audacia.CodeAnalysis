@@ -1,0 +1,21 @@
+name: $(Build.BuildId).$(Year:yy)$(DayOfYear)
+trigger: [master]
+pr: { branches: { include: [master] } }
+schedules: [ { cron: "0 0 * * *", displayName: Nightly Build, branches: { include: [ master ] } } ]
+resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build, ref: refs/heads/feature/npm-releases } ] }
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+  - template: pipelines/build/npm-package.job.yaml@templates
+    parameters:
+      path: 'Audacia.CodeAnalysis.Typescript'
+
+- stage: Release
+  displayName: Release
+  jobs:
+  - template: pipelines/release/npm-package.job.yaml@templates
+    parameters:
+      path: 'Audacia.CodeAnalysis.Typescript'
+      packageName: '@audacia/eslint-config'
