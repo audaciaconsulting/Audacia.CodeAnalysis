@@ -10,14 +10,17 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Audacia.CodeAnalysis.Typescript", "Audacia.CodeAnalysis.Typescript\Audacia.CodeAnalysis.Typescript.shproj", "{7813305C-567A-4F67-B4A8-6DAD2C264B87}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{00CF38E3-0AEB-46FE-AA3C-9FD09331AB88}"
-ProjectSection(SolutionItems) = preProject
-	build-dotnet.yaml = build-dotnet.yaml
-	README.md = README.md
-	.gitignore = .gitignore
-	build-npm.yaml = build-npm.yaml
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		build-dotnet.yaml = build-dotnet.yaml
+		build-npm.yaml = build-npm.yaml
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Audacia.CodeAnalysis.Typescript\Audacia.CodeAnalysis.Typescript.projitems*{7813305c-567a-4f67-b4a8-6dad2c264b87}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
