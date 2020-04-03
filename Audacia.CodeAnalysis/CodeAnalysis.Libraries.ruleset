@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Unit Test Rules" ToolsVersion="15.0">
+	<Include Path="CodeAnalysis.ruleset" Action="Default" />
+
+	<Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp.Analyzers">
+		<Rule Id="RCS1140" Action="Warning"/><!-- [MAINTAINABILITY] Add exception to documentation comment -->
+		<Rule Id="RCS1181" Action="Warning"/><!-- [GENERAL] Convert comment to documentation comment -->
+		<Rule Id="RCS1226" Action="Warning"/><!-- [USAGE] Add paragraph to documentation comment -->
+		<Rule Id="RCS1232" Action="Warning"/><!-- [READABILITY] Order elements in documentation comment -->
+	</Rules>
+
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+		<Rule Id="SA0001" Action="Warning" /><!-- XML comment analysis is disabled due to project configuration. -->
+		<Rule Id="SA1004" Action="Warning" /><!-- A line within a documentation header above a C# element does not begin with a single space. -->
+		<Rule Id="SA1600" Action="Warning" /><!-- A C# code element is missing a documentation header. -->
+		<Rule Id="SA1601" Action="Warning" /><!-- A C# partial element is missing a documentation header. -->
+		<Rule Id="SA1602" Action="Warning" /><!-- An item within a C# enumeration is missing an Xml documentation header. -->
+		<Rule Id="SA1605" Action="Warning" /><!-- The `<summary>` or `<content>` tag within the documentation header for a C# code element is missing or empty. -->
+		<Rule Id="SA1606" Action="Warning" /><!-- The `<summary>` tag within the documentation header for a C# code element is empty. -->
+		<Rule Id="SA1607" Action="Warning" /><!-- The `<summary>` or `<content>` tag within the documentation header for a C# code element is empty. -->
+		<Rule Id="SA1611" Action="Warning" /><!-- A C# method, constructor, delegate or indexer element is missing documentation for one or more of its parameters. -->
+		<Rule Id="SA1614" Action="Warning" /><!-- A `<param>` tag within a C# element's documentation header is empty. -->
+		<Rule Id="SA1615" Action="Warning" /><!-- A C# element is missing documentation for its return value. -->
+		<Rule Id="SA1616" Action="Warning" /><!-- The `<returns>` tag within a C# element's documentation header is empty. -->
+		<Rule Id="SA1618" Action="Warning" /><!-- A generic C# element is missing documentation for one or more of its generic type parameters. -->
+		<Rule Id="SA1619" Action="Warning" /><!-- A generic, partial C# element is missing documentation for one or more of its generic type parameters, and the documentation for the element contains a `<summary>` tag. -->
+		<Rule Id="SA1621" Action="Warning" /><!-- A `<typeparam>` tag within the Xml header documentation for a generic C# element is missing a name attribute, or contains an empty name attribute. -->
+		<Rule Id="SA1622" Action="Warning" /><!-- A `<typeparam>` tag within the Xml header documentation for a generic C# element is empty. -->
+		<Rule Id="SA1627" Action="Warning" /><!-- The Xml header documentation for a C# code element contains an empty tag. -->
+		<Rule Id="SA1629" Action="Warning" /><!-- A section of the Xml header documentation for a C# element does not end with a period (also known as a full stop). -->
+		<Rule Id="SA1631" Action="Warning" /><!-- A section of the Xml header documentation for a C# element does not contain enough alphabetic characters. -->
+		<Rule Id="SA1644" Action="Warning" /><!-- A section within the Xml documentation header for a C# element contains blank lines. -->
+		<Rule Id="SA1650" Action="Warning" /><!-- The element documentation for the element contains one or more spelling mistakes or unrecognized words. -->
+		<Rule Id="SA1651" Action="Warning" /><!-- The documentation for the element contains one or more `<placeholder>` elements. -->
+	</Rules>
+
+	<Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+		<Rule Id="CA1032" Action="Warning" /><!-- [DESIGN] Implement standard exception constructors -->
+		<Rule Id="CA2007" Action="Warning" /><!-- [RELIABILITY] Consider calling ConfigureAwait on the awaited task -->
+	</Rules>
+
+</RuleSet>

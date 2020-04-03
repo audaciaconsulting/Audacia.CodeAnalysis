@@ -2,8 +2,13 @@
 <RuleSet Name="Unit Test Rules" ToolsVersion="15.0">
 	<Include Path="CodeAnalysis.ruleset" Action="Default" />
 	
+	<Rules AnalyzerId="CSharpGuidelinesAnalyzer" RuleNamespace="CSharpGuidelinesAnalyzer">
+		<Rule Id="AV1551" Action="None"/><!-- Call the more overloaded method from other overloads *** Suppress as controller actions often look like overloads but are different HTTP methods *** -->
+		<Rule Id="AV1711" Action="None"/><!-- Name members similarly to members of related .NET Framework classes *** Suppress as Delete API actions are caught by this rule *** -->
+	</Rules>
+
 	<Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp.Analyzers">
-		<Rule Id="RCS1090" Action="Info"/><!-- [DESIGN] Call 'ConfigureAwait(false)' -->
+		<Rule Id="RCS1046" Action="None"/><!-- [NAMING] Asynchronous method name should end with 'Async' *** Suppress as controller actions should not be suffixed *** -->
 	</Rules>
 
 	<Rules AnalyzerId="AspNetCoreAnalyzers" RuleNamespace="AspNetCoreAnalyzers">
