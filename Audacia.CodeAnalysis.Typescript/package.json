@@ -21,7 +21,7 @@
     "acorn": "^7.1.1",
     "eslint": ">= 3",
     "eslint-plugin-import": "^2.18.2",
-    "minimist": "^0.2.1"
+    "minimist": "^1.2.5"
   },
   "eslintConfig": {
     "rules": {
