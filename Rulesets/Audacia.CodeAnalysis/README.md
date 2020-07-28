@@ -6,20 +6,20 @@ The `Audacia.CodeAnalysis` repository contains .NET analyzers and rulesets to pr
 
 There are two analyzer packages available - a standard package and one with extra analyzers specifically for ASP.NET Core projects. Which one you install depends on the type of project you're working on.
 
-Now you've installed the `Audacia.CodeAnalysis` or `Audacia.CodeAnalysis.AspNetCore` package you need to get one or more rulesets. Available rulesets are as follows:
+Now you've installed the `Audacia.CodeAnalysis` or `Audacia.CodeAnalysis.AspNetCore` package you need to get one or more rulesets. The rulesets are provided as `.editorconfig` files. `.editorconfig` files should generally be located at the root of your repo or solution, however they can be located anywhere in the folder hierarchy, and the file closest a particular code file will be used. See [here](https://docs.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options?view=vs-2019#file-hierarchy-and-precedence) for more information.
 
-[CodeAnalysis.ruleset](https://audacia.visualstudio.com/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis%2FCodeAnalysis.ruleset):
-This is the base ruleset and should be included in all projects.
+Each ruleset is standalone (in that it contains all configured rules), and the available rulesets are as follows:
 
-[CodeAnalysis.Tests.ruleset](https://audacia.visualstudio.com/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis%2FCodeAnalysis.Tests.ruleset):
-This ruleset overrides certain rules in the base configuration specifically to allow for patterns used in tests such as public nested classes and underscores in names.
+[General](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FGeneral%2F.editorconfig):
+This is a general ruleset that contains a default set of rules and severities without being geared toward a particular kind of application. Generally speaking, you will either use one of the more specific rulesets below, or you will add this general ruleset in the root of your repo and then use the specific rulesets to override rules within certain sub-folders of your repo.
 
-[CodeAnalysis.Libraries.ruleset](https://audacia.visualstudio.com/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis%2FCodeAnalysis.Libraries.ruleset):
-This ruleset overrides certain rules in the base configuration specifically for use in libraries, for example to enforce stricter rules around documentation.
+[Tests](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FTests%2F.editorconfig):
+This ruleset relaxes certain rules in the general configuration specifically to allow for patterns commonly used in tests such as public nested classes and underscores in names.
 
-[CodeAnalysis.AspNetCore.ruleset](https://audacia.visualstudio.com/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis%2FCodeAnalysis.AspNetCore.ruleset): See the [Audacia.CodeAnalysis.AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis.AspNetCore%2FREADME.md&_a=preview) project for more information.
+[Libraries](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FLibraries%2F.editorconfig):
+This ruleset changes the severity of certain rules in the general configuration specifically for use in libraries, for example to enforce stricter rules around documentation.
 
-Now you need to set the ruleset in your `.csproj` files. This is done by adding a `<CodeAnalysisRuleset>` element in the first property group with a path to the relevant `.ruleset` relative to the project file. If the ruleset is in the same folder as project, don't forget to prepend the filename with `./`, for example `<CodeAnalysisRuleset>./CodeAnalysis.ruleset</CodeAnalysisRuleset>`. If you're using any of `CodeAnalysis.Tests.ruleset`, `CodeAnalysis.Libraries.ruleset` or `CodeAnalysis.AspNetCore.ruleset` then you don't need to specify the base ruleset in your `.csproj` as it is referenced by the other rulesets.
+[AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FAspNetCore%2F.editorconfig): See the [Audacia.CodeAnalysis.AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis.AspNetCore%2FREADME.md&_a=preview) project for more information.
 
 Finally, build your solution! You will probably notice a lot of inspection warnings that were not present before.
 
