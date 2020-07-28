@@ -16,10 +16,12 @@
     "typescript": ">=2.8.0"
   },
   "dependencies": {
-    "eslint": ">= 3",
-    "@typescript-eslint/parser": "^2.5.0",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
-    "eslint-plugin-import": "^2.18.2"
+    "@typescript-eslint/parser": "^2.5.0",
+    "acorn": "^7.1.1",
+    "eslint": ">= 3",
+    "eslint-plugin-import": "^2.18.2",
+    "minimist": "^1.2.5"
   },
   "eslintConfig": {
     "rules": {
