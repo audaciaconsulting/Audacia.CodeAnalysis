@@ -1,5 +1,10 @@
-name: $(Year:yy)$(DayOfYear).$(Rev:r)
-trigger: [master]
+name: $(Year:yy)$(DayOfYear).$(rev:r)
+trigger:
+  branches:
+    include: [master]
+  paths:
+    include:
+      - 'Rulesets/*'
 pr: { branches: { include: [master] } }
 schedules: [ { cron: "0 0 * * *", displayName: Nightly Build, branches: { include: [ master ] } } ]
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }

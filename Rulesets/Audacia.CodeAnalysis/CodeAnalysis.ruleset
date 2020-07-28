@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="Default Rules" ToolsVersion="15.0">
 
+  <Rules AnalyzerId="Audacia.CodeAnalysis.Analyzers" RuleNamespace="Audacia.CodeAnalysis.Analyzers">
+		<Rule Id="ACL1000" Action="Warning"/><!-- Private fields should be prefixed with an underscore. -->
+    <Rule Id="ACL1001" Action="Warning"/><!-- Variable declaration uses a magic number. -->
+    <Rule Id="ACL1002" Action="Warning"/><!-- Methods should not exceed a predefined number of statements. -->
+  </Rules>
+
 	<Rules AnalyzerId="CSharpGuidelinesAnalyzer" RuleNamespace="CSharpGuidelinesAnalyzer">
 		<Rule Id="AV1000" Action="Warning"/><!-- A class or interface should have a single purpose -->
 		<Rule Id="AV1008" Action="None"/><!-- Avoid static classes *** Suppress as a bit over-zealous *** -->
@@ -12,7 +18,7 @@
 		<Rule Id="AV1225" Action="Warning"/><!-- Use a protected virtual method to raise each event -->
 		<Rule Id="AV1235" Action="Warning"/><!-- Don't pass null as the sender argument when raising an event -->
 		<Rule Id="AV1250" Action="Warning"/><!-- Evaluate the result of a LINQ expression before returning it -->
-		<Rule Id="AV1500" Action="Info"/><!-- Methods should not exceed a predefined number of statements (left as Info for now pending custom analyzer that excludes null checks from statement count) -->
+		<Rule Id="AV1500" Action="None"/><!-- Methods should not exceed a predefined number of statements *** Suppress as covered by custom analyzer ACL1002 that excludes null checks from statement count *** -->
 		<Rule Id="AV1502" Action="Warning"/><!-- Avoid conditions with double negatives -->
 		<Rule Id="AV1505" Action="Warning"/><!-- Name assemblies after their contained namespace -->
 		<Rule Id="AV1506" Action="None"/><!-- Name a source file to the type it contains *** Suppress as covered by SA1300 *** -->

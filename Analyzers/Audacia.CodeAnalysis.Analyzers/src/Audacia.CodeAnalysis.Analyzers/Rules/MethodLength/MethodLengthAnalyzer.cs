@@ -1,0 +1,168 @@
+﻿using System;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
+using Audacia.CodeAnalysis.Analyzers.Extensions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
+{
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public sealed class MethodLengthAnalyzer : DiagnosticAnalyzer
+    {
+        public const int DefaultMaxStatementCount = 10;
+
+        private const string Title = "Member or local function contains too many statements";
+        private const string MessageFormat = "{0} '{1}' contains {2} statements, which exceeds the maximum of {3} statements.";
+        private const string Description = "Methods should not exceed a predefined number of statements. You can configure the maximum number of allowed statements globally in the .editorconfig file, or locally using the [MaxMethodLength] attribute.";
+
+        public const string DiagnosticId = "ACL1002";
+        
+        private static readonly string Category = "Maintainability";
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description);
+        private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction = RegisterCompilationStart;
+
+        private readonly int _maxStatementCount;
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+
+            context.RegisterCompilationStartAction(RegisterCompilationStartAction);
+        }
+
+        private static void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
+        {
+            startContext.RegisterCodeBlockAction(actionContext => AnalyzeCodeBlock(actionContext));
+        }
+
+        private static void AnalyzeCodeBlock(CodeBlockAnalysisContext context)
+        {
+            if (context.OwningSymbol is INamedTypeSymbol || context.OwningSymbol.IsSynthesized())
+            {
+                return;
+            }
+
+            var maxStatementCount = GetMaxStatementCount(context);
+            var statementWalker = new StatementWalker(context.CancellationToken);
+            statementWalker.Visit(context.CodeBlock);
+
+            if (statementWalker.StatementCount > maxStatementCount)
+            {
+                ReportAtContainingSymbol(statementWalker.StatementCount, maxStatementCount, context);
+            }
+        }
+
+        private static int GetMaxStatementCount(CodeBlockAnalysisContext context)
+        {
+            int maxStatementCount = DefaultMaxStatementCount;
+            var attributes = context.OwningSymbol.GetAttributes();
+            var maxLengthAttribute = attributes.FirstOrDefault(att => att.AttributeClass.Name == "MaxMethodLengthAttribute");
+            if (maxLengthAttribute != null)
+            {
+                var maxLengthArgument = maxLengthAttribute.ConstructorArguments.First();
+                maxStatementCount = (int)maxLengthArgument.Value;
+            }
+
+            return maxStatementCount;
+        }
+
+        private static void ReportAtContainingSymbol(int statementCount, int maxStatementCount, CodeBlockAnalysisContext context)
+        {
+            string kind = GetMemberKind(context.OwningSymbol, context.CancellationToken);
+            string memberName = context.OwningSymbol.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat);
+            var location = GetMemberLocation(context.OwningSymbol, context.SemanticModel, context.CancellationToken);
+
+            context.ReportDiagnostic(Diagnostic.Create(Rule, location, kind, memberName, statementCount, maxStatementCount));
+        }
+
+        private static string GetMemberKind(ISymbol member, CancellationToken cancellationToken)
+        {
+            foreach (SyntaxNode syntax in member.DeclaringSyntaxReferences.Select(reference =>
+                reference.GetSyntax(cancellationToken)))
+            {
+                if (syntax is VariableDeclaratorSyntax || syntax is PropertyDeclarationSyntax)
+                {
+                    return "Initializer for";
+                }
+            }
+
+            return member.GetKind();
+        }
+
+        private static Location GetMemberLocation(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            foreach (var arrowExpressionClause in member.DeclaringSyntaxReferences
+                .Select(reference => reference.GetSyntax(cancellationToken)).OfType<ArrowExpressionClauseSyntax>())
+            {
+                var parentSymbol = semanticModel.GetDeclaredSymbol(arrowExpressionClause.Parent);
+
+                if (parentSymbol != null && parentSymbol.Locations.Any())
+                {
+                    return parentSymbol.Locations[0];
+                }
+            }
+
+            return member.Locations[0];
+        }
+
+        private sealed class StatementWalker : CSharpSyntaxWalker
+        {
+            private CancellationToken _cancellationToken;
+            private bool _nullChecksFinished;
+
+            public int StatementCount { get; private set; }
+
+            public StatementWalker(CancellationToken cancellationToken)
+            {
+                _cancellationToken = cancellationToken;
+            }
+
+            public override void Visit(SyntaxNode node)
+            {
+                _cancellationToken.ThrowIfCancellationRequested();
+
+                if (IsStatement(node))
+                {
+                    StatementCount++;
+                }
+
+                base.Visit(node);
+            }
+
+            private bool IsStatement(SyntaxNode node)
+            {
+                return !node.IsMissing && node is StatementSyntax statement && !IsExcludedStatement(statement);
+            }
+
+            private bool IsExcludedStatement(StatementSyntax node)
+            {
+                var isExcludedNodeType = node is BlockSyntax || node is LabeledStatementSyntax || node is LocalFunctionStatementSyntax;
+                if (isExcludedNodeType)
+                {
+                    return true;
+                }
+
+                if (!_nullChecksFinished)
+                {
+                    // Argument null checks will be at the top of a method, so once we're past them we can stop checking
+                    var isArgumentNullCheck = node.IsArgumentNullCheck();
+                    if (!isArgumentNullCheck)
+                    {
+                        _nullChecksFinished = true;
+                    }
+
+                    return isArgumentNullCheck;
+                }
+
+                return false;
+            }
+        }
+    }
+}

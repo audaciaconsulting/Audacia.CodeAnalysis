@@ -1,11 +1,7 @@
-# Audacia.CodeAnalysis
+# Overview
 
-### Analyzers and linters for .NET and Typescript projects.
+The `Audacia.CodeAnalysis` repo contains static code analysis rulesets and analyzers.
 
-This repository includes the source for three packages. Please follow the links below for more detailed information:
+The 'Rulesets' folder contains code that generates NuGet and npm packages that can be used in codebases to enforce coding standards.
 
-- [.NET Core](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis%2FREADME.md)
-
-- [ASP.NET Core](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis.AspNetCore%2FREADME.md) (based on the .NET Core package)
-
-- [Javascript/Typescript](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FAudacia.CodeAnalysis.Typescript%2FREADME.md)
+The 'Analyzers' folder contains custom analyzers (that can be used in the above rulesets).
