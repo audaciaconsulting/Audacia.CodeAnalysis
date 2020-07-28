@@ -57,7 +57,7 @@ foreach($analyzersPath in $analyzersPaths)
                 }
                 catch
                 {
-
+					# Catch left in purposefully because we don't want to crash the IDE when uninstalling (and because it came with the template and I'm scared to remove it)
                 }
             }
         }
