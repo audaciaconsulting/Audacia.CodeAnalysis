@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Audacia.CodeAnalysis.Analyzers.EditorConfigSettings
@@ -10,7 +9,7 @@ namespace Audacia.CodeAnalysis.Analyzers.EditorConfigSettings
 
         private readonly AnalyzerConfigOptionsProvider _analyzerConfigOptionsProvider;
 
-        public SettingsReader(AnalyzerOptions options, CancellationToken cancellationToken)
+        public SettingsReader(AnalyzerOptions options)
         {
             _analyzerConfigOptionsProvider = options.AnalyzerConfigOptionsProvider;
         }

@@ -38,7 +38,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
 
         private static void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
         {
-            var settingsReader = new SettingsReader(startContext.Options, startContext.CancellationToken);
+            var settingsReader = new SettingsReader(startContext.Options);
             startContext.RegisterCodeBlockAction(actionContext => AnalyzeCodeBlock(actionContext, settingsReader));
         }
 
