@@ -69,3 +69,8 @@ public void MyMethod()
 	var six = 6;
 }
 ```
+
+.editorconfig override of maximum allowed statements:
+```
+dotnet_diagnostic.ACL1002.max_statement_count = 6
+```
