@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
+using Audacia.CodeAnalysis.Analyzers.EditorConfigSettings;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -25,8 +26,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description);
         private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction = RegisterCompilationStart;
 
-        private readonly int _maxStatementCount;
-
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
@@ -39,17 +38,18 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
 
         private static void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
         {
-            startContext.RegisterCodeBlockAction(actionContext => AnalyzeCodeBlock(actionContext));
+            var settingsReader = new SettingsReader(startContext.Options, startContext.CancellationToken);
+            startContext.RegisterCodeBlockAction(actionContext => AnalyzeCodeBlock(actionContext, settingsReader));
         }
 
-        private static void AnalyzeCodeBlock(CodeBlockAnalysisContext context)
+        private static void AnalyzeCodeBlock(CodeBlockAnalysisContext context, SettingsReader settingsReader)
         {
             if (context.OwningSymbol is INamedTypeSymbol || context.OwningSymbol.IsSynthesized())
             {
                 return;
             }
 
-            var maxStatementCount = GetMaxStatementCount(context);
+            var maxStatementCount = GetMaxStatementCount(context, settingsReader);
             var statementWalker = new StatementWalker(context.CancellationToken);
             statementWalker.Visit(context.CodeBlock);
 
@@ -59,7 +59,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             }
         }
 
-        private static int GetMaxStatementCount(CodeBlockAnalysisContext context)
+        private static int GetMaxStatementCount(CodeBlockAnalysisContext context, SettingsReader settingsReader)
         {
             int maxStatementCount = DefaultMaxStatementCount;
             var attributes = context.OwningSymbol.GetAttributes();
@@ -68,6 +68,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             {
                 var maxLengthArgument = maxLengthAttribute.ConstructorArguments.First();
                 maxStatementCount = (int)maxLengthArgument.Value;
+            }
+            else
+            {
+                // Look up in .editorconfig
+                var configValue = settingsReader.TryGetInt(context.CodeBlock.SyntaxTree, new SettingsKey(DiagnosticId, "max_statement_count"));
+                maxStatementCount = configValue ?? maxStatementCount;
             }
 
             return maxStatementCount;

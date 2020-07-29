@@ -27,6 +27,10 @@ Finally, build your solution! You will probably notice a lot of inspection warni
 
 The analyzers used come from a variety of sources.
 
+### Audacia Custom Analyzers
+
+Audacia has a set of custom analyzers. See [here](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FAnalyzers%2FAudacia.CodeAnalysis.Analyzers%2FREADME.md&_a=preview) for more information.
+
 ### CSharpGuidelinesAnalyzer
 
 The [CSharpGuidelinesAnalyzer](https://github.com/bkoelman/CSharpGuidelinesAnalyzer) implements analyzers for the C# guidelines (found [here](https://csharpcodingguidelines.com/)) that, for a long time have been the basis of Audacia's C# coding standards.
