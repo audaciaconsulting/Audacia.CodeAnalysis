@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Audacia.CodeAnalysis.Analyzers.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,14 +15,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
         private const string Title = "Variable declaration uses a magic number";
         private const string MessageFormat = "Variable declaration for '{0}' should not use a magic number.";
         private const string Description = "Variable declarations should not use a magic number. Move the number to a constant field with a descriptive name.";
-        private const string Category = "Usage";
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.RegisterSyntaxNodeAction(AnalyzeVariable, SyntaxKind.LocalDeclarationStatement);
         }
 

@@ -41,7 +41,7 @@ var totalPrice = price + shippingCost;
 
 ## ACL1002 - Methods should not exceed a predefined number of statements
 
-The ACL1002 rule checks the number of statements in a method (or property or constructor) against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the [MaxMethodLength] attribute. In the absence of any configured value, a default maximum value of 10 is used.
+The ACL1002 rule checks the number of statements in a method (or property or constructor) against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxMethodLength]` attribute. In the absence of any configured value, a default maximum value of 10 is used.
 
 Code with violation (assuming configured maximum of 5 statements):
 ```csharp
@@ -73,4 +73,29 @@ public void MyMethod()
 .editorconfig override of maximum allowed statements:
 ```
 dotnet_diagnostic.ACL1002.max_statement_count = 6
+```
+
+## ACL1003 - Don't declare signatures with more than a predefined number of parameters
+
+The ACL1003 rule checks the number of parameters for a method or constructor against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxParameterCount]` attribute. In the absence of any configured value, a default maximum value of 4 is used.
+
+Code with violation (assuming configured maximum of 5 statements):
+```csharp
+public void MyMethod(int a, int b, int c, int d, int e)
+{
+}
+```
+
+Code with local override of maximum allowed statements:
+```csharp
+[MaxParameterCount(5)]
+public void MyMethod(int a, int b, int c, int d, int e)
+{
+}
+```
+
+.editorconfig override of maximum allowed parameters (values for methods and constructors can be configured separately):
+```
+dotnet_diagnostic.ACL1003.max_method_parameter_count = 5
+dotnet_diagnostic.ACL1003.max_constructor_parameter_count = 5
 ```
