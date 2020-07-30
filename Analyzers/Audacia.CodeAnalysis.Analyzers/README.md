@@ -79,15 +79,16 @@ dotnet_diagnostic.ACL1002.max_statement_count = 6
 ```csharp
 public void MyMethod(string arg)
 {
-    if (arg == null)
+	if (arg == null)
 	{
-	    throw new ArgumentNullException(nameof(arg));
+		throw new ArgumentNullException(nameof(arg));
 	}
-	
-    var one = 1;
+
+	var one = 1;
 	var two = 2;
 	var three = 3;
 }
+```
 
 ## ACL1003 - Don't declare signatures with more than a predefined number of parameters
 
