@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using Audacia.CodeAnalysis.Analyzers.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -13,14 +14,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.FieldWithUnderscore
         private const string Title = "Private field not prefixed with an underscore";
         private const string MessageFormat = "Field '{0}' is not prefixed with an underscore.";
         private const string Description = "Private fields should be prefixed with an underscore.";
-        private const string Category = "Naming";
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         }
 

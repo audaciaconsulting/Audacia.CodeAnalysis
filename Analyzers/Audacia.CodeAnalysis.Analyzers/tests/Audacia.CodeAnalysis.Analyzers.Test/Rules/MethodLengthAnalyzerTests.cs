@@ -242,7 +242,6 @@ namespace TestNamespace
         public void No_Diagnostics_For_Method_Body_Equal_To_Max_Allowed_Statements_Overridden_Via_Attribute()
         {
             var test = @"
-using Audacia.CodeAnalysis.Analyzers.Rules.MethodLength;
 namespace TestNamespace
 {
     public class TestClass
@@ -283,7 +282,6 @@ namespace TestNamespace
         public void No_Diagnostics_For_Method_Body_Equal_To_Max_Allowed_Statements_Overridden_Via_Full_Name_Attribute()
         {
             var test = @"
-using Audacia.CodeAnalysis.Analyzers.Rules.MethodLength;
 namespace TestNamespace
 {
     public class TestClass
