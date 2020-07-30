@@ -75,6 +75,20 @@ public void MyMethod()
 dotnet_diagnostic.ACL1002.max_statement_count = 6
 ```
 
+**Argument null checks are excluded from the statement count.** So in the following code, 3 lines would be counted rather than 5. This is because argument null checks do not really add to the complexity of a method, and by including them as statements in the analysis it may dissuade people from including them.
+```csharp
+public void MyMethod(string arg)
+{
+    if (arg == null)
+	{
+	    throw new ArgumentNullException(nameof(arg));
+	}
+	
+    var one = 1;
+	var two = 2;
+	var three = 3;
+}
+
 ## ACL1003 - Don't declare signatures with more than a predefined number of parameters
 
 The ACL1003 rule checks the number of parameters for a method or constructor against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxParameterCount]` attribute. In the absence of any configured value, a default maximum value of 4 is used.
