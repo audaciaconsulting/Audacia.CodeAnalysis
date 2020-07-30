@@ -13,7 +13,11 @@ pool: { vmImage: windows-latest }
 stages:
 - stage: Build
   displayName: Build
-  jobs: [ { template: pipelines/build/nuget-package.job.yaml@templates } ]
+  jobs:
+    - template: pipelines/build/nuget-package.job.yaml@templates
+      parameters:
+        projects: 'Rulesets/**/*.csproj'
+        tests: 'Rulesets/**/*Tests.csproj'
 
 - stage: Release
   displayName: Release
