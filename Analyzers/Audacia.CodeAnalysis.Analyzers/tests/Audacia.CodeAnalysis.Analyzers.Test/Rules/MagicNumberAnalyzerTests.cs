@@ -241,6 +241,42 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             VerifyNoDiagnostic(test);
         }
 
+        [TestMethod]
+        public void No_Diagnostic_For_Variable_With_Integer_Magic_Number_Assignment_If_The_Magic_Number_Is_1()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int arg)
+            {
+                var testVar = arg + 1;
+            }
+        }
+    }";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_For_Variable_With_Double_Magic_Number_Assignment_Even_If_The_Magic_Number_Is_1()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int arg)
+            {
+                var testVar = arg + 1.0;
+            }
+        }
+    }";
+            var expected = BuildExpectedResult(8, 37);
+
+            VerifyDiagnostic(test, expected);
+        }
+
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
             return null;
