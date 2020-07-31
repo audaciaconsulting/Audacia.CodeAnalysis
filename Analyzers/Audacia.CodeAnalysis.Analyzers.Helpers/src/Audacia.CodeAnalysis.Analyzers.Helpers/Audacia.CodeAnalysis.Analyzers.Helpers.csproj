@@ -4,4 +4,10 @@
     <TargetFramework>netstandard1.3</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>Audacia</Authors>
+    <Description>Helper library to allow customization of the analyzers in Audacia.CodeAnalysis.Analyzers. Install this NuGet packages if you need any of the provided customization points such as the attributes to override the maximum method length or parameter count.</Description>
+  </PropertyGroup>
+
 </Project>

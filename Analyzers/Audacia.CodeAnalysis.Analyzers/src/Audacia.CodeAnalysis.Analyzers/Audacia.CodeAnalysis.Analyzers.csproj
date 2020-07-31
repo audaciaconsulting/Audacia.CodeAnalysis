@@ -9,12 +9,12 @@
     <PackageId>Audacia.CodeAnalysis.Analyzers</PackageId>
     <Authors>Audacia</Authors>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>Audacia.CodeAnalysis.Analyzers</Description>
+    <Description>This is a set of custom Roslyn analyzers. It is a dependency of Audacia.CodeAnalysis and shouldn't need to be referenced directly.</Description>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
     <Copyright>Copyright © Audacia 2020</Copyright>
     <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-    <Version>0.2.2</Version>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

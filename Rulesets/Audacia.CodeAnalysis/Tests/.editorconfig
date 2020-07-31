@@ -109,8 +109,8 @@ dotnet_diagnostic.AV1706.severity = warning
 # Name types using nouns, noun phrases or adjective phrases
 dotnet_diagnostic.AV1708.severity = warning
 
-# Don't repeat the name of a class or enumeration in its members
-dotnet_diagnostic.AV1710.severity = warning
+# Don't repeat the name of a class or enumeration in its members *** Suppressed as test methods often contain the parent type in their name ***
+dotnet_diagnostic.AV1710.severity = none
 
 # Name members similarly to members of related .NET Framework classes
 dotnet_diagnostic.AV1711.severity = warning

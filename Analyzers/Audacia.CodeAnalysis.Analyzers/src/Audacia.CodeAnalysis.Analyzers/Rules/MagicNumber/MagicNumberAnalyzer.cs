@@ -65,6 +65,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
                 }
                 else if (syntaxNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 {
+                    var literal = (LiteralExpressionSyntax)syntaxNode;
+                    if (literal.Token.Value is int integer &&
+                        integer == 1)
+                    {
+                        // No diagnostic if it's a literal 1
+                        // This is a special case as it's common in code to increment/decrement by 1 so this should be allowed
+                        return;
+                    }
+
                     context.ReportDiagnostic(Diagnostic.Create(Rule, syntaxNode.GetLocation(), variable.Identifier.Text));
                 }
             }
