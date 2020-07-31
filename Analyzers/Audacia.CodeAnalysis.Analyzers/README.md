@@ -46,7 +46,7 @@ var next = previous + 1;
 
 ## ACL1002 - Methods should not exceed a predefined number of statements
 
-The ACL1002 rule checks the number of statements in a method (or property or constructor) against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxMethodLength]` attribute (which is in the `Audacia.CodeAnalysis.Analyzers.Helpers` NuGet package). In the absence of any configured value, a default maximum value of 10 is used.
+The ACL1002 rule checks the number of statements in a method (or property or constructor) against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxMethodLength]` attribute (this is in the `Audacia.CodeAnalysis.Analyzers.Helpers` NuGet package, which must be installed separately). In the absence of any configured value, a default maximum value of 10 is used.
 
 Code with violation (assuming configured maximum of 5 statements):
 ```csharp
@@ -97,7 +97,7 @@ public void MyMethod(string arg)
 
 ## ACL1003 - Don't declare signatures with more than a predefined number of parameters
 
-The ACL1003 rule checks the number of parameters for a method or constructor against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxParameterCount]` attribute (which is in the `Audacia.CodeAnalysis.Analyzers.Helpers` NuGet package). In the absence of any configured value, a default maximum value of 4 is used.
+The ACL1003 rule checks the number of parameters for a method or constructor against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxParameterCount]` attribute (this is in the `Audacia.CodeAnalysis.Analyzers.Helpers` NuGet package, which must be installed separately). In the absence of any configured value, a default maximum value of 4 is used.
 
 Code with violation (assuming configured maximum of 5 statements):
 ```csharp
