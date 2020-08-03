@@ -8,18 +8,17 @@ There are two analyzer packages available - a standard package and one with extr
 
 Now you've installed the `Audacia.CodeAnalysis` or `Audacia.CodeAnalysis.AspNetCore` package you need to get one or more rulesets. The rulesets are provided as `.editorconfig` files. `.editorconfig` files should generally be located at the root of your repo or solution, however they can be located anywhere in the folder hierarchy, and the file closest a particular code file will be used. See [here](https://docs.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options?view=vs-2019#file-hierarchy-and-precedence) for more information.
 
-Each ruleset is standalone (in that it contains all configured rules), and the available rulesets are as follows:
+The [Base](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FBase%2F.editorconfig) ruleset should be used by every project/solution as it contains the full set of rules with default severities. This should be added to the root of your repo/solution, i.e. in the same location as your .sln file.
 
-[General](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FGeneral%2F.editorconfig):
-This is a general ruleset that contains a default set of rules and severities without being geared toward a particular kind of application. Generally speaking, you will either use one of the more specific rulesets below, or you will add this general ruleset in the root of your repo and then use the specific rulesets to override rules within certain sub-folders of your repo.
+If you have a specific kind of project that falls into one of the categories below then you should include the relevant `.editorconfig` file in your project folder to override some rules:
 
-[Tests](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FTests%2F.editorconfig):
-This ruleset relaxes certain rules in the general configuration specifically to allow for patterns commonly used in tests such as public nested classes and underscores in names.
+- [Tests](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FTests%2F.editorconfig):
+    - This ruleset relaxes certain rules in the general configuration specifically to allow for patterns commonly used in tests such as public nested classes and underscores in names.
 
-[Libraries](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FLibraries%2F.editorconfig):
-This ruleset changes the severity of certain rules in the general configuration specifically for use in libraries, for example to enforce stricter rules around documentation.
+- [Libraries](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FLibraries%2F.editorconfig):
+    - This ruleset changes the severity of certain rules in the general configuration specifically for use in libraries, for example to enforce stricter rules around documentation.
 
-[AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FAspNetCore%2F.editorconfig): See the [Audacia.CodeAnalysis.AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis.AspNetCore%2FREADME.md&_a=preview) project for more information.
+- [AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FAspNetCore%2F.editorconfig): See the [Audacia.CodeAnalysis.AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis.AspNetCore%2FREADME.md&_a=preview) project for more information.
 
 Finally, build your solution! You will probably notice a lot of inspection warnings that were not present before.
 
@@ -30,6 +29,8 @@ The analyzers used come from a variety of sources.
 ### Audacia Custom Analyzers
 
 Audacia has a set of custom analyzers. See [here](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FAnalyzers%2FAudacia.CodeAnalysis.Analyzers%2FREADME.md&_a=preview) for more information.
+
+All rules are prefixed `ACL`.
 
 ### CSharpGuidelinesAnalyzer
 
