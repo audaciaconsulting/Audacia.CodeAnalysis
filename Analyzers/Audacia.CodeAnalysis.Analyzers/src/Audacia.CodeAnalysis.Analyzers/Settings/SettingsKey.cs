@@ -1,6 +1,6 @@
-﻿namespace Audacia.CodeAnalysis.Analyzers.EditorConfigSettings
+﻿namespace Audacia.CodeAnalysis.Analyzers.Settings
 {
-    class SettingsKey
+    public class SettingsKey
     {
         public const string DotnetDiagnostic = "dotnet_diagnostic";
 

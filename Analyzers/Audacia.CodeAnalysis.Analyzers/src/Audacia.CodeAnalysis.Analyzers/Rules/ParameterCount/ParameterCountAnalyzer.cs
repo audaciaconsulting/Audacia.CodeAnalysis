@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Common;
-using Audacia.CodeAnalysis.Analyzers.EditorConfigSettings;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
+using Audacia.CodeAnalysis.Analyzers.Settings;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -14,7 +14,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ParameterCountAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "ACL1003";
+        public const string Id = DiagnosticId.ParameterCount;
 
         public const int DefaultMaxParameterCount = 4;
 
@@ -26,7 +26,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
         private const string Description = "Don't declare signatures with more than a predefined number of parameters.";
 
         private static readonly DiagnosticDescriptor ParameterCountRule = new DiagnosticDescriptor(
-            DiagnosticId,
+            Id,
             Title,
             ParameterCountMessageFormat,
             DiagnosticCategory.Maintainability,
@@ -36,14 +36,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
         private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction = RegisterCompilationStart;
 
-        private static readonly Action<SymbolAnalysisContext, SettingsReader> AnalyzeMethodAction =
+        private static readonly Action<SymbolAnalysisContext, EditorConfigSettingsReader> AnalyzeMethodAction =
             (context, settingsReader) => context.SkipEmptyName(_ => AnalyzeMethod(context, settingsReader));
 
         private static readonly SettingsKey MaxMethodParameterCountKey =
-            new SettingsKey(DiagnosticId, "max_method_parameter_count");
+            new SettingsKey(Id, "max_method_parameter_count");
 
         private static readonly SettingsKey MaxConstructorParameterCountKey =
-            new SettingsKey(DiagnosticId, "max_constructor_parameter_count");
+            new SettingsKey(Id, "max_constructor_parameter_count");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(ParameterCountRule);
@@ -58,12 +58,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
         private static void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
         {
-            var settingsReader = new SettingsReader(startContext.Options);
+            var settingsReader = new EditorConfigSettingsReader(startContext.Options);
             startContext.RegisterSymbolAction(actionContext => AnalyzeMethodAction(actionContext, settingsReader),
                 SymbolKind.Method);
         }
 
-        private static void AnalyzeMethod(SymbolAnalysisContext context, SettingsReader settingsReader)
+        private static void AnalyzeMethod(SymbolAnalysisContext context, EditorConfigSettingsReader settingsReader)
         {
             var method = (IMethodSymbol)context.Symbol;
 
@@ -81,7 +81,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             }
         }
 
-        private static ParameterSettings GetParameterSettings(ISymbol symbol, SettingsReader settingsReader, SyntaxTree syntaxTree)
+        private static ParameterSettings GetParameterSettings(ISymbol symbol, EditorConfigSettingsReader settingsReader, SyntaxTree syntaxTree)
         {
             var maxParameterCount = DefaultMaxParameterCount;
             var maxConstructorParameterCount = DefaultMaxParameterCount;

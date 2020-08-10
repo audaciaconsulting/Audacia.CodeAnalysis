@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Audacia.CodeAnalysis.Analyzers.Rules.MethodLength;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.MethodLength;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -22,7 +19,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
             return new DiagnosticResult
             {
-                Id = MethodLengthAnalyzer.DiagnosticId,
+                Id = MethodLengthAnalyzer.Id,
                 Message = $"Method '{memberName}' contains {statementCount} statements, which exceeds the maximum of {maxStatementCount} statements.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
