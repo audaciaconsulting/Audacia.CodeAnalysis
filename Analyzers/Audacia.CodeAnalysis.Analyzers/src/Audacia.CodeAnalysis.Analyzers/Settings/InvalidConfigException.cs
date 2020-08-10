@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Audacia.CodeAnalysis.Analyzers.EditorConfigSettings
+namespace Audacia.CodeAnalysis.Analyzers.Settings
 {
     public class InvalidConfigException : Exception
     {

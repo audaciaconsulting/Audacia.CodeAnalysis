@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
             return new DiagnosticResult
             {
-                Id = FieldWithUnderscoreAnalyzer.DiagnosticId,
+                Id = FieldWithUnderscoreAnalyzer.Id,
                 Message = "Field 'number' is not prefixed with an underscore.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =

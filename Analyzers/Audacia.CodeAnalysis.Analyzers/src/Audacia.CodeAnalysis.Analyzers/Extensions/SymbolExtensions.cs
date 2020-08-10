@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,6 +14,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
     /// </summary>
     internal static class SymbolExtensions
     {
+        private static readonly Lazy<IEqualityComparer<ISymbol>> SymbolComparerLazy = new Lazy<IEqualityComparer<ISymbol>>(() =>
+        {
+            Type comparerType = typeof(ISymbol).GetTypeInfo().Assembly.GetType("Microsoft.CodeAnalysis.SymbolEqualityComparer");
+            FieldInfo includeField = comparerType?.GetTypeInfo().GetDeclaredField("IncludeNullability");
+
+            if (includeField != null && includeField.GetValue(null) is IEqualityComparer<ISymbol> comparer)
+            {
+                return comparer;
+            }
+
+            return EqualityComparer<ISymbol>.Default;
+        });
+
         /// <summary>
         /// Gets a user-friendly string representation of the <see cref="SymbolKind"/>.
         /// </summary>
@@ -153,6 +169,52 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         private static bool ContainsNewModifier(SyntaxTokenList? modifiers)
         {
             return modifiers != null && modifiers.Value.Any(modifier => modifier.IsKind(SyntaxKind.NewKeyword));
+        }
+
+        public static ITypeSymbol GetSymbolType(this ISymbol symbol)
+        {
+            switch (symbol)
+            {
+                case IFieldSymbol field:
+                    {
+                        return field.Type;
+                    }
+                case IPropertySymbol property:
+                    {
+                        return property.Type;
+                    }
+                case IEventSymbol @event:
+                    {
+                        return @event.Type;
+                    }
+                case IMethodSymbol method:
+                    {
+                        return method.ReturnType;
+                    }
+                case IParameterSymbol parameter:
+                    {
+                        return parameter.Type;
+                    }
+                case ILocalSymbol local:
+                    {
+                        return local.Type;
+                    }
+                default:
+                    {
+                        throw new InvalidOperationException($"Unexpected type '{symbol.GetType()}'.");
+                    }
+            }
+        }
+
+        public static bool IsEqualTo(this ISymbol first, ISymbol second)
+        {
+            return SymbolComparerLazy.Value.Equals(first, second);
+        }
+
+        public static bool IsLambdaExpressionParameter(this IParameterSymbol parameter)
+        {
+            return parameter.ContainingSymbol is IMethodSymbol methodSymbol &&
+                   (methodSymbol.MethodKind == MethodKind.LambdaMethod || methodSymbol.MethodKind == MethodKind.AnonymousFunction);
         }
     }
 }

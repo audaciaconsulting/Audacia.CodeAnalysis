@@ -13,7 +13,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.FieldWithUnderscore
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(FieldWithUnderscoreCodeFixProvider)), Shared]
     public sealed class FieldWithUnderscoreCodeFixProvider : CodeFixProvider
     {
-		public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(FieldWithUnderscoreAnalyzer.DiagnosticId);
+		public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(FieldWithUnderscoreAnalyzer.Id);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -26,7 +26,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.FieldWithUnderscore
             var diagnostic = context.Diagnostics.First();
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
             context.RegisterCodeFix(
-                CodeAction.Create("Prepend '_' to field", c => PrependUnderscore(context.Document, token, c), FieldWithUnderscoreAnalyzer.DiagnosticId),
+                CodeAction.Create("Prepend '_' to field", c => PrependUnderscore(context.Document, token, c), FieldWithUnderscoreAnalyzer.Id),
                 diagnostic);
         }
 

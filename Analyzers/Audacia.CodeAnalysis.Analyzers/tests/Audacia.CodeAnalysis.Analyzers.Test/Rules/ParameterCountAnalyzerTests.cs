@@ -19,7 +19,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
             return new DiagnosticResult
             {
-                Id = ParameterCountAnalyzer.DiagnosticId,
+                Id = ParameterCountAnalyzer.Id,
                 Message = $"{memberName} contains {parameterCount} parameters, which exceeds the maximum of {maxParameterCount} parameters.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =

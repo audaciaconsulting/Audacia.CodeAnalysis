@@ -3,8 +3,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Common;
-using Audacia.CodeAnalysis.Analyzers.EditorConfigSettings;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
+using Audacia.CodeAnalysis.Analyzers.Settings;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,14 +17,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
     {
         public const int DefaultMaxStatementCount = 10;
 
+        public const string Id = DiagnosticId.MethodLength;
+
         private const string Title = "Member or local function contains too many statements";
         private const string MessageFormat = "{0} '{1}' contains {2} statements, which exceeds the maximum of {3} statements.";
         private const string Description = "Methods should not exceed a predefined number of statements. You can configure the maximum number of allowed statements globally in the .editorconfig file, or locally using the [MaxMethodLength] attribute.";
-
-        public const string DiagnosticId = "ACL1002";
         
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-            DiagnosticId,
+            Id,
             Title,
             MessageFormat,
             DiagnosticCategory.Maintainability,
@@ -45,11 +45,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
 
         private static void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
         {
-            var settingsReader = new SettingsReader(startContext.Options);
+            var settingsReader = new EditorConfigSettingsReader(startContext.Options);
             startContext.RegisterCodeBlockAction(actionContext => AnalyzeCodeBlock(actionContext, settingsReader));
         }
 
-        private static void AnalyzeCodeBlock(CodeBlockAnalysisContext context, SettingsReader settingsReader)
+        private static void AnalyzeCodeBlock(CodeBlockAnalysisContext context, EditorConfigSettingsReader settingsReader)
         {
             if (context.OwningSymbol is INamedTypeSymbol || context.OwningSymbol.IsSynthesized())
             {
@@ -66,7 +66,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             }
         }
 
-        private static int GetMaxStatementCount(CodeBlockAnalysisContext context, SettingsReader settingsReader)
+        private static int GetMaxStatementCount(CodeBlockAnalysisContext context, EditorConfigSettingsReader settingsReader)
         {
             int maxStatementCount = DefaultMaxStatementCount;
             var attributes = context.OwningSymbol.GetAttributes();
@@ -79,7 +79,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             else
             {
                 // Look up in .editorconfig
-                var configValue = settingsReader.TryGetInt(context.CodeBlock.SyntaxTree, new SettingsKey(DiagnosticId, "max_statement_count"));
+                var configValue = settingsReader.TryGetInt(context.CodeBlock.SyntaxTree, new SettingsKey(Id, "max_statement_count"));
                 maxStatementCount = configValue ?? maxStatementCount;
             }
 

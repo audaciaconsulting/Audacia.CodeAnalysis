@@ -119,3 +119,45 @@ public void MyMethod(int a, int b, int c, int d, int e)
 dotnet_diagnostic.ACL1003.max_method_parameter_count = 5
 dotnet_diagnostic.ACL1003.max_constructor_parameter_count = 5
 ```
+
+## ACL1004 - Don't use abbreviations
+
+The ACL1004 rule checks whether single characters or (specific) abbreviations have been used as a type, member, parameter or variable name.
+
+Code with violation:
+```csharp
+var idx = 4;
+```
+
+Code with fix:
+```csharp
+var index = 4;
+```
+
+There are two additional pieces of configuration that can be applied:
+- Exclude lambda expression parameters from the check
+- Allow certain characters/abbreviations as a for loop variable
+
+### Lambda expressions
+
+Single characters are often used as lambda expression parameter names, therefore this can be allowed by using the following setting (which is set in the default configuration):
+```
+dotnet_diagnostic.ACL1004.exclude_lambdas = true
+```
+
+With the above setting in place, the following code will not result in a diagnostic.
+```csharp
+var match = list.First(a => a.Name = "Bob");
+```
+
+### Loop variables
+
+Some single characters (such as `i`) are widely used in for loops, therefore specific values can be specified as allowed as for loop variables. These values are provided as a comma-separated list as follows:
+```
+dotnet_diagnostic.ACL1004.allowed_loop_variables = i,j
+```
+
+With the above setting in place, the following code will not result in a diagnostic.
+```csharp
+for (var i = 0; i < 10; i++)
+```
