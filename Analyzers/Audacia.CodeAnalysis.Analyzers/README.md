@@ -147,7 +147,7 @@ dotnet_diagnostic.ACL1004.exclude_lambdas = true
 
 With the above setting in place, the following code will not result in a diagnostic.
 ```csharp
-var match = list.First(a => a.Name = "Bob");
+var match = list.First(a => a.Name == "Bob");
 ```
 
 ### Loop variables
