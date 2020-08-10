@@ -19,6 +19,11 @@ dotnet_diagnostic.ACL1002.severity = warning
 # Don't declare signatures with more than a predefined number of parameters
 dotnet_diagnostic.ACL1003.severity = warning
 
+# Don't use abbreviations
+dotnet_diagnostic.ACL1004.severity = warning
+dotnet_diagnostic.ACL1004.exclude_lambdas = true
+dotnet_diagnostic.ACL1004.allowed_loop_variables = i,j
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
@@ -103,8 +108,8 @@ dotnet_diagnostic.AV1568.severity = warning
 # Don't include numbers in variables, parameters and type members
 dotnet_diagnostic.AV1704.severity = warning
 
-# Don't use abbreviations
-dotnet_diagnostic.AV1706.severity = warning
+# Don't use abbreviations *** Suppressed as covered by the more configurable ACL1004 ***
+dotnet_diagnostic.AV1706.severity = none
 
 # Name types using nouns, noun phrases or adjective phrases
 dotnet_diagnostic.AV1708.severity = warning
