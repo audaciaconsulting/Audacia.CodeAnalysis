@@ -266,5 +266,28 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 
             VerifyNoDiagnostic(testCode);
         }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_HttpGet_Attribute_And_Without_Async_Suffix()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
+
+                namespace ConsoleApplication1
+                {
+                    public class TestController : ControllerBase
+                    {
+                        public async Task<string> Get()
+                        {
+                            var testTask = new Task<string>(() => string.Empty);
+
+                            return await testTask;
+                        }
+                    }
+                }";
+
+            VerifyNoDiagnostic(testCode);
+        }
     }
 }
