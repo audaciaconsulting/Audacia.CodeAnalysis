@@ -80,7 +80,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 = new List<string>
                 {
                     typeof(Task).FullName,
-                    typeof(Task<>).FullName
+                    typeof(Task<>).FullName,
+                    typeof(ValueTask).FullName,
+                    typeof(ValueTask<>).FullName,
+                    typeof(IAsyncEnumerable<>).FullName
                 };
 
             var awaitableTypes = awaitableTypeNames
@@ -129,7 +132,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                         controllerActionAttributeNames.Contains(name, StringComparer.InvariantCultureIgnoreCase)
                 );
 
-            return isControllerAction;
+            var isControllerBaseType = IsControllerBaseType(nodeAnalysisContext);
+
+            return isControllerAction || isControllerBaseType;
         }
 
         /// <summary>
@@ -187,6 +192,32 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 .ToList();
 
             return methodAttributes;
+        }
+
+        /// <summary>
+        /// Determines whether a methods containing type is a controller base type 
+        /// </summary>
+        private static bool IsControllerBaseType(this SyntaxNodeAnalysisContext nodeAnalysisContext)
+        {
+            var classBaseType = nodeAnalysisContext
+                .SemanticModel
+                .GetDeclaredSymbol(nodeAnalysisContext.Node)
+                .ContainingType
+                .BaseType;
+
+            if (classBaseType == null)
+            {
+                return false;
+            }
+
+            var isControllerBaseType = classBaseType
+                .Name
+                .Equals(
+                    "ControllerBase",
+                    StringComparison.InvariantCultureIgnoreCase
+                );
+
+            return isControllerBaseType;
         }
     }
 }
