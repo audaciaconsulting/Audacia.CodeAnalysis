@@ -289,5 +289,33 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 
             VerifyNoDiagnostic(testCode);
         }
+
+        [TestMethod]
+        public void Diagnostics_For_Private_Asynchronous_Method_In_Controller_Without_HttpGet_Attribute_And_Without_Async_Suffix()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
+
+                namespace ConsoleApplication1
+                {
+                    public class TestController : ControllerBase
+                    {
+                        private async Task<string> Get()
+                        {
+                            var testTask = new Task<string>(() => string.Empty);
+
+                            return await testTask;
+                        }
+                    }
+                }";
+
+            const string expectedMessage
+                = "Asynchronous method name 'Get' is not suffixed with 'Async'.";
+
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+
+            VerifyDiagnostic(testCode, expectedDiagnostic);
+        }
     }
 }

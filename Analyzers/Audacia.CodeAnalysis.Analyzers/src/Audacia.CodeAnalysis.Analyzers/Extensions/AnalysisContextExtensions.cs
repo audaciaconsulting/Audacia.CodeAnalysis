@@ -76,7 +76,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         {
             var methodReturnType = GetMethodSymbol(nodeAnalysisContext).ReturnType.MetadataName;
 
-            var awaitableTypeNames
+            var fullyQualifiedAwaitableTypeNames
                 = new List<string>
                 {
                     typeof(Task).FullName,
@@ -86,7 +86,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                     typeof(IAsyncEnumerable<>).FullName
                 };
 
-            var awaitableTypes = awaitableTypeNames
+            var awaitableTypes = fullyQualifiedAwaitableTypeNames
                 .Select(
                     awaitableTypeName =>
                         nodeAnalysisContext
@@ -106,11 +106,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         }
 
         /// <summary>
-        /// Returns true if method has any http action attributes (get/post/delete/put, etc)
+        /// Returns true if method is representing a http action (e.g. get/post/delete/put etc)
         /// </summary>
         internal static bool IsControllerAction(this SyntaxNodeAnalysisContext nodeAnalysisContext)
         {
-            var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
+            var methodDeclarationSyntax = (MethodDeclarationSyntax) nodeAnalysisContext.Node;
 
             var methodAttributes = GetMethodAttributes(methodDeclarationSyntax);
 
@@ -132,9 +132,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                         controllerActionAttributeNames.Contains(name, StringComparer.InvariantCultureIgnoreCase)
                 );
 
-            var isControllerBaseType = IsControllerBaseType(nodeAnalysisContext);
+            var containingTypeIsControllerType = IsControllerBaseType(nodeAnalysisContext);
 
-            return isControllerAction || isControllerBaseType;
+            var isPublicMethod = IsPublic(methodDeclarationSyntax);
+
+            return (isControllerAction || containingTypeIsControllerType) && isPublicMethod;
         }
 
         /// <summary>
@@ -195,6 +197,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         }
 
         /// <summary>
+        /// Checks whether the method has a public modifier.
+        /// </summary>
+        private static bool IsPublic(this MethodDeclarationSyntax methodDeclarationSyntax)
+        {
+            var isPublic = methodDeclarationSyntax
+                .Modifiers
+                .Any(
+                    modifier =>
+                        modifier.ValueText.Equals("public", StringComparison.InvariantCultureIgnoreCase)
+                );
+
+            return isPublic;
+        }
+
+        /// <summary>
         /// Determines whether a methods containing type is a controller base type 
         /// </summary>
         private static bool IsControllerBaseType(this SyntaxNodeAnalysisContext nodeAnalysisContext)
@@ -210,11 +227,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 return false;
             }
 
-            var isControllerBaseType = classBaseType
-                .Name
-                .Equals(
-                    "ControllerBase",
-                    StringComparison.InvariantCultureIgnoreCase
+            var controllerBaseTypeNames
+                = new List<string>
+                {
+                    "Controller",
+                    "ControllerBase"
+                };
+
+            var isControllerBaseType = controllerBaseTypeNames
+                .Any(
+                    controllerBaseTypeName => classBaseType
+                        .Name
+                        .Equals(
+                            controllerBaseTypeName,
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
                 );
 
             return isControllerBaseType;
