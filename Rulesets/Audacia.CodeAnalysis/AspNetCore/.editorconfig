@@ -54,3 +54,6 @@ dotnet_diagnostic.AV1711.severity = none
 
 # [NAMING] Asynchronous method name should end with 'Async' *** Suppress as controller actions should not be suffixed ***
 dotnet_diagnostic.RCS1046.severity = none
+
+# [NAMING] Asynchronous method name should be suffixed with 'Async'
+dotnet_diagnostic.ACL1005.severity = warning
