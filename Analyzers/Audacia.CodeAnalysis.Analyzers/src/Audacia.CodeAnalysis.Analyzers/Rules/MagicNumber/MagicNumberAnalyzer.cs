@@ -67,10 +67,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
                 {
                     var literal = (LiteralExpressionSyntax)syntaxNode;
                     if (literal.Token.Value is int integer &&
-                        integer == 1)
+                        (integer == 0 || integer == 1))
                     {
-                        // No diagnostic if it's a literal 1
-                        // This is a special case as it's common in code to increment/decrement by 1 so this should be allowed
+                        // No diagnostic if it's a literal 0 or 1
+                        // 0 is a often used as a literal e.g. with the null coalescing operator
+                        // 1 is a special case as it's common in code to increment/decrement by 1 so this should also be allowed
                         return;
                     }
 
