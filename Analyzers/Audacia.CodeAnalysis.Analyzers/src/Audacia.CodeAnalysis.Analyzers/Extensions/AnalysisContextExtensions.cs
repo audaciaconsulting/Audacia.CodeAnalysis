@@ -83,7 +83,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                     typeof(Task<>).FullName,
                     typeof(ValueTask).FullName,
                     typeof(ValueTask<>).FullName,
-                    typeof(IAsyncEnumerable<>).FullName
+                    // Hardcode IAsyncEnumerable type name as it's only included in .NET Standard 2.1.
+                    // It is in Microsoft.Bcl.AsyncInterfaces, but I don't want to add any extra dependencies here.
+                    "System.Collections.Generic.IAsyncEnumerable`1"
                 };
 
             var awaitableTypes = fullyQualifiedAwaitableTypeNames
