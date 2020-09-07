@@ -161,3 +161,7 @@ With the above setting in place, the following code will not result in a diagnos
 ```csharp
 for (var i = 0; i < 10; i++)
 ```
+
+## ACL1005 - Asynchronous method name is not suffixed with 'Async'
+
+ACL1005 is based on the Roslynator rule [RCS1046](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1046.md), which checks if asynchronous methods are suffixed with 'Async'. ACL1005 adds an exclusion for controller actions, as they are often asynchronous but should generally not be suffixed.

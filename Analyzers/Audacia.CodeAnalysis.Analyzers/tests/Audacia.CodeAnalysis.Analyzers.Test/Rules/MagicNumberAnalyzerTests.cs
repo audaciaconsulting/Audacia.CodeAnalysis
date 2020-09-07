@@ -277,6 +277,23 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             VerifyDiagnostic(test, expected);
         }
 
+        [TestMethod]
+        public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_0()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var testVar = arg ?? 0;
+            }
+        }
+    }";
+            VerifyNoDiagnostic(test);
+        }
+
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
             return null;
