@@ -24,6 +24,9 @@ dotnet_diagnostic.ACL1004.severity = warning
 dotnet_diagnostic.ACL1004.exclude_lambdas = true
 dotnet_diagnostic.ACL1004.allowed_loop_variables = i,j
 
+# [NAMING] Asynchronous method name should be suffixed with 'Async' *** Suppress as covered by RCS1046; ACL1005 is only used in the AspNetCore ruleset ***
+dotnet_diagnostic.ACL1005.severity = none
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
@@ -969,7 +972,7 @@ dotnet_diagnostic.RCS1035.severity = warning
 # [REDUNDANCY] Remove redundant empty line
 dotnet_diagnostic.RCS1036.severity = warning
 
-# [REDUNDANCY] Remove trailing white-space *** Suppress as covered by SA1028 ***
+# [REDUNDANCY] Remove trailing white-space
 dotnet_diagnostic.RCS1037.severity = none
 
 # [REDUNDANCY] Remove empty statement
@@ -1257,8 +1260,8 @@ dotnet_diagnostic.RCS1161.severity = suggestion
 # [READABILITY] Avoid chain of assignments
 dotnet_diagnostic.RCS1162.severity = warning
 
-# [REDUNDANCY] Unused parameter
-dotnet_diagnostic.RCS1163.severity = warning
+# [REDUNDANCY] Unused parameter *** Suppress as covered by CA1801 ***
+dotnet_diagnostic.RCS1163.severity = none
 
 # [REDUNDANCY] Unused type parameter
 dotnet_diagnostic.RCS1164.severity = warning
@@ -1684,7 +1687,7 @@ dotnet_diagnostic.SA1026.severity = warning
 dotnet_diagnostic.SA1027.severity = none
 
 # A line of code ends with a space, tab, or other whitespace characters before the end of line character(s).
-dotnet_diagnostic.SA1028.severity = suggestion
+dotnet_diagnostic.SA1028.severity = none
 
 # A call to a member from an inherited class begins with `base.`, and the local class does not contain an override or implementation of the member.
 dotnet_diagnostic.SA1100.severity = warning

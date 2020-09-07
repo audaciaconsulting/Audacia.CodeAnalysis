@@ -20,7 +20,28 @@ If you have a specific kind of project that falls into one of the categories bel
 
 - [AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis%2FAspNetCore%2F.editorconfig): See the [Audacia.CodeAnalysis.AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FRulesets%2FAudacia.CodeAnalysis.AspNetCore%2FREADME.md&_a=preview) project for more information.
 
-Finally, build your solution! You will probably notice a lot of inspection warnings that were not present before.
+Finally, clean and rebuild your solution (it may take a while first time round). You will probably notice a lot of inspection warnings that were not present before.
+
+## IDE Support
+
+You must be using Visual Studio version 16.5+ or Rider version 2020.2+ for full .editorconfig support.
+
+## Excluding Generated Code
+
+It's usually a good idea to exclude generated code from analysis, as you may not have control over the code generation process which can lead to unresolvable violations.
+
+If generated code is all located in a particular directory, you can place an .editorconfig file in the root of that directory and it will exclude all source code files from analysis.
+
+The .editorconfig file should look something like this:
+```
+# EF Migration Rules
+# Description: Ruleset to disable all analysis on EF Migration classes
+
+# Code files
+[*.cs]
+
+generated_code = true
+```
 
 ## More Information on Analyzers
 
