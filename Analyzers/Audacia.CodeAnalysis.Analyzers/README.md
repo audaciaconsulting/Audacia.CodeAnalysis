@@ -164,4 +164,20 @@ for (var i = 0; i < 10; i++)
 
 ## ACL1005 - Asynchronous method name is not suffixed with 'Async'
 
-ACL1005 is based on the Roslynator rule [RCS1046](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1046.md), which checks if asynchronous methods are suffixed with 'Async'. ACL1005 adds an exclusion for controller actions, as they are often asynchronous but should generally not be suffixed.
+ACL1005 is based on the Roslynator rule [RCS1046](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1046.md), which checks if asynchronous methods are suffixed with 'Async'.
+
+ACL1005 adds an exclusion for controller actions, as they are often asynchronous but should generally not be suffixed.
+
+## ACL1006 - Code block does not have braces
+
+ACL1006 is based on the Roslynator rule [RCS1007](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1007.md), which checks if statements such as `if`, `foreach` and `using` are followed by braces.
+
+ACL1006 adds an exclusion for `if` statements performing an argument null check. For example, using ACL1006 rather than RCS1007, the following code becomes valid:
+```csharp
+public void SomeMethod(string arg)
+{
+	if (arg == null) throw new ArgumentNullException(nameof(arg));
+}
+```
+
+The justification for this exclusion is that argument null checks, while advised, add noise to a codebase, and minimising this noise is useful.
