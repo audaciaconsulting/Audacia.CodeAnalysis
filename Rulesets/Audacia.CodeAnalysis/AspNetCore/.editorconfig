@@ -57,3 +57,12 @@ dotnet_diagnostic.RCS1046.severity = none
 
 # [NAMING] Asynchronous method name should be suffixed with 'Async'
 dotnet_diagnostic.ACL1005.severity = warning
+
+# [DESIGN] Uri parameters should not be strings *** Suppress as ASP.NET generally handles urls as strings ***
+dotnet_diagnostic.CA1054.severity = none
+
+# [DESIGN] Uri return values should not be strings *** Suppress as ASP.NET generally handles urls as strings ***
+dotnet_diagnostic.CA1055.severity = none
+
+# [DESIGN] Uri properties should not be strings *** Suppress as ASP.NET generally handles urls as strings ***
+dotnet_diagnostic.CA1056.severity = none

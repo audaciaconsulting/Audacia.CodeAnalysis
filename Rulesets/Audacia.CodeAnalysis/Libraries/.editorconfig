@@ -10,6 +10,9 @@
 # [DESIGN] Implement standard exception constructors
 dotnet_diagnostic.CA1032.severity = warning
 
+# [DESIGN] Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = warning
+
 # [RELIABILITY] Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = warning
 

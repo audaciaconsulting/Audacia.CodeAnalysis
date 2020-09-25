@@ -27,6 +27,9 @@ dotnet_diagnostic.ACL1004.allowed_loop_variables = i,j
 # [NAMING] Asynchronous method name should be suffixed with 'Async' *** Suppress as covered by RCS1046; ACL1005 is only used in the AspNetCore ruleset ***
 dotnet_diagnostic.ACL1005.severity = none
 
+# [STYLE] Code block should have braces, excluding null argument checks
+dotnet_diagnostic.ACL1006.severity = warning
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
@@ -106,7 +109,7 @@ dotnet_diagnostic.AV1562.severity = suggestion
 dotnet_diagnostic.AV1564.severity = suggestion
 
 # Don't use parameters as temporary variables
-dotnet_diagnostic.AV1568.severity = warning
+dotnet_diagnostic.AV1568.severity = none
 
 # Don't include numbers in variables, parameters and type members
 dotnet_diagnostic.AV1704.severity = warning
@@ -265,7 +268,7 @@ dotnet_diagnostic.CA1060.severity = none
 dotnet_diagnostic.CA1061.severity = warning
 
 # [DESIGN] Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity = warning
+dotnet_diagnostic.CA1062.severity = suggestion
 
 # [DESIGN] Implement IDisposable Correctly
 dotnet_diagnostic.CA1063.severity = warning
@@ -888,8 +891,8 @@ dotnet_diagnostic.RCS1005.severity = warning
 # [SIMPLIFICATION] Merge else clause with nested if statement
 dotnet_diagnostic.RCS1006.severity = warning
 
-# [STYLE] Add braces
-dotnet_diagnostic.RCS1007.severity = warning
+# [STYLE] Add braces *** Suppress as covered by ACL1006 ***
+dotnet_diagnostic.RCS1007.severity = none
 
 # [READABILITY] Use explicit type instead of 'var' (when the type is not obvious)
 dotnet_diagnostic.RCS1008.severity = none
