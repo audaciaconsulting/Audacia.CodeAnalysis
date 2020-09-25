@@ -8,5 +8,6 @@
         public const string ParameterCount = "ACL1003";
         public const string NoAbbreviations = "ACL1004";
         public const string AsyncSuffix = "ACL1005";
+        public const string IncludeBraces = "ACL1006";
     }
 }

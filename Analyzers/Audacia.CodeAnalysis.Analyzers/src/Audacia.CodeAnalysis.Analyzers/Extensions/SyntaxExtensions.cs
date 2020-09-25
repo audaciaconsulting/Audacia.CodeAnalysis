@@ -29,7 +29,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             {
                 var ifStatement = (IfStatementSyntax)statementSyntax;
 
-                return ifStatement.IsSingleStatement() && ifStatement.ContainsThrowArgumentNullExceptionStatement();
+                return ifStatement.IsArgumentNullCheck();
             }
 
             if (statementSyntax.IsKind(SyntaxKind.ThrowStatement))
@@ -59,6 +59,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Checks whether the given <paramref name="ifStatementSyntax"/> represents an argument null check,
+        /// i.e. a construct like this:
+        /// <code>
+        /// if (arg == null) throw new ArgumentNullException(nameof(arg));
+        /// </code>
+        /// </summary>
+        /// <param name="ifStatementSyntax"></param>
+        internal static bool IsArgumentNullCheck(this IfStatementSyntax ifStatementSyntax)
+        {
+            return ifStatementSyntax.IsSingleStatement() && ifStatementSyntax.ContainsThrowArgumentNullExceptionStatement();
         }
 
         /// <summary>
@@ -129,6 +142,106 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             var identifierName = (IdentifierNameSyntax)creationStatement.Type;
 
             return identifierName.Identifier.ValueText == nameof(ArgumentNullException);
+        }
+
+        internal static StatementSyntax EmbeddedStatement(this CommonForEachStatementSyntax forEachStatement)
+        {
+            StatementSyntax statement = forEachStatement.Statement;
+
+            return statement.IfNotBlock();
+        }
+
+        internal static StatementSyntax EmbeddedStatement(this DoStatementSyntax doStatement)
+        {
+            StatementSyntax statement = doStatement.Statement;
+
+            return statement.IfNotBlock();
+        }
+
+        internal static StatementSyntax EmbeddedStatement(this FixedStatementSyntax fixedStatement)
+        {
+            StatementSyntax statement = fixedStatement.Statement;
+
+            return statement.IfNotBlock();
+        }
+
+        internal static StatementSyntax EmbeddedStatement(this ForStatementSyntax forStatement)
+        {
+            StatementSyntax statement = forStatement.Statement;
+
+            return statement.IfNotBlock();
+        }
+
+        internal static StatementSyntax EmbeddedStatement(this IfStatementSyntax ifStatement)
+        {
+            StatementSyntax statement = ifStatement.Statement;
+
+            return statement.IfNotBlock();
+        }
+
+        internal static StatementSyntax EmbeddedStatement(this LockStatementSyntax lockStatement)
+        {
+            StatementSyntax statement = lockStatement.Statement;
+
+            return statement.IfNotBlock();
+        }
+
+        internal static StatementSyntax EmbeddedStatement(this WhileStatementSyntax whileStatement)
+        {
+            StatementSyntax statement = whileStatement.Statement;
+
+            return statement.IfNotBlock();
+        }
+
+        private static StatementSyntax IfNotBlock(this StatementSyntax statement) =>
+            (statement?.Kind() == SyntaxKind.Block) ? null : statement;
+
+        internal static StatementSyntax EmbeddedStatement(this UsingStatementSyntax usingStatement, bool allowUsingStatement = true)
+        {
+            StatementSyntax statement = usingStatement.Statement;
+
+            if (statement == null)
+            {
+                return null;
+            }
+
+            SyntaxKind kind = statement.Kind();
+
+            if (kind == SyntaxKind.Block)
+            {
+                return null;
+            }
+
+            if (!allowUsingStatement && kind == SyntaxKind.UsingStatement)
+            {
+                return null;
+            }
+
+            return statement;
+        }
+
+        internal static StatementSyntax EmbeddedStatement(this ElseClauseSyntax elseClause, bool allowIfStatement = true)
+        {
+            StatementSyntax statement = elseClause.Statement;
+
+            if (statement == null)
+            {
+                return null;
+            }
+
+            SyntaxKind kind = statement.Kind();
+
+            if (kind == SyntaxKind.Block)
+            {
+                return null;
+            }
+
+            if (!allowIfStatement && kind == SyntaxKind.IfStatement)
+            {
+                return null;
+            }
+
+            return statement;
         }
     }
 }
