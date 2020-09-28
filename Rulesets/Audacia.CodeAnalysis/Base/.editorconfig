@@ -432,7 +432,7 @@ dotnet_diagnostic.CA1828.severity = warning
 # [PERFORMANCE] Use Length/Count property instead of Count() when available
 dotnet_diagnostic.CA1829.severity = warning
 
-# [RELIABILITY] Dispose objects before losing scope *** Suprress as covered by IDISP004 ***
+# [RELIABILITY] Dispose objects before losing scope *** Suppress as covered by IDISP004 ***
 dotnet_diagnostic.CA2000.severity = none
 
 # [RELIABILITY] Do not lock on objects with weak identity
