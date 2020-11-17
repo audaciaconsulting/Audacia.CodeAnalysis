@@ -1239,8 +1239,8 @@ dotnet_diagnostic.RCS1151.severity = warning
 # [READABILITY] Sort enum members
 dotnet_diagnostic.RCS1154.severity = warning
 
-# [USAGE] Use StringComparison when comparing strings
-dotnet_diagnostic.RCS1155.severity = warning
+# [USAGE] Use StringComparison when comparing strings *** Suppress as covered by CA1304 and CA1307 ***
+dotnet_diagnostic.RCS1155.severity = none
 
 # [USAGE] Use string.Length instead of comparison with empty string *** Suppress as covered by CA1820 ***
 dotnet_diagnostic.RCS1156.severity = none
@@ -1749,8 +1749,8 @@ dotnet_diagnostic.SA1117.severity = suggestion
 # A parameter to a C# method or indexer, other than the first parameter, spans across multiple lines.
 dotnet_diagnostic.SA1118.severity = warning
 
-# A C# statement contains parenthesis which are unnecessary and should be removed.
-dotnet_diagnostic.SA1119.severity = warning
+# A C# statement contains parenthesis which are unnecessary and should be removed. *** Suppress as redundant parentheses can add structure that makes code more readable ***
+dotnet_diagnostic.SA1119.severity = none
 
 # The C# comment does not contain any comment text.
 dotnet_diagnostic.SA1120.severity = warning
