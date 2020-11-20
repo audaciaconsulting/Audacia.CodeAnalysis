@@ -24,7 +24,13 @@ Finally, clean and rebuild your solution (it may take a while first time round).
 
 ## IDE Support
 
-You must be using Visual Studio version 16.5+ or Rider version 2020.2+ for full .editorconfig support.
+You must be using Visual Studio version 16.5+ or Rider version 2020.2+ for .editorconfig support.
+
+### Rider Support
+
+Rider doesn't fully support custom settings in .editorconfig. This issue has been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53508)), but in the meantime a workaround is documented [here](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FAnalyzers%2FAudacia.CodeAnalysis.Analyzers&anchor=custom-.editorconfig-settings-in-rider).
+
+There are a few rules that Rider's code analysis doesn't pick up, for example CA1033, CA1008 and AV1715. This issue has also been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53376)).
 
 ## Excluding Generated Code
 
