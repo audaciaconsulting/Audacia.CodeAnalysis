@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Audacia.CodeAnalysis.Analyzers.Settings
@@ -8,10 +9,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Settings
         private const string EditorConfigFileName = ".editorconfig";
 
         private readonly AnalyzerConfigOptionsProvider _analyzerConfigOptionsProvider;
+        private readonly AdditionalFilesReader _additionalFilesReader;
 
         public EditorConfigSettingsReader(AnalyzerOptions options)
         {
             _analyzerConfigOptionsProvider = options.AnalyzerConfigOptionsProvider;
+            _additionalFilesReader = new AdditionalFilesReader(
+                options.AdditionalFiles
+                    .Where(f => f.Path.EndsWith(EditorConfigFileName))
+                    .Select(f => new AdditionalTextFacade(f))
+                    .ToArray());
         }
 
         public int? TryGetInt(SyntaxTree syntaxTree, SettingsKey key)
@@ -35,8 +42,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Settings
         {
             var options = _analyzerConfigOptionsProvider.GetOptions(syntaxTree);
             var isFound = options.TryGetValue(key.ToString(), out var value);
+            if (!isFound)
+            {
+                // Rider does not load .editorconfig as the AnalyzerConfigOptionsProvider
+                // A workaround is to load .editorconfig files as 'additional files', so we check them here
+                value = _additionalFilesReader.TryGetValue(key);
+            }
 
-            return isFound ? value : null;
+            return value;
         }
 
         public bool? TryGetBool(SyntaxTree syntaxTree, SettingsKey key)
