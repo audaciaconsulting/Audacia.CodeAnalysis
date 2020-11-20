@@ -181,3 +181,26 @@ public void SomeMethod(string arg)
 ```
 
 The justification for this exclusion is that argument null checks, while advised, add noise to a codebase, and minimising this noise is useful.
+
+# Custom .editorconfig Settings in Rider
+
+Some of the rules (e.g. ACL1002, ACL1003 and ACL1004) make use of custom .editorconfig settings. For example the maximum statement count for rule ACL1002 can be configured like this:
+```
+dotnet_diagnostic.ACL1002.max_statement_count = 6
+```
+
+Rider does not support these custom settings when performing its code analysis (however such settings are fully supported in Visual Studio, and also by the C# compiler itself, even when run in Rider). This issue has been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53508)), however until this functionality is supported in Rider, the following workaround can be employed.
+
+The relevant .editorconfig file(s) can be added as 'additional files' in the appropriate .csproj file(s). They should be added in order of specificity (i.e. the most specific .editorconfig added first). For example, the .csproj below declares a group of additional files called 'AnalyzerSettings' (this name can be whatever you want), and adds two .editorconfig files to this group (the first one located in the same directory as the .csproj file, and the second one located in the directory above):
+```xml
+<PropertyGroup>
+  <OutputType>Exe</OutputType>
+  <TargetFramework>netcoreapp3.1</TargetFramework>
+  <AdditionalFileItemNames>AnalyzerSettings</AdditionalFileItemNames>
+</PropertyGroup>
+
+<ItemGroup>
+  <AnalyzerSettings Include=".editorconfig" />
+  <AnalyzerSettings Include="../.editorconfig" />
+</ItemGroup>
+```
