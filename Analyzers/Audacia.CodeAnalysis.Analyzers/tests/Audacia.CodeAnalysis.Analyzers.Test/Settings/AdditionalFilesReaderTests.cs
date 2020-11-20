@@ -71,5 +71,39 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Settings
 
             mockFileTwo.Verify(f => f.FindRuleSettingValue(key), Times.Never);
         }
+
+        [TestMethod]
+        public void Whitespace_excluded_from_value_returned()
+        {
+            var key = new SettingsKey("abc", "name");
+            const string expectedValue = "123";
+
+            var mockFile = new Mock<IAdditionalText>();
+            mockFile.SetupGet(f => f.Path).Returns("dummy-path");
+            mockFile.Setup(f => f.FindRuleSettingValue(key)).Returns($"{key} = {expectedValue}  ");
+
+            var reader = new AdditionalFilesReader(new[] { mockFile.Object });
+
+            var actualValue = reader.TryGetValue(key);
+
+            Assert.AreEqual(expectedValue, actualValue);
+        }
+
+        [TestMethod]
+        public void Null_value_returned_if_setting_malformed()
+        {
+            var key = new SettingsKey("abc", "name");
+
+            var mockFile = new Mock<IAdditionalText>();
+            mockFile.SetupGet(f => f.Path).Returns("dummy-path");
+            // Malformed means no '=' sign
+            mockFile.Setup(f => f.FindRuleSettingValue(key)).Returns($"{key}  123");
+
+            var reader = new AdditionalFilesReader(new[] { mockFile.Object });
+
+            var actualValue = reader.TryGetValue(key);
+
+            Assert.IsNull(actualValue);
+        }
     }
 }
