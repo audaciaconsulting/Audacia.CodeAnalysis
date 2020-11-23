@@ -106,3 +106,9 @@ All rules are prefixed `IDISP`.
 [DocumentationAnalyzers](https://github.com/DotNetAnalyzers/DocumentationAnalyzers) provides analyzers for checking correct usage in documentation.
 
 All rules are prefixed with `DOC`.
+
+### Entity Framework Core Analyzers
+
+[Microsoft.EntityFrameworkCore.Analyzers](https://github.com/dotnet/efcore/tree/main/src/EFCore.Analyzers) provides C# analyzers for Entity Framework Core.
+
+All rules are prefixed `EF`.
