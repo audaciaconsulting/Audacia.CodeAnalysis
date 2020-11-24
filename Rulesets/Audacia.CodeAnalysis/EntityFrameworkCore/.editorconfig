@@ -1,0 +1,10 @@
+# NOTE: Requires **VS2019 16.3** or later
+
+# EntityFrameworkCore Rules
+# Description: Ruleset with rule overrides for AspNetCore apps using Entity Framework Core
+
+# Code files
+[*.cs]
+
+# Rule
+dotnet_diagnostic.EF1001.severity = warning
