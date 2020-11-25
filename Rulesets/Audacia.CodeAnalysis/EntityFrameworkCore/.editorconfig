@@ -6,5 +6,5 @@
 # Code files
 [*.cs]
 
-# Enable NetAnalyzers reliability and globalization rules
+# Internal EF Core API usage.
 dotnet_diagnostic.EF1001.severity = warning
