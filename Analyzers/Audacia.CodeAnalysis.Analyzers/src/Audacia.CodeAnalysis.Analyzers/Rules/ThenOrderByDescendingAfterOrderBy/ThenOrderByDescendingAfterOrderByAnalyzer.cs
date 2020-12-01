@@ -13,8 +13,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenOrderByDescendingAfterOrderBy
     {
         public const string Id = DiagnosticId.ThenOrderByDescendingAfterOrderBy;
 
+        public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
+
         private const string Title = "OrderByDescending statement follows OrderBy or OrderByDescending statement.";
-        private const string MessageFormat = "ThenOrderByDescending statement should follow OrderBy or OrderByDescending statement.";
+        private const string MessageFormat = "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement.";
         private const string Description = "Use ThenOrderByDescending rather than OrderByDescending.";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
@@ -57,7 +59,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenOrderByDescendingAfterOrderBy
 
             if (firstOrderByTokenIndex < lastAppearanceIndex)
             {
-                var location = context.Node.GetLocation();
+                var location = lastAppearance.GetLocation();
                 var kind = context.Node.Kind();
                 ISymbol member = context.ContainingSymbol;
                 var memberName = member.Name;
