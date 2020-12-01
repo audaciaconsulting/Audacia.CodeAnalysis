@@ -4,9 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Threading;
-using Roslynator.CSharp.Syntax;
-//using Roslynator.CSharp;
+using System.Linq;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenOrderByDescendingAfterOrderBy
 {
@@ -36,57 +34,41 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenOrderByDescendingAfterOrderBy
             var invocationExpression = (InvocationExpressionSyntax)context.Node;
 
             var dataFlowAnalysis = context.SemanticModel.AnalyzeDataFlow(invocationExpression);
-                        
 
-            //if (IsOrderByOrOrderByDescending(invocationInfo.InvocationExpression, context.SemanticModel, context.CancellationToken)
-            //    && IsOrderByOrOrderByDescending(invocationInfo2.InvocationExpression, context.SemanticModel, context.CancellationToken))
-            //{
-            //    var location = context.Node.GetLocation();
-            //    var kind = context.Node.Kind();
-            //    var memberName = invocationInfo.Name;
+            //Check if invocation expression contains OrderByDescending string.
+            if (!invocationExpression.GetText().ToString().Contains("OrderByDescending"))
+            {
+                return;
+            }
 
-            //    context.ReportDiagnostic(
-            //        Diagnostic.Create(
-            //        Rule,
-            //        location,
-            //        kind,
-            //        memberName));
-            //}
+            //Get tokens descending from this invocation expression.
+            var tokens = invocationExpression.DescendantTokens()
+                .Where(token => token.ValueText == "OrderBy" || token.ValueText == "OrderByDescending")
+                .ToList();
+
+            //Find last appearance of 'OrderByDescending' in the expression.
+            var lastAppearance = tokens.Last(t => t.ValueText == "OrderByDescending");
+            var lastAppearanceIndex = tokens.IndexOf(lastAppearance);
+
+            //Find the first appearance of 'OrderBy' or 'OrderByDescending' in the expression.
+            var firstOrderByToken = tokens.First(t => t.ValueText == "OrderBy" || t.ValueText == "OrderByDescending");
+            var firstOrderByTokenIndex = tokens.IndexOf(firstOrderByToken);
+
+
+            if (firstOrderByTokenIndex < lastAppearanceIndex)
+            {
+                var location = context.Node.GetLocation();
+                var kind = context.Node.Kind();
+                ISymbol member = context.ContainingSymbol;
+                var memberName = member.Name;
+
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                    Rule,
+                    location,
+                    kind,
+                    memberName));
+            }
         }
-
-        //private static bool IsOrderByOrOrderByDescending(InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel, CancellationToken cancellationToken)
-        //{
-        //    IMethodSymbol methodSymbol = semanticModel.GetExtensionMethodInfo(invocationExpression, cancellationToken).Symbol;
-
-        //    return methodSymbol?.IsName("OrderBy", "OrderByDescending") == true
-        //        && SymbolUtility.IsLinqExtensionOfIEnumerableOfT(methodSymbol);
-        //}
-
-        //public static void AnalyzeImported(SyntaxNodeAnalysisContext context, in SimpleMemberInvocationExpressionInfo invocationInfo)
-        //{
-        //    ExpressionSyntax expression = invocationInfo.Expression;
-
-        //    if (expression.Kind() != SyntaxKind.InvocationExpression)
-        //        return;
-
-        //    SimpleMemberInvocationExpressionInfo invocationInfo2 = SyntaxInfo.SimpleMemberInvocationExpressionInfo((InvocationExpressionSyntax)expression);
-
-        //    if (!invocationInfo2.Success)
-        //        return;
-
-        //    if (!StringUtility.Equals(invocationInfo2.NameText, "OrderBy", "OrderByDescending"))
-        //        return;
-
-        //    if (IsOrderByOrOrderByDescending(invocationInfo.InvocationExpression, context.SemanticModel, context.CancellationToken)
-        //        && IsOrderByOrOrderByDescending(invocationInfo2.InvocationExpression, context.SemanticModel, context.CancellationToken))
-        //    {
-        //        DiagnosticHelpers.ReportDiagnostic(
-        //            context,
-        //            DiagnosticDescriptors.CallThenByInsteadOfOrderBy,
-        //            invocationInfo.Name,
-        //            (invocationInfo.NameText == "OrderByDescending") ? "Descending" : null);
-        //    }
-        //}
     }
-
 }

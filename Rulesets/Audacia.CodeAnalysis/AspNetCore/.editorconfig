@@ -66,3 +66,6 @@ dotnet_diagnostic.CA1055.severity = none
 
 # [DESIGN] Uri properties should not be strings *** Suppress as ASP.NET generally handles urls as strings ***
 dotnet_diagnostic.CA1056.severity = none
+
+# OrderByDescending LINQ expression follows OrderBy or OrderByDescending.
+dotnet_diagnostic.ACL1007.severity = warning
