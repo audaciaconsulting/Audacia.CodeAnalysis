@@ -9,6 +9,9 @@
 # Methods should not exceed a predefined number of statements.
 dotnet_diagnostic.ACL1002.max_statement_count = 20 # Increase max count for tests, as they may contain complex setup
 
+# ACL1007: ThenByDescending follows OrderBy or OrderByDescending.
+dotnet_diagnostic.ACL1007.severity = suggestion
+
 # A property, method or local function should do only one thing *** Suppress as test methods may contain 'And' to make them more descriptive ***
 dotnet_diagnostic.AV1115.severity = none
 

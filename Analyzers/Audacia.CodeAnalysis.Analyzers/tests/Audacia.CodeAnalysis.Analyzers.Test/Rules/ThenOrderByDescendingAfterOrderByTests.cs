@@ -2,24 +2,24 @@
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Audacia.CodeAnalysis.Analyzers.Rules.ThenOrderByDescendingAfterOrderBy;
+using Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using CodeFixVerifier = Audacia.CodeAnalysis.Analyzers.Test.Base.CodeFixVerifier;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 {
     [TestClass]
-    public class ThenOrderByDescendingAfterOrderByTests : CodeFixVerifier
+    public class ThenByDescendingAfterOrderByTests : CodeFixVerifier
     {
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new ThenOrderByDescendingAfterOrderByAnalyzer();
+            => new ThenByDescendingAfterOrderByAnalyzer();
 
         private DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
         {
             var diagnosticResult = new DiagnosticResult
             {
-                Id = ThenOrderByDescendingAfterOrderByAnalyzer.Id,
-                Severity = ThenOrderByDescendingAfterOrderByAnalyzer.Severity,
+                Id = ThenByDescendingAfterOrderByAnalyzer.Id,
+                Severity = ThenByDescendingAfterOrderByAnalyzer.Severity,
                 Message = message,
                 Locations =
                     new[] {

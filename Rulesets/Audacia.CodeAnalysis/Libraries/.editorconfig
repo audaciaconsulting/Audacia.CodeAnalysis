@@ -6,6 +6,8 @@
 # Code files
 [*.cs]
 
+# ACL1007: ThenByDescending follows OrderBy or OrderByDescending.
+dotnet_diagnostic.ACL1007.severity = suggestion
 
 # [DESIGN] Implement standard exception constructors
 dotnet_diagnostic.CA1032.severity = warning

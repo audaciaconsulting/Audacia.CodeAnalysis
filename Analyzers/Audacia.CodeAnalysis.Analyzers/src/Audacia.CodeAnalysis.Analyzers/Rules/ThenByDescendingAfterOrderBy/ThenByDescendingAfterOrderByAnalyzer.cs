@@ -6,12 +6,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Linq;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenOrderByDescendingAfterOrderBy
+namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class ThenOrderByDescendingAfterOrderByAnalyzer : DiagnosticAnalyzer
+    public sealed class ThenByDescendingAfterOrderByAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.ThenOrderByDescendingAfterOrderBy;
+        public const string Id = DiagnosticId.ThenByDescendingAfterOrderBy;
 
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
