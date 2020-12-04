@@ -182,11 +182,11 @@ public void SomeMethod(string arg)
 
 The justification for this exclusion is that argument null checks, while advised, add noise to a codebase, and minimising this noise is useful.
 
-## ACL1007
+## ACL1007 - ThenByDescending instead of OrderByDescending if follows OrderBy or OrderByDescending statement
 
-ACL1007 is similar in function to the Roslynator rule [RCS1200](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1200.md), which checks if an 'OrderBy' follows an 'OrderBy' or 'OrderByDescending', and suggests using 'ThenBy' instead if so.
+ACL1007 is similar in function to the Roslynator rule [RCS1200](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1200.md), which checks if an `OrderBy` follows an `OrderBy` or `OrderByDescending`, and suggests using `ThenBy` instead if so.
 
-ACL1007 checks if an 'OrderByDescending' follows an 'OrderBy' or 'OrderByDescending' and suggests using 'ThenByDescending' instead if so.
+ACL1007 checks if an `OrderByDescending` follows an `OrderBy` or `OrderByDescending` and suggests using `ThenByDescending` instead if so.
 
 Code with diagnostic:
 ```csharp
