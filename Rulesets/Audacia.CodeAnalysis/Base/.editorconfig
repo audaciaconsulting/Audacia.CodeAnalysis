@@ -30,6 +30,9 @@ dotnet_diagnostic.ACL1005.severity = none
 # [STYLE] Code block should have braces, excluding null argument checks
 dotnet_diagnostic.ACL1006.severity = warning
 
+# ACL1007: ThenByDescending follows OrderBy or OrderByDescending.
+dotnet_diagnostic.ACL1007.severity = suggestion
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
