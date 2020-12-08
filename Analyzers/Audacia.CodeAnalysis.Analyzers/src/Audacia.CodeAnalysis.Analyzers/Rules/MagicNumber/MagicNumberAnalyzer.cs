@@ -65,19 +65,31 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
                 }
                 else if (syntaxNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 {
-                    var literal = (LiteralExpressionSyntax)syntaxNode;
-                    if (literal.Token.Value is int integer &&
-                        (integer == 0 || integer == 1))
+                    if (IsAcceptableInteger(syntaxNode))
                     {
-                        // No diagnostic if it's a literal 0 or 1
-                        // 0 is a often used as a literal e.g. with the null coalescing operator
-                        // 1 is a special case as it's common in code to increment/decrement by 1 so this should also be allowed
                         return;
                     }
 
                     context.ReportDiagnostic(Diagnostic.Create(Rule, syntaxNode.GetLocation(), variable.Identifier.Text));
                 }
             }
+        }
+
+        private static bool IsAcceptableInteger(CSharpSyntaxNode syntaxNode)
+        {
+            var literal = (LiteralExpressionSyntax)syntaxNode;
+            if (literal.Token.Value is int integer)
+            {
+                // No diagnostic if it's a literal 0 or 1, or a multiple of 10
+                // 0 is a often used as a literal e.g. with the null coalescing operator
+                // 1 is a special case as it's common in code to increment/decrement by 1 so this should also be allowed
+                // Multiples of 10 are often used to convert between units (e.g. pounds/pence, grams/kilograms) or to/from percentages
+                // and it's usually clear from context that this is happening
+
+                return integer == 0 || integer == 1 || (integer % 10 == 0);
+            }
+
+            return false;
         }
     }
 }
