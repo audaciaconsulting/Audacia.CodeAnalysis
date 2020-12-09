@@ -294,6 +294,40 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             VerifyNoDiagnostic(test);
         }
 
+        [TestMethod]
+        public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_10()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var testVar = arg * 10;
+            }
+        }
+    }";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_A_Multiple_Of_10()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var testVar = arg * 1000;
+            }
+        }
+    }";
+            VerifyNoDiagnostic(test);
+        }
+
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
             return null;
