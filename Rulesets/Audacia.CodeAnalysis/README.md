@@ -22,6 +22,10 @@ If you have a specific kind of project that falls into one of the categories bel
 
 Finally, clean and rebuild your solution (it may take a while first time round). You will probably notice a lot of inspection warnings that were not present before.
 
+### .NET Framework Projects
+
+When installing the `Audacia.CodeAnalysis` NuGet package in .NET Framework projects you may need to do using package manager console with the `-IncludePreRelease` argument specified explicitly. This is because some of the analyzers referenced are pre-release packages and .NET Framework seems to need you to opt-in to such packages.
+
 ## IDE Support
 
 You must be using Visual Studio version 16.5+ or Rider version 2020.2+ for .editorconfig support.
