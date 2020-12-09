@@ -2,6 +2,20 @@
 
 The `Audacia.CodeAnalysis.Analyzers` library contains custom Roslyn analyzers. These analyzers are provided to enforce coding standards where no existing analyzer exists for the rule in question.
 
+# Contributing
+
+In order to add a new analyzer you can follow existing analyzers as a guide. The most important thing is that each analyzer has a unique ID (the convention is to prefix them "ACL"). So if the last analyzer was "ACL1007", the next one should be "ACL1008".
+
+Once the analyzer is finished, you should:
+1. Ensure its use and purpose is documented in this README file
+1. Submit a PR to merge the changes into `master`
+    - when the PR completes a build will be triggered that publishes a new version of the `Audacia.CodeAnalysis.Analyzers` NuGet package
+1. Update the `Audacia.CodeAnalysis.Analyzers` package in the main `Audacia.CodeAnalysis` project
+1. Submit a second PR to merge the `Audacia.CodeAnalysis` change into `master`
+    - when the PR completes a build will be triggered that publishes a new version of the `Audacia.CodeAnalysis` NuGet package
+
+Note the second PR is needed as `Audacia.CodeAnalysis.Analyzers` should be consumed via the main `Audacia.CodeAnalysis` package. It cannot be a direct project reference as analyzers must be reference via a NuGet package.
+
 # Analyzers
 
 ## ACL1000 - Private fields should be prefixed with an underscore
