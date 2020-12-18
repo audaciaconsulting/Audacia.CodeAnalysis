@@ -51,7 +51,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
 
         private static void AnalyzeCodeBlock(CodeBlockAnalysisContext context, EditorConfigSettingsReader settingsReader)
         {
-            if (context.OwningSymbol is INamedTypeSymbol || context.OwningSymbol.IsSynthesized())
+            if (ShouldSkipSymbol(context.OwningSymbol))
             {
                 return;
             }
@@ -65,6 +65,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
                 ReportAtContainingSymbol(statementWalker.StatementCount, maxStatementCount, context);
             }
         }
+
+        private static bool ShouldSkipSymbol(ISymbol symbol) =>
+            symbol is INamedTypeSymbol ||
+            symbol.Kind == SymbolKind.Namespace ||
+            symbol.IsSynthesized();
 
         private static int GetMaxStatementCount(CodeBlockAnalysisContext context, EditorConfigSettingsReader settingsReader)
         {
