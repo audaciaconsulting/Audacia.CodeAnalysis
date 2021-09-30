@@ -106,13 +106,13 @@ dotnet_diagnostic.AV1555.severity = none
 dotnet_diagnostic.AV1561.severity = none
 
 # Don't use ref or out parameters
-dotnet_diagnostic.AV1562.severity = suggestion
+dotnet_diagnostic.AV1562.severity = warning
 
 # Avoid signatures that take a bool parameter
-dotnet_diagnostic.AV1564.severity = suggestion
+dotnet_diagnostic.AV1564.severity = warning
 
 # Don't use parameters as temporary variables
-dotnet_diagnostic.AV1568.severity = none
+dotnet_diagnostic.AV1568.severity = suggestion
 
 # Don't include numbers in variables, parameters and type members
 dotnet_diagnostic.AV1704.severity = warning
@@ -927,8 +927,8 @@ dotnet_diagnostic.RCS1017.severity = none
 # [READABILITY] Add default access modifier
 dotnet_diagnostic.RCS1018.severity = warning
 
-# [READABILITY] Order modifiers
-dotnet_diagnostic.RCS1019.severity = warning
+# [READABILITY] Order modifiers *** Suppressed as covered by SA1206 ***
+dotnet_diagnostic.RCS1019.severity = none
 
 # [SIMPLIFICATION] Simplify Nullable\<T> to T?
 dotnet_diagnostic.RCS1020.severity = warning
