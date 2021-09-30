@@ -1,0 +1,7 @@
+# EF Migration Rules
+# Description: Ruleset to disable all analysis on EF Migration classes
+
+# Code files
+[*.cs]
+
+generated_code = true
