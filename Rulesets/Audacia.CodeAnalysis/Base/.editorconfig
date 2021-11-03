@@ -934,7 +934,7 @@ dotnet_diagnostic.RCS1019.severity = none
 dotnet_diagnostic.RCS1020.severity = warning
 
 # [SIMPLIFICATION] Simplify lambda expression
-dotnet_diagnostic.RCS1021.severity = warning
+dotnet_diagnostic.RCS1021.severity = suggestion
 
 # [FORMATTING] Format empty block
 dotnet_diagnostic.RCS1023.severity = none

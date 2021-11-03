@@ -43,8 +43,8 @@ dotnet_diagnostic.ASP011.severity = warning
 # Don't use [controller].
 dotnet_diagnostic.ASP012.severity = warning
 
-# Name the controller to match the route.
-dotnet_diagnostic.ASP013.severity = warning
+# Name the controller to match the route *** Suggestion rather than Warning as controllers that map to nested routes (which should be encouraged), e.g. '/customers/{id}/addresses', violate this rule ***
+dotnet_diagnostic.ASP013.severity = suggestion
 
 # Call the more overloaded method from other overloads *** Suppress as controller actions often look like overloads but are different HTTP methods ***
 dotnet_diagnostic.AV1551.severity = none
@@ -55,14 +55,8 @@ dotnet_diagnostic.AV1711.severity = none
 # [NAMING] Asynchronous method name should end with 'Async' *** Suppress as controller actions should not be suffixed ***
 dotnet_diagnostic.RCS1046.severity = none
 
-# [NAMING] Asynchronous method name should be suffixed with 'Async'
+# [NAMING] Asynchronous method name should be suffixed with 'Async', with an exception for controller actions
 dotnet_diagnostic.ACL1005.severity = warning
 
-# [DESIGN] Uri parameters should not be strings *** Suppress as ASP.NET generally handles urls as strings ***
-dotnet_diagnostic.CA1054.severity = none
-
-# [DESIGN] Uri return values should not be strings *** Suppress as ASP.NET generally handles urls as strings ***
-dotnet_diagnostic.CA1055.severity = none
-
-# [DESIGN] Uri properties should not be strings *** Suppress as ASP.NET generally handles urls as strings ***
-dotnet_diagnostic.CA1056.severity = none
+# [SECURITY] Controller method is vulnerable to CSRF *** Suppress as API actions cannot implement CSRF protection ***
+dotnet_diagnostic.SCS0016.severity = none
