@@ -109,6 +109,8 @@ All rules are prefixed `SA`.
 
 All rules are prefixed `REFL`.
 
+** Note the ReflectionAnalyzers package has been temporarily removed from Audacia.CodeAnalysis as the release of Visual Studio 2022 (with the latest version of Roslyn) has caused errors when loading the analyzers. This is being tracked by [this GitHub issue](https://github.com/GuOrg/Gu.Analyzers/issues/315) and the package will be re-added when the issue is resolved. **
+
 ### IDisposableAnalyzers
 
 [IDisposableAnalyzers](https://github.com/DotNetAnalyzers/IDisposableAnalyzers) provides analyzers for checking correct usage of `IDisposable` in C# code.
