@@ -7,7 +7,7 @@
     <Copyright>Copyright © Audacia 2020</Copyright>
     <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
     <DevelopmentDependency>true</DevelopmentDependency>
-    <Version>1.0.0.0</Version>
+    <Version>2.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Audacia.CodeAnalysis.Analyzers" Version="1.1.20353.1" />

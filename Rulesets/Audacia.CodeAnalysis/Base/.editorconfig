@@ -930,8 +930,8 @@ dotnet_diagnostic.RCS1018.severity = warning
 # [READABILITY] Order modifiers *** Suppressed as covered by SA1206 ***
 dotnet_diagnostic.RCS1019.severity = none
 
-# [SIMPLIFICATION] Simplify Nullable\<T> to T?
-dotnet_diagnostic.RCS1020.severity = warning
+# [SIMPLIFICATION] Simplify Nullable\<T> to T? *** Suppressed as covered by SA1125 ***
+dotnet_diagnostic.RCS1020.severity = none
 
 # [SIMPLIFICATION] Simplify lambda expression
 dotnet_diagnostic.RCS1021.severity = suggestion
@@ -2187,108 +2187,96 @@ dotnet_diagnostic.SA1651.severity = suggestion
 # This rule was moved to [SA0001](SA0001.md)
 dotnet_diagnostic.SA1652.severity = none
 
-# Injection
-# [SECURITY] The dynamic value passed to the command execution should be validated.
+# [SECURITY] Command Injection
 dotnet_diagnostic.SCS0001.severity = warning
 
-# SQL Injection
-# [SECURITY] Unsafe usage of System.Web.UI.WebControls.SqlDataSource, System.Web.UI.WebControls.SqlDataSourceView or Microsoft.Whos.Framework.Data.SqlUtility.
+# [SECURITY] SQL Injection
 dotnet_diagnostic.SCS0002.severity = warning
 
-# [SECURITY] The dynamic value passed to the XPath query should be validated.
+# [SECURITY] XPath Injection
 dotnet_diagnostic.SCS0003.severity = warning
 
-# Cryptography
-# [SECURITY] Certificate Validation has been disabled. The communication could be intercepted.
+# [SECURITY] Certificate Validation Disabled
 dotnet_diagnostic.SCS0004.severity = warning
 
-# [SECURITY] The random numbers generated could be predicted.
+# [SECURITY] Weak Random Number Generator
 dotnet_diagnostic.SCS0005.severity = none
 
-# [SECURITY] MD5 or SHA1 have known collision weaknesses and are no longer considered strong hashing algorithms.
+# [SECURITY] Weak Hashing Function
 dotnet_diagnostic.SCS0006.severity = warning
 
-# [SECURITY] The XML parser is configured incorrectly. The operation could be vulnerable to XML eXternal Entity (XXE) processing.
+# [SECURITY] XML eXternal Entity Injection (XXE)
 dotnet_diagnostic.SCS0007.severity = warning
 
-# Cookies
-# [SECURITY] It is recommended to specify the Secure flag to new cookie.
+# [SECURITY] Cookie Without SSL Flag
 dotnet_diagnostic.SCS0008.severity = warning
 
-# [SECURITY] It is recommended to specify the HttpOnly flag to new cookie.
+# [SECURITY] Cookie Without HttpOnly Flag
 dotnet_diagnostic.SCS0009.severity = warning
 
-# [SECURITY] DES and 3DES are not considered a strong cipher for modern applications. Currently, NIST recommends the usage of AES block ciphers instead.
+# [SECURITY] Weak cipher algorithm
 dotnet_diagnostic.SCS0010.severity = warning
 
-# [SECURITY] The CBC mode alone is susceptible to padding oracle attack.
+# [SECURITY] Unsafe XSLT setting used
 dotnet_diagnostic.SCS0011.severity = warning
 
-# [SECURITY] ECB mode will produce the same result for identical blocks (ie: 16 bytes for AES). An attacker could be able to guess the encrypted message. The use of AES in CBC mode with a HMAC is recommended guaranteeing integrity and confidentiality.
+# [SECURITY] Controller method is potentially vulnerable to authorization bypass
+# NOTE: This can be disabled if there is a fallback authorization policy set to require an authentication user
 dotnet_diagnostic.SCS0012.severity = warning
 
-# [SECURITY] The cipher text produced is susceptible to alteration by an adversary.
+# [SECURITY] Potential usage of weak CipherMode mode
 dotnet_diagnostic.SCS0013.severity = warning
 
-# [SECURITY] Unsafe usage of System.Web.UI.WebControls.SqlDataSource, System.Web.UI.WebControls.SqlDataSourceView or Microsoft.Whos.Framework.Data.SqlUtility.
-dotnet_diagnostic.SCS0014.severity = warning
-
-# Password Management
-# [SECURITY] The password configuration to this API appears to be hardcoded.
+# [SECURITY] Hardcoded Password
 dotnet_diagnostic.SCS0015.severity = warning
 
-# Request Validation
-# [SECURITY] Controller method is vulnerable to CSRF.
+# [SECURITY] Cross-Site Request Forgery (CSRF)
 dotnet_diagnostic.SCS0016.severity = warning
 
-# [SECURITY] Request validation is disabled. Request validation allows the filtering of some XSS patterns submitted to the application.
+# [SECURITY] Request Validation Disabled (Attribute)
 dotnet_diagnostic.SCS0017.severity = warning
 
-# [SECURITY] A path traversal attack (also known as directory traversal) aims to access files and directories that are stored outside the expected directory.By manipulating variables that reference files with “dot-dot-slash (../)” sequences and its variations or by using absolute file paths, it may be possible to access arbitrary files and directories stored on file system including application source code or configuration and critical system files.
+# [SECURITY] Path Traversal
 dotnet_diagnostic.SCS0018.severity = warning
 
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
-dotnet_diagnostic.SCS0020.severity = warning
+# [SECURITY] OutputCache Conflict
+dotnet_diagnostic.SCS0019.severity = warning
 
-# [SECURITY] The validateRequest which provides additional protection against XSS is disabled in configuration file.
+# [SECURITY] Request Validation Disabled (Configuration File)
 dotnet_diagnostic.SCS0021.severity = warning
 
-# View State
-# [SECURITY] The viewStateEncryptionMode is not set to Always in configuration file.
+# [SECURITY] Event Validation Disabled
+dotnet_diagnostic.SCS0022.severity = warning
+
+# [SECURITY] View State Not Encrypted
 dotnet_diagnostic.SCS0023.severity = warning
 
-# [SECURITY] The enableViewStateMac is disabled in configuration file. (This feature cannot be disabled starting .NET 4.5.1)
+# [SECURITY] View State MAC Disabled
 dotnet_diagnostic.SCS0024.severity = warning
 
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
-dotnet_diagnostic.SCS0025.severity = warning
-
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
+# [SECURITY] LDAP Distinguished Name Injection
 dotnet_diagnostic.SCS0026.severity = warning
 
-# [SECURITY] Open redirect: possibly unvalidated input in 1st argument passed to 'Redirect'.
+# [SECURITY] Open Redirect
 dotnet_diagnostic.SCS0027.severity = warning
 
-# [SECURITY] A potential XSS was found. The endpoint returns a variable from the client input that has not been encoded. To protect against stored XSS attacks, make sure any dynamic content coming from user or data store cannot be used to inject JavaScript on a page. Most modern frameworks will escape dynamic content by default automatically (Razor for example) or by using special syntax (<%: content %>, <%= HttpUtility.HtmlEncode(content) %>).
+# [SECURITY] Insecure Deserialization
+dotnet_diagnostic.SCS0028.severity = warning
+
+# [SECURITY] Cross-Site Scripting (XSS)
 dotnet_diagnostic.SCS0029.severity = warning
 
-# [SECURITY] The requestValidationMode which provides additional protection against XSS is enabled only for pages, not for all HTTP requests in configuration file.
+# [SECURITY] Request validation is enabled only for pages (Configuration File)
 dotnet_diagnostic.SCS0030.severity = warning
 
-# [SECURITY] The dynamic value passed to the LDAP query should be validated.
+# [SECURITY] LDAP Filter Injection
 dotnet_diagnostic.SCS0031.severity = warning
 
-# [SECURITY] The minimal length of a password is recommended to be set at least to 8.
+# [SECURITY] Password RequiredLength Too Small
 dotnet_diagnostic.SCS0032.severity = warning
 
-# [SECURITY] PasswordValidator should have at least two requirements for better security (RequiredLength, RequireDigit, RequireLowercase, RequireUppercase and/or RequireNonLetterOrDigit).
+# [SECURITY] Password Complexity
 dotnet_diagnostic.SCS0033.severity = warning
 
-# [SECURITY] The RequiredLength property must be set with a minimum value of 8.
+# [SECURITY] Password RequiredLength Not Set
 dotnet_diagnostic.SCS0034.severity = warning
-
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
-dotnet_diagnostic.SCS0035.severity = warning
-
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
-dotnet_diagnostic.SCS0036.severity = warning
