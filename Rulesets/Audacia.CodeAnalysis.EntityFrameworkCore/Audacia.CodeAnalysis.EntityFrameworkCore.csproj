@@ -12,7 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="5.0.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.0" />
 	</ItemGroup>
 
 </Project>
