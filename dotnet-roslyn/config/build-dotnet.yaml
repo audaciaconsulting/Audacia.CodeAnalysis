@@ -16,8 +16,8 @@ stages:
   jobs:
     - template: pipelines/build/nuget-package.job.yaml@templates
       parameters:
-        projects: 'Rulesets/**/*.csproj'
-        tests: 'Rulesets/**/*Tests.csproj'
+        projects: 'dotnet-roslyn/config/**/*.csproj'
+        tests: 'dotnet-roslyn/config/**/*Tests.csproj'
 
 - stage: Release
   displayName: Release

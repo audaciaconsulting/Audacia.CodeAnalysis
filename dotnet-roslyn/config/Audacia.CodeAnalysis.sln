@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.CodeAnalysis", "Aud
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.CodeAnalysis.AspNetCore", "Audacia.CodeAnalysis.AspNetCore\Audacia.CodeAnalysis.AspNetCore.csproj", "{5C91F917-1488-498B-B3E9-3983A12121D9}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Audacia.CodeAnalysis.Typescript", "Audacia.CodeAnalysis.Typescript\Audacia.CodeAnalysis.Typescript.shproj", "{7813305C-567A-4F67-B4A8-6DAD2C264B87}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{00CF38E3-0AEB-46FE-AA3C-9FD09331AB88}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
@@ -20,9 +18,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.CodeAnalysis.EntityFrameworkCore", "Audacia.CodeAnalysis.EntityFrameworkCore\Audacia.CodeAnalysis.EntityFrameworkCore.csproj", "{5F23C8D8-4815-4826-A1F6-0086B5320808}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Audacia.CodeAnalysis.Typescript\Audacia.CodeAnalysis.Typescript.projitems*{7813305c-567a-4f67-b4a8-6dad2c264b87}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64

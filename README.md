@@ -1,7 +1,10 @@
 # Overview
 
-The `Audacia.CodeAnalysis` repo contains static code analysis rulesets and analyzers.
+The `Audacia.CodeAnalysis` repo contains static code analysis configuration and analyzers.
 
-The 'Rulesets' folder contains code that generates NuGet and npm packages that can be used in codebases to enforce coding standards.
+The `dotnet-roslyn` folder contains:
+- Example `.editorconfig` files - see `dotnet-roslyn/config`
+- Custom Roslyn analyzers and helpers - see `dotnet-roslyn/analyzers`
 
-The 'Analyzers' folder contains custom analyzers (that can be used in the above rulesets).
+The `eslint` folder contains:
+- Some default `eslint` config - see `eslint/config/audacia-eslint-config`
