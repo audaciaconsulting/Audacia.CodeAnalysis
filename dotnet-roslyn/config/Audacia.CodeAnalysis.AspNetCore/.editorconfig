@@ -1,0 +1,62 @@
+# NOTE: Requires **VS2019 16.3** or later
+
+# AspNetCore Rules
+# Description: Ruleset with rule overrides for AspNetCore apps
+
+# Code files
+[*.cs]
+
+
+# Parameter name does not match the name specified by the route parameter.
+dotnet_diagnostic.ASP001.severity = warning
+
+# Route parameter name does not match the method parameter name.
+dotnet_diagnostic.ASP002.severity = warning
+
+# Parameter type does not match the type specified by the name specified by the route parameter.
+dotnet_diagnostic.ASP003.severity = warning
+
+# Route parameter type does not match the method parameter type.
+dotnet_diagnostic.ASP004.severity = warning
+
+# Syntax error in parameter.
+dotnet_diagnostic.ASP005.severity = warning
+
+# Escape constraint regex.
+dotnet_diagnostic.ASP006.severity = warning
+
+# The method has no corresponding parameter.
+dotnet_diagnostic.ASP007.severity = warning
+
+# Invalid route parameter name.
+dotnet_diagnostic.ASP008.severity = warning
+
+# Use kebab-cased urls.
+dotnet_diagnostic.ASP009.severity = warning
+
+# Unexpected character in url.
+dotnet_diagnostic.ASP010.severity = warning
+
+# Route parameter appears more than once.
+dotnet_diagnostic.ASP011.severity = warning
+
+# Don't use [controller].
+dotnet_diagnostic.ASP012.severity = warning
+
+# Name the controller to match the route *** Suggestion rather than Warning as controllers that map to nested routes (which should be encouraged), e.g. '/customers/{id}/addresses', violate this rule ***
+dotnet_diagnostic.ASP013.severity = suggestion
+
+# Call the more overloaded method from other overloads *** Suppress as controller actions often look like overloads but are different HTTP methods ***
+dotnet_diagnostic.AV1551.severity = none
+
+# Name members similarly to members of related .NET Framework classes *** Suppress as Delete API actions are caught by this rule ***
+dotnet_diagnostic.AV1711.severity = none
+
+# [NAMING] Asynchronous method name should end with 'Async' *** Suppress as controller actions should not be suffixed ***
+dotnet_diagnostic.RCS1046.severity = none
+
+# [NAMING] Asynchronous method name should be suffixed with 'Async', with an exception for controller actions
+dotnet_diagnostic.ACL1005.severity = warning
+
+# [SECURITY] Controller method is vulnerable to CSRF *** Suppress as API actions cannot implement CSRF protection ***
+dotnet_diagnostic.SCS0016.severity = none

@@ -1,0 +1,25 @@
+name: $(Year:yy)$(DayOfYear).$(rev:r)
+trigger:
+  branches:
+    include: [master]
+  paths:
+    include:
+      - 'Analyzers/Audacia.CodeAnalysis.Analyzers.Helpers/*'
+pr: { branches: { include: [master] } }
+resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
+pool: { vmImage: windows-latest }
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+    - template: pipelines/build/nuget-package.job.yaml@templates
+      parameters:
+        projects: 'Analyzers/Audacia.CodeAnalysis.Analyzers.Helpers/src/Audacia.CodeAnalysis.Analyzers.Helpers/Audacia.CodeAnalysis.Analyzers.Helpers.csproj'
+        # No tests so pass the main library csproj to stop other test projects in the repo being used
+        tests: 'Analyzers/Audacia.CodeAnalysis.Analyzers.Helpers/src/Audacia.CodeAnalysis.Analyzers.Helpers/Audacia.CodeAnalysis.Analyzers.Helpers.csproj'
+
+- stage: Release
+  displayName: Release
+  jobs: [ { template: pipelines/release/internal-nuget-package.job.yaml@templates } ]
+  condition: and(succeeded(), and(not(eq(variables['Build.Reason'], 'PullRequest')), not(eq(variables['Build.Reason'], 'Schedule'))))
