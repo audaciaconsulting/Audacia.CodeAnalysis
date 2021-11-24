@@ -1,4 +1,0 @@
-﻿[*.cs]
-
-# RS2008: Enable analyzer release tracking for the analyzer project
-dotnet_diagnostic.RS2008.severity = none
