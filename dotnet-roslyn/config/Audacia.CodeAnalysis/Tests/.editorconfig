@@ -21,6 +21,9 @@ dotnet_diagnostic.CA1034.severity = none
 # [DESIGN] Validate arguments of public methods
 dotnet_diagnostic.CA1062.severity = none
 
+# [MAINTAINABILITY] Avoid excessive class coupling *** Suppressed as integration tests will generally have high coupling; even smaller unit test classes will have high coupling if the class under test also does, in which case the warning should be raised against the class itself ***
+dotnet_diagnostic.CA1506.severity = none
+
 # [DESIGN] Identifiers should not contain underscores
 dotnet_diagnostic.CA1707.severity = none
 
