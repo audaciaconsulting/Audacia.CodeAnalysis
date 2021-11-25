@@ -4,7 +4,7 @@ trigger:
     include: [master]
   paths:
     include:
-      - 'Rulesets/*'
+      - 'dotnet-roslyn/config/*'
 pr: { branches: { include: [master] } }
 schedules: [ { cron: "0 0 * * *", displayName: Nightly Build, branches: { include: [ master ] } } ]
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
