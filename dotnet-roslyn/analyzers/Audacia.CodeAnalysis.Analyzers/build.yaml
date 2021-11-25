@@ -4,7 +4,7 @@ trigger:
     include: [master]
   paths:
     include:
-      - 'Analyzers/Audacia.CodeAnalysis.Analyzers/*'
+      - 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/*'
 pr: { branches: { include: [master] } }
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
 pool: { vmImage: windows-latest }
@@ -15,8 +15,8 @@ stages:
   jobs:
     - template: pipelines/build/nuget-package.job.yaml@templates
       parameters:
-        projects: 'Analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers/Audacia.CodeAnalysis.Analyzers.csproj'
-        tests: 'Analyzers/Audacia.CodeAnalysis.Analyzers/tests/Audacia.CodeAnalysis.Analyzers.Test/Audacia.CodeAnalysis.Analyzers.Test.csproj'
+        projects: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers/Audacia.CodeAnalysis.Analyzers.csproj'
+        tests: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/tests/Audacia.CodeAnalysis.Analyzers.Test/Audacia.CodeAnalysis.Analyzers.Test.csproj'
 
 - stage: Release
   displayName: Release
