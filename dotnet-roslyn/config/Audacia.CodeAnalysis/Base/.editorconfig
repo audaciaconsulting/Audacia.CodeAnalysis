@@ -3,6 +3,8 @@
 # Default Rules
 # Description: CodeAnalysis.ruleset
 
+root = true
+
 # Code files
 [*.cs]
 
