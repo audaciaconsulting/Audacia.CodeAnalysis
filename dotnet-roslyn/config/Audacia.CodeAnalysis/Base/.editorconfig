@@ -926,8 +926,8 @@ dotnet_diagnostic.RCS1016.severity = suggestion
 # [STYLE] Avoid multiline expression body
 dotnet_diagnostic.RCS1017.severity = none
 
-# [READABILITY] Add default access modifier
-dotnet_diagnostic.RCS1018.severity = warning
+# [READABILITY] Add default access modifier *** Suppressed as covered by SA1400 ***
+dotnet_diagnostic.RCS1018.severity = none
 
 # [READABILITY] Order modifiers *** Suppressed as covered by SA1206 ***
 dotnet_diagnostic.RCS1019.severity = none
@@ -977,8 +977,8 @@ dotnet_diagnostic.RCS1034.severity = warning
 # [REDUNDANCY] Remove redundant comma in initializer
 dotnet_diagnostic.RCS1035.severity = warning
 
-# [REDUNDANCY] Remove redundant empty line
-dotnet_diagnostic.RCS1036.severity = warning
+# [REDUNDANCY] Remove redundant empty line *** Suppressed as covered by SA1507 ***
+dotnet_diagnostic.RCS1036.severity = none
 
 # [REDUNDANCY] Remove trailing white-space
 dotnet_diagnostic.RCS1037.severity = none
