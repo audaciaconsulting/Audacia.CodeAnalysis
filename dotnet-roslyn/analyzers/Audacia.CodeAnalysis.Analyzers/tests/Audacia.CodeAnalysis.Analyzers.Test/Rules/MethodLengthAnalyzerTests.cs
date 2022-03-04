@@ -424,7 +424,7 @@ namespace TestNamespace
         }
 
         [TestMethod]
-        public void No_Diagnostics_For_Method_Body_Equal_To_Max_Allowed_Statements_Including_Argument_Null_Exception()
+        public void Diagnostic_For_Method_Body_Equal_To_Max_Allowed_Statements_Including_Argument_Null_Exception()
         {
             var test = @"
 namespace TestNamespace
