@@ -58,7 +58,51 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 return throwStatement.IsThrowArgumentNullExceptionStatement() && parentIfStatement.IsSingleStatement();
             }
 
+            if (statementSyntax.IsKind(SyntaxKind.ExpressionStatement))
+            {
+                var expressionStatement = (ExpressionStatementSyntax)statementSyntax;
+                return expressionStatement.IsArgumentNullExceptionThrowIfNullExpression();
+            }
+
             return false;
+        }
+
+        /// <summary>
+        /// Checks whether the given <paramref name="expressionStatement"/> represents <see cref="ArgumentNullException"/> throwing if null.
+        /// i.e. like below.
+        /// <code>
+        /// ArgumentNullException.ThrowIfNull(obj);
+        /// </code>
+        /// </summary>
+        /// <param name="expressionStatement">The </param>
+        private static bool IsArgumentNullExceptionThrowIfNullExpression(this ExpressionStatementSyntax expressionStatement)
+        {
+            if (!expressionStatement.Expression.IsKind(SyntaxKind.InvocationExpression))
+            {
+                return false;
+            }
+
+            var invocationExpression = (InvocationExpressionSyntax)expressionStatement.Expression;
+
+            if (!invocationExpression.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression))
+            {
+                return false;
+            }
+
+            var memberExpression = (MemberAccessExpressionSyntax)invocationExpression.Expression;
+
+            if (!memberExpression.Expression.IsKind(SyntaxKind.IdentifierName))
+            {
+                return false;
+            }
+
+            var identifierName = (IdentifierNameSyntax)memberExpression.Expression;
+            if (identifierName.Identifier.ValueText != nameof(ArgumentNullException))
+            {
+                return false;
+            }
+
+            return memberExpression.Name.Identifier.Text == "ThrowIfNull";
         }
 
         /// <summary>
