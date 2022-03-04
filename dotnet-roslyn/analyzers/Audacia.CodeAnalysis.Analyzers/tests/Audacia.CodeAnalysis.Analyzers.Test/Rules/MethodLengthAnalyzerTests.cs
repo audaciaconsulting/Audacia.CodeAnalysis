@@ -393,5 +393,34 @@ namespace TestNamespace
 
             VerifyDiagnostic(test, expected);
         }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Method_Body_Equal_To_Max_Allowed_Statements_Excluding_Argument_Null_Exception_Throw_If_Null()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public class TestClass
+    {
+        public void TestMethod(string value)
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            var lineOne = ""Hello"";
+            var lineTwo = ""Hello"";
+            var lineThree = ""Hello"";
+            var lineFour = ""Hello"";
+            var lineFive = ""Hello"";
+            var lineSix = ""Hello"";
+            var lineSeven = ""Hello"";
+            var lineEight = ""Hello"";
+            var lineNine = ""Hello"";
+            var lineTen = ""Hello"";
+        }
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
     }
 }
