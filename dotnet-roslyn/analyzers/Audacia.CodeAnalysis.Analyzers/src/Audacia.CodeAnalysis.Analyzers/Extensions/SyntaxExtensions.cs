@@ -96,6 +96,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 return false;
             }
 
+            var identifierName = (IdentifierNameSyntax)memberExpression.Expression;
+            if (identifierName.Identifier.ValueText != nameof(ArgumentNullException))
+            {
+                return false;
+            }
+
             return memberExpression.Name.Identifier.Text == "ThrowIfNull";
         }
 
