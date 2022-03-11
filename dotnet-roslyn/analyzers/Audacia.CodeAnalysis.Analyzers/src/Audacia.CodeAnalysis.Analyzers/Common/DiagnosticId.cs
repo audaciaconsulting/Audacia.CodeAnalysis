@@ -10,5 +10,6 @@
         public const string AsyncSuffix = "ACL1005";
         public const string IncludeBraces = "ACL1006";
         public const string ThenByDescendingAfterOrderBy = "ACL1007";
+        public const string ControllerActionProducesResponseType = "ACL1008";
     }
 }

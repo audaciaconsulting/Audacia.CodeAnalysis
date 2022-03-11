@@ -185,7 +185,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         /// <summary>
         /// Gets any method attributes.
         /// </summary>
-        private static List<string> GetMethodAttributes(
+        internal static List<string> GetMethodAttributes(
             this MethodDeclarationSyntax methodDeclarationSyntax
         )
         {
