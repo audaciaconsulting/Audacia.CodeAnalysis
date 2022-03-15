@@ -56,172 +56,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void No_Diagnostics_For_Synchronous_Interface_Method_Declaration()
-        {
-            const string testCode = @"
-                namespace ConsoleApplication1
-                {
-                    interface ITestInterface
-                    {
-                        void TestMethod();
-                    }
-                }";
-
-            VerifyNoDiagnostic(testCode);
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_For_Synchronous_Method_With_Return_Object_Name_Containing_Task()
-        {
-            const string testCode = @"
-                namespace ConsoleApplication1
-                {
-                    class FakeTask
-                    {
-                    }
-
-                    class TestClass
-                    {
-                        FakeTask TestMethod()
-                        {
-                            return new FakeTask();
-                        }
-                    }
-                }";
-
-            VerifyNoDiagnostic(testCode);
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_For_Synchronous_Method_With_Asynchronous_Operation_Return_Type()
-        {
-            const string testCode = @"
-                namespace ConsoleApplication1
-                {
-                    class TestClass
-                    {
-                        Task<int> TestMethod()
-                        {
-                            return new Task<int>(() => default);
-                        }
-                    }
-                }";
-
-            const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'.";
-
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 6, 25);
-
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Interface_Method_With_Asynchronous_Operation_Return_Type_Without_Async_Suffix()
-        {
-            const string testCode = @"
-                namespace ConsoleApplication1
-                {
-                    interface ITestInterface
-                    {
-                        Task TestMethod();
-                    }
-                }";
-
-            const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'.";
-
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 6, 25);
-
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_For_Asynchronous_Method_With_Async_Suffix()
-        {
-            const string testCode = @"
-                namespace ConsoleApplication1
-                {
-                    class TestClass
-                    {
-                        async Task<int> TestMethodAsync()
-                        {
-                            var task = new Task<int>(() => default);
-
-                            return await task;
-                        }
-                    }
-                }";
-
-            VerifyNoDiagnostic(testCode);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Asynchronous_Method_With_No_Async_Suffix()
-        {
-            const string testCode = @"
-                namespace ConsoleApplication1
-                {
-                    class TestClass
-                    {
-                        async Task<int> TestMethod()
-                        {
-                            var task = new Task<int>(() => default);
-
-                            return await task;
-                        }
-                    }
-                }";
-
-            const string expectedMessage 
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'.";
-
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 6, 25);
-
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
-
-        [TestMethod]
-        public void Multiple_Diagnostics_For_Multiple_Asynchronous_Methods_With_No_Async_Suffix_In_Class()
-        {
-            const string testCode = @"
-                namespace ConsoleApplication1
-                {
-                    class TestClass
-                    {
-                        async Task<int> TestMethod()
-                        {
-                            var task = new Task<int>(() => default);
-
-                            return await task;
-                        }
-
-                        async Task<int> TestMethod1()
-                        {
-                            var task = new Task<int>(() => default);
-
-                            return await task;
-                        }
-                    }
-                }";
-
-            const string expectedMessage1
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'.";
-
-            const string expectedMessage2
-                = "Asynchronous method name 'TestMethod1' is not suffixed with 'Async'.";
-
-            var expectedDiagnostics
-                = new[]
-                {
-                    BuildExpectedResult(expectedMessage1, 6, 25),
-                    BuildExpectedResult(expectedMessage2, 13, 25)
-                };
-
-            VerifyDiagnostic(testCode, expectedDiagnostics);
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_Async_Suffix()
+        public void No_Diagnostics_For_Controller_With_Single_ProducesResponseType_Attribute()
         {
             const string testCode = @"
                 using System.Threading.Tasks;
@@ -232,6 +67,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     public class TestController : ControllerBase
                     {
                         [HttpGet]
+                        [ProducesResponseType(typeof(testTask), StatusCodes.Status200OK)]
                         public async Task<string> Get()
                         {
                             var testTask = new Task<string>(() => string.Empty);
@@ -245,7 +81,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void No_Diagnostics_For_Asynchronous_Controller_Post_Action_Method_Without_Async_Suffix()
+        public void No_Diagnostics_For_Controller_With_Multiple_ProducesResponseType_Attributes()
         {
             const string testCode = @"
                 using System.Threading.Tasks;
@@ -255,12 +91,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 {
                     public class TestController : ControllerBase
                     {
-                        [HttpPost]
-                        public async Task<string> Post()
+                        [HttpGet]
+                        [ProducesResponseType(string, StatusCodes.Status200OK)]
+                        [ProducesResponseType(StatusCodes.Status404NotFound)]
+                        public string Get()
                         {
-                            var testTask = new Task<string>(() => string.Empty);
-
-                            return await testTask;
+                            return 'hello';
                         }
                     }
                 }";
@@ -269,7 +105,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_HttpGet_Attribute_And_Without_Async_Suffix()
+        public void Diagnostics_For_Controller_With_No_ProducesResponseType_Attribute()
         {
             const string testCode = @"
                 using System.Threading.Tasks;
@@ -279,44 +115,111 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 {
                     public class TestController : ControllerBase
                     {
-                        public async Task<string> Get()
+                        [HttpGet]
+                        public string Get()
                         {
-                            var testTask = new Task<string>(() => string.Empty);
-
-                            return await testTask;
-                        }
-                    }
-                }";
-
-            VerifyNoDiagnostic(testCode);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Private_Asynchronous_Method_In_Controller_Without_HttpGet_Attribute_And_Without_Async_Suffix()
-        {
-            const string testCode = @"
-                using System.Threading.Tasks;
-                using Microsoft.AspNetCore.Mvc;
-
-                namespace ConsoleApplication1
-                {
-                    public class TestController : ControllerBase
-                    {
-                        private async Task<string> Get()
-                        {
-                            var testTask = new Task<string>(() => string.Empty);
-
-                            return await testTask;
+                            return 'hello';
                         }
                     }
                 }";
 
             const string expectedMessage
-                = "Asynchronous method name 'Get' is not suffixed with 'Async'.";
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
+
+        [TestMethod]
+        public void Multiple_Diagnostics_For_Multiple_Controllers_With_No_ProducesResponseType_Attribute()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
+
+                namespace ConsoleApplication1
+                {
+                    public class TestController : ControllerBase
+                    {
+                        [HttpGet]
+                        public string Get()
+                        {
+                            return 'hello';
+                        }
+
+                        [HttpGet]
+                        public string Get()
+                        {
+                            return 'hello';
+                        }
+                    }
+                }";
+            const string expectedMessage1
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
+
+            const string expectedMessage2
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
+
+            var expectedDiagnostics
+                = new[]
+                {
+                    BuildExpectedResult(expectedMessage1, 9, 25),
+                    BuildExpectedResult(expectedMessage2, 15, 25)
+                };
+
+            VerifyDiagnostic(testCode, expectedDiagnostics);
+        }
+
+        //[TestMethod]
+        //public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_HttpGet_Attribute_And_Without_Async_Suffix()
+        //{
+        //    const string testCode = @"
+        //        using System.Threading.Tasks;
+        //        using Microsoft.AspNetCore.Mvc;
+
+        //        namespace ConsoleApplication1
+        //        {
+        //            public class TestController : ControllerBase
+        //            {
+        //                public async Task<string> Get()
+        //                {
+        //                    var testTask = new Task<string>(() => string.Empty);
+
+        //                    return await testTask;
+        //                }
+        //            }
+        //        }";
+
+        //    VerifyNoDiagnostic(testCode);
+        //}
+
+        //[TestMethod]
+        //public void Diagnostics_For_Private_Asynchronous_Method_In_Controller_Without_HttpGet_Attribute_And_Without_Async_Suffix()
+        //{
+        //    const string testCode = @"
+        //        using System.Threading.Tasks;
+        //        using Microsoft.AspNetCore.Mvc;
+
+        //        namespace ConsoleApplication1
+        //        {
+        //            public class TestController : ControllerBase
+        //            {
+        //                private async Task<string> Get()
+        //                {
+        //                    var testTask = new Task<string>(() => string.Empty);
+
+        //                    return await testTask;
+        //                }
+        //            }
+        //        }";
+
+        //    const string expectedMessage
+        //        = "Asynchronous method name 'Get' is not suffixed with 'Async'.";
+
+        //    var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+
+        //    VerifyDiagnostic(testCode, expectedDiagnostic);
+        //}
     }
 }
