@@ -130,8 +130,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             var isControllerAction = methodAttributes
                 .Any(
-                    name =>
-                        controllerActionAttributeNames.Contains(name, StringComparer.InvariantCultureIgnoreCase)
+                    attribute =>
+                        controllerActionAttributeNames.Any(name => attribute.StartsWith(name))
                 );
 
             var containingTypeIsControllerType = IsControllerBaseType(nodeAnalysisContext);
