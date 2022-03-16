@@ -171,55 +171,104 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             VerifyDiagnostic(testCode, expectedDiagnostics);
         }
 
-        //[TestMethod]
-        //public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_HttpGet_Attribute_And_Without_Async_Suffix()
-        //{
-        //    const string testCode = @"
-        //        using System.Threading.Tasks;
-        //        using Microsoft.AspNetCore.Mvc;
+        [TestMethod]
+        public void No_Diagnostics_For_Controller_Get_Action_Method_Without_HttpGet_Attribute_And_With_ProducesResponseType_Attribute()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
 
-        //        namespace ConsoleApplication1
-        //        {
-        //            public class TestController : ControllerBase
-        //            {
-        //                public async Task<string> Get()
-        //                {
-        //                    var testTask = new Task<string>(() => string.Empty);
+                namespace ConsoleApplication1
+                {
+                    public class TestController : ControllerBase
+                    {
+                        [ProducesResponseType(string, StatusCodes.Status200OK)]
+                        [ProducesResponseType(StatusCodes.Status404NotFound)]
+                        public string Get()
+                        {
+                            return 'hello';
+                        }
+                    }
+                }";
 
-        //                    return await testTask;
-        //                }
-        //            }
-        //        }";
+            VerifyNoDiagnostic(testCode);
+        }
 
-        //    VerifyNoDiagnostic(testCode);
-        //}
+        [TestMethod]
+        public void Diagnostics_For_Controller_Without_HttpGet_Attribute_And_Without_ProducesResponseType_Attribute()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
 
-        //[TestMethod]
-        //public void Diagnostics_For_Private_Asynchronous_Method_In_Controller_Without_HttpGet_Attribute_And_Without_Async_Suffix()
-        //{
-        //    const string testCode = @"
-        //        using System.Threading.Tasks;
-        //        using Microsoft.AspNetCore.Mvc;
+                namespace ConsoleApplication1
+                {
+                    public class TestController : ControllerBase
+                    {
+                        public string Get()
+                        {
+                            return 'hello';
+                        }
+                    }
+                }";
 
-        //        namespace ConsoleApplication1
-        //        {
-        //            public class TestController : ControllerBase
-        //            {
-        //                private async Task<string> Get()
-        //                {
-        //                    var testTask = new Task<string>(() => string.Empty);
+            const string expectedMessage
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
 
-        //                    return await testTask;
-        //                }
-        //            }
-        //        }";
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 
-        //    const string expectedMessage
-        //        = "Asynchronous method name 'Get' is not suffixed with 'Async'.";
+            VerifyDiagnostic(testCode, expectedDiagnostic);
+        }
 
-        //    var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+        [TestMethod]
+        public void No_Diagnostics_For_Controller_Get_Action_Method_Without_ControllerBase_Inheritance_And_With_ProducesResponseType_Attribute()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
 
-        //    VerifyDiagnostic(testCode, expectedDiagnostic);
-        //}
+                namespace ConsoleApplication1
+                {
+                    public class TestController
+                    {
+                        [HttpGet]
+                        [ProducesResponseType(string, StatusCodes.Status200OK)]
+                        [ProducesResponseType(StatusCodes.Status404NotFound)]
+                        public string Get()
+                        {
+                            return 'hello';
+                        }
+                    }
+                }";
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Controller_Without_COntrollerBase_Inheritance_And_Without_ProducesResponseType_Attribute()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
+
+                namespace ConsoleApplication1
+                {
+                    public class TestController
+                    {
+                        [HttpGet]
+                        public string Get()
+                        {
+                            return 'hello';
+                        }
+                    }
+                }";
+
+            const string expectedMessage
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
+
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+
+            VerifyDiagnostic(testCode, expectedDiagnostic);
+        }
     }
 }
