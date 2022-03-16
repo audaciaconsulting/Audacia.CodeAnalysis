@@ -212,6 +212,61 @@ Code without diagnostic:
 var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 ```
 
+## ACL1009 - Method overload should call another overload
+
+ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1551.md), which ensures the more overloaded method is called from other overloads. 
+
+ACL1009 reports warnings on the three rules below:
+
+- That an overloaded method does not call another overload (unless it is the longest in the group)
+- That the longest overloaded method (the one with the most parameters) is not virtual.
+- That the order of parameters in an overloaded method does not match with the parameter order of the longest overload.
+
+Code with diagnostic:
+```csharp
+public void TestMethod(int i, int j)
+{
+	TestMethod(i, j, 0);
+}
+
+public void TestMethod(int i, string s, int j = 0)
+{
+	var line = string.Format(s, i, j);
+}
+```
+
+Code without diagnostic:
+```csharp
+public void TestMethod(int i, string s)
+{
+	TestMethod(i, s, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j = 0)
+{
+	var line = string.Format(s, i, j);
+}
+```
+
+There is one exception for these rules and that is if the class or method is from a `MVC` `Controller` as shown below. If a class inherits from a `Controller` or `ControllerBase` or if the method has Http Atrributes e.g. `HttpGet`.
+
+```csharp
+public class TestClassController : Controller
+{
+	[HttpGet]
+	public string Get(int i)
+	{
+		return string.Format(""Test"", i);
+	}
+
+	[HttpGet(""Test"")]
+	public string Get(int i, string s)
+	{
+		return string.Format(s, i);
+	}
+}
+```
+
 # Custom .editorconfig Settings in Rider
 
 Some of the rules (e.g. ACL1002, ACL1003 and ACL1004) make use of custom .editorconfig settings. For example the maximum statement count for rule ACL1002 can be configured like this:

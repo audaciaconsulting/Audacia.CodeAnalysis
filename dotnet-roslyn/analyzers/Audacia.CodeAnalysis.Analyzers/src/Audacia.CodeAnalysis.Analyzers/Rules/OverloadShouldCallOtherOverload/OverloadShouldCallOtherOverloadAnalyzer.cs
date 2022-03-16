@@ -106,7 +106,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
                 return;
             }
 
-            if (controllerBaseTypeNames.Contains(type.BaseType.ToString()))
+            if (controllerBaseTypeNames.Contains(type.BaseType.Name.ToString()))
             {
                 return;
             }

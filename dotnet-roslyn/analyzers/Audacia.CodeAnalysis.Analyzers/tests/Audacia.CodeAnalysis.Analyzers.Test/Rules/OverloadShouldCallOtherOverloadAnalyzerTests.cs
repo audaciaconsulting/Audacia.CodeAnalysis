@@ -226,7 +226,7 @@ namespace TestNamespace
             var test = @"
 namespace TestNamespace
 {
-    public class TestClassController : Controller
+    public class TestClassController
     {
         [HttpGet]
         public void Get(int i)

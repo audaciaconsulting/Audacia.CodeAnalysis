@@ -313,9 +313,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                     "HttpPut"
                };
 
-            var attributes = method.GetAttributes().Select(attribute => attribute.ToString());
+            var attributes = method.GetAttributes().Select(attribute => attribute.AttributeClass.Name.ToString());
 
-            var isControllerAction = attributes.Any(attribute => controllerActionAttributeNames.Contains(attribute, StringComparer.InvariantCultureIgnoreCase));
+            var isControllerAction = attributes.Any(attribute => controllerActionAttributeNames.Any(name => attribute.StartsWith(name, StringComparison.InvariantCultureIgnoreCase)));
 
             return isControllerAction;
         }
