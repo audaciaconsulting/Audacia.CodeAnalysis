@@ -60,3 +60,6 @@ dotnet_diagnostic.ACL1005.severity = warning
 
 # [SECURITY] Controller method is vulnerable to CSRF *** Suppress as API actions cannot implement CSRF protection ***
 dotnet_diagnostic.SCS0016.severity = none
+
+# Method overload should call another overload
+dotnet_diagnostic.ACL1009.severity = warning
