@@ -35,6 +35,12 @@ dotnet_diagnostic.ACL1006.severity = warning
 # ACL1007: ThenByDescending follows OrderBy or OrderByDescending.
 dotnet_diagnostic.ACL1007.severity = suggestion
 
+# Controller action should have at least one ProducesResponseType attribute
+dotnet_diagnostic.ACL1008.severity = none
+
+# Method overload should call another overload
+dotnet_diagnostic.ACL1009.severity = none
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
@@ -2282,9 +2288,3 @@ dotnet_diagnostic.SCS0033.severity = warning
 
 # [SECURITY] Password RequiredLength Not Set
 dotnet_diagnostic.SCS0034.severity = warning
-
-# Controller action should have at least one ProducesResponseType attribute
-dotnet_diagnostic.ACL1008.severity = none
-
-# Method overload should call another overload
-dotnet_diagnostic.ACL1009.severity = none
