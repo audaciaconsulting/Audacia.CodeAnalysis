@@ -216,5 +216,108 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             return parameter.ContainingSymbol is IMethodSymbol methodSymbol &&
                    (methodSymbol.MethodKind == MethodKind.LambdaMethod || methodSymbol.MethodKind == MethodKind.AnonymousFunction);
         }
+
+        public static SyntaxNode TryGetBodySyntaxForMethod(this IMethodSymbol method,
+            CancellationToken cancellationToken)
+        {
+            foreach (SyntaxNode syntaxNode in method.DeclaringSyntaxReferences
+                .Select(syntaxReference => syntaxReference.GetSyntax(cancellationToken)).ToArray())
+            {
+                SyntaxNode bodySyntax = TryGetDeclarationBody(syntaxNode);
+
+                if (bodySyntax != null)
+                {
+                    return bodySyntax;
+                }
+            }
+
+            return TryGetBodyForPartialMethodSyntax(method, cancellationToken);
+        }
+
+        private static SyntaxNode TryGetDeclarationBody(SyntaxNode syntaxNode)
+        {
+            switch (syntaxNode)
+            {
+                case BaseMethodDeclarationSyntax methodSyntax:
+                    {
+                        return (SyntaxNode)methodSyntax.Body ?? methodSyntax.ExpressionBody?.Expression;
+                    }
+                case AccessorDeclarationSyntax accessorSyntax:
+                    {
+                        return (SyntaxNode)accessorSyntax.Body ?? accessorSyntax.ExpressionBody?.Expression;
+                    }
+                case PropertyDeclarationSyntax propertySyntax:
+                    {
+                        return propertySyntax.ExpressionBody?.Expression;
+                    }
+                case IndexerDeclarationSyntax indexerSyntax:
+                    {
+                        return indexerSyntax.ExpressionBody?.Expression;
+                    }
+                case AnonymousFunctionExpressionSyntax anonymousFunctionSyntax:
+                    {
+                        return anonymousFunctionSyntax.Body;
+                    }
+                case LocalFunctionStatementSyntax localFunctionSyntax:
+                    {
+                        return (SyntaxNode)localFunctionSyntax.Body ?? localFunctionSyntax.ExpressionBody?.Expression;
+                    }
+                default:
+                    {
+                        return null;
+                    }
+            }
+        }
+
+        private static SyntaxNode TryGetBodyForPartialMethodSyntax(IMethodSymbol method,
+            CancellationToken cancellationToken)
+        {
+            return method.PartialImplementationPart != null
+                ? TryGetBodySyntaxForMethod(method.PartialImplementationPart, cancellationToken)
+                : null;
+        }
+
+        public static IOperation TryGetOperationBlockForMethod(this IMethodSymbol method, Compilation compilation,
+            CancellationToken cancellationToken)
+        {
+            SyntaxNode bodySyntax = TryGetBodySyntaxForMethod(method, cancellationToken);
+
+            if (bodySyntax != null)
+            {
+                SemanticModel model = compilation.GetSemanticModel(bodySyntax.SyntaxTree);
+                IOperation operation = model.GetOperation(bodySyntax);
+
+                if (operation != null && !operation.HasErrors(compilation, cancellationToken))
+                {
+                    return operation;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns true if method is representing a http action (e.g. get/post/delete/put etc)
+        /// </summary>
+        internal static bool IsControllerAction(this IMethodSymbol method)
+        {
+            var controllerActionAttributeNames
+               = new List<string>
+               {
+                    "HttpDelete",
+                    "HttpGet",
+                    "HttpHead",
+                    "HttpOptions",
+                    "HttpPatch",
+                    "HttpPost",
+                    "HttpPut"
+               };
+
+            var attributes = method.GetAttributes().Select(attribute => attribute.AttributeClass.Name.ToString());
+
+            var isControllerAction = attributes.Any(attribute => controllerActionAttributeNames.Any(name => attribute.StartsWith(name, StringComparison.InvariantCultureIgnoreCase)));
+
+            return isControllerAction;
+        }
     }
 }
