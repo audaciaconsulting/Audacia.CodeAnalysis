@@ -130,8 +130,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             var isControllerAction = methodAttributes
                 .Any(
-                    name =>
-                        controllerActionAttributeNames.Contains(name, StringComparer.InvariantCultureIgnoreCase)
+                    attribute =>
+                        controllerActionAttributeNames.Any(name => attribute.StartsWith(name))
                 );
 
             var containingTypeIsControllerType = IsControllerBaseType(nodeAnalysisContext);
@@ -185,7 +185,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         /// <summary>
         /// Gets any method attributes.
         /// </summary>
-        private static List<string> GetMethodAttributes(
+        internal static List<string> GetMethodAttributes(
             this MethodDeclarationSyntax methodDeclarationSyntax
         )
         {

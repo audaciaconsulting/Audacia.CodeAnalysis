@@ -63,3 +63,6 @@ dotnet_diagnostic.SCS0016.severity = none
 
 # Method overload should call another overload
 dotnet_diagnostic.ACL1009.severity = warning
+
+# Controller action should have at least one ProducesResponseType attribute
+dotnet_diagnostic.ACL1008.severity = warning

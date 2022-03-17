@@ -212,6 +212,30 @@ Code without diagnostic:
 var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 ```
 
+## ACL1008 - Controller actions have ProducesResponseType attribute
+
+ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute and will produce a warning if not. 
+This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
+
+Code with diagnostic:
+```csharp
+[HttpGet]
+public string Get()
+{
+	return 'hello';
+}
+```
+
+Code without diagnostic:
+```csharp
+[HttpGet]
+[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+public string Get()
+{
+	return 'hello';
+}
+```
+
 ## ACL1009 - Method overload should call another overload
 
 ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1551.md), which ensures the more overloaded method is called from other overloads. 
