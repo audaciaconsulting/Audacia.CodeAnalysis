@@ -67,12 +67,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     public class TestController : ControllerBase
                     {
                         [HttpGet]
-                        [ProducesResponseType(typeof(testTask), StatusCodes.Status200OK)]
-                        public async Task<string> Get()
+                        [ProducesResponseType(string, StatusCodes.Status200OK)]
+                        public string Get()
                         {
-                            var testTask = new Task<string>(() => string.Empty);
-
-                            return await testTask;
+                            return 'hello';
                         }
                     }
                 }";
@@ -245,7 +243,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostics_For_Controller_Without_COntrollerBase_Inheritance_And_Without_ProducesResponseType_Attribute()
+        public void Diagnostics_For_Controller_Without_ControllerBase_Inheritance_And_Without_ProducesResponseType_Attribute()
         {
             const string testCode = @"
                 using System.Threading.Tasks;
