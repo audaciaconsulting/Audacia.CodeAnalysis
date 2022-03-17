@@ -250,6 +250,8 @@ public virtual void TestMethod(int i, string s, int j = 0)
 
 There is one exception for these rules and that is if the class or method is from a `MVC` `Controller` as shown below. If a class inherits from a `Controller` or `ControllerBase` or if the method has Http Atrributes e.g. `HttpGet`.
 
+The code below will **NOT** trigger a warning since the methods are controller actions and therefore will be excluded.
+
 ```csharp
 public class TestClassController : Controller
 {
