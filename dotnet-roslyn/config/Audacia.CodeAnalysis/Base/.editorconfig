@@ -2282,3 +2282,9 @@ dotnet_diagnostic.SCS0033.severity = warning
 
 # [SECURITY] Password RequiredLength Not Set
 dotnet_diagnostic.SCS0034.severity = warning
+
+# Controller action should have at least one ProducesResponseType attribute
+dotnet_diagnostic.ACL1008.severity = none
+
+# Method overload should call another overload
+dotnet_diagnostic.ACL1009.severity = none
