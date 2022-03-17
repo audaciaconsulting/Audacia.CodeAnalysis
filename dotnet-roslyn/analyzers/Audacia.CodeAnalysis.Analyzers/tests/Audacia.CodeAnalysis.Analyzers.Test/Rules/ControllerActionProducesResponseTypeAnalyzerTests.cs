@@ -67,7 +67,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     public class TestController : ControllerBase
                     {
                         [HttpGet]
-                        [ProducesResponseType(string, StatusCodes.Status200OK)]
+                        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         public string Get()
                         {
                             return 'hello';
@@ -90,7 +90,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     public class TestController : ControllerBase
                     {
                         [HttpGet]
-                        [ProducesResponseType(string, StatusCodes.Status200OK)]
+                        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         [ProducesResponseType(StatusCodes.Status404NotFound)]
                         public string Get()
                         {
@@ -180,7 +180,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 {
                     public class TestController : ControllerBase
                     {
-                        [ProducesResponseType(string, StatusCodes.Status200OK)]
+                        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         [ProducesResponseType(StatusCodes.Status404NotFound)]
                         public string Get()
                         {
@@ -230,7 +230,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     public class TestController
                     {
                         [HttpGet]
-                        [ProducesResponseType(string, StatusCodes.Status200OK)]
+                        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         [ProducesResponseType(StatusCodes.Status404NotFound)]
                         public string Get()
                         {

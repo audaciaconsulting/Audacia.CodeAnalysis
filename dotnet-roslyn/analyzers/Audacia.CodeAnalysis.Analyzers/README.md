@@ -229,7 +229,7 @@ public string Get()
 Code without diagnostic:
 ```csharp
 [HttpGet]
-[ProducesResponseType(string, StatusCodes.Status200OK)]
+[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 public string Get()
 {
 	return 'hello';
