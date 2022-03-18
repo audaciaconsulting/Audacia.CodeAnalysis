@@ -129,7 +129,7 @@ dotnet_diagnostic.AV1704.severity = warning
 dotnet_diagnostic.AV1706.severity = none
 
 # Name types using nouns, noun phrases or adjective phrases
-dotnet_diagnostic.AV1708.severity = warning
+dotnet_diagnostic.AV1708.severity = suggestion
 
 # Don't repeat the name of a class or enumeration in its members
 dotnet_diagnostic.AV1710.severity = warning
@@ -396,7 +396,7 @@ dotnet_diagnostic.CA1806.severity = warning
 dotnet_diagnostic.CA1810.severity = warning
 
 # [PERFORMANCE] Avoid uninstantiated internal classes
-dotnet_diagnostic.CA1812.severity = warning
+dotnet_diagnostic.CA1812.severity = suggestion
 
 # [PERFORMANCE] Avoid unsealed attributes
 dotnet_diagnostic.CA1813.severity = warning
