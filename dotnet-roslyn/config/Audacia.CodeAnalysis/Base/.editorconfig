@@ -1,4 +1,4 @@
-# NOTE: Requires **VS2019 16.3** or later
+# NOTE: Requires **VS2022**
 
 # Default Rules
 # Description: CodeAnalysis.ruleset
@@ -54,7 +54,7 @@ dotnet_diagnostic.AV1010.severity = warning
 dotnet_diagnostic.AV1115.severity = warning
 
 # Return type in method signature should be a collection interface instead of a concrete type
-dotnet_diagnostic.AV1130.severity = warning
+dotnet_diagnostic.AV1130.severity = suggestion
 
 # Properties, arguments and return values representing strings, collections or tasks should never be `null`
 dotnet_diagnostic.AV1135.severity = warning
@@ -107,6 +107,12 @@ dotnet_diagnostic.AV1537.severity = none
 # Call the more overloaded method from other overloads
 dotnet_diagnostic.AV1551.severity = warning
 
+# Only use optional parameters to replace overloads
+dotnet_diagnostic.AV1553.severity = warning
+
+# Do not use optional parameters in interface methods or their concrete implementations
+dotnet_diagnostic.AV1554.severity = warning
+
 # Avoid using named arguments
 dotnet_diagnostic.AV1555.severity = none
 
@@ -121,6 +127,9 @@ dotnet_diagnostic.AV1564.severity = warning
 
 # Don't use parameters as temporary variables
 dotnet_diagnostic.AV1568.severity = suggestion
+
+# Write code that is easy to debug
+dotnet_diagnostic.AV1580.severity = suggestion
 
 # Don't include numbers in variables, parameters and type members
 dotnet_diagnostic.AV1704.severity = warning

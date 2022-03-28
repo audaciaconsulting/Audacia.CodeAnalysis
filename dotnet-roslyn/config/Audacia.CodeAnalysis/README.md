@@ -38,7 +38,7 @@ When installing the `Audacia.CodeAnalysis` NuGet package in .NET Framework proje
 
 ## IDE Support
 
-You must be using Visual Studio version 16.5+ or Rider version 2020.2+ for .editorconfig support.
+You must be using Visual Studio version 17.0+ (Visual Studio 2022) or Rider version 2021.3+.
 
 ### Rider Support
 
