@@ -38,13 +38,20 @@ When installing the `Audacia.CodeAnalysis` NuGet package in .NET Framework proje
 
 ## IDE Support
 
-You must be using Visual Studio version 17.0+ (Visual Studio 2022) or Rider version 2021.3+.
+You must be using Visual Studio version 17.0+ (Visual Studio 2022) or Rider version 2021.3.2+.
 
 ### Rider Support
 
 Rider doesn't fully support custom settings in .editorconfig. This issue has been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53508)), but in the meantime a workaround is documented [here](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2FAnalyzers%2FAudacia.CodeAnalysis.Analyzers&anchor=custom-.editorconfig-settings-in-rider).
 
 There are a few rules that Rider's code analysis doesn't pick up, for example CA1033, CA1008 and AV1715. This issue has also been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53376)).
+
+## Including Microsoft Code Style Rules in Build
+
+By default, Microsoft's code style rules (prefixed `IDE`) don't get run during a build: they just run in the IDE itself. To include these code style rules in a build you must add the following to your .csproj file:
+```xml
+<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+```
 
 ## Excluding Generated Code
 
@@ -87,9 +94,9 @@ All rules are prefixed `RCS`.
 
 ### Microsoft Analyzers
 
-Microsoft provide a number of analyzers for checking best practice C# and .NET usage. See [here](https://docs.microsoft.com/en-us/visualstudio/code-quality/code-analysis-for-managed-code-warnings) and [here](https://github.com/dotnet/roslyn-analyzers) for more information.
+Microsoft provide a number of analyzers for checking best practice C# and .NET usage. There are [quality rules](https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/) and [style rules](https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/). The [Roslyn analyzers GitHub repo](https://github.com/dotnet/roslyn-analyzers) has more information.
 
-All rules are prefixed `CA`.
+Code quality rules are prefixed `CA` and code style rules are prefixed `IDE`.
 
 ### SecurityCodeScan
 

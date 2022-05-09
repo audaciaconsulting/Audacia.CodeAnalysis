@@ -8,6 +8,8 @@ root = true
 # Code files
 [*.cs]
 
+# New files created with file-scoped namespaces
+csharp_style_namespace_declarations = file_scoped
 
 # Private fields should be prefixed with an underscore.
 dotnet_diagnostic.ACL1000.severity = warning
@@ -824,6 +826,15 @@ dotnet_diagnostic.DOC207.severity = warning
 # The documentation contains a `<see href="..."/>` element with an unrecognized URI.
 dotnet_diagnostic.DOC209.severity = warning
 
+# Use simple using statement
+dotnet_diagnostic.IDE0063.severity = warning
+
+# Use switch expression
+dotnet_diagnostic.IDE0066.severity = warning
+
+# Use file-scoped namespaces
+dotnet_diagnostic.IDE0161.severity = warning
+
 # Dispose created.
 dotnet_diagnostic.IDISP001.severity = warning
 
@@ -1313,8 +1324,8 @@ dotnet_diagnostic.RCS1172.severity = warning
 # [SIMPLIFICATION] Use coalesce expression instead of if
 dotnet_diagnostic.RCS1173.severity = warning
 
-# [REDUNDANCY] Remove redundant async/await
-dotnet_diagnostic.RCS1174.severity = warning
+# [REDUNDANCY] Remove redundant async/await *** Suppressed as not considered best practice (see https://blog.stephencleary.com/2016/12/eliding-async-await.html) ***
+dotnet_diagnostic.RCS1174.severity = none
 
 # [REDUNDANCY] Unused this parameter
 dotnet_diagnostic.RCS1175.severity = suggestion
