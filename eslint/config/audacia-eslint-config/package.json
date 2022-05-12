@@ -1,13 +1,13 @@
 {
   "name": "@audacia/eslint-config",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "ESLint Rules for Typescript projects.",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis"
   },
-  "author": "Adam Drewery",
+  "author": "Audacia",
   "license": "ISC",
   "peerDependencies": {
     "typescript": ">=2.8.0"
