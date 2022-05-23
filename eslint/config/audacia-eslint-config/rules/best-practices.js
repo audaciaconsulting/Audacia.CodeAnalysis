@@ -1,5 +1,6 @@
 module.exports = {
-  rules: {
+  rules:
+  {
     // specify the maximum cyclomatic complexity allowed in a program
     complexity: ['off', 11],
 
