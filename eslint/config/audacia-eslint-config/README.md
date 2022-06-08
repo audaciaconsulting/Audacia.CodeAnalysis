@@ -18,3 +18,6 @@ For example, in `.eslintrc.json` this may look something like:
 ```
 
 Finally, ensure that your code editor is set up to use ESLint. Jetbrains Rider comes with ESLint support preinstalled, and there is a plugin for VS Code.
+
+## Editing This Package
+1. After making changes to this package, use `npm pack` to create a local package, and then use `npm i {path to package} --install-links` to test in a consuming app.
