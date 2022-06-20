@@ -12,5 +12,6 @@
         public const string ThenByDescendingAfterOrderBy = "ACL1007";
         public const string ControllerActionProducesResponseType = "ACL1008";
         public const string OverloadShouldCallOtherOverload = "ACL1009";
+        public const string NullableReferenceTypesEnabled = "ACL1010";
     }
 }
