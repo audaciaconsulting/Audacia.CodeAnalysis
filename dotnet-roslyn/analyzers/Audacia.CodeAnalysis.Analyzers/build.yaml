@@ -13,12 +13,12 @@ stages:
 - stage: Build
   displayName: Build
   jobs:
-    - template: pipelines/build/nuget-package.job.yaml@templates
+    - template: src/build/dotnet/jobs/nuget-package.job.yaml@templates
       parameters:
         projects: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers/Audacia.CodeAnalysis.Analyzers.csproj'
         tests: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/tests/Audacia.CodeAnalysis.Analyzers.Test/Audacia.CodeAnalysis.Analyzers.Test.csproj'
 
 - stage: Release
   displayName: Release
-  jobs: [ { template: pipelines/release/internal-nuget-package.job.yaml@templates } ]
+  jobs: [ { template: src/deployment/nuget/jobs/internal-nuget-package.job.yaml@templates } ]
   condition: and(succeeded(), and(not(eq(variables['Build.Reason'], 'PullRequest')), not(eq(variables['Build.Reason'], 'Schedule'))))
