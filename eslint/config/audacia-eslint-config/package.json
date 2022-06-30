@@ -10,16 +10,13 @@
   "author": "Audacia",
   "license": "ISC",
   "peerDependencies": {
-    
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^7.32.0 || ^8.2.0",
+    "eslint-plugin-import": "^2.25.3"  
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "5.25.0",
-    "@typescript-eslint/parser": "5.25.0",
-    "eslint-config-airbnb-base": "15.0.0",
-    "acorn": "7.1.1",
-    "minimist": "1.2.5",
-    "eslint": "8.2.0",
-    "eslint-plugin-import": "2.25.2"  
+    "eslint-config-airbnb-typescript": "17.0.0"
   },
   "eslintConfig": {
     "rules": {

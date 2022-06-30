@@ -7,13 +7,16 @@ The `@audacia/eslint-config` npm package contains some default ESLint configurat
 First, install the package from the private npm feed:
 `npm install @audacia/eslint-config --save-dev`
 
-Next, modify your `ESLint` config file (usually either `.eslintrc.js` or `.eslintrc.json`) to extend the airbnb-base package and the Audacia ESLint config package by adding them to the `extends` property. (Note: the order in which the packages are listed is important; airbnb-base must be added first, followed by the Audacia ESLint config package).
+The Audacia package has a number of peer dependencies which must also be installed:
+`npm install eslint eslint-plugin-import @typescript-eslint/eslint-plugin @typescript-eslint/parser --save-dev`
+
+Next, modify your `ESLint` config file (usually either `.eslintrc.js` or `.eslintrc.json`) to extend the Audacia ESLint config package by adding it to the `extends` property.
 
 For example, in `.eslintrc.json` this may look something like:
 
 ```json
 "extends": [
-    'airbnb-base', '@audacia/eslint-config'
+    '@audacia/eslint-config'
 ]
 ```
 
