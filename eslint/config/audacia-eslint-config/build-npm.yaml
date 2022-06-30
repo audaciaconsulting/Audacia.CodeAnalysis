@@ -17,6 +17,7 @@ stages:
   - template: src/build/npm/jobs/npm-package.job.yaml@templates
     parameters:
       path: 'eslint/config/audacia-eslint-config'
+      test: false
 
 - stage: Release
   displayName: Release
