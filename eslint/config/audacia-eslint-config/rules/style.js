@@ -32,10 +32,6 @@ module.exports = {
 
     // disallow multiple empty lines, only one newline at the end, and no new lines at the beginning
     // https://eslint.org/docs/rules/no-multiple-empty-lines
-    'no-multiple-empty-lines': ['error', { max: 2, maxBOF: 1, maxEOF: 0 }],
-
-    // disallow use of unary operators, ++ and --
-    // https://eslint.org/docs/rules/no-plusplus
-    'no-plusplus': 'off'
+    'no-multiple-empty-lines': ['error', { max: 2, maxBOF: 1, maxEOF: 0 }]
   }
 };
