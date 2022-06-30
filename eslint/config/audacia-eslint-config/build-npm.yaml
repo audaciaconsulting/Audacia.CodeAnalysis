@@ -14,14 +14,14 @@ stages:
 - stage: Build
   displayName: Build
   jobs:
-  - template: pipelines/build/npm-package.job.yaml@templates
+  - template: src/build/npm/jobs/npm-package.job.yaml@templates
     parameters:
       path: 'eslint/config/audacia-eslint-config'
 
 - stage: Release
   displayName: Release
   jobs:
-  - template: pipelines/release/npm-package.job.yaml@templates
+  - template: src/deployment/npm/jobs/npm-package.job.yaml@templates
     parameters:
       path: 'eslint/config/audacia-eslint-config'
       packageName: '@audacia/eslint-config'

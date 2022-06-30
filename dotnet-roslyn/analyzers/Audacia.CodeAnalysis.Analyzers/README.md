@@ -16,6 +16,8 @@ Once the analyzer is finished, you should:
 
 Note the second PR is needed as `Audacia.CodeAnalysis.Analyzers` should be consumed via the main `Audacia.CodeAnalysis` package. It cannot be a direct project reference as analyzers must be reference via a NuGet package.
 
+**Important:** The unit test project in this solution will fail to build if the path length of items in the bin folder exceeds 260 characters. (You will see errors similar to `Could not copy Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll`). Therefore, it is recommended to clone this repo into a high-level directory (e.g. C:\Projects).
+
 # Analyzers
 
 ## ACL1000 - Private fields should be prefixed with an underscore
@@ -292,6 +294,19 @@ public class TestClassController : Controller
 	}
 }
 ```
+
+## ACL1010 - Nullable reference types enabled
+
+ACL1010 checks whether nullable reference types have been enabled on a project. 
+
+ACL1010 reports a warning if: 
+
+- The `<Nullable>` node is omitted from a .csproj file
+- The `<Nullable>` node is included in a .csproj file but has a value of `disable`
+
+All other values are permitted.
+
+ACL1010 also provides a code fix, which inserts or updates the <Nullable> node in a .csproj file with a default value of `enable`.
 
 # Custom .editorconfig Settings in Rider
 
