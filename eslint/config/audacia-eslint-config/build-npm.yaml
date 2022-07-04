@@ -7,7 +7,7 @@ trigger:
       - 'eslint/config/audacia-eslint-config/*'
 pr: { branches: { include: [master] } }
 schedules: [ { cron: "0 0 * * *", displayName: Nightly Build, branches: { include: [ master ] } } ]
-resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build, ref: refs/heads/bug/119781-npm-versioning-fails-in-package-job-template } ] }
+resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
 pool: { name: Prometheus }
 
 stages:
