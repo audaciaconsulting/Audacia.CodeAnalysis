@@ -50,7 +50,7 @@ You can configure and override rules from this plugin by using `@audacia/vue/<ru
 
 | Rule | Description |   |   |
 |------|-------------|---|---|
-| `@audacia/vue/data-test-attribute` | use data-test attributes for test automation | :white_check_mark: | :wrench: |
+| [`@audacia/vue/data-test-attribute`](/docs/rules/data-test-attribute.md) | use data-test attributes for test automation | :white_check_mark: | :wrench: |
 
 ## Development
 
