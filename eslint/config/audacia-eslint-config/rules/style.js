@@ -3,6 +3,7 @@ module.exports = {
 
     // require trailing commas in multiline object literals
     'comma-dangle': ['off'],
+    '@typescript-eslint/comma-dangle': ['error', 'never'],
 
     // enforce consistent line breaks inside function parentheses
     // https://eslint.org/docs/rules/function-paren-newline
