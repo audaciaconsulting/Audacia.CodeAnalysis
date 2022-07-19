@@ -1,27 +1,22 @@
 {
   "name": "@audacia/eslint-config",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "ESLint Rules for Typescript projects.",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis"
   },
-  "author": "Adam Drewery",
+  "author": "Audacia",
   "license": "ISC",
   "peerDependencies": {
-    "typescript": ">=2.8.0"
-  },
-  "devDependencies": {
-    "typescript": ">=2.8.0"
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^7.32.0 || ^8.2.0",
+    "eslint-plugin-import": "^2.25.3"  
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.5.0",
-    "@typescript-eslint/parser": "^2.5.0",
-    "acorn": "^7.1.1",
-    "eslint": ">= 3",
-    "eslint-plugin-import": "^2.18.2",
-    "minimist": "^1.2.5"
+    "eslint-config-airbnb-typescript": "17.0.0"
   },
   "eslintConfig": {
     "rules": {
