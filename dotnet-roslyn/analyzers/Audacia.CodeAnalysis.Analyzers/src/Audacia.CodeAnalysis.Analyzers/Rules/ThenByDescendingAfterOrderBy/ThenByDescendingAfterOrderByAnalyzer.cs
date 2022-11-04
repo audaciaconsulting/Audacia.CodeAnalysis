@@ -33,35 +33,40 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
-            var invocationExpression = (InvocationExpressionSyntax)context.Node;
-
-            var dataFlowAnalysis = context.SemanticModel.AnalyzeDataFlow(invocationExpression);
-
-            //Check if invocation expression contains OrderByDescending string.
-            if (!invocationExpression.GetText().ToString().Contains("OrderByDescending"))
+            if (context.Node.Kind() != SyntaxKind.InvocationExpression)
             {
                 return;
             }
 
+            var invocationExpression = (InvocationExpressionSyntax)context.Node;
+
+            var orderByMethodNames = new[] { "OrderBy", "OrderByDescending" };
+
             //Get tokens descending from this invocation expression.
-            var tokens = invocationExpression.DescendantTokens()
-                .Where(token => token.ValueText == "OrderBy" || token.ValueText == "OrderByDescending")
+            //Don't include tokens inside arguments as a subsequent 'OrderBy' within an argument e.g. in a lambda passed into a select or where should not be replaced with a 'ThenBy'
+            var tokens = invocationExpression.DescendantTokens(node => !node.IsKind(SyntaxKind.Argument))
+                .Where(token => orderByMethodNames.Contains(token.ValueText))
                 .ToList();
+
+            //Check if invocation expression doesn't contain any 'OrderByDescending' tokens.
+            if (!tokens.Any(t => t.ValueText == "OrderByDescending"))
+            {
+                return;
+            }
 
             //Find last appearance of 'OrderByDescending' in the expression.
             var lastAppearance = tokens.Last(t => t.ValueText == "OrderByDescending");
             var lastAppearanceIndex = tokens.IndexOf(lastAppearance);
 
             //Find the first appearance of 'OrderBy' or 'OrderByDescending' in the expression.
-            var firstOrderByToken = tokens.First(t => t.ValueText == "OrderBy" || t.ValueText == "OrderByDescending");
+            var firstOrderByToken = tokens.First(t => orderByMethodNames.Contains(t.ValueText));
             var firstOrderByTokenIndex = tokens.IndexOf(firstOrderByToken);
-
 
             if (firstOrderByTokenIndex < lastAppearanceIndex)
             {
                 var location = lastAppearance.GetLocation();
                 var kind = context.Node.Kind();
-                ISymbol member = context.ContainingSymbol;
+                var member = context.ContainingSymbol;
                 var memberName = member.Name;
 
                 context.ReportDiagnostic(
