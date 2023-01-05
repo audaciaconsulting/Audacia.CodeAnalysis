@@ -48,6 +48,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             SyntaxKind.SwitchExpression,
             SyntaxKind.SwitchStatement,
             SyntaxKind.TryStatement,
+            SyntaxKind.CatchClause,
+            SyntaxKind.FinallyClause,
         };
 
         public override void Initialize(AnalysisContext context)
