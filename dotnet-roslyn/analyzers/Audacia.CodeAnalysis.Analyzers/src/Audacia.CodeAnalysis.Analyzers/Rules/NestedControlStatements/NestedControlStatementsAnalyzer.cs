@@ -104,8 +104,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
                 .Where(n => n.IsKind(SyntaxKind.Block) || n.IsKind(SyntaxKind.SwitchSection) || n.IsKind(SyntaxKind.SwitchExpressionArm))
                 .ToList();
 
-            var nodesTooDeep = new List<SyntaxNode>();
-
             foreach (var block in blocks)
             {
                 var childStatements = block.ChildNodes().Where(n => ControlStatementKinds.Contains(n.Kind())).ToList();
