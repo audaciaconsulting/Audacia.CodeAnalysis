@@ -45,6 +45,7 @@ dotnet_diagnostic.ACL1009.severity = none
 
 # [Maintainability] ACL1011: Don't nest too many control statements
 dotnet_diagnostic.ACL1011.severity = warning
+dotnet_diagnostic.ACL1011.max_control_statement_depth = 2
 
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning

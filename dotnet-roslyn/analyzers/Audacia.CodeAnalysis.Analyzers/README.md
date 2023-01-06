@@ -349,6 +349,8 @@ This analyzer considers the following to be "control statements":
 - Switch: either `switch` - `case` block or a `switch` expression
 - Try blocks: `try`, `catch`, `finally`
 
+Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1011.max_control_statement_depth`.
+
 # Custom .editorconfig Settings in Rider
 
 Some of the rules (e.g. ACL1002, ACL1003 and ACL1004) make use of custom .editorconfig settings. For example the maximum statement count for rule ACL1002 can be configured like this:
