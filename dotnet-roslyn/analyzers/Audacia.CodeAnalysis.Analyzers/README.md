@@ -308,6 +308,49 @@ All other values are permitted.
 
 ACL1010 also provides a code fix, which inserts or updates the <Nullable> node in a .csproj file with a default value of `enable`.
 
+
+## ACL1011 - Don't nest too many control statements
+
+ACL1011 checks how deeply nested control statements are to and raises a warning if a statement is too deeply nested, by default after 2.
+
+For example a warning is raised for this:
+
+```csharp
+if (condition1) 
+{
+	if (condition2) 
+	{
+		if (condition3) 
+		{
+			if (condition4) 
+			{
+				Console.WriteLine("I'm in too deep!");
+			}
+		}
+	}
+}
+```
+
+The warning should be resolved with an appropriate refactor or rewrite of the code responsible, e.g.
+
+```csharp
+
+if (condition1 && condition2 && condition3 && condition4) 
+{
+	Console.WriteLine("I'm in too deep!");
+}
+```
+
+This analyzer considers the following to be "control statements":
+- While loops: `while`
+- Do loops: `do`
+- For loops: `for` or `foreach`
+- If statements: `if`
+- Switch: either `switch` - `case` block or a `switch` expression
+- Try blocks: `try`, `catch`, `finally`
+
+Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1011.max_control_statement_depth`.
+
 # Custom .editorconfig Settings in Rider
 
 Some of the rules (e.g. ACL1002, ACL1003 and ACL1004) make use of custom .editorconfig settings. For example the maximum statement count for rule ACL1002 can be configured like this:
