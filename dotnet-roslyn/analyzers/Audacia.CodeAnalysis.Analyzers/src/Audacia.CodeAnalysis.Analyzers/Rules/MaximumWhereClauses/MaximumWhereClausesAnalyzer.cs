@@ -75,10 +75,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
                 .SelectMany(p => p.DescendantNodes(n => n.IsKind(SyntaxKind.LogicalAndExpression)))
                 .ToList();
 
-            // the number of clauses is the (number of ands / 2) + 1
-            // a LogicalAndExpression node appears once for each clause it's connected to e.g. for 'A && B' we get two
-            // so half is the number of '&&'s we see, then + 1 for the number of clauses
-            // as the ands join the clauses e.g. 'A && B && C' is two '&&'s and comprised of three clauses: A, B, and C.
+            // the number of ands counted above counts each '&&' symbol twice for some reason
+            // so we want the number of '&&'s and then + 1 for the number of clauses
             var numberOfClauses = ands.Count() / 2 + 1;
 
             if (numberOfClauses > max)
