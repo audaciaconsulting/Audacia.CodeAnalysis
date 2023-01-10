@@ -47,6 +47,10 @@ dotnet_diagnostic.ACL1009.severity = none
 dotnet_diagnostic.ACL1011.severity = warning
 dotnet_diagnostic.ACL1011.max_control_statement_depth = 2
 
+# [Maintainability] ACL1012: Don't pass predicates into 'Where' methosd with too many clauses
+dotnet_diagnostic.ACL1012.severity = warning
+dotnet_diagnostic.ACL1012.max_where_clauses
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 

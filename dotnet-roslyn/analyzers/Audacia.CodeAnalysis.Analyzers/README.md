@@ -351,6 +351,36 @@ This analyzer considers the following to be "control statements":
 
 Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1011.max_control_statement_depth`.
 
+## ACL1012 - Don't pass predicates into 'Where' methosd with too many clauses
+
+ACL1012 checks how many logical and clauses are contained in a `Where` method call's predicate and raises a warning if there are too many, by default after 3.
+
+For example a warning is raised for this:
+
+```csharp
+var filtered = myCollection.Where(a => a.Length > 10 && a.Name != "IAmAllowedToBeLonger" && a.Property != null && a.Property.Value == 1);
+```
+
+Because there are too many (in this case 4) and clauses at the top level of the where statement. To resolve the warning, this could be refactored as follows:
+
+```csharp
+var filtered = myCollection
+	.Where(a => a.Length < 10)
+	.Where(a => a.Name != "IAmAllowedToBeLonger")
+	.Where(a => a.Property != null)
+	.Where(a => a.Property.Value == 1);
+```
+
+If this is overkill, you can still have less than four and clauses in each `Where`, to group together related clauses for example. 
+
+```csharp
+var filtered = myCollection
+	.Where(a => a.Length < 10 && a.Name != "IAmAllowedToBeLonger")
+	.Where(a => a.Property != null && a.Property.Value == 1);
+```
+
+Maximum allowed clauses can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1012.max_where_clauses`.
+
 # Custom .editorconfig Settings in Rider
 
 Some of the rules (e.g. ACL1002, ACL1003 and ACL1004) make use of custom .editorconfig settings. For example the maximum statement count for rule ACL1002 can be configured like this:

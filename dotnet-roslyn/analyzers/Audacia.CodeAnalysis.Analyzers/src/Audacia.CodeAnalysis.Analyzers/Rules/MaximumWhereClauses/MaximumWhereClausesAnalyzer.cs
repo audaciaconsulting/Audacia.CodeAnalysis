@@ -22,7 +22,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
 
         private const string MessageFormat = "'Where' contains {0} clauses, which exceeds the maximum of {1} clauses per 'Where'.";
 
-        private const string Description = "Don't pass predicates into 'Where' methosd with more than a predefined number of clauses.";
+        private const string Description = "Don't pass predicates into 'Where' methosd with too many clauses.";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -64,7 +64,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
 
             var text = invocationExpression.GetText().ToString();
 
-            ////Check if invocation expression contains Where string.
+            // Check if invocation expression contains Where string.
             if (!text.Contains("Where") && !text.Contains("&&"))
             {
                 return;
