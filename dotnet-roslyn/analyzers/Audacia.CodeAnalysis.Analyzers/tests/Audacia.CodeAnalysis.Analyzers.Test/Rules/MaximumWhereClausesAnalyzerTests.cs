@@ -167,5 +167,37 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 
             VerifyDiagnostic(testCode, expectedDiagnostics);
         }
+
+        [TestMethod]
+        public void No_Diagnostic_For_Where_With_Three_And_Symbols_But_Less_Than_Four_Clauses()
+        {
+            const string testCode = @"
+                using System;
+                using System.Linq;
+
+                namespace TestApp
+                {
+                    class Program
+                    {
+                        class TestClass
+                        {
+                            public string String { get; set; }
+                            public int Number { get; set; }
+                        }
+
+                        static void Main(string[] args)
+                        {
+                            TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
+                                   new TestClass { String = ""cba"", Number = 2 },
+                                   new TestClass { String = ""bac"", Number = 2 },
+                                   new TestClass { String = ""abc"", Number = 1 } };
+
+                            tests.Where(t => t.String == ""abc"" && t.Number == 2 && (t.String.Length > 0 || (t.String.Length > 1 && t.String.Contains(""ac"")) || (t.String.Length >2  && t.String.Contains(""cb"")));
+                        }
+                    }
+                }";
+
+            VerifyNoDiagnostic(testCode);
+        }
     }
 }
