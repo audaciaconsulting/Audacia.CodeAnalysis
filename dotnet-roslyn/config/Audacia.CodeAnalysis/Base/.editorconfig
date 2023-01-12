@@ -925,7 +925,7 @@ dotnet_diagnostic.RCS1003.severity = warning
 dotnet_diagnostic.RCS1004.severity = none
 
 # [SIMPLIFICATION] Simplify nested using statement
-dotnet_diagnostic.RCS1005.severity = none
+dotnet_diagnostic.RCS1005.severity = warning
 
 # [SIMPLIFICATION] Merge else clause with nested if statement
 dotnet_diagnostic.RCS1006.severity = warning
@@ -1219,7 +1219,7 @@ dotnet_diagnostic.RCS1108.severity = warning
 dotnet_diagnostic.RCS1110.severity = warning
 
 # [SIMPLIFICATION] Combine 'Enumerable.Where' method chain
-dotnet_diagnostic.RCS1112.severity = warning
+dotnet_diagnostic.RCS1112.severity = none
 
 # [GENERAL] Mark local variable as const
 dotnet_diagnostic.RCS1118.severity = warning
