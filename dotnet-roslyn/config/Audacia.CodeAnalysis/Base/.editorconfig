@@ -925,7 +925,7 @@ dotnet_diagnostic.RCS1003.severity = warning
 dotnet_diagnostic.RCS1004.severity = none
 
 # [SIMPLIFICATION] Simplify nested using statement
-dotnet_diagnostic.RCS1005.severity = warning
+dotnet_diagnostic.RCS1005.severity = none
 
 # [SIMPLIFICATION] Merge else clause with nested if statement
 dotnet_diagnostic.RCS1006.severity = warning
