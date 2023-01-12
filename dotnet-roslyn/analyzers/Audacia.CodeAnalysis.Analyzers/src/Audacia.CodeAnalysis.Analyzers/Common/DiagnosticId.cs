@@ -14,5 +14,6 @@
         public const string OverloadShouldCallOtherOverload = "ACL1009";
         public const string NullableReferenceTypesEnabled = "ACL1010";
         public const string NestedControlStatementsAnalyzer = "ACL1011";
+        public const string MaximumWhereClausesAnalyzer = "ACL1012";
     }
 }
