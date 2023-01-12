@@ -351,7 +351,7 @@ This analyzer considers the following to be "control statements":
 
 Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1011.max_control_statement_depth`.
 
-## ACL1012 - Don't pass predicates into 'Where' methosd with too many clauses
+## ACL1012 - Don't pass predicates into 'Where' methods with too many clauses
 
 ACL1012 checks how many logical and clauses are contained in a `Where` method call's predicate and raises a warning if there are too many, by default after 3.
 
