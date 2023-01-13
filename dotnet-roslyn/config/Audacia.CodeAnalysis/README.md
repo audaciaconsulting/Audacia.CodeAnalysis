@@ -71,6 +71,23 @@ The .editorconfig file should look something like this:
 generated_code = true
 ```
 
+## Configuring Warnings As Errors
+
+Add the following to your project's `.csproj` file to make the compiler treat warnings as errors, and stop compilation when a warning is raised:
+
+```xml
+<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+```
+
+You can configure treating warnings as errors for specific warnings as follows: 
+
+```xml
+<WarningsAsErrors>ACL1005,CS0168</WarningsAsErrors>
+<WarningsNotAsErrors>ACL1006,CS0167</WarningsNotAsErrors>
+```
+
+To see warnings as errors for a single compilation without changing your `.csproj`, pass in the `--warnaserror` to `dotnet build`.
+
 ## More Information on Analyzers
 
 The analyzers used come from a variety of sources.
