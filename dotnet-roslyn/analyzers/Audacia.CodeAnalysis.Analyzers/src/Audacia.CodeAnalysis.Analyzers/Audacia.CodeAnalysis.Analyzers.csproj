@@ -14,7 +14,7 @@
     <Copyright>Copyright © Audacia 2020</Copyright>
     <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
