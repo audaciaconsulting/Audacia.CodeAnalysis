@@ -20,5 +20,8 @@ stages:
 
 - stage: Release
   displayName: Release
-  jobs: [ { template: src/deployment/nuget/jobs/internal-public-nuget-package.job.yaml@templates } ]
+  jobs:
+    - template: src/deployment/nuget/jobs/internal-public-nuget-package.job.yaml@templates
+      parameters:
+        environment: NuGet Internal (Gated)
   condition: and(succeeded(), and(not(eq(variables['Build.Reason'], 'PullRequest')), not(eq(variables['Build.Reason'], 'Schedule'))))
