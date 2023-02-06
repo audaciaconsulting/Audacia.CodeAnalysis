@@ -124,20 +124,24 @@ module.exports = {
             return true;
         }
 
+        function getLocation(node) {
+            return node.loc;
+        }
+
         function generateFixer(node, attribute) {
             let range;
             let fixValue;
 
             const id = ids.create(configuration.idLength);
 
-            if (!node.startSourceSpan)
-            {
-                // If this is the parent (template node), skip it
-                return undefined;
-            } else if (!attribute) {
+            if (!attribute) {
                 // If we don't already have the attribute add it at the end of the start tag
-                const selfClosing = node.startSourceSpan.end.offset == node.endSourceSpan.end.offset
-                const endOfStartTag = node.startSourceSpan.end.offset - (selfClosing ? 2 : 1);
+                const parent = node.children?.length > 0;
+                const span = parent ? node.sourceSpan : node.startSourceSpan;
+
+                const selfClosing = !(parent || node.startSourceSpan?.end.offset != node.endSourceSpan?.end.offset);
+                const endOfStartTag = span.end.offset - (selfClosing ? 2 : 1);
+
                 range = [endOfStartTag, endOfStartTag];
                 fixValue = ` ${configuration.testAttribute}="${id}"`;
             } else if (attribute.valueSpan === undefined) {
@@ -176,11 +180,6 @@ module.exports = {
                     // Add any children so they can be checked too
                     childNodes.push(...currentNode.children.filter(n => n.type == 'Element$1'));
 
-                    // Skip the template node
-                    if (i === 0) {
-                        continue;
-                    }
-
                     // Check element first
                     if (isIncludedElement(currentNode.name)) {
                         message = `${currentNode.name} elements should include a '${configuration.testAttribute}' attribute`;
@@ -208,10 +207,15 @@ module.exports = {
                         fix = generateFixer(currentNode, attribute);
                     }
 
+                    const loc = getLocation(currentNode);
+
+                    // Don't return node on it's own as the angular ESlint can be aggressive and highligh the whole file.
+                    // Return the location instead to highlight only the issue.
                     context.report({
-                        node,
+                        currentNode,
                         message,
                         fix,
+                        loc
                     });
                 }
             }

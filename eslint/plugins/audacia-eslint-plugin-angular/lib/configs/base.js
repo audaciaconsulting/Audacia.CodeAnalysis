@@ -8,6 +8,10 @@ module.exports = {
         browser: true,
         es6: true,
     },
-    plugins: ['@audacia/eslint-plugin-vue'],
+    plugins: [
+        "html",
+        "@angular-eslint",
+        "@audacia/eslint-plugin-angular"
+    ],
     rules: {},
 };

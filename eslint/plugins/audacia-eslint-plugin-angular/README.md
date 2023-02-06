@@ -4,7 +4,9 @@ An ESLint plugin which provides lint rules for angular projects.
 
 ## Installation
 
-You'll first need to install [@angular-eslint/template-parser](https://www.npmjs.com/package/@angular-eslint/template-parser).
+You'll first need to install [@angular-eslint/eslint-plugin](https://www.npmjs.com/package/@angular-eslint/template-parser).
+
+If the plugin is going to be used with HTML files, you'll also need [@angular-eslint](https://eslint.org/docs/latest/use/getting-started) and [eslint-plugin-html](https://www.npmjs.com/package/eslint-plugin-html). This is because Angular ESLint doesn't parse HTML files by default.
 
 Next, install `@audacia/eslint-plugin-angular`:
 

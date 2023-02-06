@@ -125,6 +125,13 @@ ruleTester.run("data-test-attribute", rule, {
         {
             name: 'test attribute check on child elements',
             code: '<template><div><input data-test="test-id" onclick="foobar()"/></div></template>',
+        },
+        {
+            name: 'test attribute check on multiple templates elements',
+            code: `
+                <template><div><input data-test="test-id" onclick="foobar()"/></div></template>
+                <template><div><input data-test="test-id" onclick="foobar()"/></div></template>
+                <template><div><input data-test="test-id" onclick="foobar()"/></div></template>`,
         }
     ],
     invalid: [
