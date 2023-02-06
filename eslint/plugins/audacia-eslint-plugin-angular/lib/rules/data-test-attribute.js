@@ -135,14 +135,11 @@ module.exports = {
             const id = ids.create(configuration.idLength);
 
             if (!attribute) {
-                // If we don't already have the attribute add it at the end of the start tag
-                const parent = node.children?.length > 0;
-                const span = parent ? node.sourceSpan : node.startSourceSpan;
+                // If we don't already have the attribute add it at the star of node
+                // We can't add it to the end because we don't know if the span ends on the same line
+                const startOfNode = node.sourceSpan.start.offset + node.name.length + 1;
 
-                const selfClosing = !(parent || node.startSourceSpan?.end.offset != node.endSourceSpan?.end.offset);
-                const endOfStartTag = span.end.offset - (selfClosing ? 2 : 1);
-
-                range = [endOfStartTag, endOfStartTag];
+                range = [startOfNode, startOfNode];
                 fixValue = ` ${configuration.testAttribute}="${id}"`;
             } else if (attribute.valueSpan === undefined) {
                 // The attribute exists but has no value so add the id

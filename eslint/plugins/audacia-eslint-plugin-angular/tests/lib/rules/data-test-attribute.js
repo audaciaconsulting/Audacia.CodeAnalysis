@@ -140,7 +140,7 @@ ruleTester.run("data-test-attribute", rule, {
             name: '(click) without test attribute',
             code: '<template><div (click)="foobar()"></div></template>',
             errors: ["Elements with click events should include a 'data-test' attribute"],
-            output: '<template><div (click)="foobar()" data-test="test-id"></div></template>',
+            output: '<template><div data-test="test-id" (click)="foobar()"></div></template>',
             options: [{ enableFixer: true }],
         },
         {
@@ -198,7 +198,7 @@ ruleTester.run("data-test-attribute", rule, {
             name: 'input element with (click) event without test attribute',
             code: '<template><input (click)="foobar()"/></template>',
             errors: ["input elements should include a 'data-test' attribute"],
-            output: '<template><input (click)="foobar()" data-test="test-id"/></template>',
+            output: '<template><input data-test="test-id" (click)="foobar()"/></template>',
             options: [{ enableFixer: true }],
         },
         {
@@ -220,7 +220,7 @@ ruleTester.run("data-test-attribute", rule, {
             name: 'self-closing input element without test attribute',
             code: '<template><input (click)="foobar()"/></template>',
             errors: ["input elements should include a 'data-test' attribute"],
-            output: '<template><input (click)="foobar()" data-test="test-id"/></template>',
+            output: '<template><input data-test="test-id" (click)="foobar()"/></template>',
             options: [{ enableFixer: true }]
         },
         {
@@ -242,28 +242,28 @@ ruleTester.run("data-test-attribute", rule, {
             name: '(click) without test attribute when multiple events configured',
             code: '<template><div (click)="foobar()"></div></template>',
             errors: ["Elements with click events should include a 'data-test' attribute"],
-            output: '<template><div (click)="foobar()" data-test="test-id"></div></template>',
+            output: '<template><div data-test="test-id" (click)="foobar()"></div></template>',
             options: [{ enableFixer: true, events: ['click', 'mouseup'] }],
         },
         {
             name: '(mouseup) without test attribute when multiple events configured',
             code: '<template><div (mouseup)="foobar()"></div></template>',
             errors: ["Elements with mouseup events should include a 'data-test' attribute"],
-            output: '<template><div (mouseup)="foobar()" data-test="test-id"></div></template>',
+            output: '<template><div data-test="test-id" (mouseup)="foobar()"></div></template>',
             options: [{ enableFixer: true, events: ['click', 'mouseup'] }]
         },
         {
             name: 'multiple events configured on element gives first event error',
             code: '<template><div (click)="foobar()" (mouseup)="foobar()"></div></template>',
             errors: ["Elements with click events should include a 'data-test' attribute"],
-            output: '<template><div (click)="foobar()" (mouseup)="foobar()" data-test="test-id"></div></template>',
+            output: '<template><div data-test="test-id" (click)="foobar()" (mouseup)="foobar()"></div></template>',
             options: [{ enableFixer: true, events: ['click', 'mouseup'] }],
         },
         {
             name: 'multiple events configured on element in different order gives first event error',
             code: '<template><div (mouseup)="foobar()" (click)="foobar()"></div></template>',
             errors: ["Elements with mouseup events should include a 'data-test' attribute"],
-            output: '<template><div (mouseup)="foobar()" (click)="foobar()" data-test="test-id"></div></template>',
+            output: '<template><div data-test="test-id" (mouseup)="foobar()" (click)="foobar()"></div></template>',
             options: [{ enableFixer: true, events: ['click', 'mouseup'] }],
         },
         // using on style
@@ -271,14 +271,14 @@ ruleTester.run("data-test-attribute", rule, {
             name: 'onclick without test attribute',
             code: '<template><div onclick="foobar()"></div></template>',
             errors: ["Elements with click events should include a 'data-test' attribute"],
-            output: '<template><div onclick="foobar()" data-test="test-id"></div></template>',
+            output: '<template><div data-test="test-id" onclick="foobar()"></div></template>',
             options: [{ enableFixer: true }],
         },
         {
             name: 'multiple events configured on element in different order gives first onevent error',
             code: '<template><div onmouseup="foobar()" onclick="foobar()"></div></template>',
             errors: ["Elements with mouseup events should include a 'data-test' attribute"],
-            output: '<template><div onmouseup="foobar()" onclick="foobar()" data-test="test-id"></div></template>',
+            output: '<template><div data-test="test-id" onmouseup="foobar()" onclick="foobar()"></div></template>',
             options: [{ enableFixer: true, events: ['click', 'mouseup'] }]
         },
         // multiple elements configured
@@ -317,7 +317,7 @@ ruleTester.run("data-test-attribute", rule, {
             name: '(click) event without custom test attribute',
             code: '<template><div (click)="foobar()"></div></template>',
             errors: ["Elements with click events should include a 'data-other-attribute' attribute"],
-            output: '<template><div (click)="foobar()" data-other-attribute="test-id"></div></template>',
+            output: '<template><div data-other-attribute="test-id" (click)="foobar()"></div></template>',
             options: [{ enableFixer: true, testAttribute: 'data-other-attribute' }],
 
         },
