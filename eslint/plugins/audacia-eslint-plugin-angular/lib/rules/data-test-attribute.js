@@ -169,10 +169,6 @@ module.exports = {
                     .filter(n => n.type == 'Element$1');
 
                 let message = '';
-                // Element.name = element type [div, template, input, etc]
-                // Element.attributes = element attributs [<data-test-attribute>, onmouseup]
-                // Element.Output = element events [(click), (mouseup), etc]
-
                 // Go through each node
                 for (var i = 0; i < childNodes.length; i++) {
                     const currentNode = childNodes[i];

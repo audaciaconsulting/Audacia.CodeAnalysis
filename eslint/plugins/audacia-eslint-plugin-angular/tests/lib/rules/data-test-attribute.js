@@ -121,6 +121,11 @@ ruleTester.run("data-test-attribute", rule, {
             code: '<template><input data-other-attribute="test-id"/></template>',
             options: [{ testAttribute: 'data-other-attribute' }]
         },
+        // child input elements
+        {
+            name: 'test attribute check on child elements',
+            code: '<template><div><input data-test="test-id" onclick="foobar()"/></div></template>',
+        }
     ],
     invalid: [
         // (click) events
@@ -331,10 +336,11 @@ ruleTester.run("data-test-attribute", rule, {
             options: [{ enableFixer: true, testAttribute: 'data-other-attribute' }]
         },
         {
+            name: '(click) event with empty value in custom test attribute in different order',
             code: '<template><div data-other-attribute="" (click)="foobar()"></div></template>',
             errors: ["Elements with click events should include a 'data-other-attribute' attribute"],
             output: '<template><div data-other-attribute="test-id" (click)="foobar()"></div></template>',
             options: [{ enableFixer: true, testAttribute: 'data-other-attribute' }]
-        },
+        }
     ],
 });
