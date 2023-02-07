@@ -13,16 +13,16 @@
     "test": "mocha \"tests/lib/rules/**/*.js\""
   },
   "peerDependencies": {
-    "eslint": "8.33.0",
-    "@angular-eslint/eslint-plugin": "15.2.0",
-    "@angular-eslint/template-parser": "15.2.0"
+    "eslint": ">=6.0.0",
+    "@angular-eslint/eslint-plugin": ">=13.1.0",
+    "@angular-eslint/template-parser": ">=13.1.0"
   },
   "devDependencies": {
     "eslint": "8.33.0",
-    "mocha": "10.2.0"
+    "mocha": "10.2.0",
+    "@angular-eslint/template-parser": "15.2.0"
   },
   "dependencies": {
-    "@angular-eslint/template-parser": "^15.2.0",
     "nanoid": "3.1.30",
     "proxyquire": "2.1.3"
   }

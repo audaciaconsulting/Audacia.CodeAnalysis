@@ -91,11 +91,15 @@ module.exports = {
         const configuration = parseOptions(context.options[0]);
 
         function getIncludedEvent(node) {
+            // Get angular outputs: i.e. `(click)="foobar()"`
             const outputs = node.outputs.map((o) => o.name);
+
+            // Get attributes: i.e. `onclick="foobar()"`
             const attributes = node.attributes?.map((a) => a.name)
                 .filter((a) => a.startsWith('on'))
                 .map((a) => a.slice(2));
 
+            // Combine outputs and attributes (by name)
             const events = outputs.concat(attributes)
                 .filter((n) => configuration.events.includes(n));
 
@@ -135,7 +139,7 @@ module.exports = {
             const id = ids.create(configuration.idLength);
 
             if (!attribute) {
-                // If we don't already have the attribute add it at the star of node
+                // If we don't already have the attribute add it at the start of node
                 // We can't add it to the end because we don't know if the span ends on the same line
                 const startOfNode = node.sourceSpan.start.offset + node.name.length + 1;
 
