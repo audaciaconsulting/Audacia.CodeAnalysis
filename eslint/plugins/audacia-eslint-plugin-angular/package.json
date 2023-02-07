@@ -20,6 +20,7 @@
   "devDependencies": {
     "eslint": "8.33.0",
     "mocha": "10.2.0",
+    "@angular-eslint/eslint-plugin": "15.2.0",
     "@angular-eslint/template-parser": "15.2.0"
   },
   "dependencies": {
