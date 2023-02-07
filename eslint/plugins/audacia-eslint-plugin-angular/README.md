@@ -8,11 +8,17 @@ You'll first need to install [@angular-eslint/eslint-plugin](https://www.npmjs.c
 
 If the plugin is going to be used with HTML files, you'll also need [@angular-eslint](https://eslint.org/docs/latest/use/getting-started) and [eslint-plugin-html](https://www.npmjs.com/package/eslint-plugin-html). This is because Angular ESLint doesn't parse HTML files by default.
 
-Next, install `@audacia/eslint-plugin-angular`:
+</br>
+
+Before continuing, make sure you have the [AudaciaPublic](https://dev.azure.com/audacia/Audacia.Public/_artifacts/feed/AudaciaPublic) feed configured.
+ You can find more information on how to set this up in the [Audacia wiki](https://dev.azure.com/audacia/Audacia/_wiki/wikis/Audacia.wiki/259/Configuring-a-project-to-access-the-Audacia-NPM-registry).
+
+Next, you can install `@audacia/eslint-plugin-angular`:
 
 ```sh
 npm install @audacia/eslint-plugin-angular --save-dev
 ```
+
 
 ## Usage
 
