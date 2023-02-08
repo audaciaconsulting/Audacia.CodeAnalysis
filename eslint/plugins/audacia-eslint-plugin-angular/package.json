@@ -24,7 +24,7 @@
     "@angular-eslint/template-parser": "15.2.0"
   },
   "dependencies": {
-    "nanoid": "3.1.30",
+    "nanoid": "4.0.1",
     "proxyquire": "2.1.3"
   }
 }
