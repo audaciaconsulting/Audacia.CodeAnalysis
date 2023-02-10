@@ -20,6 +20,10 @@ tester.run('data-test-attribute', rule, {
       name: '@click with test attribute in different order',
       code: '<template><div data-test="test-id" @click="foobar()"></div></template>',
     },
+    {
+      name: '@click.stop with test attribute',
+      code: '<template><div @click.stop="foobar()" data-test="test-id"></div></template>',
+    },
     // using v-on: style
     {
       name: 'v-on:click with test attribute',
@@ -136,6 +140,13 @@ tester.run('data-test-attribute', rule, {
       code: '<template><div @click="foobar()" data-test=""></div></template>',
       errors: ["Elements with click events should include a 'data-test' attribute"],
       output: '<template><div @click="foobar()" data-test="test-id"></div></template>',
+      options: [{ enableFixer: true }],
+    },
+    {
+      name: '@click.stop without test attribute',
+      code: '<template><div @click.stop="foobar()"></div></template>',
+      errors: ["Elements with click events should include a 'data-test' attribute"],
+      output: '<template><div @click.stop="foobar()" data-test="test-id"></div></template>',
       options: [{ enableFixer: true }],
     },
     {
