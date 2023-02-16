@@ -155,6 +155,6 @@ All rules are prefixed with `DOC`.
 All rules are prefixed `EF`.
 
 ### Sonar Source
-[Sonar Source C#](https://rules.sonarsource.com/) provides analyzers for Bugs, Vulnerabilities, Security Hotspots, and Code Smells in C# code.
+[SonarAnalyzer.CSharp](https://rules.sonarsource.com/) provides analyzers for Bugs, Vulnerabilities, Security Hotspots, and Code Smells in C# code.
 
 All rules are prefixed with `S`.
