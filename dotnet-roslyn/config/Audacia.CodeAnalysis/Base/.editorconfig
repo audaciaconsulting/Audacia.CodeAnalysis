@@ -63,11 +63,11 @@ dotnet_diagnostic.AV1010.severity = warning
 # A property, method or local function should do only one thing
 dotnet_diagnostic.AV1115.severity = warning
 
-# Return type in method signature should be a collection interface instead of a concrete type
-dotnet_diagnostic.AV1130.severity = suggestion
+# Return type in method signature should be a collection interface instead of a concrete type  *** Suppress as covered by S3956 ***
+dotnet_diagnostic.AV1130.severity = none
 
-# Properties, arguments and return values representing strings, collections or tasks should never be `null`
-dotnet_diagnostic.AV1135.severity = warning
+# Properties, arguments and return values representing strings, collections or tasks should never be `null`  *** Suppress as covered by S1168 ***
+dotnet_diagnostic.AV1135.severity = none
 
 # Don't swallow errors by catching generic exceptions *** Suppress as covered by CA1031 ***
 dotnet_diagnostic.AV1210.severity = none
@@ -501,8 +501,8 @@ dotnet_diagnostic.CA2207.severity = warning
 # [USAGE] Instantiate argument exceptions correctly
 dotnet_diagnostic.CA2208.severity = warning
 
-# [USAGE] Non-constant fields should not be visible
-dotnet_diagnostic.CA2211.severity = warning
+# [USAGE] Non-constant fields should not be visible *** Suppress as covered by S2223 ***
+dotnet_diagnostic.CA2211.severity = none
 
 # [USAGE] Disposable fields should be disposed
 dotnet_diagnostic.CA2213.severity = warning
@@ -519,8 +519,8 @@ dotnet_diagnostic.CA2217.severity = none
 # [USAGE] Override GetHashCode on overriding Equals
 dotnet_diagnostic.CA2218.severity = warning
 
-# [USAGE] Do not raise exceptions in finally clauses
-dotnet_diagnostic.CA2219.severity = warning
+# [USAGE] Do not raise exceptions in finally clauses *** Suppress as covered by S1163 ***
+dotnet_diagnostic.CA2219.severity = none
 
 # [USAGE] Override Equals on overloading operator equals
 dotnet_diagnostic.CA2224.severity = warning
@@ -1035,8 +1035,8 @@ dotnet_diagnostic.RCS1042.severity = warning
 # [REDUNDANCY] Remove 'partial' modifier from type with a single part
 dotnet_diagnostic.RCS1043.severity = warning
 
-# [MAINTAINABILITY] Remove original exception from throw statement
-dotnet_diagnostic.RCS1044.severity = warning
+# [MAINTAINABILITY] Remove original exception from throw statement *** Suppress as covered by S3445 ***
+dotnet_diagnostic.RCS1044.severity = none
 
 # [NAMING] Rename private field according to camel case with underscore *** Suppress as applies itself to static readonly fields ***
 dotnet_diagnostic.RCS1045.severity = none
@@ -1317,8 +1317,8 @@ dotnet_diagnostic.RCS1166.severity = warning
 # [MAINTAINABILITY] Parameter name differs from base name *** Suppress as covered by CA1725 ***
 dotnet_diagnostic.RCS1168.severity = none
 
-# [DESIGN] Make field read-only
-dotnet_diagnostic.RCS1169.severity = warning
+# [DESIGN] Make field read-only *** Suppress as covered by S2933 ***
+dotnet_diagnostic.RCS1169.severity = none
 
 # [DESIGN] Use read-only auto-implemented property
 dotnet_diagnostic.RCS1170.severity = suggestion
@@ -1425,7 +1425,7 @@ dotnet_diagnostic.RCS1207.severity = warning
 # [READABILITY] Order type parameter constraints
 dotnet_diagnostic.RCS1209.severity = warning
 
-# [USAGE] Return Task.FromResult instead of returning null *** Suppress as covered by AV1135 ***
+# [USAGE] Return Task.FromResult instead of returning null  *** Suppress as covered by S4586 ***
 dotnet_diagnostic.RCS1210.severity = none
 
 # [REDUNDANCY] Remove unnecessary else clause
@@ -1959,8 +1959,8 @@ dotnet_diagnostic.SA1316.severity = warning
 # The access modifier for a C# element has not been explicitly defined.
 dotnet_diagnostic.SA1400.severity = warning
 
-# A field within a C# class has an access modifier other than private.
-dotnet_diagnostic.SA1401.severity = warning
+# A field within a C# class has an access modifier other than private. *** Suppress as covered by S4487 ***
+dotnet_diagnostic.SA1401.severity = none
 
 # A C# code file contains more than one unique type.
 dotnet_diagnostic.SA1402.severity = suggestion
@@ -2316,3 +2316,237 @@ dotnet_diagnostic.SCS0033.severity = warning
 
 # [SECURITY] Password RequiredLength Not Set
 dotnet_diagnostic.SCS0034.severity = warning
+
+# [DESIGN] Methods should not have too many parameters *** Suppress as covered by custom analyzer ACL1003 ***
+dotnet_diagnostic.S107.severity = none
+
+# Redundant modifiers should not be used
+dotnet_diagnostic.S2333.severity = warning
+
+# "params" should not be introduced on overrides
+dotnet_diagnostic.S3600.severity = warning
+
+# Composite format strings should be used correctly
+dotnet_diagnostic.S3457.severity = warning
+
+# Composite format strings should be used correctly *** Suppress as covered by RCS1160 ***
+dotnet_diagnostic.S3442.severity = none
+
+# Remove unused private member *** Suppress as covered by S4487 ***
+dotnet_diagnostic.IDE0051.severity = none
+
+# Remove redundant parentheses *** Suppress as covered by RCS1032 ***
+dotnet_diagnostic.S1110.severity = none
+
+# "for" loop increment clauses should modify the loops' counters
+dotnet_diagnostic.S1994.severity = warning
+
+# Method signatures should not contain nested generic types
+dotnet_diagnostic.S4017.severity = warning
+
+# Types should not have members with visibility set higher than the type's visibility
+dotnet_diagnostic.S3059.severity = warning
+
+# Extensions should be in separate namespaces
+dotnet_diagnostic.S4226.severity = warning
+
+# Non-flags enums should not be used in bitwise operations *** Suppress as covered by RCS1130 ***
+dotnet_diagnostic.S3265.severity = none
+
+# Flags enumerations zero-value members should be named "None"
+dotnet_diagnostic.S2346.severity = warnings
+
+# Literal suffixes should be upper case *** Suppress as covered by CA1308 ***
+dotnet_diagnostic.S818.severity = none
+
+# Event Handlers should have the correct signature
+dotnet_diagnostic.S3906.severity = warning
+
+# Arguments of public methods should be validated against null
+dotnet_diagnostic.S3900.severity = warning
+
+# Type names should not match namespaces
+dotnet_diagnostic.S4041.severity = warning
+
+# Exceptions should provide standard constructors
+dotnet_diagnostic.S3872.severity = warning
+
+# Members should not be initialized to default values
+dotnet_diagnostic.S3052.severity = none
+
+# Underscores should be used to make large numbers readable
+dotnet_diagnostic.S2148.severity = suggestion
+
+# Files should contain an empty newline at the end
+dotnet_diagnostic.S113.severity = suggestion
+
+# Strings or integral types should be used for indexers
+dotnet_diagnostic.S3876.severity = warning
+
+# String literals should not be duplicated
+dotnet_diagnostic.S1192.severity = warning
+
+# Methods should not have identical implementations
+dotnet_diagnostic.S4144.severity = warning
+
+# Delivering code in production with debug features activated is security-sensitive
+dotnet_diagnostic.S4507.severity = warning
+
+# Azure Functions should log all failures
+dotnet_diagnostic.S6423.severity = warning
+
+# Azure Functions should use Structured Error Handling
+dotnet_diagnostic.S6421.severity = warning
+
+# Empty "default" clauses should be removed *** Suppress as covered by RCS1070 ***
+dotnet_diagnostic.S3532.severity = none
+
+# Default parameter values should not be passed as arguments
+dotnet_diagnostic.S3254.severity = suggestion
+
+# Redundant parentheses should not be used
+dotnet_diagnostic.S3235.severity = warning
+
+# "SafeHandle.DangerousGetHandle" should not be called
+dotnet_diagnostic.S3869.severity = error
+
+# Locales should be set for data types
+dotnet_diagnostic.S4057.severity = warning
+
+# Overloads with a "CultureInfo" or an "IFormatProvider" parameter should be used *** Suppress as covered by CA1304 ***
+dotnet_diagnostic.S4056.severity = none
+
+# "Shared" parts should not be created with "new"
+dotnet_diagnostic.S4277.severity = warning
+
+# Neither "Thread.Resume" nor "Thread.Suspend" should be used *** Suppress as covered by CS0618 ***
+dotnet_diagnostic.S3889.severity = none
+
+# Shared resources should not be used for locking *** Suppress as covered by RCS1059 ***
+dotnet_diagnostic.S2551.severity = none
+
+# Duplicate casts should not be made
+dotnet_diagnostic.S3247.severity = warning
+
+# "Assembly.GetExecutingAssembly" should not be called
+dotnet_diagnostic.S3902.severity = warning
+
+# Value types should implement "IEquatable<T>"
+dotnet_diagnostic.S3898.severity = warning
+
+# Finalizers should not be empty *** Suppress as covered by CA1821 ***
+dotnet_diagnostic.S3880.severity = none
+
+# Classes should implement their "ExportAttribute" interfaces
+dotnet_diagnostic.S4159.severity = warning
+
+# 'member1' hides inherited member 'member2'. Use the new keyword if hiding was intended *** Suppress as covered by S4019 ***
+dotnet_diagnostic.CS0108.severity = none
+
+# Constructors should only call non-overridable methods  *** Suppress as covered by CA2214 ***
+dotnet_diagnostic.S1699.severity = none
+
+# Members should not have conflicting transparency annotations
+dotnet_diagnostic.S4211.severity = warning
+
+# "ISerializable" should be implemented correctly *** Suppress as covered by CA2237 ***
+dotnet_diagnostic.S3925.severity = none
+
+# "IDisposable" should be implemented correctly *** Suppress as covered by CA1063 ***
+dotnet_diagnostic.S3881.severity = none
+
+# Child class fields should not differ from parent class fields only by capitalization
+dotnet_diagnostic.S4025.severity = warning
+
+# Optional parameters should not be used
+dotnet_diagnostic.S2360.severity = warning
+
+# Public constant members should not be used
+dotnet_diagnostic.S2339.severity = warning
+
+# "for" loop stop conditions should be invariant
+dotnet_diagnostic.S127.severity = warning
+
+# Not specifying a timeout for regular expressions is security-sensitive
+dotnet_diagnostic.S6444.severity = warning
+
+# Conditionals should start on new lines *** Suppress as covered by RCS1026 ***
+dotnet_diagnostic.S3972.severity = none
+
+# Exit methods should not be called
+dotnet_diagnostic.S1147.severity = warning
+
+# Number patterns should be regular
+dotnet_diagnostic.S3937.severity = warning
+
+# "==" should not be used when "Equals" is overridden
+dotnet_diagnostic.S1698.severity = warning
+
+# Namespaces should not be empty
+dotnet_diagnostic.S3261.severity = warning
+
+# Calls to "async" methods should not be blocking in Azure Functions
+dotnet_diagnostic.S6287.severity = warning
+
+# Non-async "Task/Task<T>" methods should not return null
+dotnet_diagnostic.S4586.severity = warning
+
+# ValueTask should be awaited before assignment - (ValueTask)
+dotnet_diagnostic.AV1840.severity = warning
+
+# Use ValueTasks correctly - (ValueTask) CSharpGuidlines has better instructions *** Suppress as covered by AV1840 ***
+dotnet_diagnostic.CA2012.severity = none
+
+# "ValueTask" should be consumed correctly - (ValueTask) CSharpGuidlines has better instructions *** Suppress as covered by AV1840 ***
+dotnet_diagnostic.S5034.severity = none
+
+# "async" methods should not return "void"
+dotnet_diagnostic.S3168.severity = warning
+
+# Calls to "async" methods should not be blocking
+dotnet_diagnostic.S4462.severity = warning
+
+# "ConfigureAwait(false)" should be used *** Suppress as covered by CA2234 ***
+dotnet_diagnostic.S3216.severity = none
+
+# Parameter validation in "async"/"await" methods should be wrapped
+dotnet_diagnostic.S4457.severity = warning
+
+# [DESIGN] "Generic.List" should not be part of public APIs
+dotnet_diagnostic.S3956.severity = warning
+
+# [DESIGN] Method parameters should be declared with base types
+dotnet_diagnostic.S3242.severity = warning
+
+# [DESIGN] Azure Functions should be stateless
+dotnet_diagnostic.S6419.severity = warning
+
+# Runtime type checking should be simplified - is" should not be used with "this"
+dotnet_diagnostic.S2219.severity = warning
+
+# [SECURITY] Insufficient Logging & Monitoring - Exception types should be "public"
+dotnet_diagnostic.S3871.severity = warning
+
+# Generic type parameters should be co/contravariant when possible
+dotnet_diagnostic.S3246.severity = warning
+
+# Method parameters should be declared with base types
+dotnet_diagnostic.S3242.severity = suggestion
+
+# [MAINTAINABILITY] "Obsolete" attributes should include explanations  *** Suppress as covered by CA1041 ***
+dotnet_diagnostic.S1123.severity = none
+
+#  "nameof" should be used *** Suppress as covered by REFL016 ***
+dotnet_diagnostic.S2302.severity = none
+
+# General exceptions should never be thrown *** Suppress as covered by CA2201 ***
+dotnet_diagnostic.S112.severity = none
+
+# [SECURITY] Standard outputs should not be used directly to log anything
+dotnet_diagnostic.S106.severity = warning
+
+# "switch" statements should have at least 3 "case" clauses
+dotnet_diagnostic.S1301.severity = warning
+
+# [SECURITY] "switch" statements should not have too many "case" clauses
+dotnet_diagnostic.S1479.severity = warning
