@@ -84,6 +84,7 @@ tester.run('data-test-attribute', rule, {
     {
       name: 'event that is not configured',
       code: '<template><div @mouseup="foobar()"></div></template>',
+      options: [{ events: ['click',] }],
     },
     // data-test attribute on other element
     {
