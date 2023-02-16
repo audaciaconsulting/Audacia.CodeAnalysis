@@ -42,8 +42,8 @@ You must be using Visual Studio version 17.0+ (Visual Studio 2022) or Rider vers
 
 ### Rider Support
 
-Rider doesn't fully support custom settings in .editorconfig. This issue has been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53508)), but in the meantime a workaround is documented 
-[here](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/README.md&anchor=custom-.editorconfig-settings-in-rider&_a=preview).  
+Rider doesn't fully support custom settings in .editorconfig. This issue has been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53508)), but in the meantime a workaround is documented
+[here](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/README.md&anchor=custom-.editorconfig-settings-in-rider&_a=preview).
 
 There are a few rules that Rider's code analysis doesn't pick up, for example CA1033, CA1008 and AV1715. This issue has also been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53376)).
 
@@ -79,7 +79,7 @@ Add the following to your project's `.csproj` file to make the compiler treat wa
 <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 ```
 
-You can configure treating warnings as errors for specific warnings as follows: 
+You can configure treating warnings as errors for specific warnings as follows:
 
 ```xml
 <WarningsAsErrors>ACL1005,CS0168</WarningsAsErrors>
@@ -153,3 +153,8 @@ All rules are prefixed with `DOC`.
 [Microsoft.EntityFrameworkCore.Analyzers](https://github.com/dotnet/efcore/tree/main/src/EFCore.Analyzers) provides C# analyzers for Entity Framework Core.
 
 All rules are prefixed `EF`.
+
+### Sonar Source
+[Sonar Source C#](https://rules.sonarsource.com/) provides analyzers for Bugs, Vulnerabilities, Security Hotspots, and Code Smells in C# code.
+
+All rules are prefixed with `S`.
