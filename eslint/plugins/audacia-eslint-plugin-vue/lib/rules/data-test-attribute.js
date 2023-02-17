@@ -135,9 +135,9 @@ module.exports = {
 
     function getIncludedEvent(node) {
       const events = (node.startTag.attributes ?? [])
-        .filter((a) => a.directive && a.key.name.name === 'on' && a.key.argument)
-        .map((a) => a.key.argument.name)
-        .filter((n) => configuration.events.includes(n));
+        .filter((a) => a.directive && a.key.name.name === 'on')
+        .filter((a) => configuration.events.includes(a.key.argument.name))
+        .map((a) => ({ name: a.key.argument.name, loc: a.loc }));
 
       return events.length > 0
         ? events[0]
@@ -197,14 +197,25 @@ module.exports = {
     return VueUtils.defineTemplateBodyVisitor(context, {
       VElement: (node) => {
         let message;
+        let loc;
 
         if (isIncludedElement(node.name)) {
           message = `${node.name} elements should include a '${configuration.testAttribute}' attribute`;
+          // set the location to just include "<tagname"
+          loc = {
+            start: node.loc.start,
+            end: {
+              line: node.loc.start.line,
+              column: node.loc.start.column + node.name.length + 1
+            }
+          }
         } else {
           const event = getIncludedEvent(node);
 
           if (event) {
-            message = `Elements with ${event} events should include a '${configuration.testAttribute}' attribute`;
+            message = `Elements with ${event.name} events should include a '${configuration.testAttribute}' attribute`;
+            // location will be the whole event attribute
+            loc = event.loc;
           } else {
             return;
           }
@@ -224,6 +235,7 @@ module.exports = {
 
         context.report({
           node,
+          loc,
           message,
           fix,
         });
