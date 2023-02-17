@@ -5,6 +5,8 @@
 		<Description>Code analysis packages and rulesets for ASP.NET Core apps.</Description>
 		<Authors>Audacia</Authors>
 		<Version>1.4.0.0</Version>
+		<PackageIcon>package-icon.png</PackageIcon>
+		<DevelopmentDependency>true</DevelopmentDependency>
 	</PropertyGroup>
 
 	<ItemGroup>
