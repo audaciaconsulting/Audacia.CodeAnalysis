@@ -135,7 +135,7 @@ module.exports = {
 
     function getIncludedEvent(node) {
       const events = (node.startTag.attributes ?? [])
-        .filter((a) => a.directive && a.key.name.name === 'on')
+        .filter((a) => a.directive && a.key.name.name === 'on' && a.key.argument)
         .map((a) => a.key.argument.name)
         .filter((n) => configuration.events.includes(n));
 
