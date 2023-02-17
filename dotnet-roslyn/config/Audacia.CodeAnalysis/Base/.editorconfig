@@ -2550,3 +2550,6 @@ dotnet_diagnostic.S1301.severity = warning
 
 # [SECURITY] "switch" statements should not have too many "case" clauses
 dotnet_diagnostic.S1479.severity = warning
+
+# [SECURITY] Empty arrays and collections should be returned instead of null
+dotnet_diagnostic.S1168.severity = warning
