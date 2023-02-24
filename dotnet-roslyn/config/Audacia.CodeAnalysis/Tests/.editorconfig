@@ -35,3 +35,9 @@ dotnet_diagnostic.S1607.severity = warning
 
 # [DESIGN] TestCases should contain tests
 dotnet_diagnostic.S2187.severity = warning
+
+# Use a testable date/time provider
+dotnet_diagnostic.S6354.severity = warning
+
+# "[ExpectedException]" should not be used
+dotnet_diagnostic.S3431.severity = warning

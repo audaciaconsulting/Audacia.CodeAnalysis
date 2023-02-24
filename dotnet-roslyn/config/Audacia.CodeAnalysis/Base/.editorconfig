@@ -1962,7 +1962,7 @@ dotnet_diagnostic.SA1316.severity = warning
 # The access modifier for a C# element has not been explicitly defined.
 dotnet_diagnostic.SA1400.severity = warning
 
-# A field within a C# class has an access modifier other than private *** Suppress as covered by ACL1000 ***
+# A field within a C# class has an access modifier other than private *** Suppress as covered by CA1051 ***
 dotnet_diagnostic.SA1401.severity = none
 
 # A C# code file contains more than one unique type.
@@ -2356,8 +2356,8 @@ dotnet_diagnostic.S4226.severity = warning
 # Non-flags enums should not be used in bitwise operations *** Suppress as covered by RCS1130 ***
 dotnet_diagnostic.S3265.severity = none
 
-# Flags enumerations zero-value members should be named "None"
-dotnet_diagnostic.S2346.severity = warnings
+# Flags enumerations zero-value members should be named "None" *** Suppress as covered by CA1008 ***
+dotnet_diagnostic.S2346.severity = none
 
 # Literal suffixes should be upper case *** Suppress as covered by CA1308 ***
 dotnet_diagnostic.S818.severity = none
@@ -2542,16 +2542,16 @@ dotnet_diagnostic.S2330.severity = warning
 dotnet_diagnostic.S6096.severity = warning
 
 # Dynamic code execution should not be vulnerable to injection attacks - AspNetCore
-dotnet_diagnostic.S5334.severity = warning
+dotnet_diagnostic.S5334.severity = none
 
 # HTTP request redirections should not be open to forging attacks - AspNetCore
-dotnet_diagnostic.S5146.severity = warning
+dotnet_diagnostic.S5146.severity = none
 
 # Deserialization should not be vulnerable to injection attacks - AspNetCore
-dotnet_diagnostic.S5135.severity = warning
+dotnet_diagnostic.S5135.severity = none
 
 # Endpoints should not be vulnerable to reflected cross-site scripting (XSS) attacks - AspNetCore
-dotnet_diagnostic.S5131.severity = warning
+dotnet_diagnostic.S5131.severity = none
 
 # "CoSetProxyBlanket" and "CoInitializeSecurity" should not be used
 dotnet_diagnostic.S3884.severity = warning
@@ -2569,13 +2569,13 @@ dotnet_diagnostic.S2115.severity = warning
 dotnet_diagnostic.S2091.severity = warning
 
 # I/O function calls should not be vulnerable to path injection attacks  - AspNetCore
-dotnet_diagnostic.S2083.severity = warning
+dotnet_diagnostic.S2083.severity = none
 
 # LDAP queries should not be vulnerable to injection attacks  - AspNetCore
-dotnet_diagnostic.S2078.severity = warning
+dotnet_diagnostic.S2078.severity = none
 
 # OS commands should not be vulnerable to command injection attacks  - AspNetCore
-dotnet_diagnostic.S2076.severity = warning
+dotnet_diagnostic.S2076.severity = none
 
 # Type inheritance should not be recursive
 dotnet_diagnostic.S3464.severity = warning
@@ -2773,7 +2773,7 @@ dotnet_diagnostic.S1186.severity = warning
 dotnet_diagnostic.S1163.severity = warning
 
 # Server-side requests should not be vulnerable to forging attacks - AspNetCore
-dotnet_diagnostic.S5144.severity = warning
+dotnet_diagnostic.S5144.severity = none
 
 # "PartCreationPolicyAttribute" should be used with "ExportAttribute"
 dotnet_diagnostic.S4428.severity = warning
@@ -2848,7 +2848,7 @@ dotnet_diagnostic.S2997.severity = none
 dotnet_diagnostic.S2996.severity = warning
 
 # "Object.ReferenceEquals" should not be used for value types *** Suppress as covered by SA1121 ***
-dotnet_diagnostic.S2995.severity = warning
+dotnet_diagnostic.S2995.severity = none
 
 # Doubled prefix operators "!!" and "~~" should not be used
 dotnet_diagnostic.S2761.severity = warning
@@ -2905,10 +2905,10 @@ dotnet_diagnostic.S6350.severity = warning
 dotnet_diagnostic.S5766.severity = warning
 
 # Disabling ASP.NET "Request Validation" feature is security-sensitive - AspNet
-dotnet_diagnostic.S5753.severity = warning
+dotnet_diagnostic.S5753.severity = none
 
 # Allowing requests with excessive content length is security-sensitive - AspNet
-dotnet_diagnostic.S5693.severity = warning
+dotnet_diagnostic.S5693.severity = none
 
 # Setting loose file permissions is security-sensitive
 dotnet_diagnostic.S2612.severity = warning
@@ -3283,7 +3283,7 @@ dotnet_diagnostic.S121.severity = none
 dotnet_diagnostic.S1067.severity = warning
 
 # ASP.NET HTTP request validation feature should not be disabled - AspNet
-dotnet_diagnostic.S4564.severity = warning
+dotnet_diagnostic.S4564.severity = none
 
 # Serialization constructors should be secured
 dotnet_diagnostic.S4212.severity = warning
@@ -3298,7 +3298,7 @@ dotnet_diagnostic.S1244.severity = warning
 dotnet_diagnostic.S881.severity = warning
 
 # Use a testable date/time provider - Tests
-dotnet_diagnostic.S6354.severity = warning
+dotnet_diagnostic.S6354.severity = none
 
 # Parameter validation in "async"/"await" methods should be wrapped
 dotnet_diagnostic.S4457.severity = warning
@@ -3358,7 +3358,7 @@ dotnet_diagnostic.S3909.severity = none
 dotnet_diagnostic.S3908.severity = warning
 
 # "[ExpectedException]" should not be used - Test
-dotnet_diagnostic.S3431.severity = warning
+dotnet_diagnostic.S3431.severity = none
 
 # "this" should not be exposed from constructors
 dotnet_diagnostic.S3366.severity = warning
@@ -3496,13 +3496,13 @@ dotnet_diagnostic.S1694.severity = warning
 dotnet_diagnostic.S1659.severity = none
 
 # Culture should be specified for "string" operations *** Suppress as covered by CA1304 ***
-dotnet_diagnostic.S1449.severity = warning
+dotnet_diagnostic.S1449.severity = none
 
 # "switch" statements should have at least 3 "case" clauses
 dotnet_diagnostic.S1301.severity = warning
 
 # Unused "using" should be removed *** Suppress as covered by IDE0005 ***
-dotnet_diagnostic.S1128.severity = warning
+dotnet_diagnostic.S1128.severity = none
 
 # A close curly brace should be located at the beginning of a line
 dotnet_diagnostic.S1109.severity = warning
@@ -3511,7 +3511,7 @@ dotnet_diagnostic.S1109.severity = warning
 dotnet_diagnostic.S105.severity = warning
 
 # Methods and properties should be named in PascalCase *** Suppress as covered by SA1300 ***
-dotnet_diagnostic.S100.severity = warning
+dotnet_diagnostic.S100.severity = none
 
 # Track uses of in-source issue suppressions
 dotnet_diagnostic.S1309.severity = suggestion
