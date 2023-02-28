@@ -268,5 +268,56 @@ namespace TestNamespace
 
             VerifyDiagnostic(test, expected);
         }
+
+
+        [TestMethod]
+        public void Diagnostics_For_Record_Constructor_Parameters_Equal_To_Max_Allowed_Number()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public record TestClass (int a, int b, int c, int d)
+    {
+    }
+}";
+            VerifyDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Record_Constructor_Parameters_Greater_Than_Max_Allowed()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public record TestClass (int a, int b, int c, int d, int e, int f)
+    {
+    }
+}";
+            VerifyDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Record_Constructor_Parameters_Greater_Than_Max_Allowed_Overridden_Via_Attribute()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    [MaxParameterCountAttribute(1)]
+    public record TestClass (int a, int b, int c, int d, int e, int f)
+    {
+    }
+
+    public sealed class MaxParameterCountAttribute : System.Attribute
+    {
+        public int ParameterCount { get; }
+
+        public MaxParameterCountAttribute(int parameterCount)
+        {
+            ParameterCount = parameterCount;
+        }
+    }
+}";
+            VerifyDiagnostic(test);
+        }
     }
 }
