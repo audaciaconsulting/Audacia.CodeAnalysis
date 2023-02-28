@@ -136,14 +136,18 @@ dotnet_diagnostic.ACL1003.max_method_parameter_count = 5
 dotnet_diagnostic.ACL1003.max_constructor_parameter_count = 5
 ```
 
-However, this does <b>not</b> work with the `record` reference type:
+However, this does <b>not</b> work with the `record` reference type, and syntax synonyms (`record class`, `record struct`):
 ```csharp
 // No parameter count violation.
-public record MyFirstMethod (int a, int b, int c, int d, int e);
+public record Person(string a, int b, int c, int d, int e);
 
 // Attribute is ignored.
 [MaxParameterCount(1)]
-public record MySecondMethod (int a, int b, int c, int d, int e, int f);
+public record Student(int a, int b, int c, int d, int e, int f) : Person(a, b, c, d, e);
+
+// This includes both classes and structures
+public record struct School(int a, int b); // Record struct
+public record Exam(int a, int b); // Record class
 ```
 
 ## ACL1004 - Don't use abbreviations
