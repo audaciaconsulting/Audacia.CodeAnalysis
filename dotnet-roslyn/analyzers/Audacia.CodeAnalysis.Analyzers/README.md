@@ -136,6 +136,16 @@ dotnet_diagnostic.ACL1003.max_method_parameter_count = 5
 dotnet_diagnostic.ACL1003.max_constructor_parameter_count = 5
 ```
 
+However, this does <b>not</b> work with the `record` reference type:
+```csharp
+// No parameter count violation.
+public record MyFirstMethod (int a, int b, int c, int d, int e);
+
+// Attribute is ignored.
+[MaxParameterCount(1)]
+public record MySecondMethod (int a, int b, int c, int d, int e, int f);
+```
+
 ## ACL1004 - Don't use abbreviations
 
 The ACL1004 rule checks whether single characters or (specific) abbreviations have been used as a type, member, parameter or variable name.
@@ -216,7 +226,7 @@ var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 
 ## ACL1008 - Controller actions have ProducesResponseType attribute
 
-ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute and will produce a warning if not. 
+ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute and will produce a warning if not.
 This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
 
 Code with diagnostic:
@@ -240,7 +250,7 @@ public string Get()
 
 ## ACL1009 - Method overload should call another overload
 
-ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1551.md), which ensures the more overloaded method is called from other overloads. 
+ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1551.md), which ensures the more overloaded method is called from other overloads.
 
 ACL1009 reports warnings on the three rules below:
 
@@ -297,9 +307,9 @@ public class TestClassController : Controller
 
 ## ACL1010 - Nullable reference types enabled
 
-ACL1010 checks whether nullable reference types have been enabled on a project. 
+ACL1010 checks whether nullable reference types have been enabled on a project.
 
-ACL1010 reports a warning if: 
+ACL1010 reports a warning if:
 
 - The `<Nullable>` node is omitted from a .csproj file
 - The `<Nullable>` node is included in a .csproj file but has a value of `disable`
@@ -316,13 +326,13 @@ ACL1011 checks how deeply nested control statements are to and raises a warning 
 For example a warning is raised for this:
 
 ```csharp
-if (condition1) 
+if (condition1)
 {
-	if (condition2) 
+	if (condition2)
 	{
-		if (condition3) 
+		if (condition3)
 		{
-			if (condition4) 
+			if (condition4)
 			{
 				Console.WriteLine("I'm in too deep!");
 			}
@@ -335,7 +345,7 @@ The warning should be resolved with an appropriate refactor or rewrite of the co
 
 ```csharp
 
-if (condition1 && condition2 && condition3 && condition4) 
+if (condition1 && condition2 && condition3 && condition4)
 {
 	Console.WriteLine("I'm in too deep!");
 }
@@ -371,7 +381,7 @@ var filtered = myCollection
 	.Where(a => a.Property.Value == 1);
 ```
 
-If this is overkill, you can still have less than four and clauses in each `Where`, to group together related clauses for example. 
+If this is overkill, you can still have less than four and clauses in each `Where`, to group together related clauses for example.
 
 ```csharp
 var filtered = myCollection
