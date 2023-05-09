@@ -132,6 +132,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             return false;
         }
 
+        public static bool IsRecordImplementation(this ISymbol member, CancellationToken cancellationToken)
+        {
+            foreach (SyntaxReference reference in member.DeclaringSyntaxReferences)
+            {
+                SyntaxNode syntax = reference.GetSyntax(cancellationToken);
+
+                if (ContainsRecordSyntax(syntax))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private static SyntaxTokenList? TryGetModifiers(SyntaxNode syntax)
         {
             switch (syntax)
@@ -169,6 +184,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         private static bool ContainsNewModifier(SyntaxTokenList? modifiers)
         {
             return modifiers != null && modifiers.Value.Any(modifier => modifier.IsKind(SyntaxKind.NewKeyword));
+        }
+
+        private static bool ContainsRecordSyntax(SyntaxNode syntax)
+        {
+            SyntaxTokenList? modifiers = TryGetModifiers(syntax);
+
+            var matchingSyntax = syntax.IsKind(SyntaxKind.RecordDeclaration) || syntax.IsKind(SyntaxKind.RecordStructDeclaration);
+            var containsModifiers = modifiers != null && modifiers.Value.Any(modifier => modifier.IsKind(SyntaxKind.RecordKeyword));
+
+            return matchingSyntax || containsModifiers;
         }
 
         public static ITypeSymbol GetSymbolType(this ISymbol symbol)
