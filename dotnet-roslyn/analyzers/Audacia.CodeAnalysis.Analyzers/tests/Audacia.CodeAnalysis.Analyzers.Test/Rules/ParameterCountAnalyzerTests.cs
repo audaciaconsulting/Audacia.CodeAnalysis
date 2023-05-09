@@ -280,7 +280,7 @@ namespace TestNamespace
     {
     }
 }";
-            VerifyDiagnostic(test);
+            VerifyNoDiagnostic(test);
         }
 
         [TestMethod]
