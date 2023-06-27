@@ -116,12 +116,6 @@ Microsoft provide a number of analyzers for checking best practice C# and .NET u
 
 Code quality rules are prefixed `CA` and code style rules are prefixed `IDE`.
 
-### SecurityCodeScan
-
-[SecurityCodeScan](https://security-code-scan.github.io/) provides analyzers for checking common security issues.
-
-All rules are prefixed `SCS`.
-
 ### StyleCop
 
 [StyleCop](https://github.com/DotNetAnalyzers/StyleCopAnalyzers) provides analyzers for checking formatting, naming, layout and other related areas.
@@ -153,8 +147,3 @@ All rules are prefixed with `DOC`.
 [Microsoft.EntityFrameworkCore.Analyzers](https://github.com/dotnet/efcore/tree/main/src/EFCore.Analyzers) provides C# analyzers for Entity Framework Core.
 
 All rules are prefixed `EF`.
-
-### Sonar Source
-[SonarAnalyzer.CSharp](https://rules.sonarsource.com/) provides analyzers for Bugs, Vulnerabilities, Security Hotspots, and Code Smells in C# code.
-
-All rules are prefixed with `S`.
