@@ -109,6 +109,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             return !member.IsExtern &&
                 !member.IsOverride &&
                 !member.HidesBaseMember(cancellationToken) &&
+                !member.IsRecordImplementation(cancellationToken) &&
                 !member.IsInterfaceImplementation();
         }
 

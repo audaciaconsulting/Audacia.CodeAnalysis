@@ -1,0 +1,30 @@
+{
+  "name": "@audacia/eslint-plugin-angular",
+  "version": "1.1.0",
+  "description": "",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis"
+  },
+  "author": "Audacia",
+  "license": "ISC",
+  "scripts": {
+    "test": "mocha \"tests/lib/rules/**/*.js\""
+  },
+  "peerDependencies": {
+    "eslint": ">=6.0.0",
+    "@angular-eslint/eslint-plugin": ">=13.1.0",
+    "@angular-eslint/template-parser": ">=13.1.0"
+  },
+  "devDependencies": {
+    "eslint": "8.33.0",
+    "mocha": "10.2.0",
+    "@angular-eslint/eslint-plugin": "15.2.0",
+    "@angular-eslint/template-parser": "15.2.0"
+  },
+  "dependencies": {
+    "nanoid": "4.0.1",
+    "proxyquire": "2.1.3"
+  }
+}
