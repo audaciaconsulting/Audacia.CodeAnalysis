@@ -11,4 +11,4 @@ The `eslint` folder contains:
 
 
 # Contributing
-We welcome contributions! Please feel free to check our [Contribution Guidlines](https://github.com/audaciaconsulting/.github/blob/46ce207a42935c9e73a01cb48dde02acc39ada03/CONTRIBUTING.md) for feature requests, issue reporting and guidelines.
+We welcome contributions! Please feel free to check our [Contribution Guidlines](https://github.com/audaciaconsulting/.github/blob/main/CONTRIBUTING.md) for feature requests, issue reporting and guidelines.
