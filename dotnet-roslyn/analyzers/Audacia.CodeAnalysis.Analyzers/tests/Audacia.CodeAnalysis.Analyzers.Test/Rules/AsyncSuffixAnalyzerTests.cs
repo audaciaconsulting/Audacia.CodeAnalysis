@@ -1,6 +1,7 @@
 ﻿using Audacia.CodeAnalysis.Analyzers.Rules.AsyncSuffix;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,25 +10,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
     [TestClass]
     public class AsyncSuffixAnalyzerTests : CodeFixVerifier
     {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() 
-            => new AsyncSuffixAnalyzer();
-
-        private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
-        {
-            var diagnosticResult = new DiagnosticResult
-            {
-                Id = AsyncSuffixAnalyzer.Id,
-                Severity = AsyncSuffixAnalyzer.Severity,
-                Message = message,
-                Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
-            };
-
-            return diagnosticResult;
-        }
-
         [TestMethod]
         public void No_Diagnostics_For_Empty_Code()
         {
@@ -115,7 +97,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostics_For_Interface_Method_With_Asynchronous_Operation_Return_Type_Without_Async_Suffix()
+        public void Diagnostic_And_Code_Fix_For_Interface_Method_With_Asynchronous_Operation_Return_Type_Without_Async_Suffix()
         {
             const string testCode = @"
                 namespace ConsoleApplication1
@@ -132,6 +114,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 6, 25);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
+
+            const string fixedTestCode = @"
+                namespace ConsoleApplication1
+                {
+                    interface ITestInterface
+                    {
+                        Task TestMethodAsync();
+                    }
+                }";
+            VerifyCodeFix(testCode, fixedTestCode);
         }
 
         [TestMethod]
@@ -155,7 +147,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostics_For_Asynchronous_Method_With_No_Async_Suffix()
+        public void Diagnostic_And_Code_Fix_For_Asynchronous_Method_With_No_Async_Suffix()
         {
             const string testCode = @"
                 namespace ConsoleApplication1
@@ -177,6 +169,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 6, 25);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
+
+            const string fixedTestCode = @"
+                namespace ConsoleApplication1
+                {
+                    class TestClass
+                    {
+                        async Task<int> TestMethodAsync()
+                        {
+                            var task = new Task<int>(() => default);
+
+                            return await task;
+                        }
+                    }
+                }";
+            VerifyCodeFix(testCode, fixedTestCode);
         }
 
         [TestMethod]
@@ -291,7 +298,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostics_For_Private_Asynchronous_Method_In_Controller_Without_HttpGet_Attribute_And_Without_Async_Suffix()
+        public void Diagnostic_And_Code_Fix_For_Private_Asynchronous_Method_In_Controller_Without_HttpGet_Attribute_And_Without_Async_Suffix()
         {
             const string testCode = @"
                 using System.Threading.Tasks;
@@ -316,6 +323,46 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
+
+            const string fixedTestCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
+
+                namespace ConsoleApplication1
+                {
+                    public class TestController : ControllerBase
+                    {
+                        private async Task<string> GetAsync()
+                        {
+                            var testTask = new Task<string>(() => string.Empty);
+
+                            return await testTask;
+                        }
+                    }
+                }";
+            VerifyCodeFix(testCode, fixedTestCode);
+        }
+        
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() 
+            => new AsyncSuffixAnalyzer();
+        
+        protected override CodeFixProvider GetCSharpCodeFixProvider() 
+            => new AsyncSuffixFixProvider();
+
+        private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
+        {
+            var diagnosticResult = new DiagnosticResult
+            {
+                Id = AsyncSuffixAnalyzer.Id,
+                Severity = AsyncSuffixAnalyzer.Severity,
+                Message = message,
+                Locations =
+                    new[] {
+                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                    }
+            };
+
+            return diagnosticResult;
         }
     }
 }
