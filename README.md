@@ -8,3 +8,7 @@ The `dotnet-roslyn` folder contains:
 
 The `eslint` folder contains:
 - Some default `eslint` config - see `eslint/config/audacia-eslint-config`
+
+
+# Contributing
+We welcome contributions! Please feel free to check our [Contribution Guidlines](https://github.com/audaciaconsulting/.github/blob/main/CONTRIBUTING.md) for feature requests, issue reporting and guidelines.
