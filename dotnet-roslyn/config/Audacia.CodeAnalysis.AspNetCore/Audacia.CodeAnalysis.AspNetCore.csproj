@@ -1,22 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
+        <Description>Code analysis packages and rulesets for ASP.NET Core apps.</Description>
+        <Authors>Audacia</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <Version>1.5.0.0</Version>
+        <PackageIcon>package-icon.png</PackageIcon>
+        <DevelopmentDependency>true</DevelopmentDependency>
+    </PropertyGroup>
 
-	<PropertyGroup>
-		<TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
-		<Description>Code analysis packages and rulesets for ASP.NET Core apps.</Description>
-		<Authors>Audacia</Authors>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Version>1.5.0.0</Version>
-		<PackageIcon>package-icon.png</PackageIcon>
-		<DevelopmentDependency>true</DevelopmentDependency>
-	</PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Audacia.CodeAnalysis\Audacia.CodeAnalysis.csproj" />
+    </ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\Audacia.CodeAnalysis\Audacia.CodeAnalysis.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AspNetCoreAnalyzers" Version="0.2.0.1-dev" />
+    </ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="AspNetCoreAnalyzers" Version="0.2.0.1-dev" />
-	</ItemGroup>
-
+    <ItemGroup>
+        <None Include="package-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 </Project>
