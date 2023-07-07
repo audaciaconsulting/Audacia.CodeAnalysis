@@ -6,7 +6,6 @@ trigger:
     include:
       - 'eslint/plugins/audacia-eslint-plugin-vue/*'
 pr: { branches: { include: [master] } }
-schedules: [ { cron: "0 0 * * *", displayName: Nightly Build, branches: { include: [ master ] } } ]
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
 pool: { vmImage: windows-2022 }
 
