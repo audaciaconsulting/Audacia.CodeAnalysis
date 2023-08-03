@@ -1,4 +1,4 @@
-const { customAlphabet } = import('nanoid');
+const { customAlphabet } = require('nanoid');
 
 const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890';
 
