@@ -7,7 +7,7 @@ trigger:
       - 'eslint/config/audacia-eslint-config/*'
 pr: { branches: { include: [master] } }
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
-pool: { name: Prometheus }
+pool: { vmImage: windows-latest }
 
 stages:
 - stage: Build
