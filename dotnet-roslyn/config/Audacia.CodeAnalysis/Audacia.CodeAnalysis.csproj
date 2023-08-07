@@ -10,7 +10,6 @@
     <PackageIcon>package-icon.png</PackageIcon>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Version>1.5.0.0</Version>
-    <PackageIcon>package-icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
