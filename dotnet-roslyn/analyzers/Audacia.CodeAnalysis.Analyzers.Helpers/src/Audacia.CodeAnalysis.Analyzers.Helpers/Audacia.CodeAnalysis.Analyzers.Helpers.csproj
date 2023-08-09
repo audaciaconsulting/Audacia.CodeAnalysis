@@ -10,6 +10,10 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Helper library to allow customization of the analyzers in Audacia.CodeAnalysis.Analyzers. Install this NuGet packages if you need any of the provided customization points such as the attributes to override the maximum method length or parameter count.</Description>
+    <PackageIcon>package-icon.png</PackageIcon>
   </PropertyGroup>
 
+  <ItemGroup>
+        <None Include="../../../../../package-icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>
