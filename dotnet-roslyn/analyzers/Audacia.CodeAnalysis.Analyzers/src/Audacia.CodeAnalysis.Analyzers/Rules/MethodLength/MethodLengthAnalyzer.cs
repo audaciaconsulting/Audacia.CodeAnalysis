@@ -156,7 +156,25 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
 
             private bool IsStatement(SyntaxNode node)
             {
-                return !node.IsMissing && node is StatementSyntax statement && !IsExcludedStatement(statement);
+                return !node.IsMissing && node is StatementSyntax statement && !IsExcludedStatement(statement) && !IsLoggingStatement(node);;
+            }
+            
+            private static bool IsLoggingStatement(SyntaxNode node)
+            {
+                // Check if the node is an invocation expression
+                if (node is ExpressionStatementSyntax expressionStatement &&
+                    expressionStatement.Expression is InvocationExpressionSyntax invocation)
+                {
+                    // Check if the expression being invoked is a member access (like "logger.Info")
+                    if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+                    {
+                        // Check if the name of the method being accessed starts with "Log"
+                        return memberAccess.Name.Identifier.Text.StartsWith("Log");
+                    }
+                }
+
+                // If none of the above checks passed, then it's not a logging statement
+                return false;
             }
 
             private bool IsExcludedStatement(StatementSyntax node)
