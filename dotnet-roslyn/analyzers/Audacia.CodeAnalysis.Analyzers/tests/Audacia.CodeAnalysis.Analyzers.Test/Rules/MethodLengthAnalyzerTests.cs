@@ -361,7 +361,7 @@ public class TestClass
         }
 
         // In the next four tests, MaxMethodLengthAttribute is declared inline in the test code rather than using the actual type
-        // in the Audacia.CodeAnalysis.Analyzers library
+        // in the Audacia.CodeAnalysis.Analyzers.Core library
         // There is an open issue about this: https://github.com/dotnet/roslyn/issues/30248
 
         [TestMethod]

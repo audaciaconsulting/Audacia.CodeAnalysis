@@ -21,7 +21,9 @@
     <PackageReference Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers\Audacia.CodeAnalysis.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.AspNetCore\Audacia.CodeAnalysis.Analyzers.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.Core\Audacia.CodeAnalysis.Analyzers.Core.csproj" />
+    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.Shared\Audacia.CodeAnalysis.Analyzers.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

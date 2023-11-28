@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Common;
+﻿using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Rules.NullableReferenceTypes;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
