@@ -1,5 +1,5 @@
 ﻿using Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations;
-using Audacia.CodeAnalysis.Analyzers.Settings;
+using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Audacia.CodeAnalysis.Analyzers.Settings;
+using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 

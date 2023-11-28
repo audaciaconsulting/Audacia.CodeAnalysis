@@ -1,5 +1,5 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Common;
-using Audacia.CodeAnalysis.Analyzers.Rules.NullableReferenceTypes;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.NullableReferenceTypes;
+using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;

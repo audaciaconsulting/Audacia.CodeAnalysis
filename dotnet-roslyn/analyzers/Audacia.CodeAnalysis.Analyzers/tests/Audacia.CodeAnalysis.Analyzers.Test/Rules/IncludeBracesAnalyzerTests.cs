@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Audacia.CodeAnalysis.Analyzers.Rules.IncludeBraces;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.IncludeBraces;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;

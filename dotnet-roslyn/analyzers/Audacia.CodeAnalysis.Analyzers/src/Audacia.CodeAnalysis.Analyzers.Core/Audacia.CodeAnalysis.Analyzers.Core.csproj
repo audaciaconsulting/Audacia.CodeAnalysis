@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <RootNamespace>Audacia.CodeAnalysis.Analyzers</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageId>Audacia.CodeAnalysis.Analyzers.Core</PackageId>
+        <Authors>Audacia</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <Description>This is a set of custom Roslyn analyzers. It is a dependency of Audacia.CodeAnalysis and shouldn't need to be referenced directly.</Description>
+        <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+        <Copyright>Copyright © Audacia $([System.DateTime]::Now.ToString('yyyy'))</Copyright>
+        <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <PackageIcon>package-icon.png</PackageIcon>
+        <Version>2.0.0</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.5.0" PrivateAssets="all" />
+        <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="../../../../../package-icon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Audacia.CodeAnalysis.Analyzers.Shared\Audacia.CodeAnalysis.Analyzers.Shared.csproj" />
+      <ProjectReference Include="..\Audacia.CodeAnalysis.Analyzers.Shared\Audacia.CodeAnalysis.Analyzers.Shared.csproj" />
+    </ItemGroup>
+</Project>
