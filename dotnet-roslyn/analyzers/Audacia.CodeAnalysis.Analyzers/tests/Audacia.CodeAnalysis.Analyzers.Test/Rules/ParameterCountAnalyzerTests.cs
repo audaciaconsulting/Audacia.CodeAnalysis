@@ -45,6 +45,45 @@ namespace TestNamespace
 
             VerifyNoDiagnostic(test);
         }
+        
+        
+        [TestMethod]
+        public void No_Diagnostics_For_Method_Parameters_One_More_Than_Max_Allowed_Number_But_Last_Is_Excluded_Type()
+        {
+            var test = @"namespace TestNamespace
+                        {
+                            public class TestClass
+                            {
+                                public void TestMethod(int i, int j, int k, int l, CancellationToken token)
+                                {
+                                }
+                            }
+                        }";
+
+            VerifyNoDiagnostic(test);
+        }
+        
+        [TestMethod]
+        public void Diagnostics_For_Method_Parameters_Two_More_Than_Max_Allowed_Number_But_Last_Is_Excluded_Type()
+        {
+            var test = @"namespace TestNamespace
+                        {
+                            public class TestClass
+                            {
+                                public void TestMethod(int i, int j, int k, int l, int p, CancellationToken token)
+                                {
+                                }
+                            }
+                        }";
+            
+            var expected = BuildExpectedResult(
+                memberName: "Method 'TestMethod'",
+                lineNumber: 5,
+                column: 45,
+                parameterCount: 5);
+
+            VerifyDiagnostic(test, expected);
+        }
 
         [TestMethod]
         public void No_Diagnostics_For_Constructor_Parameters_Less_Than_Max_Allowed_Number()

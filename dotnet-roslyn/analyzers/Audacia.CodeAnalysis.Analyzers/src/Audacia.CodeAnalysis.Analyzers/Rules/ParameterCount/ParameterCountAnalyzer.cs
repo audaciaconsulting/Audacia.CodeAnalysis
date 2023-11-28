@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -14,10 +15,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ParameterCountAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.ParameterCount;
-
-        public const int DefaultMaxParameterCount = 4;
-
         private const string Title = "Signature contains too many parameters";
 
         private const string ParameterCountMessageFormat =
@@ -44,6 +41,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
         private static readonly SettingsKey MaxConstructorParameterCountKey =
             new SettingsKey(Id, "max_constructor_parameter_count");
+        
+        private static IEnumerable<Type> ExcludedParameterTypes = new List<Type>
+        {
+            typeof(CancellationToken)
+        };
+
+        public const string Id = DiagnosticId.ParameterCount;
+
+        public const int DefaultMaxParameterCount = 4;
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(ParameterCountRule);
@@ -69,8 +75,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
             if (!method.IsPropertyOrEventAccessor() && MemberRequiresAnalysis(method, context.CancellationToken))
             {
-                string memberName = GetMemberName(method);
-                bool isConstructor = IsConstructor(method);
+                var memberName = GetMemberName(method);
+                var isConstructor = IsConstructor(method);
 
                 ParameterSettings settings =
                     GetParameterSettings(method, settingsReader, context.Symbol.DeclaringSyntaxReferences[0].SyntaxTree);
@@ -147,11 +153,27 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
         private static void AnalyzeParameters(SymbolAnalysisContext context, ParameterCountInfo parameterCountInfo, string memberName)
         {
-            ImmutableArray<IParameterSymbol> parameters = parameterCountInfo.MethodSymbol.Parameters;
+            var parameters = parameterCountInfo.MethodSymbol.Parameters;
 
-            if (parameters.Length > parameterCountInfo.MaxParameterCount)
+            var excludedParameters = parameters.AsEnumerable()
+                .Where(parameter =>
+                {
+                    var parameterTypeName = parameter.Type.Name;
+
+                    if (parameter.IsLastParameter(parameters) &&
+                        ExcludedParameterTypes.Select(excludedParam => excludedParam.Name)
+                            .Contains(parameterTypeName))
+                    {
+                        return false;
+                    }
+
+                    return true;
+                })
+                .ToArray();
+
+            if (excludedParameters.Length > parameterCountInfo.MaxParameterCount)
             {
-                ReportParameterCount(context, parameterCountInfo, memberName, parameters.Length);
+                ReportParameterCount(context, parameterCountInfo, memberName, excludedParameters.Length);
             }
         }
 
