@@ -57,9 +57,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers\Audacia.CodeAnalysis.Analyzers.csproj">
-      <Project>{D396F349-3900-42BA-91B0-7EF957FD6116}</Project>
-      <Name>Audacia.CodeAnalysis.Analyzers</Name>
+    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.Core\Audacia.CodeAnalysis.Analyzers.Core.csproj">
+      <Project>{d396f349-3900-42ba-91b0-7ef957fd6116}</Project>
+      <Name>Audacia.CodeAnalysis.Analyzers.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

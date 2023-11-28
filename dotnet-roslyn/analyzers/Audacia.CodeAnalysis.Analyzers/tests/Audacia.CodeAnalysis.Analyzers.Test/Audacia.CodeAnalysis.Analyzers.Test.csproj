@@ -14,6 +14,9 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers\Audacia.CodeAnalysis.Analyzers.csproj" />
+    <ProjectReference Include="..\..\Audacia.CodeAnalysis.Analyzers.AspNetCore\Audacia.CodeAnalysis.Analyzers.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.AspNetCore\Audacia.CodeAnalysis.Analyzers.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.Core\Audacia.CodeAnalysis.Analyzers.Core.csproj" />
+    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.Shared\Audacia.CodeAnalysis.Analyzers.Shared.csproj" />
   </ItemGroup>
 </Project>

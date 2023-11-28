@@ -28,20 +28,11 @@ dotnet_diagnostic.ACL1004.severity = warning
 dotnet_diagnostic.ACL1004.exclude_lambdas = true
 dotnet_diagnostic.ACL1004.allowed_loop_variables = i,j
 
-# [NAMING] Asynchronous method name should be suffixed with 'Async' *** Suppress as covered by RCS1046; ACL1005 is only used in the AspNetCore ruleset ***
-dotnet_diagnostic.ACL1005.severity = none
-
 # [STYLE] Code block should have braces, excluding null argument checks
 dotnet_diagnostic.ACL1006.severity = warning
 
 # ACL1007: ThenByDescending follows OrderBy or OrderByDescending.
 dotnet_diagnostic.ACL1007.severity = suggestion
-
-# Controller action should have at least one ProducesResponseType attribute
-dotnet_diagnostic.ACL1008.severity = none
-
-# Method overload should call another overload
-dotnet_diagnostic.ACL1009.severity = none
 
 # [Maintainability] ACL1011: Don't nest too many control statements
 dotnet_diagnostic.ACL1011.severity = warning
