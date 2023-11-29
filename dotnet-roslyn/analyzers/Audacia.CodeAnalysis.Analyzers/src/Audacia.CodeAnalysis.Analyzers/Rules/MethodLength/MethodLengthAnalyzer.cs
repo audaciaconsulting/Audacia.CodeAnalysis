@@ -156,7 +156,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
 
             private bool IsStatement(SyntaxNode node)
             {
-                return !node.IsMissing && node is StatementSyntax statement && !IsExcludedStatement(statement) && !IsLoggingStatement(node);;
+                return !node.IsMissing && node is StatementSyntax statement && !IsExcludedStatement(statement) && !IsLoggingStatement(node);
             }
             
             private static bool IsLoggingStatement(SyntaxNode node)
@@ -169,7 +169,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
                     if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                     {
                         // Check if the name of the method being accessed starts with "Log"
-                        return memberAccess.Name.Identifier.Text.StartsWith("Log");
+                        return memberAccess.Name.Identifier.Text.StartsWith("Log") && memberAccess.;
                     }
                 }
 
