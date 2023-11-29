@@ -169,7 +169,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
                     if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                     {
                         // Check if the name of the method being accessed starts with "Log"
-                        return memberAccess.Name.Identifier.Text.StartsWith("Log") && memberAccess.;
+                        return memberAccess.Name.Identifier.Text.StartsWith("Log");
                     }
                 }
 
