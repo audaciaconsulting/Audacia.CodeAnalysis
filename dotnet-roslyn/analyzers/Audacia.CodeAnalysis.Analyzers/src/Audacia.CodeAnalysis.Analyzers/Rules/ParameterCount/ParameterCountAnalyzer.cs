@@ -43,9 +43,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
         private static readonly SettingsKey MaxConstructorParameterCountKey =
             new SettingsKey(Id, "max_constructor_parameter_count");
 
-        private static IEnumerable<Type> ExcludedParameterTypes = new List<Type>
+        private static IEnumerable<string> ExcludedParameterTypes = new List<string>
         {
-            typeof(CancellationToken)
+            nameof(CancellationToken)
         };
 
         public const string Id = DiagnosticId.ParameterCount;
@@ -167,8 +167,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
                 {
                     var parameterTypeName = parameter.Type.Name;
 
-                    return !parameter.IsLastParameter(methodParameters) ||
-                           !ExcludedParameterTypes.Select(excludedParam => excludedParam.Name)
+                    return !ExcludedParameterTypes.Select(excludedParam => excludedParam)
                                .Contains(parameterTypeName);
                 })
                 .ToArray();

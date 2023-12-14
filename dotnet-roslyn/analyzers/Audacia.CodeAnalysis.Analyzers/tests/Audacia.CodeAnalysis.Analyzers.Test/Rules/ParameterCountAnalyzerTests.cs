@@ -15,15 +15,18 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new ParameterCountAnalyzer();
         }
 
-        private DiagnosticResult BuildExpectedResult(string memberName, int lineNumber, int column, int parameterCount, int maxParameterCount = ParameterCountAnalyzer.DefaultMaxParameterCount)
+        private DiagnosticResult BuildExpectedResult(string memberName, int lineNumber, int column, int parameterCount,
+            int maxParameterCount = ParameterCountAnalyzer.DefaultMaxParameterCount)
         {
             return new DiagnosticResult
             {
                 Id = ParameterCountAnalyzer.Id,
-                Message = $"{memberName} contains {parameterCount} parameters, which exceeds the maximum of {maxParameterCount} parameters.",
+                Message =
+                    $"{memberName} contains {parameterCount} parameters, which exceeds the maximum of {maxParameterCount} parameters.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] {
+                    new[]
+                    {
                         new DiagnosticResultLocation("Test0.cs", lineNumber, column)
                     }
             };
@@ -45,8 +48,7 @@ namespace TestNamespace
 
             VerifyNoDiagnostic(test);
         }
-        
-        
+
         [TestMethod]
         public void No_Diagnostics_For_Method_Parameters_One_More_Than_Max_Allowed_Number_But_Last_Is_Excluded_Type()
         {
@@ -62,7 +64,23 @@ namespace TestNamespace
 
             VerifyNoDiagnostic(test);
         }
-        
+
+        [TestMethod]
+        public void No_Diagnostics_For_Method_Parameters_One_More_Than_Max_Allowed_Number_But_Has_Excluded_Type()
+        {
+            var test = @"namespace TestNamespace
+                        {
+                            public class TestClass
+                            {
+                                public void TestMethod(int i, int j, int k, CancellationToken token, int l)
+                                {
+                                }
+                            }
+                        }";
+
+            VerifyNoDiagnostic(test);
+        }
+
         [TestMethod]
         public void Diagnostics_For_Method_Parameters_Two_More_Than_Max_Allowed_Number_But_Last_Is_Excluded_Type()
         {
@@ -75,7 +93,29 @@ namespace TestNamespace
                                 }
                             }
                         }";
-            
+
+            var expected = BuildExpectedResult(
+                memberName: "Method 'TestMethod'",
+                lineNumber: 5,
+                column: 45,
+                parameterCount: 5);
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Method_Parameters_Two_More_Than_Max_Allowed_Number_But_Has_Excluded_Type()
+        {
+            var test = @"namespace TestNamespace
+                        {
+                            public class TestClass
+                            {
+                                public void TestMethod(int i, int j, int k, int l, CancellationToken token, int p)
+                                {
+                                }
+                            }
+                        }";
+
             var expected = BuildExpectedResult(
                 memberName: "Method 'TestMethod'",
                 lineNumber: 5,
@@ -307,7 +347,6 @@ namespace TestNamespace
 
             VerifyDiagnostic(test, expected);
         }
-
 
         [TestMethod]
         public void Diagnostics_For_Record_Constructor_Parameters_Equal_To_Max_Allowed_Number()
