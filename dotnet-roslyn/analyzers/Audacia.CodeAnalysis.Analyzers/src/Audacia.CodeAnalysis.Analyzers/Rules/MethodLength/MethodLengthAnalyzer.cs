@@ -20,9 +20,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
         public const string Id = DiagnosticId.MethodLength;
 
         private const string Title = "Member or local function contains too many statements";
-        private const string MessageFormat = "{0} '{1}' contains {2} statements, which exceeds the maximum of {3} statements.";
-        private const string Description = "Methods should not exceed a predefined number of statements. You can configure the maximum number of allowed statements globally in the .editorconfig file, or locally using the [MaxMethodLength] attribute.";
-        
+
+        private const string MessageFormat =
+            "{0} '{1}' contains {2} statements, which exceeds the maximum of {3} statements.";
+
+        private const string Description =
+            "Methods should not exceed a predefined number of statements. You can configure the maximum number of allowed statements globally in the .editorconfig file, or locally using the [MaxMethodLength] attribute.";
+
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             Id,
             Title,
@@ -31,7 +35,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             DiagnosticSeverity.Warning,
             true,
             Description);
-        private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction = RegisterCompilationStart;
+
+        private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction =
+            RegisterCompilationStart;
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -49,7 +55,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             startContext.RegisterCodeBlockAction(actionContext => AnalyzeCodeBlock(actionContext, settingsReader));
         }
 
-        private static void AnalyzeCodeBlock(CodeBlockAnalysisContext context, EditorConfigSettingsReader settingsReader)
+        private static void AnalyzeCodeBlock(CodeBlockAnalysisContext context,
+            EditorConfigSettingsReader settingsReader)
         {
             if (ShouldSkipSymbol(context.OwningSymbol))
             {
@@ -57,7 +64,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             }
 
             var maxStatementCount = GetMaxStatementCount(context, settingsReader);
-            var statementWalker = new StatementWalker(context.CancellationToken);
+            var statementWalker = new StatementWalker(context.SemanticModel, context.CancellationToken);
             statementWalker.Visit(context.CodeBlock);
 
             if (statementWalker.StatementCount > maxStatementCount)
@@ -71,11 +78,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             symbol.Kind == SymbolKind.Namespace ||
             symbol.IsSynthesized();
 
-        private static int GetMaxStatementCount(CodeBlockAnalysisContext context, EditorConfigSettingsReader settingsReader)
+        private static int GetMaxStatementCount(CodeBlockAnalysisContext context,
+            EditorConfigSettingsReader settingsReader)
         {
             int maxStatementCount = DefaultMaxStatementCount;
             var attributes = context.OwningSymbol.GetAttributes();
-            var maxLengthAttribute = attributes.FirstOrDefault(att => att.AttributeClass.Name == "MaxMethodLengthAttribute");
+            var maxLengthAttribute =
+                attributes.FirstOrDefault(att => att.AttributeClass.Name == "MaxMethodLengthAttribute");
             if (maxLengthAttribute != null)
             {
                 var maxLengthArgument = maxLengthAttribute.ConstructorArguments.First();
@@ -84,26 +93,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             else
             {
                 // Look up in .editorconfig
-                var configValue = settingsReader.TryGetInt(context.CodeBlock.SyntaxTree, new SettingsKey(Id, "max_statement_count"));
+                var configValue = settingsReader.TryGetInt(context.CodeBlock.SyntaxTree,
+                    new SettingsKey(Id, "max_statement_count"));
                 maxStatementCount = configValue ?? maxStatementCount;
             }
 
             return maxStatementCount;
         }
 
-        private static void ReportAtContainingSymbol(int statementCount, int maxStatementCount, CodeBlockAnalysisContext context)
+        private static void ReportAtContainingSymbol(int statementCount, int maxStatementCount,
+            CodeBlockAnalysisContext context)
         {
             string kind = GetMemberKind(context.OwningSymbol, context.CancellationToken);
             string memberName = context.OwningSymbol.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat);
             var location = GetMemberLocation(context.OwningSymbol, context.SemanticModel, context.CancellationToken);
 
-            context.ReportDiagnostic(Diagnostic.Create(Rule, location, kind, memberName, statementCount, maxStatementCount));
+            context.ReportDiagnostic(Diagnostic.Create(Rule, location, kind, memberName, statementCount,
+                maxStatementCount));
         }
 
         private static string GetMemberKind(ISymbol member, CancellationToken cancellationToken)
         {
             foreach (SyntaxNode syntax in member.DeclaringSyntaxReferences.Select(reference =>
-                reference.GetSyntax(cancellationToken)))
+                         reference.GetSyntax(cancellationToken)))
             {
                 if (syntax is VariableDeclaratorSyntax || syntax is PropertyDeclarationSyntax)
                 {
@@ -114,10 +126,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             return member.GetKind();
         }
 
-        private static Location GetMemberLocation(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Location GetMemberLocation(ISymbol member, SemanticModel semanticModel,
+            CancellationToken cancellationToken)
         {
             foreach (var arrowExpressionClause in member.DeclaringSyntaxReferences
-                .Select(reference => reference.GetSyntax(cancellationToken)).OfType<ArrowExpressionClauseSyntax>())
+                         .Select(reference => reference.GetSyntax(cancellationToken))
+                         .OfType<ArrowExpressionClauseSyntax>())
             {
                 var parentSymbol = semanticModel.GetDeclaredSymbol(arrowExpressionClause.Parent);
 
@@ -133,12 +147,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
         private sealed class StatementWalker : CSharpSyntaxWalker
         {
             private CancellationToken _cancellationToken;
+
             private bool _nullChecksFinished;
+
+            private readonly SemanticModel _semanticModel;
 
             public int StatementCount { get; private set; }
 
-            public StatementWalker(CancellationToken cancellationToken)
+            public StatementWalker(SemanticModel semanticModel, CancellationToken cancellationToken)
             {
+                _semanticModel = semanticModel;
                 _cancellationToken = cancellationToken;
             }
 
@@ -146,7 +164,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             {
                 _cancellationToken.ThrowIfCancellationRequested();
 
-                if (IsStatement(node))
+                if (IsStatement(node, _semanticModel))
                 {
                     StatementCount++;
                 }
@@ -154,12 +172,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
                 base.Visit(node);
             }
 
-            private bool IsStatement(SyntaxNode node)
+            private bool IsStatement(SyntaxNode node, SemanticModel semanticModel)
             {
-                return !node.IsMissing && node is StatementSyntax statement && !IsExcludedStatement(statement) && !IsLoggingStatement(node);
+                return !node.IsMissing &&
+                       node is StatementSyntax statement &&
+                       !IsExcludedStatement(statement) &&
+                       !IsLoggingStatement(node, semanticModel);
             }
-            
-            private static bool IsLoggingStatement(SyntaxNode node)
+
+            private static bool IsLoggingStatement(SyntaxNode node, SemanticModel semanticModel)
             {
                 // Check if the node is an invocation expression
                 if (node is ExpressionStatementSyntax expressionStatement &&
@@ -168,8 +189,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
                     // Check if the expression being invoked is a member access (like "logger.Info")
                     if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                     {
+                        var type = semanticModel.GetTypeInfo(memberAccess.Expression).Type?.Name;
                         // Check if the name of the method being accessed starts with "Log"
-                        return memberAccess.Name.Identifier.Text.StartsWith("Log");
+                        return type == "ILogger" && memberAccess.Name.Identifier.Text.StartsWith("Log");
                     }
                 }
 
@@ -179,7 +201,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
 
             private bool IsExcludedStatement(StatementSyntax node)
             {
-                var isExcludedNodeType = node is BlockSyntax || node is LabeledStatementSyntax || node is LocalFunctionStatementSyntax;
+                var isExcludedNodeType = node is BlockSyntax ||
+                                         node is LabeledStatementSyntax ||
+                                         node is LocalFunctionStatementSyntax;
                 if (isExcludedNodeType)
                 {
                     return true;

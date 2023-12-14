@@ -112,9 +112,72 @@ namespace TestNamespace
             _logger.LogWarning(""Hello World Warning!"");
         }
     }
+
+    public class TestLogger
+    {
+        public void Log() {}
+    }
 }";
 
             VerifyNoDiagnostic(test);
+        }
+        
+        [TestMethod]
+        public void Diagnostics_For_Method_Body_Equal_To_Max_Allowed_Statements_With_Additional_Logging_Statements()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public class TestClass
+    {
+        private readonly ILogger<TestClass> _logger;
+
+        public TestClass()
+        {
+            using var loggerFactory = new LoggerFactory();
+        
+            _logger = loggerFactory.CreateLogger<TestClass>();
+        }
+
+        public void TestMethod()
+        {
+            var lineOne = ""Hello"";
+            var lineTwo = ""Hello"";
+            var lineThree = ""Hello"";
+            var lineFour = ""Hello"";
+            var lineFive = ""Hello"";
+            var lineSix = ""Hello"";
+            var lineSeven = ""Hello"";
+            var lineEight = ""Hello"";
+            var lineNine = ""Hello"";
+            var lineTen = ""Hello"";
+
+            var testLogger = new TestLogger();
+            testLogger.Log();
+
+            _logger.Log(""Hello World!"");
+            _logger.LogCritical(""Hello World Critical!"");
+            _logger.LogDebug(""Hello World Debug!"");
+            _logger.LogError(""Hello World Error!"");
+            _logger.LogInformation(""Hello World Information!"");
+            _logger.LogTrace(""Hello World Trace!"");
+            _logger.LogWarning(""Hello World Warning!"");
+        }
+    }
+
+    public class TestLogger
+    {
+        public void Log() {}
+    }
+}";
+
+            var expected = BuildExpectedResult(
+                memberName: "TestClass.TestMethod()",
+                lineNumber: 15,
+                column: 21,
+                statementCount: 12);
+
+            VerifyDiagnostic(test, expected);
         }
 
         [TestMethod]
