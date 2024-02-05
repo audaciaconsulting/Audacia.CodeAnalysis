@@ -2253,8 +2253,8 @@ dotnet_diagnostic.IDE0005.severity = warning
 # Use `var` instead of explicit type
 dotnet_diagnostic.IDE0007.severity = warning
 
-# Ise explicit type instead of `var`
-dotnet_diagnostic.IDE0008.severity = warning
+# Use explicit type instead of `var`
+dotnet_diagnostic.IDE0008.severity = none
 
 # Add `this` or `Me` qualification
 dotnet_diagnostic.IDE0009.severity = none
@@ -2507,6 +2507,48 @@ dotnet_diagnostic.IDE0220.severity = warning
 
 # Use UTF-8 string literal
 dotnet_diagnostic.IDE0230.severity = warning
+
+# Nullable directive is redundant
+dotnet_diagnostic.IDE0240.severity = warning
+
+# Nullable directive is unnecessary
+dotnet_diagnostic.IDE0241.severity = warning
+
+# Struct can be made 'readonly'
+dotnet_diagnostic.IDE0250.severity = warning
+
+# Member can be made 'readonly'
+dotnet_diagnostic.IDE0251.severity = warning
+
+# Use pattern matching
+dotnet_diagnostic.IDE0260.severity = warning
+
+# Null check can be simplified
+dotnet_diagnostic.IDE0270.severity = warning
+
+# Use nameof
+dotnet_diagnostic.IDE0280.severity = warning
+
+# Use primary constructor
+dotnet_diagnostic.IDE0290.severity = warning
+
+# Use collection expression for array
+dotnet_diagnostic.IDE0300.severity = warning
+
+# Use collection expression for empty
+dotnet_diagnostic.IDE0301.severity = warning
+
+# 	Use collection expression for stackalloc
+dotnet_diagnostic.IDE0302.severity = warning
+
+# Use collection expression for Create()
+dotnet_diagnostic.IDE0303.severity = warning
+
+# Use collection expression for builder
+dotnet_diagnostic.IDE0304.severity = warning
+
+# Use collection expression for fluent
+dotnet_diagnostic.IDE0305.severity = warning
 
 # Use conditional delegate call
 dotnet_diagnostic.IDE1005.severity = warning
