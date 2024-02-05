@@ -15,7 +15,7 @@
         <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>package-icon.png</PackageIcon>
-        <Version>1.6.0</Version>
+        <Version>1.7.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
