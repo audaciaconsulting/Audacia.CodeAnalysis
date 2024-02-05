@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -343,6 +344,28 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             var isControllerAction = attributes.Any(attribute => controllerActionAttributeNames.Any(name => attribute.StartsWith(name, StringComparison.InvariantCultureIgnoreCase)));
 
             return isControllerAction;
+        }
+        
+        /// <summary>
+        /// Checks whether the <paramref name="parameterSymbol"/> is the last parameter and returns true is so.
+        /// </summary>
+        /// <param name="parameterSymbol"></param>
+        /// <param name="methodParameters"></param>
+        /// <returns></returns>
+        public static bool IsLastParameter(this IParameterSymbol parameterSymbol,
+            ImmutableArray<IParameterSymbol> methodParameters)
+        {
+            // If the list is empty, then there's no last parameter
+            if (methodParameters.Length == 0)
+            {
+                return false;
+            }
+
+            // Get the last parameter
+            var lastParameter = methodParameters[methodParameters.Length - 1];
+
+            // Check if the provided parameterSymbol is the last one
+            return ReferenceEquals(lastParameter, parameterSymbol);
         }
     }
 }
