@@ -164,7 +164,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             {
                 _cancellationToken.ThrowIfCancellationRequested();
 
-                if (IsStatement(node, _semanticModel))
+                if (IsStatement(node))
                 {
                     StatementCount++;
                 }
@@ -172,12 +172,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
                 base.Visit(node);
             }
 
-            private bool IsStatement(SyntaxNode node, SemanticModel semanticModel)
+            private bool IsStatement(SyntaxNode node)
             {
                 return !node.IsMissing &&
                        node is StatementSyntax statement &&
                        !IsExcludedStatement(statement) &&
-                       !IsLoggingStatement(node, semanticModel);
+                       !IsLoggingStatement(node, _semanticModel);
             }
 
             private static bool IsLoggingStatement(SyntaxNode node, SemanticModel semanticModel)
