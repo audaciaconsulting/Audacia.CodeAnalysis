@@ -564,5 +564,45 @@ namespace TestNamespace
 
             VerifyDiagnostic(test, expected);
         }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Class_With_Primary_Constructor_And_Body_Greater_Than_Max_Allowed()
+        {
+            // Issue #12 for more details: in-compatability with C#12 primary constructors.
+            var test = @"
+namespace TestNamespace
+{
+    public class Test(int property) : BaseClass(property)
+    {
+        public void MethodOne()
+        {
+            var one = string.Empty;
+            var two = string.Empty;
+            var three = string.Empty;
+            var four = string.Empty;
+            var five = string.Empty;
+        }
+        
+        public void MethodTwo()
+        {
+            var one = string.Empty;
+            var two = string.Empty;
+            var three = string.Empty;
+            var four = string.Empty;
+            var five = string.Empty;
+            var six = string.Empty;
+        }
+    }
+
+    public class BaseClass
+    {
+        protected BaseClass(int property)
+        {
+        }
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
     }
 }

@@ -15,18 +15,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
     /// </summary>
     internal static class SymbolExtensions
     {
-        private static readonly Lazy<IEqualityComparer<ISymbol>> SymbolComparerLazy = new Lazy<IEqualityComparer<ISymbol>>(() =>
-        {
-            Type comparerType = typeof(ISymbol).GetTypeInfo().Assembly.GetType("Microsoft.CodeAnalysis.SymbolEqualityComparer");
-            FieldInfo includeField = comparerType?.GetTypeInfo().GetDeclaredField("IncludeNullability");
-
-            if (includeField != null && includeField.GetValue(null) is IEqualityComparer<ISymbol> comparer)
+        private static readonly Lazy<IEqualityComparer<ISymbol>> SymbolComparerLazy =
+            new Lazy<IEqualityComparer<ISymbol>>(() =>
             {
-                return comparer;
-            }
+                Type comparerType = typeof(ISymbol).GetTypeInfo().Assembly
+                    .GetType("Microsoft.CodeAnalysis.SymbolEqualityComparer");
+                FieldInfo includeField = comparerType?.GetTypeInfo().GetDeclaredField("IncludeNullability");
 
-            return EqualityComparer<ISymbol>.Default;
-        });
+                if (includeField != null && includeField.GetValue(null) is IEqualityComparer<ISymbol> comparer)
+                {
+                    return comparer;
+                }
+
+                return EqualityComparer<ISymbol>.Default;
+            });
 
         /// <summary>
         /// Gets a user-friendly string representation of the <see cref="SymbolKind"/>.
@@ -53,22 +55,22 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             {
                 case MethodKind.PropertyGet:
                 case MethodKind.PropertySet:
-                    {
-                        return "Property accessor";
-                    }
+                {
+                    return "Property accessor";
+                }
                 case MethodKind.EventAdd:
                 case MethodKind.EventRemove:
-                    {
-                        return "Event accessor";
-                    }
+                {
+                    return "Event accessor";
+                }
                 case MethodKind.LocalFunction:
-                    {
-                        return "Local function";
-                    }
+                {
+                    return "Local function";
+                }
                 default:
-                    {
-                        return method.Kind.ToString();
-                    }
+                {
+                    return method.Kind.ToString();
+                }
             }
         }
 
@@ -87,13 +89,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 case MethodKind.PropertySet:
                 case MethodKind.EventAdd:
                 case MethodKind.EventRemove:
-                    {
-                        return true;
-                    }
+                {
+                    return true;
+                }
                 default:
-                    {
-                        return false;
-                    }
+                {
+                    return false;
+                }
             }
         }
 
@@ -103,7 +105,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             if (!(member is IFieldSymbol))
             {
                 foreach (TSymbol interfaceMember in member.ContainingType.AllInterfaces.SelectMany(@interface =>
-                    @interface.GetMembers().OfType<TSymbol>()))
+                             @interface.GetMembers().OfType<TSymbol>()))
                 {
                     ISymbol implementer = member.ContainingType.FindImplementationForInterfaceMember(interfaceMember);
 
@@ -153,30 +155,30 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             switch (syntax)
             {
                 case MethodDeclarationSyntax methodSyntax:
-                    {
-                        return methodSyntax.Modifiers;
-                    }
+                {
+                    return methodSyntax.Modifiers;
+                }
                 case BasePropertyDeclarationSyntax propertyEventIndexerSyntax:
-                    {
-                        return propertyEventIndexerSyntax.Modifiers;
-                    }
+                {
+                    return propertyEventIndexerSyntax.Modifiers;
+                }
                 case VariableDeclaratorSyntax _:
+                {
+                    if (syntax.Parent.Parent is BaseFieldDeclarationSyntax eventFieldSyntax)
                     {
-                        if (syntax.Parent.Parent is BaseFieldDeclarationSyntax eventFieldSyntax)
-                        {
-                            return eventFieldSyntax.Modifiers;
-                        }
+                        return eventFieldSyntax.Modifiers;
+                    }
 
-                        break;
-                    }
+                    break;
+                }
                 case BaseTypeDeclarationSyntax typeSyntax:
-                    {
-                        return typeSyntax.Modifiers;
-                    }
+                {
+                    return typeSyntax.Modifiers;
+                }
                 case DelegateDeclarationSyntax delegateSyntax:
-                    {
-                        return delegateSyntax.Modifiers;
-                    }
+                {
+                    return delegateSyntax.Modifiers;
+                }
             }
 
             return null;
@@ -191,8 +193,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         {
             SyntaxTokenList? modifiers = TryGetModifiers(syntax);
 
-            var matchingSyntax = syntax.IsKind(SyntaxKind.RecordDeclaration) || syntax.IsKind(SyntaxKind.RecordStructDeclaration);
-            var containsModifiers = modifiers != null && modifiers.Value.Any(modifier => modifier.IsKind(SyntaxKind.RecordKeyword));
+            var matchingSyntax = syntax.IsKind(SyntaxKind.RecordDeclaration) ||
+                                 syntax.IsKind(SyntaxKind.RecordStructDeclaration);
+            var containsModifiers = modifiers != null &&
+                                    modifiers.Value.Any(modifier => modifier.IsKind(SyntaxKind.RecordKeyword));
 
             return matchingSyntax || containsModifiers;
         }
@@ -202,33 +206,33 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             switch (symbol)
             {
                 case IFieldSymbol field:
-                    {
-                        return field.Type;
-                    }
+                {
+                    return field.Type;
+                }
                 case IPropertySymbol property:
-                    {
-                        return property.Type;
-                    }
+                {
+                    return property.Type;
+                }
                 case IEventSymbol @event:
-                    {
-                        return @event.Type;
-                    }
+                {
+                    return @event.Type;
+                }
                 case IMethodSymbol method:
-                    {
-                        return method.ReturnType;
-                    }
+                {
+                    return method.ReturnType;
+                }
                 case IParameterSymbol parameter:
-                    {
-                        return parameter.Type;
-                    }
+                {
+                    return parameter.Type;
+                }
                 case ILocalSymbol local:
-                    {
-                        return local.Type;
-                    }
+                {
+                    return local.Type;
+                }
                 default:
-                    {
-                        throw new InvalidOperationException($"Unexpected type '{symbol.GetType()}'.");
-                    }
+                {
+                    throw new InvalidOperationException($"Unexpected type '{symbol.GetType()}'.");
+                }
             }
         }
 
@@ -240,14 +244,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         public static bool IsLambdaExpressionParameter(this IParameterSymbol parameter)
         {
             return parameter.ContainingSymbol is IMethodSymbol methodSymbol &&
-                   (methodSymbol.MethodKind == MethodKind.LambdaMethod || methodSymbol.MethodKind == MethodKind.AnonymousFunction);
+                   (methodSymbol.MethodKind == MethodKind.LambdaMethod ||
+                    methodSymbol.MethodKind == MethodKind.AnonymousFunction);
         }
 
         public static SyntaxNode TryGetBodySyntaxForMethod(this IMethodSymbol method,
             CancellationToken cancellationToken)
         {
             foreach (SyntaxNode syntaxNode in method.DeclaringSyntaxReferences
-                .Select(syntaxReference => syntaxReference.GetSyntax(cancellationToken)).ToArray())
+                         .Select(syntaxReference => syntaxReference.GetSyntax(cancellationToken)).ToArray())
             {
                 SyntaxNode bodySyntax = TryGetDeclarationBody(syntaxNode);
 
@@ -265,33 +270,33 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             switch (syntaxNode)
             {
                 case BaseMethodDeclarationSyntax methodSyntax:
-                    {
-                        return (SyntaxNode)methodSyntax.Body ?? methodSyntax.ExpressionBody?.Expression;
-                    }
+                {
+                    return (SyntaxNode)methodSyntax.Body ?? methodSyntax.ExpressionBody?.Expression;
+                }
                 case AccessorDeclarationSyntax accessorSyntax:
-                    {
-                        return (SyntaxNode)accessorSyntax.Body ?? accessorSyntax.ExpressionBody?.Expression;
-                    }
+                {
+                    return (SyntaxNode)accessorSyntax.Body ?? accessorSyntax.ExpressionBody?.Expression;
+                }
                 case PropertyDeclarationSyntax propertySyntax:
-                    {
-                        return propertySyntax.ExpressionBody?.Expression;
-                    }
+                {
+                    return propertySyntax.ExpressionBody?.Expression;
+                }
                 case IndexerDeclarationSyntax indexerSyntax:
-                    {
-                        return indexerSyntax.ExpressionBody?.Expression;
-                    }
+                {
+                    return indexerSyntax.ExpressionBody?.Expression;
+                }
                 case AnonymousFunctionExpressionSyntax anonymousFunctionSyntax:
-                    {
-                        return anonymousFunctionSyntax.Body;
-                    }
+                {
+                    return anonymousFunctionSyntax.Body;
+                }
                 case LocalFunctionStatementSyntax localFunctionSyntax:
-                    {
-                        return (SyntaxNode)localFunctionSyntax.Body ?? localFunctionSyntax.ExpressionBody?.Expression;
-                    }
+                {
+                    return (SyntaxNode)localFunctionSyntax.Body ?? localFunctionSyntax.ExpressionBody?.Expression;
+                }
                 default:
-                    {
-                        return null;
-                    }
+                {
+                    return null;
+                }
             }
         }
 
@@ -328,8 +333,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         internal static bool IsControllerAction(this IMethodSymbol method)
         {
             var controllerActionAttributeNames
-               = new List<string>
-               {
+                = new List<string>
+                {
                     "HttpDelete",
                     "HttpGet",
                     "HttpHead",
@@ -337,15 +342,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                     "HttpPatch",
                     "HttpPost",
                     "HttpPut"
-               };
+                };
 
             var attributes = method.GetAttributes().Select(attribute => attribute.AttributeClass.Name.ToString());
 
-            var isControllerAction = attributes.Any(attribute => controllerActionAttributeNames.Any(name => attribute.StartsWith(name, StringComparison.InvariantCultureIgnoreCase)));
+            var isControllerAction = attributes.Any(attribute =>
+                controllerActionAttributeNames.Any(name =>
+                    attribute.StartsWith(name, StringComparison.InvariantCultureIgnoreCase)));
 
             return isControllerAction;
         }
-        
+
         /// <summary>
         /// Checks whether the <paramref name="parameterSymbol"/> is the last parameter and returns true is so.
         /// </summary>
@@ -366,6 +373,50 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             // Check if the provided parameterSymbol is the last one
             return ReferenceEquals(lastParameter, parameterSymbol);
+        }
+
+        /// <summary>
+        /// Return a value indicating whether the provided <paramref name="symbol"/> is a constructor.
+        /// </summary>
+        /// <param name="symbol">The symbol to check.</param>
+        /// <returns></returns>
+        public static bool IsConstructor(this ISymbol symbol)
+        {
+            return symbol is IMethodSymbol methodSymbol
+                   && (methodSymbol.MethodKind == MethodKind.Constructor ||
+                       methodSymbol.MethodKind == MethodKind.StaticConstructor);
+        }
+
+        /// <summary>
+        /// Return a value indicating whether the provided symbol represents a primary constructor.
+        /// <br/>
+        /// <example>
+        /// <c>public class MyClass(int property)...</c> the <c>MyClass</c> method symbol would return true.
+        /// </example>
+        /// </summary>
+        /// <param name="symbol">The symbol to check.</param>
+        /// <returns></returns>
+        public static bool IsPrimaryConstructor(this ISymbol symbol)
+        {
+            // Code here is inspired by Roslyn's internal extensions https://github.com/dotnet/roslyn/blob/63d2b774f2984b686b1c82697ef3bf446e8d8133/src/Workspaces/SharedUtilitiesAndExtensions/Compiler/CSharp/Extensions/ITypeSymbolExtensions.cs#L40
+            if (symbol is IMethodSymbol
+                && symbol.ContainingSymbol is INamedTypeSymbol typeSymbol
+                && (typeSymbol.TypeKind is TypeKind.Class || typeSymbol.TypeKind is TypeKind.Struct))
+            {
+                // Currently, the Roslyn API doesn't provide information about primary constructors.
+                // This is tracked by: https://github.com/dotnet/roslyn/issues/53092.
+                var primaryConstructor = typeSymbol.InstanceConstructors.FirstOrDefault(
+                    c =>
+                    {
+                        var syntaxNode = c.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
+                        return syntaxNode is RecordDeclarationSyntax
+                               || syntaxNode is ClassDeclarationSyntax
+                               || syntaxNode is StructDeclarationSyntax;
+                    });
+                return primaryConstructor != null;
+            }
+
+            return false;
         }
     }
 }
