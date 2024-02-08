@@ -24,6 +24,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
         private const string Description = "Don't use abbreviations.";
 
         private const string Category = DiagnosticCategory.Naming;
+        
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             Id,
@@ -31,8 +33,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
             MessageFormat,
             Category,
             DiagnosticSeverity.Warning,
-            true,
-            Description);
+            isEnabledByDefault: true,
+            Description,
+            HelpLinkUrl);
 
         private static readonly ImmutableArray<SymbolKind> MemberSymbolKinds =
             ImmutableArray.Create(SymbolKind.Property, SymbolKind.Method, SymbolKind.Field, SymbolKind.Event);

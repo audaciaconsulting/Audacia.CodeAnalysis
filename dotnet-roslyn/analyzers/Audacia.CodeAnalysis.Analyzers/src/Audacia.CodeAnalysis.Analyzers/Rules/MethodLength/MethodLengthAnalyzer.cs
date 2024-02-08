@@ -26,6 +26,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
 
         private const string Description =
             "Methods should not exceed a predefined number of statements. You can configure the maximum number of allowed statements globally in the .editorconfig file, or locally using the [MaxMethodLength] attribute.";
+        
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             Id,
@@ -33,8 +35,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
             MessageFormat,
             DiagnosticCategory.Maintainability,
             DiagnosticSeverity.Warning,
-            true,
-            Description);
+            isEnabledByDefault: true,
+            Description,
+            HelpLinkUrl);
 
         private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction =
             RegisterCompilationStart;

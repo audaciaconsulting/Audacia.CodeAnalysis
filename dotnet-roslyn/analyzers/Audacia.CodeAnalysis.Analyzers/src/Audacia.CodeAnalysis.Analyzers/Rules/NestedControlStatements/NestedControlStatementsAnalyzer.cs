@@ -16,7 +16,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class NestedControlStatementsAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.NestedControlStatementsAnalyzer;
+        public const string Id = DiagnosticId.NestedControlStatements;
 
         public const int DefaultMaximumDepth = 2;
 
@@ -27,6 +27,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
         private const string Description = "Don't nest too many control statements.";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+        
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             Id,
@@ -34,8 +36,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             MessageFormat,
             DiagnosticCategory.Maintainability,
             DiagnosticSeverity.Warning,
-            true,
-            Description);
+            isEnabledByDefault: true,
+            Description,
+            HelpLinkUrl);
 
         private static readonly SyntaxKind[] ControlStatementKinds =
         {
