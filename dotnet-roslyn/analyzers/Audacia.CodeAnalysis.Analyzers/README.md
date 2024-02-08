@@ -19,6 +19,9 @@ Note the second PR is needed as `Audacia.CodeAnalysis.Analyzers` should be consu
 
 **Important:** The unit test project in this solution will fail to build if the path length of items in the bin folder exceeds 260 characters. (You will see errors similar to `Could not copy Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll`). Therefore, it is recommended to clone this repo into a high-level directory (e.g. C:\Projects).
 
+## Help link URLs
+If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](./src/Audacia.CodeAnalysis.Analyzers/Common/HelpLinkUrlFactory.cs) is updated to reflect the new titles.
+
 ## Testing changes locally
 
 **Prerequisites**: The "Visual Studio extension development" toolset is required for testing changes locally. This can be installed by modifying your installation of visual studio, and search for this toolset under the 'Other Toolsets' header.
@@ -28,6 +31,17 @@ To run VS experimentally set the `.Vsix` project as the startup project, which l
 # Analyzers
 
 ## ACL1000 - Private fields should be prefixed with an underscore
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Naming</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-05.2:</td>
+</tr>
+</table>
 
 The ACL1000 rule checks whether private field names are prefixed with an underscore. It also provides a code fix, which inserts an underscore.
 
@@ -51,7 +65,17 @@ public class MyClass
 
 ## ACL1001 - Variable declarations should not use a magic number
 
-Category: Usage
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-01.8</td>
+</tr>
+</table>
+
 
 The ACL1001 rule checks for magic numbers being used in variable declarations. Magic numbers should generally be extracted to a well-named variable.
 
@@ -76,7 +100,16 @@ var next = previous + 1;
 
 ## ACL1002 - Methods should not exceed a predefined number of statements
 
-Category: Maintainability
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintanability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-01.1</td>
+</tr>
+</table>
 
 The ACL1002 rule checks the number of statements in a method (or property or constructor) against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxMethodLength]` attribute (this is in the `Audacia.CodeAnalysis.Analyzers.Helpers` NuGet package, which must be installed separately). In the absence of any configured value, a default maximum value of 10 is used.
 
@@ -148,7 +181,16 @@ public void MyMethod(string arg)
 
 ## ACL1003 - Don't declare signatures with more than a predefined number of parameters
 
-Category: Maintainability
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintanability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-01.21</td>
+</tr>
+</table>
 
 The ACL1003 rule checks the number of parameters for a method or constructor against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxParameterCount]` attribute (this is in the `Audacia.CodeAnalysis.Analyzers.Helpers` NuGet package, which must be installed separately). In the absence of any configured value, a default maximum value of 4 is used.
 
@@ -200,7 +242,16 @@ public async Task MyMethodAsync(int a, int b, int c, int d, CancellationToken ca
 
 ## ACL1004 - Don't use abbreviations
 
-Category: Naming
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Naming</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-05.1</td>
+</tr>
+</table>
 
 The ACL1004 rule checks whether single characters or (specific) abbreviations have been used as a type, member, parameter or variable name.
 
@@ -261,9 +312,18 @@ for (var i = 0; i < 10; i++)
 
 ## ACL1005 - Asynchronous method name is not suffixed with 'Async'
 
-Category: Naming
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Naming</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-05.15</td>
+</tr>
+</table>
 
-ACL1005 is based on the Roslynator rule [RCS1046](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1046.md), which checks if asynchronous methods are suffixed with 'Async'.
+ACL1005 is based on the Roslynator rule [RCS1046](https://josefpihrt.github.io/docs/roslynator/analyzers/RCS1046), which checks if asynchronous methods are suffixed with 'Async'.
 
 ACL1005 adds an exclusion for controller actions, as they are often asynchronous but should generally not be suffixed.
 
@@ -271,7 +331,9 @@ ACL1005 adds an exclusion for controller actions, as they are often asynchronous
 
 Category: Style
 
-ACL1006 is based on the Roslynator rule [RCS1007](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1007.md), which checks if statements such as `if`, `foreach` and `using` are followed by braces.
+Audacia coding standard: `CS-06.1`
+
+ACL1006 is based on the Roslynator rule [RCS1007](https://josefpihrt.github.io/docs/roslynator/analyzers/RCS1007), which checks if statements such as `if`, `foreach` and `using` are followed by braces.
 
 ACL1006 adds an exclusion for `if` statements performing an argument null check. For example, using ACL1006 rather than RCS1007, the following code becomes valid:
 
@@ -286,9 +348,18 @@ The justification for this exclusion is that argument null checks, while advised
 
 ## ACL1007 - ThenByDescending instead of OrderByDescending if follows OrderBy or OrderByDescending statement
 
-Category: Usage
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
 
-ACL1007 is similar in function to the Roslynator rule [RCS1200](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1200.md), which checks if an `OrderBy` follows an `OrderBy` or `OrderByDescending`, and suggests using `ThenBy` instead if so.
+ACL1007 is similar in function to the Roslynator rule [RCS1200](https://josefpihrt.github.io/docs/roslynator/analyzers/RCS1200), which checks if an `OrderBy` follows an `OrderBy` or `OrderByDescending`, and suggests using `ThenBy` instead if so.
 
 ACL1007 checks if an `OrderByDescending` follows an `OrderBy` or `OrderByDescending` and suggests using `ThenByDescending` instead if so.
 
@@ -306,7 +377,16 @@ var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 
 ## ACL1008 - Controller actions have ProducesResponseType attribute
 
-Category: Maintainability
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
 
 ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute and will produce a warning if not.
 This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
@@ -317,7 +397,7 @@ Code with diagnostic:
 [HttpGet]
 public string Get()
 {
-	return 'hello';
+    return 'hello';
 }
 ```
 
@@ -328,13 +408,22 @@ Code without diagnostic:
 [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 public string Get()
 {
-	return 'hello';
+    return 'hello';
 }
 ```
 
 ## ACL1009 - Method overload should call another overload
 
-Category: Maintainability
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-01.20</td>
+</tr>
+</table>
 
 ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1551.md), which ensures the more overloaded method is called from other overloads.
 
@@ -347,14 +436,14 @@ ACL1009 reports warnings on the three rules below:
 Code with diagnostic:
 
 ```csharp
-public void TestMethod(int i, int j)
+public void TestMethod(int i, string s)
 {
-	TestMethod(i, j, 0);
+    var line = string.Format(s, i, 0);
 }
 
 public void TestMethod(int i, string s, int j = 0)
 {
-	var line = string.Format(s, i, j);
+    var line = string.Format(s, i, j);
 }
 ```
 
@@ -363,12 +452,12 @@ Code without diagnostic:
 ```csharp
 public void TestMethod(int i, string s)
 {
-	TestMethod(i, s, 0);
+    TestMethod(i, s, 0);
 }
 
 public virtual void TestMethod(int i, string s, int j = 0)
 {
-	var line = string.Format(s, i, j);
+    var line = string.Format(s, i, j);
 }
 ```
 
@@ -395,7 +484,16 @@ public class TestClassController : Controller
 
 ## ACL1010 - Nullable reference types enabled
 
-Category: Maintainability
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-01.28</td>
+</tr>
+</table>
 
 ACL1010 checks whether nullable reference types have been enabled on a project.
 
@@ -411,7 +509,16 @@ ACL1010 also provides a code fix, which inserts or updates the <Nullable> node i
 
 ## ACL1011 - Don't nest too many control statements
 
-Category: Maintainability
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-01.14</td>
+</tr>
+</table>
 
 ACL1011 checks how deeply nested control statements are to and raises a warning if a statement is too deeply nested, by default after 2.
 
@@ -455,7 +562,16 @@ Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_
 
 ## ACL1012 - Don't pass predicates into 'Where' methods with too many clauses
 
-Category: Maintainability
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
 
 ACL1012 checks how many logical and clauses are contained in a `Where` method call's predicate and raises a warning if there are too many, by default after 3.
 
