@@ -51,6 +51,8 @@ public class MyClass
 
 ## ACL1001 - Variable declarations should not use a magic number
 
+Category: Usage
+
 The ACL1001 rule checks for magic numbers being used in variable declarations. Magic numbers should generally be extracted to a well-named variable.
 
 Code with violation:
@@ -73,6 +75,8 @@ var next = previous + 1;
 ```
 
 ## ACL1002 - Methods should not exceed a predefined number of statements
+
+Category: Maintainability
 
 The ACL1002 rule checks the number of statements in a method (or property or constructor) against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxMethodLength]` attribute (this is in the `Audacia.CodeAnalysis.Analyzers.Helpers` NuGet package, which must be installed separately). In the absence of any configured value, a default maximum value of 10 is used.
 
@@ -121,13 +125,30 @@ public void MyMethod(string arg)
 		throw new ArgumentNullException(nameof(arg));
 	}
 
-	var one = 1;
-	var two = 2;
-	var three = 3;
+	const int one = 1;
+	const int two = 2;
+	const int three = 3;
+}
+```
+
+**Lines of logging are excluded from the statement count.** So in the following code, 3 lines would be counted rather than 5. This is because logging does not add complexity to the method, and we don't want to dissuade people from including them.
+
+```csharp
+public void MyMethod(string arg)
+{
+    _logger.LogInformation("Starting method");
+
+    const int one = 1;
+    const int two = 2;
+    const int three = 3;
+    
+    _logger.LogInformation("Finished method");
 }
 ```
 
 ## ACL1003 - Don't declare signatures with more than a predefined number of parameters
+
+Category: Maintainability
 
 The ACL1003 rule checks the number of parameters for a method or constructor against a maximum allowed value. This maximum value can be configured globally in the .editorconfig file, or locally using the `[MaxParameterCount]` attribute (this is in the `Audacia.CodeAnalysis.Analyzers.Helpers` NuGet package, which must be installed separately). In the absence of any configured value, a default maximum value of 4 is used.
 
@@ -158,7 +179,7 @@ dotnet_diagnostic.ACL1003.max_constructor_parameter_count = 5
 However, this does <b>not</b> work with the `record` reference type, and syntax synonyms (`record class`, `record struct`):
 ```csharp
 // No parameter count violation.
-public record Person(string a, int b, int c, int d, int e);
+public record Person(int a, int b, int c, int d, int e);
 
 // Attribute is ignored.
 [MaxParameterCount(1)]
@@ -169,7 +190,17 @@ public record struct School(int a, int b); // Record struct
 public record Exam(int a, int b); // Record class
 ```
 
+**`CancellationToken`s are excluded from the parameter count.** So in the following code, 4 parameters would be counted rather than 5.
+
+```csharp
+public async Task MyMethodAsync(int a, int b, int c, int d, CancellationToken cancellationToken)
+{
+}
+```
+
 ## ACL1004 - Don't use abbreviations
+
+Category: Naming
 
 The ACL1004 rule checks whether single characters or (specific) abbreviations have been used as a type, member, parameter or variable name.
 
@@ -183,6 +214,16 @@ Code with fix:
 
 ```csharp
 var index = 4;
+```
+
+The following is a full list of the abbreviations that are checked for:
+```cs
+"Btn", "Ctrl", "Frm", "Chk", "Cmb",
+"Ctx", "Dg", "Pnl", "Dlg", "Ex", "Lbl", 
+"Txt", "Mnu", "Prg", "Rb", "Cnt", "Tv", 
+"Ddl", "Fld", "Lnk", "Img", "Lit",
+"Vw", "Gv", "Dts", "Rpt", "Vld", "Pwd", 
+"Ctl", "Tm", "Mgr", "Flt", "Len", "Idx", "Str"
 ```
 
 There are two additional pieces of configuration that can be applied:
@@ -220,11 +261,15 @@ for (var i = 0; i < 10; i++)
 
 ## ACL1005 - Asynchronous method name is not suffixed with 'Async'
 
+Category: Naming
+
 ACL1005 is based on the Roslynator rule [RCS1046](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1046.md), which checks if asynchronous methods are suffixed with 'Async'.
 
 ACL1005 adds an exclusion for controller actions, as they are often asynchronous but should generally not be suffixed.
 
 ## ACL1006 - Code block does not have braces
+
+Category: Style
 
 ACL1006 is based on the Roslynator rule [RCS1007](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1007.md), which checks if statements such as `if`, `foreach` and `using` are followed by braces.
 
@@ -240,6 +285,8 @@ public void SomeMethod(string arg)
 The justification for this exclusion is that argument null checks, while advised, add noise to a codebase, and minimising this noise is useful.
 
 ## ACL1007 - ThenByDescending instead of OrderByDescending if follows OrderBy or OrderByDescending statement
+
+Category: Usage
 
 ACL1007 is similar in function to the Roslynator rule [RCS1200](https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1200.md), which checks if an `OrderBy` follows an `OrderBy` or `OrderByDescending`, and suggests using `ThenBy` instead if so.
 
@@ -258,6 +305,8 @@ var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 ```
 
 ## ACL1008 - Controller actions have ProducesResponseType attribute
+
+Category: Maintainability
 
 ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute and will produce a warning if not.
 This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
@@ -284,6 +333,8 @@ public string Get()
 ```
 
 ## ACL1009 - Method overload should call another overload
+
+Category: Maintainability
 
 ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1551.md), which ensures the more overloaded method is called from other overloads.
 
@@ -344,6 +395,8 @@ public class TestClassController : Controller
 
 ## ACL1010 - Nullable reference types enabled
 
+Category: Maintainability
+
 ACL1010 checks whether nullable reference types have been enabled on a project.
 
 ACL1010 reports a warning if:
@@ -357,6 +410,8 @@ ACL1010 also provides a code fix, which inserts or updates the <Nullable> node i
 
 
 ## ACL1011 - Don't nest too many control statements
+
+Category: Maintainability
 
 ACL1011 checks how deeply nested control statements are to and raises a warning if a statement is too deeply nested, by default after 2.
 
@@ -399,6 +454,8 @@ This analyzer considers the following to be "control statements":
 Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1011.max_control_statement_depth`.
 
 ## ACL1012 - Don't pass predicates into 'Where' methods with too many clauses
+
+Category: Maintainability
 
 ACL1012 checks how many logical and clauses are contained in a `Where` method call's predicate and raises a warning if there are too many, by default after 3.
 
