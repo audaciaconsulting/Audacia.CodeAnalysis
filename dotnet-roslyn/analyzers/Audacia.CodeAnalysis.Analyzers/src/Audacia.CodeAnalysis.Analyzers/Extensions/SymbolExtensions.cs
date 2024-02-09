@@ -399,7 +399,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         public static bool IsPrimaryConstructor(this ISymbol symbol)
         {
             // Code here is inspired by Roslyn's internal extensions https://github.com/dotnet/roslyn/blob/63d2b774f2984b686b1c82697ef3bf446e8d8133/src/Workspaces/SharedUtilitiesAndExtensions/Compiler/CSharp/Extensions/ITypeSymbolExtensions.cs#L40
-            if (symbol is IMethodSymbol
+            if (symbol.IsConstructor()
                 && symbol.ContainingSymbol is INamedTypeSymbol typeSymbol
                 && (typeSymbol.TypeKind is TypeKind.Class || typeSymbol.TypeKind is TypeKind.Struct))
             {
