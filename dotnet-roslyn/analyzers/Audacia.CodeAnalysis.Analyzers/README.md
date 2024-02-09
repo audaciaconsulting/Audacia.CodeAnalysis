@@ -436,19 +436,47 @@ ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisd
 
 ACL1009 reports warnings on the three rules below:
 
-- That an overloaded method does not call another overload (unless it is the longest in the group)
-- That the longest overloaded method (the one with the most parameters) is not virtual.
-- That the order of parameters in an overloaded method does not match with the parameter order of the longest overload.
+### That an overloaded method does not call another overload (unless it is the longest in the group)
 
 Code with diagnostic:
 
 ```csharp
 public void TestMethod(int i, string s)
 {
-    var line = string.Format(s, i, 0);
+   var line = string.Format(s, i, 0);
 }
 
-public void TestMethod(int i, string s, int j = 0)
+public virtual void TestMethod(int i, string s, int j)
+{
+   var line = string.Format(s, i, j);
+}
+```
+
+Code without diagnostic:
+
+```csharp
+public void TestMethod(int i, string s)
+{
+    TestMethod(i, s, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j)
+{
+    var line = string.Format(s, i, j);
+}
+```
+
+### That the longest overloaded method (the one with the most parameters) is not virtual.
+
+Code with diagnostic:
+
+```csharp
+public void TestMethod(int i, string s)
+{
+    TestMethod(i, s, 0);
+}
+
+public void TestMethod(int i, string s, int j)
 {
     var line = string.Format(s, i, j);
 }
@@ -462,7 +490,36 @@ public void TestMethod(int i, string s)
     TestMethod(i, s, 0);
 }
 
-public virtual void TestMethod(int i, string s, int j = 0)
+public virtual void TestMethod(int i, string s, int j)
+{
+    var line = string.Format(s, i, j);
+}
+```
+### The order of parameters in an overloaded method does not match with the parameter order of the longest overload.
+
+Code with diagnostic:
+
+```csharp
+public void TestMethod(string s, int i)
+{
+    TestMethod(i, s, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j)
+{
+    var line = string.Format(s, i, j);
+}
+```
+
+Code without diagnostic:
+
+```csharp
+public void TestMethod(int i, string s)
+{
+    TestMethod(i, s, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j)
 {
     var line = string.Format(s, i, j);
 }
