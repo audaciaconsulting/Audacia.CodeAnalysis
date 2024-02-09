@@ -80,7 +80,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             if (!method.IsPropertyOrEventAccessor() && MemberRequiresAnalysis(method, context.CancellationToken))
             {
                 var memberName = GetMemberName(method);
-                var isConstructor = IsConstructor(method);
+                var isConstructor = method.IsConstructor();
 
                 ParameterSettings settings =
                     GetParameterSettings(method, settingsReader,
@@ -130,12 +130,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
         private static string GetMemberName(IMethodSymbol method)
         {
-            return IsConstructor(method) ? GetNameForConstructor(method) : GetNameForMethod(method);
-        }
-
-        private static bool IsConstructor(IMethodSymbol method)
-        {
-            return method.MethodKind == MethodKind.Constructor || method.MethodKind == MethodKind.StaticConstructor;
+            return method.IsConstructor() ? GetNameForConstructor(method) : GetNameForMethod(method);
         }
 
         private static string GetNameForConstructor(IMethodSymbol method)
