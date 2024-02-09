@@ -39,7 +39,7 @@ To run VS experimentally set the `.Vsix` project as the startup project, which l
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-05.2:</td>
+    <td>CS-05.2</td>
 </tr>
 </table>
 
