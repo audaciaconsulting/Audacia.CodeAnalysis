@@ -329,9 +329,16 @@ ACL1005 adds an exclusion for controller actions, as they are often asynchronous
 
 ## ACL1006 - Code block does not have braces
 
-Category: Style
-
-Audacia coding standard: `CS-06.1`
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Style</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-06.1</td>
+</tr>
+</table>
 
 ACL1006 is based on the Roslynator rule [RCS1007](https://josefpihrt.github.io/docs/roslynator/analyzers/RCS1007), which checks if statements such as `if`, `foreach` and `using` are followed by braces.
 
