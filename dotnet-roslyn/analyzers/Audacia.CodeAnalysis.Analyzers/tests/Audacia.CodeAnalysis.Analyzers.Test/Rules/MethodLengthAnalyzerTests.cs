@@ -564,5 +564,86 @@ namespace TestNamespace
 
             VerifyDiagnostic(test, expected);
         }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Class_With_Primary_Constructor_And_Body_Greater_Than_Max_Allowed()
+        {
+            // Issue #12 for more details: in-compatability with C#12 primary constructors.
+            var test = @"
+namespace TestNamespace
+{
+    public class Test(int property) : BaseClass(property)
+    {
+        public void MethodOne()
+        {
+            var one = string.Empty;
+            var two = string.Empty;
+            var three = string.Empty;
+            var four = string.Empty;
+            var five = string.Empty;
+        }
+        
+        public void MethodTwo()
+        {
+            var one = string.Empty;
+            var two = string.Empty;
+            var three = string.Empty;
+            var four = string.Empty;
+            var five = string.Empty;
+            var six = string.Empty;
+        }
+    }
+
+    public class BaseClass
+    {
+        protected BaseClass(int property)
+        {
+        }
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Method_Body_Greater_Than_Max_Allowed_In_Class_With_Primary_Constructor()
+        {
+            // Issue #12 for more details: in-compatability with C#12 primary constructors.
+            var test = @"
+namespace TestNamespace
+{
+    public class TestClass(int property) : BaseClass(property)
+    {
+        public void TestMethod()
+        {
+            var one = string.Empty;
+            var two = string.Empty;
+            var three = string.Empty;
+            var four = string.Empty;
+            var five = string.Empty;
+            var six = string.Empty;
+            var seven = string.Empty;
+            var eight = string.Empty;
+            var nine = string.Empty;
+            var ten = string.Empty;
+            var eleven = string.Empty;
+        }
+    }
+
+    public class BaseClass
+    {
+        protected BaseClass(int property)
+        {
+        }
+    }
+}";
+            
+            var expected = BuildExpectedResult(
+                memberName: "TestClass.TestMethod()",
+                lineNumber: 6,
+                column: 21,
+                statementCount: 11);
+            VerifyDiagnostic(test, expected);
+        }
     }
 }

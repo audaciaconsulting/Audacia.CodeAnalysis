@@ -76,8 +76,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
         private static bool ShouldSkipSymbol(ISymbol symbol) =>
             symbol is INamedTypeSymbol ||
             symbol.Kind == SymbolKind.Namespace ||
-            symbol.IsSynthesized();
-
+            symbol.IsSynthesized() ||
+            symbol.IsPrimaryConstructor();
+        
         private static int GetMaxStatementCount(CodeBlockAnalysisContext context,
             EditorConfigSettingsReader settingsReader)
         {
