@@ -21,6 +21,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             "{0} contains {1} parameters, which exceeds the maximum of {2} parameters.";
 
         private const string Description = "Don't declare signatures with more than a predefined number of parameters.";
+        
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor ParameterCountRule = new DiagnosticDescriptor(
             Id,
@@ -28,8 +30,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             ParameterCountMessageFormat,
             DiagnosticCategory.Maintainability,
             DiagnosticSeverity.Warning,
-            true,
-            Description);
+            isEnabledByDefault: true,
+            Description,
+            HelpLinkUrl);
 
         private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction =
             RegisterCompilationStart;

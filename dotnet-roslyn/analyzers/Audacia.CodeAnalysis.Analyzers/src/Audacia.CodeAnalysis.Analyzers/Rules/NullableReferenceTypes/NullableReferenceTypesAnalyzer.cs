@@ -11,18 +11,23 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NullableReferenceTypes
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class NullableReferenceTypesAnalyzer : DiagnosticAnalyzer
     {
+        private const string Id = DiagnosticId.NullableReferenceTypesEnabled;
+        
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+        
         /// <summary>
         /// The diagnostic rule for the nullable reference type analyzer. 
         /// </summary>
         private static readonly DiagnosticDescriptor Rule
             = new DiagnosticDescriptor(
-                DiagnosticId.NullableReferenceTypesEnabled,
+                Id,
                 DiagnosticMessages.NullableReferenceTypes.Title,
                 DiagnosticMessages.NullableReferenceTypes.MessageFormat,
                 DiagnosticCategory.Maintainability,
                 DiagnosticSeverity.Warning,
-                true,
-                DiagnosticMessages.NullableReferenceTypes.Description);
+                isEnabledByDefault: true,
+                DiagnosticMessages.NullableReferenceTypes.Description,
+                HelpLinkUrl);
 
         /// <summary>
         /// The collection of diagnostics for this analyzer.

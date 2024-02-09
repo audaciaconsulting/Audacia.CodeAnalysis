@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Settings;
@@ -14,7 +12,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class MaximumWhereClausesAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.MaximumWhereClausesAnalyzer;
+        public const string Id = DiagnosticId.MaximumWhereClauses;
 
         public const int DefaultMaximumClauses = 3;
 
@@ -25,6 +23,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
         private const string Description = "Don't pass predicates into 'Where' methods with too many clauses.";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+        
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             Id,
@@ -32,8 +32,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
             MessageFormat,
             DiagnosticCategory.Maintainability,
             DiagnosticSeverity.Warning,
-            true,
-            Description);
+            isEnabledByDefault: true,
+            Description,
+            HelpLinkUrl);
 
         public override void Initialize(AnalysisContext context)
         {

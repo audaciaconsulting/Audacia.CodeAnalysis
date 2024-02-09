@@ -48,14 +48,18 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
         private const string Description = "Call the more overloaded method from other overloads.";
         private const string Category = DiagnosticCategory.Maintainability;
         private const DiagnosticSeverity Serverity = DiagnosticSeverity.Warning;
+        
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+        
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             Id,
             Title,
             MessageFormat,
             Category,
             Serverity,
-            true,
-            Description);
+            isEnabledByDefault: true,
+            Description,
+            HelpLinkUrl);
         private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction = RegisterCompilationStart;
 
         private static readonly DiagnosticDescriptor MakeVirtualRule = new DiagnosticDescriptor(Id, Title,
