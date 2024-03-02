@@ -202,4 +202,20 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
 
         VerifyDiagnostic(test, expected);
     }
+
+    [TestMethod]
+    public void Diagnostic_If_Class_With_Generic_Argument_Has_Suffix()
+    {
+        var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeNameDto<T>
+        {
+        }
+    }";
+
+        var expected = BuildExpectedResult(4, 9, "TypeNameDto", "Dto");
+
+        VerifyDiagnostic(test, expected);
+    }
 }

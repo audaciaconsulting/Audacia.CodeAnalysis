@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.UseRecordTypes
 {
@@ -40,8 +41,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseRecordTypes
         private readonly bool _isSettingsReaderInjected;
         private ISettingsReader _settingsReader;
 
-        public UseRecordTypesAnalyzer(ISettingsReader settingsReader)
+        public UseRecordTypesAnalyzer()
         {
+            // Analyzers must have a public parameterless constructor to be instantiated by the framework, don't remove this.
+        }
+
+        public UseRecordTypesAnalyzer(ISettingsReader settingsReader) : this()
+        {
+            // This constructor is used for unit testing
             _settingsReader = settingsReader;
             _isSettingsReaderInjected = true;
         }
@@ -76,12 +83,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseRecordTypes
 
             if (TryMatchToForbiddenSuffix(className, context, out var forbiddenSuffix))
             {
-                var diagnostic = Diagnostic.Create(Rule, classDeclarationSyntax.GetLocation(), className, forbiddenSuffix);
+                // This is where the diagnostic highlights the problem.
+                // If we use the class declaration itself, the whole class contents will be highlighted.
+                var spanLength = classDeclarationSyntax.Identifier.Span.End - classDeclarationSyntax.Keyword.SpanStart;
+
+                // Highlight 'class XXXSuffix' and nothing else.
+                var location = Location.Create(
+                    classDeclarationSyntax.SyntaxTree,
+                    new TextSpan(classDeclarationSyntax.Keyword.SpanStart, spanLength));
+                var diagnostic = Diagnostic.Create(Rule, location, className, forbiddenSuffix);
                 context.ReportDiagnostic(diagnostic);
             }
         }
 
-        private bool TryMatchToForbiddenSuffix(string className, SyntaxNodeAnalysisContext context, out string forbiddenSuffix)
+        private bool TryMatchToForbiddenSuffix(string className, SyntaxNodeAnalysisContext context,
+            out string forbiddenSuffix)
         {
             forbiddenSuffix = null;
             var syntaxTree = context.Compilation.SyntaxTrees.FirstOrDefault();
@@ -92,7 +108,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseRecordTypes
                     ?.Split(',') ?? new[] { "Dto" };
 
                 // Case-sensitive comparison
-                forbiddenSuffix = forbiddenSuffixes.FirstOrDefault(suffix => className.EndsWith(suffix, StringComparison.InvariantCulture));
+                forbiddenSuffix = forbiddenSuffixes.FirstOrDefault(suffix =>
+                    className.EndsWith(suffix, StringComparison.InvariantCulture));
             }
 
             return forbiddenSuffix != null;
