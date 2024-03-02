@@ -16,14 +16,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
 
         public const int DefaultMaximumClauses = 3;
 
-        private const string Title = "'Where' method contains too many clauses, consisder separating out into separate chained 'Where' methods.";
+        private const string Title = "'Where' method contains too many clauses, consisder separating out into separate chained 'Where' methods";
 
-        private const string MessageFormat = "'Where' contains {0} clauses, which exceeds the maximum of {1} clauses per 'Where'.";
+        private const string MessageFormat = "'Where' contains {0} clauses, which exceeds the maximum of {1} clauses per 'Where'";
 
         private const string Description = "Don't pass predicates into 'Where' methods with too many clauses.";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
-        
+
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(

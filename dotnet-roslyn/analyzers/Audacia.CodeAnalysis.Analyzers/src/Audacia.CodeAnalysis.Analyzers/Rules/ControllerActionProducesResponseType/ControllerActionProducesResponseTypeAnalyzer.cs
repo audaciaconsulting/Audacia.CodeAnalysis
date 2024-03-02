@@ -17,9 +17,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
 
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
-        private const string MessageFormat = "Controller action name '{0}' has no [ProducesResponseType] attribute.";
+        private const string MessageFormat = "Controller action name '{0}' has no [ProducesResponseType] attribute";
 
-        private const string Title = "Controller action has no [ProducesResponseType] attribute.";
+        private const string Title = "Controller action has no [ProducesResponseType] attribute";
 
         private const string Description = "Controller actions should have at least one [ProducesResponseType] attribute.";
 
@@ -69,7 +69,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
         private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext)
         {
             var isController = nodeAnalysisContext.IsControllerAction();
-            
+
             if (isController)
             {
                 var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;

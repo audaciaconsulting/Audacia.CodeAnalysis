@@ -32,7 +32,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = DiagnosticId.NullableReferenceTypesEnabled,
-                Message = DiagnosticMessages.NullableReferenceTypes.Description,
+                Message = "Nullable reference types should be enabled",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {

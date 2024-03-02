@@ -89,7 +89,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'.";
+                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 6, 25);
 
@@ -109,7 +109,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'.";
+                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 6, 25);
 
@@ -163,8 +163,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     }
                 }";
 
-            const string expectedMessage 
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'.";
+            const string expectedMessage
+                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 6, 25);
 
@@ -211,10 +211,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage1
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'.";
+                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'";
 
             const string expectedMessage2
-                = "Asynchronous method name 'TestMethod1' is not suffixed with 'Async'.";
+                = "Asynchronous method name 'TestMethod1' is not suffixed with 'Async'";
 
             var expectedDiagnostics
                 = new[]
@@ -318,7 +318,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage
-                = "Asynchronous method name 'Get' is not suffixed with 'Async'.";
+                = "Asynchronous method name 'Get' is not suffixed with 'Async'";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 
@@ -342,11 +342,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
             VerifyCodeFix(testCode, fixedTestCode);
         }
-        
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() 
+
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
             => new AsyncSuffixAnalyzer();
-        
-        protected override CodeFixProvider GetCSharpCodeFixProvider() 
+
+        protected override CodeFixProvider GetCSharpCodeFixProvider()
             => new AsyncSuffixFixProvider();
 
         private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)

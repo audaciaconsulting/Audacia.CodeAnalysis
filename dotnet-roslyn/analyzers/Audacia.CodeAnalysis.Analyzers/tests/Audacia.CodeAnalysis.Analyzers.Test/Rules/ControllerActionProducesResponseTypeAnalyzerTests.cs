@@ -10,7 +10,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
     [TestClass]
     public class ControllerActionProducesResponseTypeAnalyzerTests : CodeFixVerifier
     {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() 
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
             => new ControllerActionProducesResponseTypeAnalyzer();
 
         private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
@@ -122,7 +122,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage
-                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 
@@ -154,10 +154,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     }
                 }";
             const string expectedMessage1
-                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute";
 
             const string expectedMessage2
-                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute";
 
             var expectedDiagnostics
                 = new[]
@@ -211,7 +211,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage
-                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 
@@ -262,7 +262,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage
-                = "Controller action name 'Get' has no [ProducesResponseType] attribute.";
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 

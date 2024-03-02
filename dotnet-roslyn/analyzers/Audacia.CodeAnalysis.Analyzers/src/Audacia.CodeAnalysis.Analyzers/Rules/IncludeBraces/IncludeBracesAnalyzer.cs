@@ -13,7 +13,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.IncludeBraces
     {
         public const string Id = DiagnosticId.IncludeBraces;
         private const string Title = "Code block does not have braces";
-        private const string MessageFormat = "Code block should have braces.";
+        private const string MessageFormat = "Code block should have braces";
         private const string Description = "Add braces.";
 
         private const string Category = DiagnosticCategory.Style;

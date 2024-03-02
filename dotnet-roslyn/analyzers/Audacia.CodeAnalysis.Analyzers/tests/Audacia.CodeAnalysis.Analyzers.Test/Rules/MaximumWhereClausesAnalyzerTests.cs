@@ -162,7 +162,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     }
                 }";
 
-            const string expectedMessage = "'Where' contains 4 clauses, which exceeds the maximum of 3 clauses per 'Where'.";
+            const string expectedMessage = "'Where' contains 4 clauses, which exceeds the maximum of 3 clauses per 'Where'";
             var expectedDiagnostics = BuildExpectedResult(expectedMessage, 22, 29);
 
             VerifyDiagnostic(testCode, expectedDiagnostics);

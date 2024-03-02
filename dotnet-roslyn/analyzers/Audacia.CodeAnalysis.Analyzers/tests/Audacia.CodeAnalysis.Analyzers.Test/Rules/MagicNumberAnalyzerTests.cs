@@ -16,7 +16,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = MagicNumberAnalyzer.Id,
-                Message = "Variable declaration for 'testVar' should not use a magic number.",
+                Message = "Variable declaration for 'testVar' should not use a magic number",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -29,7 +29,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostics_For_Empty_Code()
         {
             var test = @"";
-            
+
             VerifyNoDiagnostic(test);
         }
 
@@ -127,7 +127,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 
             VerifyDiagnostic(test, expected);
         }
-        
+
         [TestMethod]
         public void Diagnostic_For_Variable_With_Partial_Magic_Number_Assignment_But_Also_Const_Field()
         {

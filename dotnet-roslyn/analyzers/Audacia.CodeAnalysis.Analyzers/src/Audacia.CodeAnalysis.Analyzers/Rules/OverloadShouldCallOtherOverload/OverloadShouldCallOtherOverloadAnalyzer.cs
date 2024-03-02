@@ -36,21 +36,24 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
         private const string Title = "Method overload should call another overload";
 
         private const string MessageFormat =
-            "Parameter order in '{0}' does not match with the parameter order of the longest overload.";
+            "Parameter order in '{0}' does not match with the parameter order of the longest overload";
 
-        private const string InvokeMessageFormat = "Overloaded method '{0}' should call another overload.";
+        private const string InvokeMessageFormat = "Overloaded method '{0}' should call another overload";
 
-        private const string MakeVirtualMessageFormat = "Method overload with the most parameters should be virtual.";
+        private const string MakeVirtualMessageFormat = "Method overload with the most parameters should be virtual";
 
         private const string OrderMessageFormat =
-            "Parameter order in '{0}' does not match with the parameter order of the longest overload.";
+            "Parameter order in '{0}' does not match with the parameter order of the longest overload";
 
         private const string Description = "Call the more overloaded method from other overloads.";
         private const string Category = DiagnosticCategory.Maintainability;
         private const DiagnosticSeverity Serverity = DiagnosticSeverity.Warning;
-        
+
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
-        
+
+        private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction =
+            RegisterCompilationStart;
+
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             Id,
             Title,
@@ -60,7 +63,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
             isEnabledByDefault: true,
             Description,
             HelpLinkUrl);
-        private static readonly Action<CompilationStartAnalysisContext> RegisterCompilationStartAction = RegisterCompilationStart;
 
         private static readonly DiagnosticDescriptor MakeVirtualRule = new DiagnosticDescriptor(Id, Title,
             MakeVirtualMessageFormat, Category, DiagnosticSeverity.Warning, true, Description);
@@ -71,7 +73,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
         private static readonly DiagnosticDescriptor InvokeRule = new DiagnosticDescriptor(Id, Title,
             InvokeMessageFormat, Category, DiagnosticSeverity.Warning, true, Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+            ImmutableArray.Create(Rule, MakeVirtualRule, OrderRule, InvokeRule);
 
         private static readonly ImmutableArray<MethodKind> RegularMethodKinds = new[]
         {
@@ -115,8 +118,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
                 return;
             }
 
-            IGrouping<string, IMethodSymbol>[] methodGroups = GetRegularMethodsInTypeHierarchy(type, context.CancellationToken)
-                .GroupBy(method => method.Name).Where(HasAtLeastTwoItems).ToArray();
+            IGrouping<string, IMethodSymbol>[] methodGroups =
+                GetRegularMethodsInTypeHierarchy(type, context.CancellationToken)
+                    .GroupBy(method => method.Name).Where(HasAtLeastTwoItems).ToArray();
 
             foreach (IGrouping<string, IMethodSymbol> methodGroup in methodGroups)
             {
@@ -127,9 +131,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
         }
 
         private static IEnumerable<IMethodSymbol> GetRegularMethodsInTypeHierarchy(INamedTypeSymbol type,
-           CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
-            return EnumerateSelfWithBaseTypes(type).SelectMany(nextType => GetRegularMethodsInType(nextType, cancellationToken))
+            return EnumerateSelfWithBaseTypes(type)
+                .SelectMany(nextType => GetRegularMethodsInType(nextType, cancellationToken))
                 .ToArray();
         }
 
@@ -142,7 +147,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
         }
 
         private static IEnumerable<IMethodSymbol> GetRegularMethodsInType(INamedTypeSymbol type,
-           CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             return type.GetMembers().OfType<IMethodSymbol>().Where(method => IsRegularMethod(method, cancellationToken))
                 .ToArray();
@@ -152,7 +157,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
         {
             var test = method.GetAttributes();
             return RegularMethodKinds.Contains(method.MethodKind) && !method.IsSynthesized() &&
-                HasMethodBody(method, cancellationToken) && !method.IsControllerAction();
+                   HasMethodBody(method, cancellationToken) && !method.IsControllerAction();
         }
 
         private static bool HasMethodBody(IMethodSymbol method, CancellationToken cancellationToken)
@@ -219,7 +224,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
         private static bool InvokesAnotherOverload(IMethodSymbol methodToAnalyze,
             MethodInvocationWalker invocationWalker, SymbolAnalysisContext context)
         {
-            IOperation operation = methodToAnalyze.TryGetOperationBlockForMethod(context.Compilation, context.CancellationToken);
+            IOperation operation =
+                methodToAnalyze.TryGetOperationBlockForMethod(context.Compilation, context.CancellationToken);
 
             if (operation != null)
             {
@@ -242,9 +248,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
 
         private static bool CanBeMadeVirtual(IMethodSymbol method)
         {
-            return !method.IsStatic && method.DeclaredAccessibility != Accessibility.Private && !method.ContainingType.IsSealed &&
-                method.ContainingType.TypeKind != TypeKind.Struct && !method.IsVirtual && !method.IsOverride &&
-                !method.ExplicitInterfaceImplementations.Any();
+            return !method.IsStatic && method.DeclaredAccessibility != Accessibility.Private &&
+                   !method.ContainingType.IsSealed &&
+                   method.ContainingType.TypeKind != TypeKind.Struct && !method.IsVirtual && !method.IsOverride &&
+                   !method.ExplicitInterfaceImplementations.Any();
         }
 
         private static void CompareOrderOfParameters(IMethodSymbol method, IMethodSymbol longestOverload,
@@ -263,7 +270,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
             List<IParameterSymbol> parametersInLongestOverload)
         {
             return AreRegularParametersDeclaredInSameOrder(method, parametersInLongestOverload) &&
-                AreDefaultParametersDeclaredInSameOrder(method, parametersInLongestOverload);
+                   AreDefaultParametersDeclaredInSameOrder(method, parametersInLongestOverload);
         }
 
         private static bool AreRegularParametersDeclaredInSameOrder(IMethodSymbol method,
@@ -285,7 +292,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
         private static bool AreDefaultParametersDeclaredInSameOrder(IMethodSymbol method,
             List<IParameterSymbol> parametersInLongestOverload)
         {
-            List<IParameterSymbol> defaultParametersInMethod = method.Parameters.Where(IsParameterWithDefaultValue).ToList();
+            List<IParameterSymbol> defaultParametersInMethod =
+                method.Parameters.Where(IsParameterWithDefaultValue).ToList();
 
             List<IParameterSymbol> defaultParametersInLongestOverload =
                 parametersInLongestOverload.Where(IsParameterWithDefaultValue).ToList();
@@ -305,7 +313,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
             {
                 string parameterName = parameters[parameterIndex].Name;
 
-                int indexInLongestOverload = parametersInLongestOverload.FindIndex(parameter => parameter.Name == parameterName);
+                int indexInLongestOverload =
+                    parametersInLongestOverload.FindIndex(parameter => parameter.Name == parameterName);
 
                 if (indexInLongestOverload != -1 && indexInLongestOverload != parameterIndex)
                 {
@@ -386,6 +395,5 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload
                 }
             }
         }
-
     }
 }

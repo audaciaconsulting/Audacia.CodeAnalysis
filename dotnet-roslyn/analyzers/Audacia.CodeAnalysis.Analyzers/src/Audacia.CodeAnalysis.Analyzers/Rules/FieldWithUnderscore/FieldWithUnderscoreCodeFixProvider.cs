@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.Options;
 using Microsoft.CodeAnalysis.Rename;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.FieldWithUnderscore
@@ -36,8 +37,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.FieldWithUnderscore
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var symbol = semanticModel.GetDeclaredSymbol(declaration.Parent, cancellationToken);
             var solution = document.Project.Solution;
-
-            return await Renamer.RenameSymbolAsync(solution, symbol, newName, solution.Workspace.Options, cancellationToken).ConfigureAwait(false);
+            return await Renamer.RenameSymbolAsync(solution, symbol, new SymbolRenameOptions(), newName, cancellationToken).ConfigureAwait(false);
         }
 	}
 }
