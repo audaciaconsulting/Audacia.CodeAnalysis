@@ -678,7 +678,7 @@ Maximum allowed clauses can be configured in `.editorconfig` by setting `dotnet_
 </tr>
 </table>
 
-ACL1013 checks for classes that are suitable to be replaced with record types. It will raise a warning if a type with a particular suffix is declared as a `class`.
+ACL1013 checks for classes that are suitable to be replaced with record types in projects with a language version of >= C#9. It will raise a warning if a type with a particular suffix is declared as a `class`.
 
 Code with diagnostic:
 
