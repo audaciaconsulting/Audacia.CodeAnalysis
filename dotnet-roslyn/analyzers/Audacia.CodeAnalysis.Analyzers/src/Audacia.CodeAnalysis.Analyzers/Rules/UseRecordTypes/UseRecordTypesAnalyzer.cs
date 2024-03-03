@@ -64,6 +64,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseRecordTypes
 
         private void CompilationStartRegistration(CompilationStartAnalysisContext context)
         {
+            if (context.Compilation is CSharpCompilation cSharpCompilation &&
+                cSharpCompilation.LanguageVersion < LanguageVersion.CSharp9)
+            {
+                // record types were introduced in C# 9
+                return;
+            }
+
             // We don't want to reinitialize if the ISettingsReader object was injected as that means we're in a unit test
             if (_settingsReader == null || !_isSettingsReaderInjected)
             {
@@ -103,9 +110,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseRecordTypes
             var syntaxTree = context.Compilation.SyntaxTrees.FirstOrDefault();
             if (syntaxTree != null)
             {
+                const string defaultForbiddenSuffix = "Dto";
                 var forbiddenSuffixes = _settingsReader
                     .TryGetValue(syntaxTree, new SettingsKey(Id, IncludedSuffixesSetting))
-                    ?.Split(',') ?? new[] { "Dto" };
+                    ?.Split(',')
+                    .Select(suffix => suffix.Trim())?? new[] { defaultForbiddenSuffix };
 
                 // Case-sensitive comparison
                 forbiddenSuffix = forbiddenSuffixes.FirstOrDefault(suffix =>
