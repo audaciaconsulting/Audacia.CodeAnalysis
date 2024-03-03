@@ -4,6 +4,7 @@ using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -13,6 +14,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 [TestClass]
 public class UseRecordTypesAnalyzerTests : CodeFixVerifier
 {
+    public UseRecordTypesAnalyzerTests()
+    {
+        ParseOptions = new CSharpParseOptions(LanguageVersion.Latest);
+    }
+
     private readonly Mock<ISettingsReader> _mockSettingsReader = new Mock<ISettingsReader>();
 
     private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string typeName, string suffix)
@@ -140,6 +146,23 @@ namespace ConsoleApplication1
                 It.IsAny<SyntaxTree>(),
                 new SettingsKey(UseRecordTypesAnalyzer.Id, UseRecordTypesAnalyzer.IncludedSuffixesSetting)))
             .Returns("Request");
+
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeNameDto
+    {
+    }
+}";
+
+        VerifyNoDiagnostic(test);
+    }
+
+    [TestMethod]
+    public void No_Diagnostic_If_Using_Unsupported_Language_Version()
+    {
+        // Set the C# language version to a version before records were introduced
+        ParseOptions = new CSharpParseOptions(LanguageVersion.CSharp8);
 
         const string test = @"
 namespace ConsoleApplication1
