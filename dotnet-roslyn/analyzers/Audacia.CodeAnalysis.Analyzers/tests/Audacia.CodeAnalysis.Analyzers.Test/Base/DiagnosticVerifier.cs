@@ -21,7 +21,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
-
         internal static CompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.ConsoleApplication);
         internal static CSharpParseOptions ParseOptions = CSharpParseOptions.Default;
         internal static string DefaultFilePathPrefix = "Test";
