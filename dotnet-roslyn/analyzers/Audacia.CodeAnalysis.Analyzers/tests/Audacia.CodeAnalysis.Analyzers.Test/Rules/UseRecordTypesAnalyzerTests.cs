@@ -3,6 +3,7 @@ using Audacia.CodeAnalysis.Analyzers.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -10,7 +11,7 @@ using Moq;
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 
 [TestClass]
-public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
+public class UseRecordTypesAnalyzerTests : CodeFixVerifier
 {
     private readonly Mock<ISettingsReader> _mockSettingsReader = new Mock<ISettingsReader>();
 
@@ -22,7 +23,8 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
             Message = $"Type '{typeName}' has suffix '{suffix}', which should be record types",
             Severity = DiagnosticSeverity.Warning,
             Locations =
-                new[] {
+                new[]
+                {
                     new DiagnosticResultLocation("Test0.cs", lineNumber, column)
                 }
         };
@@ -33,19 +35,24 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
         return new UseRecordTypesAnalyzer(_mockSettingsReader.Object);
     }
 
+    protected override CodeFixProvider GetCSharpCodeFixProvider()
+    {
+        return new UseRecordTypesCodeFixProvider();
+    }
+
     [TestMethod]
     public void No_Diagnostic_If_Method_Uses_Suffix()
     {
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
     {
-        class TypeName
+        private void MethodNameDto()
         {
-            private void MethodNameDto()
-            {
-            }
         }
-    }";
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -53,13 +60,13 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
     [TestMethod]
     public void No_Diagnostic_If_Record_Uses_Suffix()
     {
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    record TypeNameDto
     {
-        record TypeNameDto
-        {
-        }
-    }";
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -67,14 +74,14 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
     [TestMethod]
     public void No_Diagnostic_If_Property_Uses_Suffix()
     {
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
     {
-        class TypeName
-        {
-            public string PropertyNameDto { get; set; }
-        }
-    }";
+        public string PropertyNameDto { get; set; }
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -82,13 +89,13 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
     [TestMethod]
     public void No_Diagnostic_If_Interface_Uses_Suffix()
     {
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    interface ITypeNameDto
     {
-        interface ITypeNameDto
-        {
-        }
-    }";
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -96,13 +103,13 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
     [TestMethod]
     public void No_Diagnostic_If_Class_Uses_Suffix_To_Lowercase()
     {
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeNamedto
     {
-        class TypeNamedto
-        {
-        }
-    }";
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -115,13 +122,13 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
                 new SettingsKey(UseRecordTypesAnalyzer.Id, UseRecordTypesAnalyzer.IncludedSuffixesSetting)))
             .Returns("Command");
 
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeNameRequest
     {
-        class TypeNameRequest
-        {
-        }
-    }";
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -134,88 +141,159 @@ public class UseRecordTypesAnalyzerTests : DiagnosticVerifier
                 new SettingsKey(UseRecordTypesAnalyzer.Id, UseRecordTypesAnalyzer.IncludedSuffixesSetting)))
             .Returns("Request");
 
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeNameDto
     {
-        class TypeNameDto
-        {
-        }
-    }";
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
 
     [TestMethod]
-    public void Diagnostic_If_Class_Uses_Suffix()
+    public void Diagnostic_And_Code_Fix_If_Class_Uses_Suffix()
     {
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeNameDto
     {
-        class TypeNameDto
-        {
-        }
-    }";
+    }
+}";
 
-        var expected = BuildExpectedResult(4, 9, "TypeNameDto", "Dto");
+        var expected = BuildExpectedResult(
+            lineNumber: 4, column: 5, "TypeNameDto", "Dto");
 
         VerifyDiagnostic(test, expected);
+
+        const string fixedTestCode = @"
+namespace ConsoleApplication1
+{
+    record TypeNameDto
+    {
+    }
+}";
+        VerifyCodeFix(test, fixedTestCode);
     }
 
     [TestMethod]
-    public void Diagnostic_If_Class_Uses_Suffix_Provided_In_Settings()
+    public void Diagnostic_And_Code_Fix_If_Class_Uses_Suffix_Provided_In_Settings()
     {
         _mockSettingsReader.Setup(settings => settings.TryGetValue(
                 It.IsAny<SyntaxTree>(),
                 new SettingsKey(UseRecordTypesAnalyzer.Id, UseRecordTypesAnalyzer.IncludedSuffixesSetting)))
-            .Returns("Command");
+            .Returns("Command,Request");
 
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeNameCommand
     {
-        class TypeNameCommand
-        {
-        }
-    }";
+    }
+}";
 
-        var expected = BuildExpectedResult(4, 9, "TypeNameCommand", "Command");
+        var expected = BuildExpectedResult(
+            lineNumber: 4, column: 5, "TypeNameCommand", "Command");
 
         VerifyDiagnostic(test, expected);
+
+        const string fixedTestCode = @"
+namespace ConsoleApplication1
+{
+    record TypeNameCommand
+    {
+    }
+}";
+        VerifyCodeFix(test, fixedTestCode);
     }
 
     [TestMethod]
-    public void Diagnostic_If_Class_Name_Matches_Suffix_Exactly()
+    public void Diagnostic_And_Code_Fix_If_Class_Name_Matches_Suffix_Exactly()
     {
         _mockSettingsReader.Setup(settings => settings.TryGetValue(
                 It.IsAny<SyntaxTree>(),
                 new SettingsKey(UseRecordTypesAnalyzer.Id, UseRecordTypesAnalyzer.IncludedSuffixesSetting)))
             .Returns("TypeName");
 
-        var test = @"
-    namespace ConsoleApplication1
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
     {
-        class TypeName
-        {
-        }
-    }";
+    }
+}";
 
-        var expected = BuildExpectedResult(4, 9, "TypeName", "TypeName");
+        var expected = BuildExpectedResult(
+            lineNumber: 4, column: 5, "TypeName", "TypeName");
 
         VerifyDiagnostic(test, expected);
+
+        const string fixedTestCode = @"
+namespace ConsoleApplication1
+{
+    record TypeName
+    {
+    }
+}";
+        VerifyCodeFix(test, fixedTestCode);
     }
 
     [TestMethod]
-    public void Diagnostic_If_Class_With_Generic_Argument_Has_Suffix()
+    public void Diagnostic_And_Code_Fix_For_Class_With_Primary_Constructor()
     {
-        var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeNameDto<T>
-        {
-        }
-    }";
+        _mockSettingsReader.Setup(settings => settings.TryGetValue(
+                It.IsAny<SyntaxTree>(),
+                new SettingsKey(UseRecordTypesAnalyzer.Id, UseRecordTypesAnalyzer.IncludedSuffixesSetting)))
+            .Returns("TypeName");
 
-        var expected = BuildExpectedResult(4, 9, "TypeNameDto", "Dto");
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeName(int Property1, int Property2)
+    {
+    }
+}";
+
+        var expected = BuildExpectedResult(
+            lineNumber: 4, column: 5, "TypeName", "TypeName");
 
         VerifyDiagnostic(test, expected);
+
+        const string fixedTestCode = @"
+namespace ConsoleApplication1
+{
+    record TypeName(int Property1, int Property2)
+    {
+    }
+}";
+        VerifyCodeFix(test, fixedTestCode);
+    }
+
+    [TestMethod]
+    public void Diagnostic_And_Code_Fix_If_Class_With_Generic_Argument_Has_Suffix()
+    {
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeNameDto<T>
+    {
+    }
+}";
+
+        var expected = BuildExpectedResult(
+            lineNumber: 4, column: 5, "TypeNameDto", "Dto");
+
+        VerifyDiagnostic(test, expected);
+
+        const string fixedTestCode = @"
+namespace ConsoleApplication1
+{
+    record TypeNameDto<T>
+    {
+    }
+}";
+        VerifyCodeFix(test, fixedTestCode);
     }
 }
