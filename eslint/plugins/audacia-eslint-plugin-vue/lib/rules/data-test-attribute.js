@@ -149,7 +149,8 @@ module.exports = {
     }
 
     function getDataTestAttribute(element) {
-      const attrName = configuration.testAttribute;
+      // Vue ESLint parser converts attribute name to lower case.
+      const attrName = configuration.testAttribute.toLowerCase();
 
       const dataAttr = utils.getAttribute(element, attrName)
           || utils.getDirective(element, 'bind', attrName);
