@@ -23,11 +23,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Common
             switch (diagnosticId)
             {
                 case DiagnosticId.FieldWithUnderscore:
-                    return $"{helpLinkUrlPrefix}variable-declarations-should-not-use-a-magic-number";
+                    return $"{helpLinkUrlPrefix}private-fields-should-be-prefixed-with-an-underscore";
                 case DiagnosticId.MagicNumber:
-                    return $"{helpLinkUrlPrefix}methods-should-not-exceed-a-predefined-number-of-statements";
+                    return $"{helpLinkUrlPrefix}variable-declarations-should-not-use-a-magic-number";
                 case DiagnosticId.MethodLength:
-                    return $"{helpLinkUrlPrefix}dont-declare-signatures-with-more-than-a-predefined-number-of-parameters";
+                    return $"{helpLinkUrlPrefix}methods-should-not-exceed-a-predefined-number-of-statements";
                 case DiagnosticId.ParameterCount:
                     return $"{helpLinkUrlPrefix}dont-declare-signatures-with-more-than-a-predefined-number-of-parameters";
                 case DiagnosticId.NoAbbreviations:
@@ -48,11 +48,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Common
                     return $"{helpLinkUrlPrefix}dont-nest-too-many-control-statements";
                 case DiagnosticId.MaximumWhereClauses:
                     return $"{helpLinkUrlPrefix}dont-pass-predicates-into-where-methods-with-too-many-clauses";
+                case DiagnosticId.UseRecordTypes:
+                    return $"{helpLinkUrlPrefix}use-record-types";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),
                         $"No help link has been set up for diagnostic id {diagnosticId}");
-                
+
             }
         }
     }

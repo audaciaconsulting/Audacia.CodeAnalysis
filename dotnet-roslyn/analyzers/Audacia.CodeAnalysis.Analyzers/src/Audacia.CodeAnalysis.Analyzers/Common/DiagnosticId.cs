@@ -15,5 +15,6 @@
         public const string NullableReferenceTypesEnabled = "ACL1010";
         public const string NestedControlStatements = "ACL1011";
         public const string MaximumWhereClauses = "ACL1012";
+        public const string UseRecordTypes = "ACL1013";
     }
 }
