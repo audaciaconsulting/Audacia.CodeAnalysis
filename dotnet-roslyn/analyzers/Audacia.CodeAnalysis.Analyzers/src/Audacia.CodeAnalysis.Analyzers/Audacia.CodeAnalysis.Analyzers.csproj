@@ -2,6 +2,8 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <IncludeBuildOutput>false</IncludeBuildOutput>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -15,7 +17,7 @@
         <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>package-icon.png</PackageIcon>
-        <Version>1.7.3</Version>
+        <Version>1.7.4</Version>
     </PropertyGroup>
 
     <ItemGroup>

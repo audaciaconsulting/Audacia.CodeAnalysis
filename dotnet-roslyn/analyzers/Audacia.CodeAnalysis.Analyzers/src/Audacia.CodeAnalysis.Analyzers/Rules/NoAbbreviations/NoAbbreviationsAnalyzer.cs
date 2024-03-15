@@ -20,11 +20,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
         public const string AllowedLoopVariablesSetting = "allowed_loop_variables";
 
         private const string Title = "Identifier contains an abbreviation or is too short";
-        private const string MessageFormat = "{0} '{1}' should have a more descriptive name.";
+        private const string MessageFormat = "{0} '{1}' should have a more descriptive name";
         private const string Description = "Don't use abbreviations.";
 
         private const string Category = DiagnosticCategory.Naming;
-        
+
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
@@ -58,7 +58,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
         private readonly Action<SyntaxNodeAnalysisContext> _analyzeLetClauseAction = AnalyzeLetClause;
         private readonly bool _isSettingsReaderInjected;
         private ISettingsReader _settingsReader;
-        
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         public NoAbbreviationsAnalyzer()
@@ -126,7 +126,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
         private void AnalyzeNamedType(SymbolAnalysisContext context)
         {
             var type = (INamedTypeSymbol)context.Symbol;
-            
+
             if (type.IsSynthesized())
             {
                 return;

@@ -20,7 +20,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = MethodLengthAnalyzer.Id,
-                Message = $"Method '{memberName}' contains {statementCount} statements, which exceeds the maximum of {maxStatementCount} statements.",
+                Message = $"Method '{memberName}' contains {statementCount} statements, which exceeds the maximum of {maxStatementCount} statements",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -72,7 +72,7 @@ namespace TestNamespace
 
             VerifyNoDiagnostic(test);
         }
-        
+
         [TestMethod]
         public void No_Diagnostics_For_Method_Body_Equal_To_Max_Allowed_Statements_With_Additional_Logging_Statements()
         {
@@ -121,7 +121,7 @@ namespace TestNamespace
 
             VerifyNoDiagnostic(test);
         }
-        
+
         [TestMethod]
         public void Diagnostics_For_Method_Body_Equal_To_Max_Allowed_Statements_With_Additional_Logging_Statements()
         {
@@ -637,7 +637,7 @@ namespace TestNamespace
         }
     }
 }";
-            
+
             var expected = BuildExpectedResult(
                 memberName: "TestClass.TestMethod()",
                 lineNumber: 6,

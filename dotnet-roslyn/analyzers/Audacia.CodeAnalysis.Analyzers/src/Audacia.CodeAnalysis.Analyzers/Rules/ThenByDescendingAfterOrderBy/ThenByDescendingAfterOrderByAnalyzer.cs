@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Linq;
+using Microsoft.CodeAnalysis.Rename;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy
 {
@@ -15,10 +16,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy
 
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
-        private const string Title = "OrderByDescending statement follows OrderBy or OrderByDescending statement.";
-        private const string MessageFormat = "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement.";
+        private const string Title = "OrderByDescending statement follows OrderBy or OrderByDescending statement";
+        private const string MessageFormat = "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
         private const string Description = "Use ThenOrderByDescending rather than OrderByDescending.";
-        
+
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, Description, HelpLinkUrl);
@@ -35,7 +36,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node.Kind() != SyntaxKind.InvocationExpression)
+            if (!context.Node.IsKind(SyntaxKind.InvocationExpression))
             {
                 return;
             }
