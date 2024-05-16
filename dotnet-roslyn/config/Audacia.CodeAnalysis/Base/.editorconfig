@@ -54,6 +54,9 @@ dotnet_diagnostic.ACL1012.max_where_clauses = 3
 # [Usage] ACL1013: Use record types
 dotnet_diagnostic.ACL1013.severity = warning
 
+# [Naming] ACL1014: Don't include numbers in identifiers
+dotnet_diagnostic.ACL1014.severity = warning
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
