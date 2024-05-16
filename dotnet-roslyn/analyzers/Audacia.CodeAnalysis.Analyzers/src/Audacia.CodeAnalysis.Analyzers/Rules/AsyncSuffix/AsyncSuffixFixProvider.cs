@@ -46,7 +46,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AsyncSuffix
             var solution = document.Project.Solution;
 
             return await Renamer
-                .RenameSymbolAsync(solution, symbol, newName, solution.Workspace.Options, cancellationToken)
+                .RenameSymbolAsync(solution, symbol, new SymbolRenameOptions(), newName, cancellationToken)
                 .ConfigureAwait(false);
         }
     }

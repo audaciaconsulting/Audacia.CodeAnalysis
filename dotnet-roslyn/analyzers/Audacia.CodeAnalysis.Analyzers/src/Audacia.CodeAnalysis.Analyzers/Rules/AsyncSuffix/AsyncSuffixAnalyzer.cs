@@ -14,16 +14,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AsyncSuffix
 
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
-        private const string MessageFormat = "Asynchronous method name '{0}' is not suffixed with 'Async'.";
+        private const string MessageFormat = "Asynchronous method name '{0}' is not suffixed with 'Async'";
 
-        private const string Title = "Asynchronous method name is not suffixed with 'Async'.";
+        private const string Title = "Asynchronous method name is not suffixed with 'Async'";
 
         private const string Description = "Asynchronous method names should be suffixed with 'Async'.";
-        
+
         private const string Category = DiagnosticCategory.Naming;
 
         private const bool IsEnabled = true;
-        
+
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule

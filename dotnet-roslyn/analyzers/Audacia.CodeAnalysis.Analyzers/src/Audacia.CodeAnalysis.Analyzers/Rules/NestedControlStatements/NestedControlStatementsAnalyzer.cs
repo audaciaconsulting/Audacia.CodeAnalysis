@@ -22,12 +22,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
 
         private const string Title = "Signature contains too many nested control flow statements";
 
-        private const string MessageFormat = "{0} contains {1} nested control flow statements, which exceeds the maximum of {2} nested control flow statements.";
+        private const string MessageFormat = "{0} contains {1} nested control flow statements, which exceeds the maximum of {2} nested control flow statements";
 
         private const string Description = "Don't nest too many control statements.";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
-        
+
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
@@ -130,8 +130,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
 
         private static void ReportAtContainingSymbol(int depth, int maxDepth, SyntaxNodeAnalysisContext context, SyntaxNode node)
         {
-            string kind = node.Kind().ToString(); 
-            var location = node.GetLocation(); 
+            string kind = node.Kind().ToString();
+            var location = node.GetLocation();
 
             context.ReportDiagnostic(Diagnostic.Create(Rule, location, kind, depth, maxDepth));
         }

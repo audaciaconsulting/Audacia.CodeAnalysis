@@ -265,7 +265,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement.";
+                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
             // this diagnostic gets raised twice for some reason, not sure why but have decided it's not worth fixing
             var expectedDiagnostics = new[]
@@ -307,7 +307,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement.";
+                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 58);
 
@@ -344,7 +344,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement.";
+                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 83);
 
@@ -381,7 +381,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement.";
+                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 68);
 
@@ -418,7 +418,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 }";
 
             const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement.";
+                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
             var expectedDiagnostics
                 = new[]

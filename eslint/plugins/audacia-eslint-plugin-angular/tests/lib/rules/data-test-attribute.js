@@ -104,6 +104,12 @@ ruleTester.run("data-test-attribute", rule, {
             code: '<template><div data-other-attribute="test-id" (click)="foobar()"></div></template>',
             options: [{ testAttribute: 'data-other-attribute' }],
         },
+        // custom attribute (click) events (camel case)
+        {
+            name: '(click) with custom test attribute',
+            code: '<template><div (click)="foobar()" dataOtherAttribute="test-id"></div></template>',
+            options: [{ testAttribute: 'dataOtherAttribute' }],
+        },
         // custom attribute using on style
         {
             name: 'onclick with custom test attribute',
@@ -120,6 +126,12 @@ ruleTester.run("data-test-attribute", rule, {
             name: 'input element with custom test attribute',
             code: '<template><input data-other-attribute="test-id"/></template>',
             options: [{ testAttribute: 'data-other-attribute' }]
+        },
+        // custom attribute input elements (camel case)
+        {
+            name: 'input element with custom test attribute',
+            code: '<template><input dataOtherAttribute="test-id"/></template>',
+            options: [{ testAttribute: 'dataOtherAttribute' }]
         },
         // child input elements
         {
@@ -319,7 +331,6 @@ ruleTester.run("data-test-attribute", rule, {
             errors: ["Elements with click events should include a 'data-other-attribute' attribute"],
             output: '<template><div data-other-attribute="test-id" (click)="foobar()"></div></template>',
             options: [{ enableFixer: true, testAttribute: 'data-other-attribute' }],
-
         },
         {
             name: '(click) event with no value in custom test attribute',
@@ -348,6 +359,14 @@ ruleTester.run("data-test-attribute", rule, {
             errors: ["Elements with click events should include a 'data-other-attribute' attribute"],
             output: '<template><div data-other-attribute="test-id" (click)="foobar()"></div></template>',
             options: [{ enableFixer: true, testAttribute: 'data-other-attribute' }]
+        },
+        // custom attribute (click) events (camel case)
+        {
+            name: '(click) event without custom test attribute',
+            code: '<template><div (click)="foobar()"></div></template>',
+            errors: ["Elements with click events should include a 'dataOtherAttribute' attribute"],
+            output: '<template><div dataOtherAttribute="test-id" (click)="foobar()"></div></template>',
+            options: [{ enableFixer: true, testAttribute: 'dataOtherAttribute' }],
         }
     ],
 });
