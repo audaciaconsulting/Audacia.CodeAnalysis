@@ -26,7 +26,7 @@ public class UseRecordTypesAnalyzerTests : CodeFixVerifier
         return new DiagnosticResult
         {
             Id = UseRecordTypesAnalyzer.Id,
-            Message = $"Type '{typeName}' has suffix '{suffix}', which should be record types",
+            Message = $"Type '{typeName}' has suffix '{suffix}', which should be a record type",
             Severity = DiagnosticSeverity.Warning,
             Locations =
                 new[]
@@ -146,6 +146,25 @@ namespace ConsoleApplication1
                 It.IsAny<SyntaxTree>(),
                 new SettingsKey(UseRecordTypesAnalyzer.Id, UseRecordTypesAnalyzer.IncludedSuffixesSetting)))
             .Returns("Request");
+
+        const string test = @"
+namespace ConsoleApplication1
+{
+    class TypeNameDto
+    {
+    }
+}";
+
+        VerifyNoDiagnostic(test);
+    }
+
+    [TestMethod]
+    public void No_Diagnostic_If_Editor_Config_Specified_Invalid_Character()
+    {
+        _mockSettingsReader.Setup(settings => settings.TryGetValue(
+                It.IsAny<SyntaxTree>(),
+                new SettingsKey(UseRecordTypesAnalyzer.Id, UseRecordTypesAnalyzer.IncludedSuffixesSetting)))
+            .Returns(".");
 
         const string test = @"
 namespace ConsoleApplication1
