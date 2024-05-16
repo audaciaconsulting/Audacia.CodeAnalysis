@@ -50,6 +50,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Common
                     return $"{helpLinkUrlPrefix}dont-pass-predicates-into-where-methods-with-too-many-clauses";
                 case DiagnosticId.UseRecordTypes:
                     return $"{helpLinkUrlPrefix}use-record-types";
+                case DiagnosticId.DoNotUseNumberInIdentifierName:
+                    return $"{helpLinkUrlPrefix}do-not-include-numbers-in-identifier-name";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),

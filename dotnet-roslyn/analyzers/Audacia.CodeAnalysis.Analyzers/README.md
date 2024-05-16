@@ -714,7 +714,7 @@ Note the following:
 - The diagnostic `Dto`s is removed unless explicitly included above.
 - The suffixes are case-sensitive, in case another word happens to end with the same letters.
 
-## ACL1014 - Don't include numbers in identifiers
+## ACL1014 - Do not include numbers in identifier name
 
 
 <table>
