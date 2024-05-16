@@ -141,8 +141,8 @@ dotnet_diagnostic.AV1568.severity = suggestion
 # Write code that is easy to debug
 dotnet_diagnostic.AV1580.severity = suggestion
 
-# Don't include numbers in variables, parameters and type members
-dotnet_diagnostic.AV1704.severity = warning
+# Don't include numbers in variables, parameters and type members *** Suppressed as covered by the more configurable ACL1014 ***
+dotnet_diagnostic.AV1704.severity = none
 
 # Don't use abbreviations *** Suppressed as covered by the more configurable ACL1004 ***
 dotnet_diagnostic.AV1706.severity = none
