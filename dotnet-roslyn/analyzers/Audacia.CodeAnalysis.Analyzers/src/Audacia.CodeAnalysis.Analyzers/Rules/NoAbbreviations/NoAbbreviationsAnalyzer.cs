@@ -169,11 +169,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
             AnalyzeTypeAsTuple(localFunction.Symbol.ReturnType, context.ReportDiagnostic);
         }
 
-        private void AnalyzeParameter(SymbolAnalysisContext context)
+        private void AnalyzeParameter(SyntaxNodeAnalysisContext context)
         {
-            var parameter = (IParameterSymbol)context.Symbol;
+            var parameter = (IParameterSymbol)context.SemanticModel.GetDeclaredSymbol(context.Node);
 
-            if (parameter.ContainingSymbol.IsOverride || parameter.IsSynthesized())
+            if (parameter.IsOverride || parameter.IsSynthesized())
             {
                 return;
             }
