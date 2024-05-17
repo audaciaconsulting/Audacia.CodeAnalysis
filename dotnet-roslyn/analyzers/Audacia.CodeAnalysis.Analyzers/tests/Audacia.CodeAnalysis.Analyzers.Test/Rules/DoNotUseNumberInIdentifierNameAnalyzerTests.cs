@@ -91,7 +91,7 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     }
 
     [TestMethod]
-    public void Diagnostic_If_Numbers_Used_For_Type_Name()
+    public void Diagnostic_If_Numbers_Used_For_Class_Name()
     {
         var test = @"
     namespace ConsoleApplication
@@ -105,6 +105,100 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     }";
 
         var expected = BuildExpectedResult(4, 15, "Class", "TypeName1");
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostic_If_Numbers_Used_For_Interface_Name()
+    {
+        var test = @"
+    namespace ConsoleApplication
+    {
+        interface ITypeName1
+        {
+            private void MethodName()
+            {
+            }
+        }
+    }";
+
+        var expected = BuildExpectedResult(4, 19, "Interface", "ITypeName1");
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostic_If_Numbers_Used_For_Enum_Name()
+    {
+        var test = @"
+    namespace ConsoleApplication
+    {
+        enum TypeName1
+        {
+        }
+    }";
+
+        var expected = BuildExpectedResult(4, 14, "Enum", "TypeName1");
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostic_If_Numbers_Used_For_Struct_Name()
+    {
+        var test = @"
+    namespace ConsoleApplication
+    {
+        struct TypeName1
+        {
+        }
+    }";
+
+        var expected = BuildExpectedResult(4, 16, "Structure", "TypeName1");
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void No_Diagnostic_If_Numbers_Used_And_Word_Is_Allowed()
+    {
+        _mockSettingsReader.Setup(settings => settings.TryGetValue(
+                It.IsAny<SyntaxTree>(),
+                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting)))
+            .Returns("B2C, 365");
+
+        var test = @"
+    namespace ConsoleApplication
+    {
+        class TypeNameB2C
+        {
+        }
+        class TypeNameb2c // Case-insensitive
+        {
+        }
+    }";
+
+        VerifyNoDiagnostic(test);
+    }
+
+    [TestMethod]
+    public void Diagnostic_If_Numbers_Used_And_Word_Is_Allowed_When_Identifier_Contains_Additional_Numbers()
+    {
+        _mockSettingsReader.Setup(settings => settings.TryGetValue(
+                It.IsAny<SyntaxTree>(),
+                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting)))
+            .Returns("B2C");
+
+        var test = @"
+    namespace ConsoleApplication
+    {
+        class TypeNameB2CPart1
+        {
+        }
+    }";
+
+        var expected = BuildExpectedResult(4, 15, "Class", "TypeNameB2CPart1");
 
         VerifyDiagnostic(test, expected);
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
@@ -343,9 +344,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.DoNotUseNumberInIdentifierName
                 .Select(suffix => suffix.Trim()) ?? Array.Empty<string>();
             foreach (var allowedWord in allowedWords)
             {
-                if (text.IndexOf(allowedWord, StringComparison.OrdinalIgnoreCase) > -1)
+                var indexOfAllowedWord = text.IndexOf(allowedWord, StringComparison.OrdinalIgnoreCase);
+                if (indexOfAllowedWord > -1)
                 {
-                    text = text.Replace(allowedWord, string.Empty);
+                    // Would like to use the overload of string replace here but cannot until we're on a higher version of .NET
+                    text = $"{text.Substring(0, indexOfAllowedWord)}{text.Substring(indexOfAllowedWord + allowedWord.Length, text.Length - indexOfAllowedWord - allowedWord.Length)}";
                 }
             }
 
