@@ -4,8 +4,6 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>
 
     <PropertyGroup>

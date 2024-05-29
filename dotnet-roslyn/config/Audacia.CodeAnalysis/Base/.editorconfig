@@ -1026,17 +1026,8 @@ dotnet_diagnostic.RCS1036.severity = none
 # [REDUNDANCY] Remove trailing white-space
 dotnet_diagnostic.RCS1037.severity = none
 
-# [REDUNDANCY] Remove empty statement
-dotnet_diagnostic.RCS1038.severity = warning
-
 # [REDUNDANCY] Remove argument list from attribute
 dotnet_diagnostic.RCS1039.severity = warning
-
-# [REDUNDANCY] Remove empty else clause
-dotnet_diagnostic.RCS1040.severity = warning
-
-# [REDUNDANCY] Remove empty initializer
-dotnet_diagnostic.RCS1041.severity = warning
 
 # [REDUNDANCY] Remove enum default underlying type
 dotnet_diagnostic.RCS1042.severity = warning
@@ -1104,9 +1095,6 @@ dotnet_diagnostic.RCS1064.severity = warning
 # [STYLE] Avoid usage of while statement to create an inifinite loop
 dotnet_diagnostic.RCS1065.severity = none
 
-# [REDUNDANCY] Remove empty finally clause
-dotnet_diagnostic.RCS1066.severity = warning
-
 # [STYLE] Remove argument list from object creation expression
 dotnet_diagnostic.RCS1067.severity = warning
 
@@ -1121,9 +1109,6 @@ dotnet_diagnostic.RCS1070.severity = warning
 
 # [REDUNDANCY] Remove redundant base constructor call
 dotnet_diagnostic.RCS1071.severity = warning
-
-# [REDUNDANCY] Remove empty namespace declaration
-dotnet_diagnostic.RCS1072.severity = warning
 
 # [SIMPLIFICATION] Replace if statement with return statement
 dotnet_diagnostic.RCS1073.severity = warning
@@ -1173,9 +1158,6 @@ dotnet_diagnostic.RCS1089.severity = warning
 # [DESIGN] Call 'ConfigureAwait(false)' *** Suppress and only enforce for library code ***
 dotnet_diagnostic.RCS1090.severity = none
 
-# [REDUNDANCY] Remove empty region
-dotnet_diagnostic.RCS1091.severity = warning
-
 # [FORMATTING] Add empty line before 'while' keyword in 'do' statement
 dotnet_diagnostic.RCS1092.severity = warning
 
@@ -1214,9 +1196,6 @@ dotnet_diagnostic.RCS1104.severity = warning
 
 # [SIMPLIFICATION] Unncessary interpolation
 dotnet_diagnostic.RCS1105.severity = warning
-
-# [REDUNDANCY] Remove empty destructor
-dotnet_diagnostic.RCS1106.severity = warning
 
 # [REDUNDANCY] Remove redundant 'ToCharArray' call
 dotnet_diagnostic.RCS1107.severity = warning
