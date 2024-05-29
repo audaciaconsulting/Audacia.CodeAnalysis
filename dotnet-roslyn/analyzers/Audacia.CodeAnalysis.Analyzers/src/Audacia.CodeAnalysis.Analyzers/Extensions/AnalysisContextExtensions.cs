@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -19,23 +20,24 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             }
         }
 
-        internal static void SkipEmptyName(this SyntaxNodeAnalysisContext context, Action<SymbolAnalysisContext> action)
+        internal static void SkipEmptyName(
+            this SyntaxNodeAnalysisContext context,
+            Action<SyntaxNodeAnalysisContext> action)
         {
-            SymbolAnalysisContext symbolContext = context.ToSymbolContext();
-            symbolContext.SkipEmptyName(_ => action(symbolContext));
+            if (context.Node is ParameterSyntax parameterSyntax &&
+                !string.IsNullOrWhiteSpace(parameterSyntax.Identifier.ValueText))
+            {
+                action(context);
+            }
         }
 
-        internal static SymbolAnalysisContext ToSymbolContext(this SyntaxNodeAnalysisContext syntaxContext)
+        private static CompilationWithAnalyzers SyntaxToSymbolContext(SyntaxNodeAnalysisContext syntaxContext,
+            ISymbol symbol)
         {
-            ISymbol symbol = syntaxContext.SemanticModel.GetDeclaredSymbol(syntaxContext.Node);
-
-            return SyntaxToSymbolContext(syntaxContext, symbol);
-        }
-
-        private static SymbolAnalysisContext SyntaxToSymbolContext(SyntaxNodeAnalysisContext syntaxContext, ISymbol symbol)
-        {
-            return new SymbolAnalysisContext(symbol, syntaxContext.SemanticModel.Compilation, syntaxContext.Options,
-                syntaxContext.ReportDiagnostic, _ => true, syntaxContext.CancellationToken);
+            return new CompilationWithAnalyzers(
+                syntaxContext.SemanticModel.Compilation,
+                new ImmutableArray<DiagnosticAnalyzer>(),
+                syntaxContext.Options);
         }
 
         internal static void SkipInvalid(this OperationAnalysisContext context, Action<OperationAnalysisContext> action)
@@ -46,7 +48,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             }
         }
 
-        internal static void SkipInvalid(this OperationBlockAnalysisContext context, Action<OperationBlockAnalysisContext> action)
+        internal static void SkipInvalid(this OperationBlockAnalysisContext context,
+            Action<OperationBlockAnalysisContext> action)
         {
             if (!context.OperationBlocks.Any(block => block.HasErrors(context.Compilation, context.CancellationToken)))
             {
@@ -112,7 +115,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         /// </summary>
         internal static bool IsControllerAction(this SyntaxNodeAnalysisContext nodeAnalysisContext)
         {
-            var methodDeclarationSyntax = (MethodDeclarationSyntax) nodeAnalysisContext.Node;
+            var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
             var methodAttributes = GetMethodAttributes(methodDeclarationSyntax);
 
@@ -158,7 +161,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         /// </summary>
         internal static string GetMethodName(this SyntaxNodeAnalysisContext nodeAnalysisContext)
         {
-            var methodDeclarationSyntax = (MethodDeclarationSyntax) nodeAnalysisContext.Node;
+            var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
             var methodName = methodDeclarationSyntax.Identifier.ValueText;
 
@@ -214,7 +217,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         }
 
         /// <summary>
-        /// Determines whether a methods containing type is a controller base type 
+        /// Determines whether a methods containing type is a controller base type
         /// </summary>
         private static bool IsControllerBaseType(this SyntaxNodeAnalysisContext nodeAnalysisContext)
         {

@@ -21,8 +21,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
-        
         internal static CompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.ConsoleApplication);
+        internal static CSharpParseOptions ParseOptions = CSharpParseOptions.Default;
         internal static string DefaultFilePathPrefix = "Test";
         internal static string CSharpDefaultFileExt = "cs";
         internal static string VisualBasicDefaultExt = "vb";
@@ -81,7 +81,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         }
 
         /// <summary>
-        /// General method that gets a collection of actual diagnostics found in the source after the analyzer is run, 
+        /// General method that gets a collection of actual diagnostics found in the source after the analyzer is run,
         /// then verifies each of them.
         /// </summary>
         /// <param name="sources">An array of strings to create source documents from to run the analyzers on</param>
@@ -395,6 +395,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .CurrentSolution
                 .AddProject(projectId, TestProjectName, TestProjectName, language)
                 .WithProjectCompilationOptions(projectId, CompilationOptions)
+                .WithProjectParseOptions(projectId, ParseOptions)
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, CSharpSymbolsReference)

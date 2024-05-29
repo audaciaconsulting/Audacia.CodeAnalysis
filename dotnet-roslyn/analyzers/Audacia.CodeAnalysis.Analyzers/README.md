@@ -663,4 +663,54 @@ var filtered = myCollection
 	.Where(a => a.Property != null && a.Property.Value == 1);
 ```
 
+<<<<<<< HEAD
 Maximum allowed clauses can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1012.max_where_clauses`.
+
+## ACL1013 - Use record types
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-02.9</td>
+</tr>
+</table>
+
+ACL1013 checks for classes that are suitable to be replaced with record types in projects with a language version of >= C#9. It will raise a warning if a type with a particular suffix is declared as a `class`.
+
+Code with diagnostic:
+
+```csharp
+public class PersonDto
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+```
+
+Code without diagnostic:
+
+```csharp
+public record PersonDto
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+```
+
+By default, types suffixed with `Dto` will raise a warning. This can be configured in `.editorconfig` as below.
+
+### Included suffixes
+
+To override the default behaviour of only checking for `Dto` suffixes, you can specify what types are checked in your `.editorconfig` as follows:
+
+```
+dotnet_diagnostic.ACL1013.included_suffixes = Command,Request
+```
+
+Note the following:
+- The diagnostic `Dto`s is removed unless explicitly included above.
+- The suffixes are case-sensitive, in case another word happens to end with the same letters.

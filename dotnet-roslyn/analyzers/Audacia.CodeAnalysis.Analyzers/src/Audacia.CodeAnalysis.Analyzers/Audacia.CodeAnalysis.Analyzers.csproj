@@ -4,6 +4,8 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -17,12 +19,12 @@
         <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>package-icon.png</PackageIcon>
-        <Version>1.7.4</Version>
+        <Version>1.8.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.5.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all" />
         <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
     </ItemGroup>
 
