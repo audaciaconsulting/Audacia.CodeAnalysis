@@ -1494,6 +1494,39 @@ dotnet_diagnostic.RCS1240.severity = warning
 # [DESIGN] Implement non-generic counterpart
 dotnet_diagnostic.RCS1241.severity = warning
 
+# Remove unnecessary braces from record declaration
+dotnet_diagnostic.RCS1251.severity = warning
+
+# Normalize format of enum flag value
+dotnet_diagnostic.RCS1254.severity = warning
+
+# Use enum field explicitly
+dotnet_diagnostic.RCS1257.severity = warning
+
+# Unnecessary enum flag
+dotnet_diagnostic.RCS1258.severity = warning
+
+# Resource can be disposed asynchronously
+dotnet_diagnostic.RCS1261.severity = warning
+
+# Unnecessary raw string literal
+dotnet_diagnostic.RCS1262.severity = warning
+
+# Invalid reference in a documentation comment
+dotnet_diagnostic.RCS1263.severity = warning
+
+# Remove redundant catch block
+dotnet_diagnostic.RCS1265.severity = warning
+
+# Use raw string literal
+dotnet_diagnostic.RCS1266.severity = warning
+
+# Use string interpolation instead of 'string.Concat'
+dotnet_diagnostic.RCS1267.severity = warning
+
+# Simplify numeric comparison
+dotnet_diagnostic.RCS1268.severity = warning
+
 # Cast return value to the correct type.
 dotnet_diagnostic.REFL001.severity = warning
 
