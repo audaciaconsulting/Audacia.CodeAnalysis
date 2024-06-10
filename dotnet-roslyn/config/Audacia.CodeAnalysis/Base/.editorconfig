@@ -54,6 +54,9 @@ dotnet_diagnostic.ACL1012.max_where_clauses = 3
 # [Usage] ACL1013: Use record types
 dotnet_diagnostic.ACL1013.severity = warning
 
+# [Naming] ACL1014: Don't include numbers in identifiers
+dotnet_diagnostic.ACL1014.severity = warning
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
@@ -144,8 +147,8 @@ dotnet_diagnostic.AV1568.severity = suggestion
 # Write code that is easy to debug
 dotnet_diagnostic.AV1580.severity = suggestion
 
-# Don't include numbers in variables, parameters and type members
-dotnet_diagnostic.AV1704.severity = warning
+# Don't include numbers in variables, parameters and type members *** Suppressed as covered by the more configurable ACL1014 ***
+dotnet_diagnostic.AV1704.severity = none
 
 # Don't use abbreviations *** Suppressed as covered by the more configurable ACL1004 ***
 dotnet_diagnostic.AV1706.severity = none
@@ -1023,17 +1026,8 @@ dotnet_diagnostic.RCS1036.severity = none
 # [REDUNDANCY] Remove trailing white-space
 dotnet_diagnostic.RCS1037.severity = none
 
-# [REDUNDANCY] Remove empty statement
-dotnet_diagnostic.RCS1038.severity = warning
-
 # [REDUNDANCY] Remove argument list from attribute
 dotnet_diagnostic.RCS1039.severity = warning
-
-# [REDUNDANCY] Remove empty else clause
-dotnet_diagnostic.RCS1040.severity = warning
-
-# [REDUNDANCY] Remove empty initializer
-dotnet_diagnostic.RCS1041.severity = warning
 
 # [REDUNDANCY] Remove enum default underlying type
 dotnet_diagnostic.RCS1042.severity = warning
@@ -1101,9 +1095,6 @@ dotnet_diagnostic.RCS1064.severity = warning
 # [STYLE] Avoid usage of while statement to create an inifinite loop
 dotnet_diagnostic.RCS1065.severity = none
 
-# [REDUNDANCY] Remove empty finally clause
-dotnet_diagnostic.RCS1066.severity = warning
-
 # [STYLE] Remove argument list from object creation expression
 dotnet_diagnostic.RCS1067.severity = warning
 
@@ -1118,9 +1109,6 @@ dotnet_diagnostic.RCS1070.severity = warning
 
 # [REDUNDANCY] Remove redundant base constructor call
 dotnet_diagnostic.RCS1071.severity = warning
-
-# [REDUNDANCY] Remove empty namespace declaration
-dotnet_diagnostic.RCS1072.severity = warning
 
 # [SIMPLIFICATION] Replace if statement with return statement
 dotnet_diagnostic.RCS1073.severity = warning
@@ -1170,9 +1158,6 @@ dotnet_diagnostic.RCS1089.severity = warning
 # [DESIGN] Call 'ConfigureAwait(false)' *** Suppress and only enforce for library code ***
 dotnet_diagnostic.RCS1090.severity = none
 
-# [REDUNDANCY] Remove empty region
-dotnet_diagnostic.RCS1091.severity = warning
-
 # [FORMATTING] Add empty line before 'while' keyword in 'do' statement
 dotnet_diagnostic.RCS1092.severity = warning
 
@@ -1211,9 +1196,6 @@ dotnet_diagnostic.RCS1104.severity = warning
 
 # [SIMPLIFICATION] Unncessary interpolation
 dotnet_diagnostic.RCS1105.severity = warning
-
-# [REDUNDANCY] Remove empty destructor
-dotnet_diagnostic.RCS1106.severity = warning
 
 # [REDUNDANCY] Remove redundant 'ToCharArray' call
 dotnet_diagnostic.RCS1107.severity = warning
@@ -1511,6 +1493,39 @@ dotnet_diagnostic.RCS1240.severity = warning
 
 # [DESIGN] Implement non-generic counterpart
 dotnet_diagnostic.RCS1241.severity = warning
+
+# Remove unnecessary braces from record declaration
+dotnet_diagnostic.RCS1251.severity = warning
+
+# Normalize format of enum flag value
+dotnet_diagnostic.RCS1254.severity = warning
+
+# Use enum field explicitly
+dotnet_diagnostic.RCS1257.severity = warning
+
+# Unnecessary enum flag
+dotnet_diagnostic.RCS1258.severity = warning
+
+# Resource can be disposed asynchronously
+dotnet_diagnostic.RCS1261.severity = warning
+
+# Unnecessary raw string literal
+dotnet_diagnostic.RCS1262.severity = warning
+
+# Invalid reference in a documentation comment
+dotnet_diagnostic.RCS1263.severity = warning
+
+# Remove redundant catch block
+dotnet_diagnostic.RCS1265.severity = warning
+
+# Use raw string literal
+dotnet_diagnostic.RCS1266.severity = warning
+
+# Use string interpolation instead of 'string.Concat'
+dotnet_diagnostic.RCS1267.severity = warning
+
+# Simplify numeric comparison
+dotnet_diagnostic.RCS1268.severity = warning
 
 # Cast return value to the correct type.
 dotnet_diagnostic.REFL001.severity = warning

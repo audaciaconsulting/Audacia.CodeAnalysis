@@ -663,7 +663,6 @@ var filtered = myCollection
 	.Where(a => a.Property != null && a.Property.Value == 1);
 ```
 
-<<<<<<< HEAD
 Maximum allowed clauses can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1012.max_where_clauses`.
 
 ## ACL1013 - Use record types
@@ -714,3 +713,55 @@ dotnet_diagnostic.ACL1013.included_suffixes = Command,Request
 Note the following:
 - The diagnostic `Dto`s is removed unless explicitly included above.
 - The suffixes are case-sensitive, in case another word happens to end with the same letters.
+
+## ACL1014 - Do not include numbers in identifier name
+
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Naming</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1014 is based on the CSharpGuidelinesAnalyzer rule [AV1704](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1704.md), which checks if identifiers contain numbers in their name. 
+
+ACL1014 supports excluding words in the `.editorconfig` that are used in your domain terminology.
+
+Code with diagnostic:
+
+```csharp
+public class Class1 
+{
+     public void Method1(int parameter1)
+     {
+         var variable1 = parameter1;
+     }    
+}
+```
+
+Code without diagnostic
+
+```csharp
+public class Class
+{
+     public void Method(int parameter)
+     {
+         var variable = parameter;
+     }    
+}
+```
+
+### Allowed words
+To override the default behaviour of prohibiting all numbers, you can specify what words are allowed as follows:
+
+```
+dotnet_diagnostic.ACL1014.allowed_words = B2C,365
+```
+Note the following:
+- These overrides are case-insensitive. For example. an identifier with 'b2c' in its name would not violate this rule.
+- These overrides can contain letters. For example, an identifier with '2' in its name would violate this rule.

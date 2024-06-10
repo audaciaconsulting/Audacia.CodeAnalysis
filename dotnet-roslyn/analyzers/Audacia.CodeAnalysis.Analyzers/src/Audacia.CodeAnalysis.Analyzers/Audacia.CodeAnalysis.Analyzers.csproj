@@ -4,8 +4,6 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -19,7 +17,7 @@
         <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>package-icon.png</PackageIcon>
-        <Version>1.8.0</Version>
+        <Version>1.9.0</Version>
     </PropertyGroup>
 
     <ItemGroup>

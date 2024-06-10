@@ -201,6 +201,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             return methodAttributes;
         }
 
+        internal static SyntaxTree GetSyntaxTree(this SyntaxNodeAnalysisContext context)
+        {
+            return context.Compilation.SyntaxTrees.FirstOrDefault();
+        }
+
+        internal static SyntaxTree GetSyntaxTree(this OperationAnalysisContext context)
+        {
+            return context.Compilation.SyntaxTrees.FirstOrDefault();
+        }
+
+        internal static SyntaxTree GetSyntaxTree(this SymbolAnalysisContext context)
+        {
+            return context.Compilation.SyntaxTrees.FirstOrDefault();
+        }
+
         /// <summary>
         /// Checks whether the method has a public modifier.
         /// </summary>

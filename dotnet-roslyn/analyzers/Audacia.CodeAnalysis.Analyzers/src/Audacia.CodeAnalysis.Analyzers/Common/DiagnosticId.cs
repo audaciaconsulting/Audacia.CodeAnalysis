@@ -16,5 +16,6 @@
         public const string NestedControlStatements = "ACL1011";
         public const string MaximumWhereClauses = "ACL1012";
         public const string UseRecordTypes = "ACL1013";
+        public const string DoNotUseNumberInIdentifierName = "ACL1014";
     }
 }
