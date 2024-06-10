@@ -192,9 +192,33 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     {
         class TypeNameB2C
         {
+            void Method365()
+            {
+                var azureB2CUrl = ""..."";
+            }            
         }
-        class TypeNameb2c // Case-insensitive
+    }";
+
+        VerifyNoDiagnostic(test);
+    }
+
+    [TestMethod]
+    public void No_Diagnostic_If_Numbers_Used_With_Different_Casing_And_Word_Is_Allowed()
+    {
+        _mockSettingsReader.Setup(settings => settings.TryGetValue(
+                It.IsAny<SyntaxTree>(),
+                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting)))
+            .Returns("ABC123");
+
+        var test = @"
+    namespace ConsoleApplication
+    {
+        class TypeNameAbc123
         {
+            void MethodAbC123()
+            {
+                var abc123 = 1.0;
+            }
         }
     }";
 
