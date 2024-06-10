@@ -110,6 +110,25 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     }
 
     [TestMethod]
+    public void Diagnostic_If_Numbers_Used_For_Record_Name()
+    {
+        var test = @"
+    namespace ConsoleApplication
+    {
+        record TypeName1
+        {
+            private void MethodName()
+            {
+            }
+        }
+    }";
+
+        var expected = BuildExpectedResult(4, 16, "Class", "TypeName1");
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
     public void Diagnostic_If_Numbers_Used_For_Interface_Name()
     {
         var test = @"
