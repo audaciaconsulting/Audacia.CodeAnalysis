@@ -192,7 +192,7 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     {
         class TypeNameB2C
         {
-            void Method365()
+            void Method365(int 365Url)
             {
                 var azureB2CUrl = ""..."";
             }            
@@ -215,9 +215,9 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     {
         class TypeNameAbc123
         {
-            void MethodAbC123()
+            void MethodAbC123(int abc123)
             {
-                var abc123 = 1.0;
+                var anotherAbc123 = 1.0;
             }
         }
     }";
