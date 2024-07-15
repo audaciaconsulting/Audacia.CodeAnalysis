@@ -279,6 +279,29 @@ namespace TestNamespace
         }
 
         [TestMethod]
+        public void No_Diagnostics_For_Class_Primary_Constructor_Parameters_Equal_To_Max_Allowed_Number_Overridden_Via_Attribute()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    [MaxParameterCount(5)]
+    public class TestClass(int a, int b, int c, int d, int e) { }
+
+    public sealed class MaxParameterCountAttribute : System.Attribute
+    {
+        public int ParameterCount { get; }
+
+        public MaxParameterCountAttribute(int parameterCount)
+        {
+            ParameterCount = parameterCount;
+        }
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
         public void Diagnostics_For_Method_Parameters_Greater_Than_Max_Allowed_Overridden_Via_Attribute()
         {
             var test = @"
