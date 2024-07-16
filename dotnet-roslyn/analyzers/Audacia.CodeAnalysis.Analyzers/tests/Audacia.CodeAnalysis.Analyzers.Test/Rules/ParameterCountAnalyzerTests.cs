@@ -126,7 +126,7 @@ namespace TestNamespace
         }
 
         [TestMethod]
-        public void No_Diagnostics_For_Constructor_Parameters_Less_Than_Max_Allowed_Number()
+        public void No_Diagnostics_For_Class_Constructor_Parameters_Less_Than_Max_Allowed_Number()
         {
             var test = @"
 namespace TestNamespace
@@ -160,7 +160,7 @@ namespace TestNamespace
         }
 
         [TestMethod]
-        public void No_Diagnostics_For_Constructor_Parameters_Equal_To_Max_Allowed_Number()
+        public void No_Diagnostics_For_Class_Constructor_Parameters_Equal_To_Max_Allowed_Number()
         {
             var test = @"
 namespace TestNamespace
@@ -200,7 +200,7 @@ namespace TestNamespace
         }
 
         [TestMethod]
-        public void Diagnostic_For_Constructor_Parameters_More_Than_Max_Allowed_Number()
+        public void Diagnostic_For_Class_Constructor_Parameters_More_Than_Max_Allowed_Number()
         {
             var test = @"
 namespace TestNamespace
@@ -217,6 +217,24 @@ namespace TestNamespace
                 memberName: "Constructor for 'TestClass'",
                 lineNumber: 6,
                 column: 16,
+                parameterCount: 5);
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_For_Class_Primary_Constructor_Parameters_More_Than_Max_Allowed_Number()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public class TestClass(int a, int b, int c, int d, int e);
+}";
+
+            var expected = BuildExpectedResult(
+                memberName: "Constructor for 'TestClass'",
+                lineNumber: 4,
+                column: 18,
                 parameterCount: 5);
 
             VerifyDiagnostic(test, expected);
@@ -251,7 +269,7 @@ namespace TestNamespace
         }
 
         [TestMethod]
-        public void No_Diagnostics_For_Constructor_Parameters_Equal_To_Max_Allowed_Number_Overridden_Via_Attribute()
+        public void No_Diagnostics_For_Class_Constructor_Parameters_Equal_To_Max_Allowed_Number_Overridden_Via_Attribute()
         {
             var test = @"
 namespace TestNamespace
@@ -285,7 +303,7 @@ namespace TestNamespace
 namespace TestNamespace
 {
     [MaxParameterCount(5)]
-    public class TestClass(int a, int b, int c, int d, int e) { }
+    public class TestClass(int a, int b, int c, int d, int e);
 
     public sealed class MaxParameterCountAttribute : System.Attribute
     {
@@ -296,6 +314,30 @@ namespace TestNamespace
             ParameterCount = parameterCount;
         }
     }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Class_Primary_Constructor_Parameters_Equal_To_Max_Allowed_Number()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public class TestClass(int a, int b, int c, int d);
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Class_Primary_Constructor_Parameters_Less_Than_Max_Allowed_Number()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public class TestClass(int i, int j);
 }";
 
             VerifyNoDiagnostic(test);
@@ -337,7 +379,7 @@ namespace TestNamespace
         }
 
         [TestMethod]
-        public void Diagnostics_For_Constructor_Parameters_Greater_Than_Max_Allowed_Overridden_Via_Attribute()
+        public void Diagnostics_For_Class_Constructor_Parameters_Greater_Than_Max_Allowed_Overridden_Via_Attribute()
         {
             var test = @"
 namespace TestNamespace
@@ -372,41 +414,13 @@ namespace TestNamespace
         }
 
         [TestMethod]
-        public void Diagnostics_For_Record_Constructor_Parameters_Equal_To_Max_Allowed_Number()
-        {
-            var test = @"
-namespace TestNamespace
-{
-    public record TestClass (int a, int b, int c, int d)
-    {
-    }
-}";
-            VerifyNoDiagnostic(test);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Record_Constructor_Parameters_Greater_Than_Max_Allowed()
-        {
-            var test = @"
-namespace TestNamespace
-{
-    public record TestClass (int a, int b, int c, int d, int e, int f)
-    {
-    }
-}";
-            VerifyDiagnostic(test);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Record_Constructor_Parameters_Greater_Than_Max_Allowed_Overridden_Via_Attribute()
+        public void Diagnostics_For_Class_Primary_Constructor_Parameters_Greater_Than_Max_Allowed_Overridden_Via_Attribute()
         {
             var test = @"
 namespace TestNamespace
 {
     [MaxParameterCountAttribute(1)]
-    public record TestClass (int a, int b, int c, int d, int e, int f)
-    {
-    }
+    public class TestClass(int a, int b);
 
     public sealed class MaxParameterCountAttribute : System.Attribute
     {
@@ -418,7 +432,62 @@ namespace TestNamespace
         }
     }
 }";
-            VerifyDiagnostic(test);
+
+            var expected = BuildExpectedResult(
+                memberName: "Constructor for 'TestClass'",
+                lineNumber: 5,
+                column: 18,
+                parameterCount: 2,
+                maxParameterCount: 1);
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Record_Primary_Constructor_Parameters_Equal_To_Max_Allowed_Number_Overridden_Via_Attribute()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    [MaxParameterCount(5)]
+    public record TestRecord(int a, int b, int c, int d, int e);
+
+    public sealed class MaxParameterCountAttribute : System.Attribute
+    {
+        public int ParameterCount { get; }
+
+        public MaxParameterCountAttribute(int parameterCount)
+        {
+            ParameterCount = parameterCount;
+        }
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Record_Primary_Constructor_Parameters_Equal_To_Max_Allowed_Number()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public record TestRecord(int a, int b, int c, int d);
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Record_Primary_Constructor_Parameters_Less_Than_Max_Allowed_Number()
+        {
+            var test = @"
+namespace TestNamespace
+{
+    public record TestRecord(int i, int j);
+}";
+
+            VerifyNoDiagnostic(test);
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
         private static readonly SettingsKey MaxConstructorParameterCountKey =
             new SettingsKey(Id, "max_constructor_parameter_count");
 
-        private static IEnumerable<string> ExcludedParameterTypes = new List<string>
+        private static readonly IEnumerable<string> ExcludedParameterTypes = new List<string>
         {
             nameof(CancellationToken)
         };
@@ -87,11 +87,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
                 var memberName = GetMemberName(method);
                 var isConstructor = method.IsConstructor();
 
-                ParameterSettings settings =
+                var settings =
                     GetParameterSettings(
                         method,
                         settingsReader,
-                        isConstructor,
                         context.Symbol.DeclaringSyntaxReferences[0].SyntaxTree);
 
                 var parameterCountInfo = new ParameterCountInfo(method, settings, isConstructor);
@@ -101,23 +100,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
         }
 
         private static ParameterSettings GetParameterSettings(
-            ISymbol symbol,
+            IMethodSymbol symbol,
             EditorConfigSettingsReader settingsReader,
-            bool isConstructor,
             SyntaxTree syntaxTree)
         {
             var maxParameterCount = DefaultMaxParameterCount;
             var maxConstructorParameterCount = DefaultMaxParameterCount;
 
-            ImmutableArray<AttributeData> attributes;
-            if (isConstructor)
-            {
-                attributes = CheckForGetAttributes(symbol);
-            }
-            else
-            {
-                attributes = symbol.GetAttributes();
-            }
+            var attributes = GetAttributes(symbol);
 
             var maxCountAttribute =
                 attributes.FirstOrDefault(att => att.AttributeClass.Name == "MaxParameterCountAttribute");
@@ -139,9 +129,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             return new ParameterSettings(maxParameterCount, maxConstructorParameterCount);
         }
 
-        private static ImmutableArray<AttributeData> CheckForGetAttributes(ISymbol symbol)
+        private static ImmutableArray<AttributeData> GetAttributes(IMethodSymbol symbol)
         {
-            symbol.
+            // If it is a primary ctor, we must get the attributes from the class
+            return symbol.IsPrimaryConstructor()
+                ? symbol.ContainingSymbol.GetAttributes()
+                : symbol.GetAttributes();
         }
 
         private static bool MemberRequiresAnalysis(
@@ -157,7 +150,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
         private static string GetMemberName(IMethodSymbol method)
         {
-            return method.IsConstructor() ? GetNameForConstructor(method) : GetNameForMethod(method);
+            return method.IsConstructor()
+                ? GetNameForConstructor(method)
+                : GetNameForMethod(method);
         }
 
         private static string GetNameForConstructor(IMethodSymbol method)
