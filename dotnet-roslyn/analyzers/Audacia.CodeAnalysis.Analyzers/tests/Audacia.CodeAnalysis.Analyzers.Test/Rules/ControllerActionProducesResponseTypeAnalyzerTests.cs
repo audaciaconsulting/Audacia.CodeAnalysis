@@ -130,6 +130,55 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
+        public void Diagnostics_For_Controller_With_No_ProducesResponseType_And_IActionResult_ReturnType_Attribute()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
+
+                namespace ConsoleApplication1
+                {
+                    public class TestController : ControllerBase
+                    {
+                        [HttpGet]
+                        public IActionResult Get()
+                        {
+                            return 'hello';
+                        }
+                    }
+                }";
+
+            const string expectedMessage
+                = "Controller action name 'Get' has no [ProducesResponseType] attribute";
+
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+
+            VerifyDiagnostic(testCode, expectedDiagnostic);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Controller_With_TypedResult_ReturnType_ProducesResponseType_Attributes()
+        {
+            const string testCode = @"
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Mvc;
+
+                namespace ConsoleApplication1
+                {
+                    public class TestController : ControllerBase
+                    {
+                        [HttpGet]
+                        public Results<NotFound, Ok<string>> Get()
+                        {
+                            return 'hello';
+                        }
+                    }
+                }";
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
         public void Multiple_Diagnostics_For_Multiple_Controllers_With_No_ProducesResponseType_Attribute()
         {
             const string testCode = @"
