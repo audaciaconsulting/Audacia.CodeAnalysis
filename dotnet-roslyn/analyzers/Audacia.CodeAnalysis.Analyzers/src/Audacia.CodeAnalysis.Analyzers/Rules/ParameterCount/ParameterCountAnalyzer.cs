@@ -38,7 +38,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             RegisterCompilationStart;
 
         private static readonly Action<SymbolAnalysisContext, EditorConfigSettingsReader> AnalyzeMethodAction =
-            (context, settingsReader) => context.SkipEmptyName(_ => AnalyzeMethod(context, settingsReader));
+        (
+            context,
+            settingsReader) => context.SkipEmptyName(_ => AnalyzeMethod(context, settingsReader));
 
         private static readonly SettingsKey MaxMethodParameterCountKey =
             new SettingsKey(Id, "max_method_parameter_count");
@@ -46,7 +48,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
         private static readonly SettingsKey MaxConstructorParameterCountKey =
             new SettingsKey(Id, "max_constructor_parameter_count");
 
-        private static IEnumerable<string> ExcludedParameterTypes = new List<string>
+        private static readonly IEnumerable<string> ExcludedParameterTypes = new List<string>
         {
             nameof(CancellationToken)
         };
@@ -69,11 +71,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
         private static void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
         {
             var settingsReader = new EditorConfigSettingsReader(startContext.Options);
-            startContext.RegisterSymbolAction(actionContext => AnalyzeMethodAction(actionContext, settingsReader),
+            startContext.RegisterSymbolAction(
+                actionContext => AnalyzeMethodAction(actionContext, settingsReader),
                 SymbolKind.Method);
         }
 
-        private static void AnalyzeMethod(SymbolAnalysisContext context, EditorConfigSettingsReader settingsReader)
+        private static void AnalyzeMethod(
+            SymbolAnalysisContext context,
+            EditorConfigSettingsReader settingsReader)
         {
             var method = (IMethodSymbol)context.Symbol;
 
@@ -82,8 +87,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
                 var memberName = GetMemberName(method);
                 var isConstructor = method.IsConstructor();
 
-                ParameterSettings settings =
-                    GetParameterSettings(method, settingsReader,
+                var settings =
+                    GetParameterSettings(
+                        method,
+                        settingsReader,
                         context.Symbol.DeclaringSyntaxReferences[0].SyntaxTree);
 
                 var parameterCountInfo = new ParameterCountInfo(method, settings, isConstructor);
@@ -92,13 +99,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             }
         }
 
-        private static ParameterSettings GetParameterSettings(ISymbol symbol, EditorConfigSettingsReader settingsReader,
+        private static ParameterSettings GetParameterSettings(
+            IMethodSymbol symbol,
+            EditorConfigSettingsReader settingsReader,
             SyntaxTree syntaxTree)
         {
             var maxParameterCount = DefaultMaxParameterCount;
             var maxConstructorParameterCount = DefaultMaxParameterCount;
 
-            var attributes = symbol.GetAttributes();
+            var attributes = GetAttributes(symbol);
+
             var maxCountAttribute =
                 attributes.FirstOrDefault(att => att.AttributeClass.Name == "MaxParameterCountAttribute");
             if (maxCountAttribute != null)
@@ -119,7 +129,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             return new ParameterSettings(maxParameterCount, maxConstructorParameterCount);
         }
 
-        private static bool MemberRequiresAnalysis(ISymbol member, CancellationToken cancellationToken)
+        private static ImmutableArray<AttributeData> GetAttributes(IMethodSymbol symbol)
+        {
+            // If it is a primary ctor, we must get the attributes from the class
+            return symbol.IsPrimaryConstructor()
+                ? symbol.ContainingSymbol.GetAttributes()
+                : symbol.GetAttributes();
+        }
+
+        private static bool MemberRequiresAnalysis(
+            ISymbol member,
+            CancellationToken cancellationToken)
         {
             return !member.IsExtern &&
                    !member.IsOverride &&
@@ -130,7 +150,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
         private static string GetMemberName(IMethodSymbol method)
         {
-            return method.IsConstructor() ? GetNameForConstructor(method) : GetNameForMethod(method);
+            return method.IsConstructor()
+                ? GetNameForConstructor(method)
+                : GetNameForMethod(method);
         }
 
         private static string GetNameForConstructor(IMethodSymbol method)
@@ -155,19 +177,22 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             return builder.ToString();
         }
 
-        private static void AnalyzeParameters(SymbolAnalysisContext context, ParameterCountInfo parameterCountInfo,
+        private static void AnalyzeParameters(
+            SymbolAnalysisContext context,
+            ParameterCountInfo parameterCountInfo,
             string memberName)
         {
             var methodParameters = parameterCountInfo.MethodSymbol.Parameters;
 
             var parametersWithoutExcludedTypes = methodParameters.AsEnumerable()
-                .Where(parameter =>
-                {
-                    var parameterTypeName = parameter.Type.Name;
+                .Where(
+                    parameter =>
+                    {
+                        var parameterTypeName = parameter.Type.Name;
 
-                    return !ExcludedParameterTypes.Select(excludedParam => excludedParam)
-                               .Contains(parameterTypeName);
-                })
+                        return !ExcludedParameterTypes.Select(excludedParam => excludedParam)
+                            .Contains(parameterTypeName);
+                    })
                 .ToArray();
 
             if (parametersWithoutExcludedTypes.Length > parameterCountInfo.MaxParameterCount)
@@ -176,13 +201,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             }
         }
 
-        private static void ReportParameterCount(SymbolAnalysisContext context, ParameterCountInfo parameterCountInfo,
-            string name, int parameterCount)
+        private static void ReportParameterCount(
+            SymbolAnalysisContext context,
+            ParameterCountInfo parameterCountInfo,
+            string name,
+            int parameterCount)
         {
             if (!parameterCountInfo.MethodSymbol.IsSynthesized())
             {
-                var diagnostic = Diagnostic.Create(ParameterCountRule, parameterCountInfo.MethodSymbol.Locations[0],
-                    name, parameterCount, parameterCountInfo.MaxParameterCount);
+                var diagnostic = Diagnostic.Create(
+                    ParameterCountRule,
+                    parameterCountInfo.MethodSymbol.Locations[0],
+                    name,
+                    parameterCount,
+                    parameterCountInfo.MaxParameterCount);
 
                 context.ReportDiagnostic(diagnostic);
             }
@@ -194,7 +226,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
 
             public int MaxConstructorParameterCount { get; }
 
-            public ParameterSettings(int maxParameterCount, int maxConstructorParameterCount)
+            public ParameterSettings(
+                int maxParameterCount,
+                int maxConstructorParameterCount)
             {
                 MaxParameterCount = maxParameterCount;
                 MaxConstructorParameterCount = maxConstructorParameterCount;
@@ -212,7 +246,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
             public int MaxParameterCount =>
                 _isConstructor ? _settings.MaxConstructorParameterCount : _settings.MaxParameterCount;
 
-            public ParameterCountInfo(IMethodSymbol methodSymbol, ParameterSettings settings,
+            public ParameterCountInfo(
+                IMethodSymbol methodSymbol,
+                ParameterSettings settings,
                 bool isConstructor = false)
             {
                 MethodSymbol = methodSymbol;
