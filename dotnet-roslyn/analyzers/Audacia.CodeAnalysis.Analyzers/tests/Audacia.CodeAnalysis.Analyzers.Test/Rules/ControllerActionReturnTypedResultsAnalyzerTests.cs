@@ -147,7 +147,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string expectedMessage
                 = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 10, 26);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
@@ -176,7 +176,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string expectedMessage
                 = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 10, 26);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
@@ -218,8 +218,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             var expectedDiagnostics
                 = new[]
                 {
-                    BuildExpectedResult(expectedMessage1, 9, 25),
-                    BuildExpectedResult(expectedMessage2, 17, 25)
+                    BuildExpectedResult(expectedMessage1, 10, 26),
+                    BuildExpectedResult(expectedMessage2, 18, 26)
                 };
 
             VerifyDiagnostic(testCode, expectedDiagnostics);

@@ -123,7 +123,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string expectedMessage
                 = "Controller action name 'Get' should return a TypedResult rather than an IActionResult";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 10, 32);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
@@ -151,7 +151,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string expectedMessage
                 = "Controller action name 'Get' should return a TypedResult rather than an IActionResult";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 10, 38);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
@@ -189,8 +189,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             var expectedDiagnostics
                 = new[]
                 {
-                    BuildExpectedResult(expectedMessage1, 9, 25),
-                    BuildExpectedResult(expectedMessage2, 15, 25)
+                    BuildExpectedResult(expectedMessage1, 10, 32),
+                    BuildExpectedResult(expectedMessage2, 16, 32)
                 };
 
             VerifyDiagnostic(testCode, expectedDiagnostics);

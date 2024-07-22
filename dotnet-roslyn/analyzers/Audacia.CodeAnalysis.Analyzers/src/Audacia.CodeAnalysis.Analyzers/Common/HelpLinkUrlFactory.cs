@@ -39,7 +39,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Common
                 case DiagnosticId.ThenByDescendingAfterOrderBy:
                     return $"{helpLinkUrlPrefix}thenbydescending-instead-of-orderbydescending-if-follows-orderby-or-orderbydescending-statement";
                 case DiagnosticId.ControllerActionProducesResponseType:
-                    return $"{helpLinkUrlPrefix}controller-actions-have-producesresponsetype-attribute-when-returntype-isnot-typedresults";
+                    return $"{helpLinkUrlPrefix}controller-actions-have-producesresponsetype-attribute-when-return-type-is-not-typedresults";
                 case DiagnosticId.OverloadShouldCallOtherOverload:
                     return $"{helpLinkUrlPrefix}method-overload-should-call-another-overload";
                 case DiagnosticId.NullableReferenceTypesEnabled:
@@ -53,9 +53,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Common
                 case DiagnosticId.DoNotUseNumberInIdentifierName:
                     return $"{helpLinkUrlPrefix}do-not-include-numbers-in-identifier-name";
                 case DiagnosticId.DoNotUseProducesResponseTypeWithTypedResults:
-                    return $"{helpLinkUrlPrefix}do-not-use-producesresponse-attribute-with-typedresults";
+                    return $"{helpLinkUrlPrefix}controller-action-has-producesresponsetype-attribute-when-return-type-is-typedresults";
                 case DiagnosticId.UseTypedResultsInsteadOfIActionResult:
-                    return $"{helpLinkUrlPrefix}use-typedresults-instead-of-iactionresults";
+                    return $"{helpLinkUrlPrefix}controller-actions-should-return-typedresults-instead-of-iactionresults";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),

@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
@@ -79,19 +80,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResult
 
                 var methodAttributes = methodDeclarationSyntax.GetMethodAttributes();
 
-                var hasProducesResponseType = methodAttributes
-                .Any(
-                    name =>
-                        name.Equals("ProducesResponseType")
-                );
+                var attribute = methodDeclarationSyntax.AttributeLists
+                    .SelectMany(al => al.Attributes)
+                    .FirstOrDefault(a => a.Name.ToString() == "ProducesResponseType");
                 
-                if (hasProducesResponseType && returnType.Contains("Results"))
+                if (attribute != null && returnType.Contains("Results"))
                 {
-                    var location = nodeAnalysisContext.Node.GetLocation();
+                    var location = attribute.GetLocation();
 
-                    var methodName = nodeAnalysisContext.GetMethodName();
-
-                    var diagnostic = Diagnostic.Create(Rule, location, methodName);
+                    var diagnostic = Diagnostic.Create(Rule, location, attribute.Name);
 
                     nodeAnalysisContext.ReportDiagnostic(diagnostic);
                 }

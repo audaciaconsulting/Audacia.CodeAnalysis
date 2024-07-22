@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResults
@@ -75,11 +74,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResult
             {
                 var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
-                var returnType = methodDeclarationSyntax.ReturnType.ToString();
+                var returnType = methodDeclarationSyntax.ReturnType;
                 
-                if (returnType.Contains(typeof(IActionResult).Name))
+                if (returnType.ToString().Contains("IActionResult"))
                 {
-                    var location = nodeAnalysisContext.Node.GetLocation();
+                    var location = returnType.GetLocation();
 
                     var methodName = nodeAnalysisContext.GetMethodName();
 
