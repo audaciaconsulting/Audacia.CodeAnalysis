@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+
 namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResults
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -16,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResult
 
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
-        private const string MessageFormat = "Controller action name '{0}' [ProducesResponseType] attribute should not be applied when using TypedResults";
+        private const string MessageFormat = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
         private const string Title = "Controller action has [ProducesResponseType] attribute when return type is TypedResult";
 
@@ -83,7 +84,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResult
                     name =>
                         name.Equals("ProducesResponseType")
                 );
-
+                
                 if (hasProducesResponseType && returnType.Contains("Results"))
                 {
                     var location = nodeAnalysisContext.Node.GetLocation();

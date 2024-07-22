@@ -143,7 +143,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public IActionResult Get()
                         {
-                            return 'hello';
+                            return Ok('hello');
                         }
                     }
                 }";
@@ -170,7 +170,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public Results<NotFound, Ok<string>> Get()
                         {
-                            return 'hello';
+                            var result = GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
                     }
                 }";

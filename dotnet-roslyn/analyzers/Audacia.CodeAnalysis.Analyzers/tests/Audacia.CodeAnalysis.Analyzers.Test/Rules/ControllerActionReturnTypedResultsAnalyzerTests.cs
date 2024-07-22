@@ -68,7 +68,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public Results<NotFound, Ok<string>> Get()
                         {
-                            return 'hello';
+                            var result = GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
                     }
                 }";
@@ -91,7 +92,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         public IActionResult Get()
                         {
-                            return 'hello';
+                            return Ok('hello');
                         }
                     }
                 }";
@@ -113,7 +114,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public async Task<Results<NotFound, Ok<string>>> Get()
                         {
-                            return 'hello';
+                            var result = await GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
                     }
                 }";
@@ -136,13 +138,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         public Results<NotFound, Ok<string>> Get()
                         {
-                            return 'hello';
+                            var result = GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
                     }
                 }";
 
             const string expectedMessage
-                = "Controller action name 'Get' [ProducesResponseType] attribute should not be applied when using TypedResults";
+                = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 
@@ -164,13 +167,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         public async Task<Results<NotFound, Ok<string>>> Get()
                         {
-                            return 'hello';
+                            var result = await GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
                     }
                 }";
 
             const string expectedMessage
-                = "Controller action name 'Get' [ProducesResponseType] attribute should not be applied when using TypedResults";
+                = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 9, 25);
 
@@ -192,28 +196,30 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         public async Task<Results<NotFound, Ok<string>>> Get()
                         {
-                            return 'hello';
+                            var result = await GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
 
                         [HttpGet]
                         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
                         public async Task<Results<NotFound, Ok<string>>> Get()
                         {
-                            return 'hello';
+                            var result = await GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
                     }
                 }";
             const string expectedMessage1
-                = "Controller action name 'Get' [ProducesResponseType] attribute should not be applied when using TypedResults";
+                = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
             const string expectedMessage2
-                = "Controller action name 'Get' [ProducesResponseType] attribute should not be applied when using TypedResults";
+                = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
             var expectedDiagnostics
                 = new[]
                 {
                     BuildExpectedResult(expectedMessage1, 9, 25),
-                    BuildExpectedResult(expectedMessage2, 16, 25)
+                    BuildExpectedResult(expectedMessage2, 17, 25)
                 };
 
             VerifyDiagnostic(testCode, expectedDiagnostics);

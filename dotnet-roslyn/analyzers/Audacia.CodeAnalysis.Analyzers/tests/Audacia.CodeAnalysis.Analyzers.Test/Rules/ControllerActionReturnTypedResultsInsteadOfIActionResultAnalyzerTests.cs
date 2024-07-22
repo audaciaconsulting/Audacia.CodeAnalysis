@@ -69,7 +69,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public Results<NotFound, Ok<string>> Get()
                         {
-                            return 'hello';
+                            var result = GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
                     }
                 }";
@@ -91,7 +92,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public async Task<Results<NotFound, Ok<string>>> Get()
                         {
-                            return 'hello';
+                            var result = await GetResult();
+                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result); 
                         }
                     }
                 }";
@@ -113,7 +115,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public IActionResult Get()
                         {
-                            return 'hello';
+                            return Ok('hello');
                         }
                     }
                 }";
@@ -140,7 +142,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public async Task<IActionResult> Get()
                         {
-                            return 'hello';
+                            var result = await GetResult();
+                            return Ok(result);
                         }
                     }
                 }";
@@ -167,13 +170,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         [HttpGet]
                         public IActionResult Get()
                         {
-                            return 'hello';
+                            return Ok('hello');
                         }
 
                         [HttpGet]
                         public IActionResult Get()
                         {
-                            return 'hello';
+                            return Ok('hello');
                         }
                     }
                 }";

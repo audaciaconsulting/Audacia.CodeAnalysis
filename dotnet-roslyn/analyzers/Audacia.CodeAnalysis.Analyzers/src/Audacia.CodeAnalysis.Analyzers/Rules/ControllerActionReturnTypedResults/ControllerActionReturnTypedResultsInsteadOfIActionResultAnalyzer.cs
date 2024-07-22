@@ -5,13 +5,15 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResults
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ControllerActionReturnTypedResultsInsteadOfIActionResultAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.UseTypedResultsInsteadofIActionResult;
+        public const string Id = DiagnosticId.UseTypedResultsInsteadOfIActionResult;
 
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
@@ -74,8 +76,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResult
                 var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
                 var returnType = methodDeclarationSyntax.ReturnType.ToString();
-
-                if (returnType.Contains("IActionResult"))
+                
+                if (returnType.Contains(typeof(IActionResult).Name))
                 {
                     var location = nodeAnalysisContext.Node.GetLocation();
 

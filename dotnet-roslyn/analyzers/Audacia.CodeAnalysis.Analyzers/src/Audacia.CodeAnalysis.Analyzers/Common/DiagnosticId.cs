@@ -18,6 +18,6 @@
         public const string UseRecordTypes = "ACL1013";
         public const string DoNotUseNumberInIdentifierName = "ACL1014";
         public const string DoNotUseProducesResponseTypeWithTypedResults = "ACL1015";
-        public const string UseTypedResultsInsteadofIActionResult = "ACL1016";
+        public const string UseTypedResultsInsteadOfIActionResult = "ACL1016";
     }
 }

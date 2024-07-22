@@ -766,7 +766,7 @@ Note the following:
 - These overrides are case-insensitive. For example. an identifier with 'b2c' in its name would not violate this rule.
 - These overrides can contain letters. For example, an identifier with '2' in its name would violate this rule.
 
-## ACL1015 - Controller actions does not have ProducesResponseType attribute when return type is TypedResults
+## ACL1015 - Controller action has ProducesResponseType attribute when return type is TypedResults
 
 <table>
 <tr>
@@ -779,7 +779,7 @@ Note the following:
 </tr>
 </table>
 
-ACL1015 checks if a controller action does not have `ProducesResponseType` attribute when the return type TypedResults and will produce a warning if not.
+ACL1015 checks if a controller action has `ProducesResponseType` attribute when the return type is TypedResults and will produce a warning if that is the case.
 This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
 
 Code with diagnostic:
@@ -789,7 +789,8 @@ Code with diagnostic:
 [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 public public Results<NotFound, Ok<string>> Get()
 {
-    return 'hello';
+    var result = GetResult();
+    result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
 }
 ```
 
@@ -799,7 +800,8 @@ Code without diagnostic:
 [HttpGet]
 public public Results<NotFound, Ok<string>> Get()
 {
-    return 'hello';
+    var result = GetResult();
+    result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
 }
 ```
 
@@ -825,7 +827,7 @@ Code with diagnostic:
 [HttpGet]
 public public IActionResult Get()
 {
-    return 'hello';
+    return Ok('hello');
 }
 ```
 
@@ -835,6 +837,7 @@ Code without diagnostic:
 [HttpGet]
 public public Results<NotFound, Ok<string>> Get()
 {
-    return 'hello';
+    var result = GetResult();
+    result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
 }
 ```
