@@ -805,7 +805,7 @@ public public Results<NotFound, Ok<string>> Get()
 }
 ```
 
-## ACL1016 - Controller actions should return TypedResults instead of IActionResults
+## ACL1016 - Controller action should return TypedResults instead of IActionResults
 
 <table>
 <tr>
