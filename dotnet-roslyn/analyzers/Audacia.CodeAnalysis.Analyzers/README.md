@@ -787,10 +787,10 @@ Code with diagnostic:
 ```csharp
 [HttpGet]
 [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-public public Results<NotFound, Ok<string>> Get()
+public Results<NotFound, Ok<string>> Get()
 {
     var result = GetResult();
-    result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
 }
 ```
 
@@ -798,10 +798,10 @@ Code without diagnostic:
 
 ```csharp
 [HttpGet]
-public public Results<NotFound, Ok<string>> Get()
+public Results<NotFound, Ok<string>> Get()
 {
     var result = GetResult();
-    result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
 }
 ```
 
@@ -825,7 +825,7 @@ Code with diagnostic:
 
 ```csharp
 [HttpGet]
-public public IActionResult Get()
+public IActionResult Get()
 {
     return Ok('hello');
 }
@@ -835,9 +835,9 @@ Code without diagnostic:
 
 ```csharp
 [HttpGet]
-public public Results<NotFound, Ok<string>> Get()
+public Results<NotFound, Ok<string>> Get()
 {
     var result = GetResult();
-    result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
 }
 ```

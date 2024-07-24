@@ -61,7 +61,7 @@ dotnet_diagnostic.ACL1005.severity = warning
 # Method overload should call another overload
 dotnet_diagnostic.ACL1009.severity = warning
 
-# Controller action should have at least one ProducesResponseType attribut
+# Controller action should have at least one ProducesResponseType attribute
 dotnet_diagnostic.ACL1008.severity = warning
 
 # Disabling ASP.NET "Request Validation" feature is security-sensitive

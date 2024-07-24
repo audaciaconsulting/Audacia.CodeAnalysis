@@ -70,7 +70,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         public Results<NotFound, Ok<string>> Get()
                         {
                             var result = GetResult();
-                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+                            return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
                         }
                     }
                 }";
@@ -93,7 +93,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                         public async Task<Results<NotFound, Ok<string>>> Get()
                         {
                             var result = await GetResult();
-                            result == null ? TypedResults.NotFound() : TypedResults.Ok(result); 
+                            return result == null ? TypedResults.NotFound() : TypedResults.Ok(result); 
                         }
                     }
                 }";
