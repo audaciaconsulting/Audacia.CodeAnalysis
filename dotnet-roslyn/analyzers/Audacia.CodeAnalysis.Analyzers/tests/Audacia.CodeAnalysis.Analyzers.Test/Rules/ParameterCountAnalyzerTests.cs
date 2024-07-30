@@ -489,5 +489,67 @@ namespace TestNamespace
 
             VerifyNoDiagnostic(test);
         }
+        
+         [TestMethod]
+                public void No_Diagnostics_For_Method_Parameters_Equal_To_Max_Allowed_Number_With_This_Param()
+                {
+                    var test = @"
+        namespace TestNamespace
+        {
+            public class TestClass
+            {
+                public void ExampleFunction()
+                {
+                }
+            }
+            
+            public static class TestClassExtensions
+            {
+            
+                public static string Extension(this TestClass testClass, int a, int b, int c, int d)
+                {
+                
+                return string.Empty;
+                }
+                public void TestMethod(int a, int b, int c, int d)
+                {
+                }
+            }
+        }";
+        
+                    VerifyNoDiagnostic(test);
+                }
+
+        [TestMethod]
+        public void Diagnostics_For_Method_Parameters_Greater_To_Max_Allowed_Number_With_This_Param()
+        {
+            var test = @"
+        namespace TestNamespace
+        {
+            public class TestClass
+            {
+                public void ExampleFunction()
+                {
+                }
+            }
+            
+            public static class TestClassExtensions
+            {
+                public static string Extension(this TestClass testClass, int a, int b, int c, int d, int e)
+                {
+                    return string.Empty;
+                }
+            }
+        }";
+
+            var expected = BuildExpectedResult(
+                memberName: "Method 'Extension'",
+                lineNumber: 13,
+                column: 38,
+                parameterCount: 5,
+                maxParameterCount: 4);
+
+            VerifyDiagnostic(test, expected);
+        }
     }
 }
