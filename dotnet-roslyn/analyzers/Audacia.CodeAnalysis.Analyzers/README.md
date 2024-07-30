@@ -240,6 +240,15 @@ public async Task MyMethodAsync(int a, int b, int c, int d, CancellationToken ca
 }
 ```
 
+This does however exclude `this` params that are used as part of extension methods:
+```csharp
+// No parameter count violation.
+public static string ExampleExtension(this Person person, int a, int b, int c, int d, int e);
+
+// Parameter Count Violation
+public static string ExampleExtension(this Person person, int a, int b, int c, int d, int e, int f);
+```
+
 ## ACL1004 - Don't use abbreviations
 
 <table>
