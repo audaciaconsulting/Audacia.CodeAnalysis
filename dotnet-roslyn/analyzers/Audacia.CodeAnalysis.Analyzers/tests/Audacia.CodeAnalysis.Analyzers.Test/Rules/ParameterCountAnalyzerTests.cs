@@ -505,14 +505,10 @@ namespace TestNamespace
             
             public static class TestClassExtensions
             {
-            
                 public static string Extension(this TestClass testClass, int a, int b, int c, int d)
                 {
                 
                 return string.Empty;
-                }
-                public void TestMethod(int a, int b, int c, int d)
-                {
                 }
             }
         }";
