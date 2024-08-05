@@ -422,7 +422,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 if(check == 11 && check != 42)
                     {
                     }
-            }
+            }w
         }
     }";
       
@@ -490,6 +490,102 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 
 
         }
+
+        [TestMethod]
+        public void No_Diagnostic_For_Switch_Statement_No_Magic_Number()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+         class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var check = 11;
+
+                 switch (check):
+                {
+                case check:
+                    return;
+                default:
+                    return;
+                } 
+            }
+        }
+    }";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_For_While_Statement_No_Magic_Number()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+         class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var check = 11;
+
+                 while(check == check)
+                    {
+                        return
+                    }
+            }
+        }
+    }";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_For_For_Statement_No_Magic_Number()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+         class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var check = 11;
+                var iterator = 2;
+
+                 for (var counter = iterator; counter < check; counter++)
+                {
+
+                }
+            }
+        }
+    }";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_For_If_Statement_No_Magic_Number()
+        {
+            var test = @"
+    namespace ConsoleApplication1
+    {
+         class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var check = 11;
+                var iterator = 2;
+
+                if(check != iterator)
+                {
+                    return;
+                }
+
+            }
+        }
+    }";
+            VerifyNoDiagnostic(test);
+        }
+
+
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
             return null;

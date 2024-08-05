@@ -195,7 +195,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
                     })
                 .ToArray();
 
-            var parameterCountExcludingExtensionMethodType = (parameterCountInfo.MethodSymbol.IsExtensionMethod ? parametersWithoutExcludedTypes.Length - 1 : parametersWithoutExcludedTypes.Length);
+            var parameterCountExcludingExtensionMethodType = parameterCountInfo.MethodSymbol.IsExtensionMethod ? parametersWithoutExcludedTypes.Length - 1 : parametersWithoutExcludedTypes.Length;
             if (parameterCountExcludingExtensionMethodType > parameterCountInfo.MaxParameterCount)
             {
                 ReportParameterCount(context, parameterCountInfo, memberName, parameterCountExcludingExtensionMethodType);
