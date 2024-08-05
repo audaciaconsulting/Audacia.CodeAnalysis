@@ -2,6 +2,7 @@ using Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CodeFixVerifier = Audacia.CodeAnalysis.Analyzers.Test.Base.CodeFixVerifier;
@@ -11,12 +12,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
     [TestClass]
     public class MagicNumberAnalyzerTests : CodeFixVerifier
     {
-        private DiagnosticResult BuildExpectedResult(int lineNumber, int column)
+        private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string varName = "testVar")
         {
             return new DiagnosticResult
             {
                 Id = MagicNumberAnalyzer.Id,
-                Message = "Variable declaration for 'testVar' should not use a magic number",
+                Message = $"Variable declaration for '{varName}' should not use a magic number",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -312,8 +313,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_A_Multiple_Of_10()
+        public void Diagnostic_For_For_Loop_Magic_Number()
         {
+          
             var test = @"
     namespace ConsoleApplication1
     {
@@ -321,13 +323,173 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
             private int Calculate(int? arg)
             {
-                var testVar = arg * 1000;
+                for(int testVar = 7; i > 0; i--)
+                    {
+                        continue;
+                    }
             }
         }
     }";
-            VerifyNoDiagnostic(test);
+            var expected = BuildExpectedResult(8, 35);
+            VerifyDiagnostic(test, expected);
         }
 
+        [TestMethod]
+        public void Diagnostic_While_Iteriable_Magic_Number()
+        {
+
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var count = 0;
+
+                while(count < 11)
+                    {
+                        count++;
+                    }
+            }
+        }
+    }";
+            var expected = BuildExpectedResult(10, 31, SyntaxKind.WhileStatement.ToString());
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_Multi_Variable_While_Iteriable_Magic_Number()
+        {
+
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var count = 0;
+
+                while(count < 11 || count == 11)
+                    {
+                        count++;
+                    }
+            }
+        }
+    }";
+            var expected1 = BuildExpectedResult(10, 31, SyntaxKind.WhileStatement.ToString());
+            var expected2 = BuildExpectedResult(10, 46, SyntaxKind.WhileStatement.ToString());
+            VerifyDiagnostic(test, new[] { expected1, expected2 });
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_Magic_Number()
+        {
+
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var check = 11;
+
+                if(check == 11)
+                    {
+                    }
+            }
+        }
+    }";
+            var expected = BuildExpectedResult(10, 29, SyntaxKind.IfStatement.ToString());
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_Multi_Variable_If_Magic_Number()
+        {
+
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var check = 11;
+
+                if(check == 11 && check != 42)
+                    {
+                    }
+            }
+        }
+    }";
+      
+            var expected1 = BuildExpectedResult(10, 29, SyntaxKind.IfStatement.ToString());
+            var expected2 = BuildExpectedResult(10, 44, SyntaxKind.IfStatement.ToString());
+            VerifyDiagnostic(test, new[] { expected1, expected2 });
+        }
+
+        [TestMethod]
+        public void Diagnostic_Case_Switch_Label_Magic_Number()
+        {
+
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var check = 11;
+
+                 switch (check):
+                {
+                case 11:
+                    return;
+                default:
+                    return;
+                } 
+            }
+        }
+    }";
+
+            var expected = BuildExpectedResult(12, 22, SyntaxKind.CaseSwitchLabel.ToString());
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_Switch_Statement_Magic_Number()
+        {
+
+            var test = @"
+    namespace ConsoleApplication1
+    {
+        class TypeName
+        {
+            private int Calculate(int? arg)
+            {
+                var check = 11;
+
+                 switch (11):
+                {
+                case check:
+                    return;
+                default:
+                    return;
+                } 
+            }
+        }
+    }";
+
+            var expected = BuildExpectedResult(10, 26, SyntaxKind.SwitchStatement.ToString());
+
+            VerifyDiagnostic(test, expected);
+
+
+        }
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
             return null;
