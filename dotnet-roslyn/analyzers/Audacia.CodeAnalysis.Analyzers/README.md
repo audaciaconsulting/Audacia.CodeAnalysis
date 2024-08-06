@@ -382,7 +382,7 @@ Code without diagnostic:
 var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 ```
 
-## ACL1008 - Controller actions have ProducesResponseType attribute
+## ACL1008 - Controller actions have ProducesResponseType attribute when return type is not TypedResults
 
 <table>
 <tr>
@@ -395,7 +395,7 @@ var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 </tr>
 </table>
 
-ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute and will produce a warning if not.
+ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute when the return type is not TypedResults and will produce a warning if not.
 This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
 
 Code with diagnostic:
@@ -765,3 +765,79 @@ dotnet_diagnostic.ACL1014.allowed_words = B2C,365
 Note the following:
 - These overrides are case-insensitive. For example. an identifier with 'b2c' in its name would not violate this rule.
 - These overrides can contain letters. For example, an identifier with '2' in its name would violate this rule.
+
+## ACL1015 - Controller action has ProducesResponseType attribute when return type is TypedResults
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1015 checks if a controller action has `ProducesResponseType` attribute when the return type is TypedResults and will produce a warning if that is the case.
+This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
+
+Code with diagnostic:
+
+```csharp
+[HttpGet]
+[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+public Results<NotFound, Ok<string>> Get()
+{
+    var result = GetResult();
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
+
+Code without diagnostic:
+
+```csharp
+[HttpGet]
+public Results<NotFound, Ok<string>> Get()
+{
+    var result = GetResult();
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
+
+## ACL1016 - Controller action should return TypedResults instead of IActionResults
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1016 checks if a controller action return type is TypedResults instead of IActionResult and will produce a warning if not.
+This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
+
+Code with diagnostic:
+
+```csharp
+[HttpGet]
+public IActionResult Get()
+{
+    return Ok('hello');
+}
+```
+
+Code without diagnostic:
+
+```csharp
+[HttpGet]
+public Results<NotFound, Ok<string>> Get()
+{
+    var result = GetResult();
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
