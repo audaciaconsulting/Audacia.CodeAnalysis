@@ -74,9 +74,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResult
             {
                 var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
+                var nameSpaces = nodeAnalysisContext.SemanticModel.GetTypeInfo(methodDeclarationSyntax.ReturnType).Type.ContainingNamespace;
+
                 var returnType = methodDeclarationSyntax.ReturnType;
-                
-                if (returnType.ToString().Contains("IActionResult"))
+
+                var returnTypeSymbol = nodeAnalysisContext.SemanticModel.GetSymbolInfo(returnType).Symbol as INamedTypeSymbol;
+
+                if (returnTypeSymbol != null && returnTypeSymbol.IsGenericType) 
+                {
+                    var genericTypeArgument = returnTypeSymbol.TypeArguments.FirstOrDefault();
+
+                    nameSpaces = genericTypeArgument.ContainingNamespace;
+                }
+
+                if (returnType.ToString().Contains("IActionResult") && nameSpaces.ToDisplayString().Contains("Microsoft.AspNetCore.Mvc"))
                 {
                     var location = returnType.GetLocation();
 

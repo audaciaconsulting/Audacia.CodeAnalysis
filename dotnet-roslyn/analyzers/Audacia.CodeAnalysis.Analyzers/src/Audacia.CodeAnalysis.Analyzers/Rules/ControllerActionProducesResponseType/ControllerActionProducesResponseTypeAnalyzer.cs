@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
+using System.Xml.Linq;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
@@ -74,6 +75,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
             {
                 var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
+                var nameSpaces = nodeAnalysisContext.SemanticModel.GetTypeInfo(methodDeclarationSyntax.ReturnType).Type.ContainingNamespace;
+
+                var returnType = methodDeclarationSyntax.ReturnType;
+
+                var returnTypeSymbol = nodeAnalysisContext.SemanticModel.GetSymbolInfo(returnType).Symbol as INamedTypeSymbol;
+
+                if (returnTypeSymbol != null && returnTypeSymbol.IsGenericType)
+                {
+                    var genericTypeArgument = returnTypeSymbol.TypeArguments.FirstOrDefault();
+
+                    nameSpaces = genericTypeArgument.ContainingNamespace;
+                }
+
                 var methodAttributes = methodDeclarationSyntax.GetMethodAttributes();
 
                 var hasProducesResponseType = methodAttributes
@@ -82,9 +96,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
                         name.Equals("ProducesResponseType")
                 );
 
-                var returnType = methodDeclarationSyntax.ReturnType.ToString();
-                
-                if (!hasProducesResponseType && !returnType.Contains("Results"))
+                if (!hasProducesResponseType && 
+                    !returnType.ToString().Contains("Results") && 
+                    !nameSpaces.ToDisplayString().Contains("Microsoft.AspNetCore.Http"))
                 {
                     var location = nodeAnalysisContext.Node.GetLocation();
 

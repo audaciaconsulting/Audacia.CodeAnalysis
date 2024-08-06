@@ -129,6 +129,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string testCode = @"
                 using System.Threading.Tasks;
                 using Microsoft.AspNetCore.Mvc;
+                using Microsoft.AspNetCore.Http
 
                 namespace ConsoleApplication1
                 {
@@ -147,7 +148,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string expectedMessage
                 = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 10, 26);
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 11, 26);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
@@ -158,6 +159,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string testCode = @"
                 using System.Threading.Tasks;
                 using Microsoft.AspNetCore.Mvc;
+                using Microsoft.AspNetCore.Http
 
                 namespace ConsoleApplication1
                 {
@@ -176,7 +178,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string expectedMessage
                 = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 10, 26);
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 11, 26);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
@@ -187,6 +189,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string testCode = @"
                 using System.Threading.Tasks;
                 using Microsoft.AspNetCore.Mvc;
+                using Microsoft.AspNetCore.Http
 
                 namespace ConsoleApplication1
                 {
@@ -218,8 +221,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             var expectedDiagnostics
                 = new[]
                 {
-                    BuildExpectedResult(expectedMessage1, 10, 26),
-                    BuildExpectedResult(expectedMessage2, 18, 26)
+                    BuildExpectedResult(expectedMessage1, 11, 26),
+                    BuildExpectedResult(expectedMessage2, 19, 26)
                 };
 
             VerifyDiagnostic(testCode, expectedDiagnostics);

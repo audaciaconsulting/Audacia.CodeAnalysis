@@ -76,21 +76,39 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResult
             {
                 var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
-                var returnType = methodDeclarationSyntax.ReturnType.ToString();
+                var nameSpaces = nodeAnalysisContext.SemanticModel.GetTypeInfo(methodDeclarationSyntax.ReturnType).Type.ContainingNamespace;
+
+                var returnType = methodDeclarationSyntax.ReturnType;
+
+                var returnTypeSymbol = nodeAnalysisContext.SemanticModel.GetSymbolInfo(returnType).Symbol as INamedTypeSymbol;
+
+                if (returnTypeSymbol != null && returnTypeSymbol.IsGenericType)
+                {
+                    var genericTypeArgument = returnTypeSymbol.TypeArguments.FirstOrDefault();
+
+                    nameSpaces = genericTypeArgument.ContainingNamespace;
+                }
 
                 var methodAttributes = methodDeclarationSyntax.GetMethodAttributes();
 
                 var attribute = methodDeclarationSyntax.AttributeLists
                     .SelectMany(al => al.Attributes)
                     .FirstOrDefault(a => a.Name.ToString() == "ProducesResponseType");
-                
-                if (attribute != null && returnType.Contains("Results"))
+
+                if (attribute != null)
                 {
-                    var location = attribute.GetLocation();
+                    var attributeNameSpace = nodeAnalysisContext.SemanticModel.GetTypeInfo(attribute).Type.ContainingNamespace;
 
-                    var diagnostic = Diagnostic.Create(Rule, location, attribute.Name);
+                    if (attributeNameSpace.ToDisplayString().Contains("Microsoft.AspNetCore.Mvc") && 
+                        returnType.ToString().Contains("Results") && 
+                        nameSpaces.ToDisplayString().Contains("Microsoft.AspNetCore.Http"))
+                    {
+                        var location = attribute.GetLocation();
 
-                    nodeAnalysisContext.ReportDiagnostic(diagnostic);
+                        var diagnostic = Diagnostic.Create(Rule, location, attribute.Name);
+
+                        nodeAnalysisContext.ReportDiagnostic(diagnostic);
+                    }
                 }
             }
         }

@@ -61,6 +61,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string testCode = @"
                 using System.Threading.Tasks;
                 using Microsoft.AspNetCore.Mvc;
+                using Microsoft.AspNetCore.Http;
 
                 namespace ConsoleApplication1
                 {
@@ -84,6 +85,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string testCode = @"
                 using System.Threading.Tasks;
                 using Microsoft.AspNetCore.Mvc;
+                using Microsoft.AspNetCore.Http;
 
                 namespace ConsoleApplication1
                 {
