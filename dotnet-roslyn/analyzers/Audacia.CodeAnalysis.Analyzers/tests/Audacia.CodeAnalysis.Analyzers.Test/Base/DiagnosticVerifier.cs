@@ -4,10 +4,12 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Base
@@ -21,6 +23,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+        private static readonly MetadataReference AspNetCoreMvcReference = MetadataReference.CreateFromFile(typeof(ProducesResponseTypeAttribute).Assembly.Location);
+        private static readonly MetadataReference IActionResultReference = MetadataReference.CreateFromFile(typeof(IActionResult).Assembly.Location);
+        private static readonly MetadataReference TypedResultsReference = MetadataReference.CreateFromFile(typeof(Results).Assembly.Location);
         internal static CompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.ConsoleApplication);
         internal static CSharpParseOptions ParseOptions = CSharpParseOptions.Default;
         internal static string DefaultFilePathPrefix = "Test";
@@ -357,6 +362,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
             }
 
             var project = CreateProject(sources, language);
+
             var documents = project.Documents.ToArray();
 
             if (sources.Length != documents.Length)
@@ -399,7 +405,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, CSharpSymbolsReference)
-                .AddMetadataReference(projectId, CodeAnalysisReference);
+                .AddMetadataReference(projectId, CodeAnalysisReference)
+                .AddMetadataReference(projectId, AspNetCoreMvcReference)
+                .AddMetadataReference(projectId, IActionResultReference)
+                .AddMetadataReference(projectId, TypedResultsReference);
 
             int count = 0;
             foreach (var source in sources)
