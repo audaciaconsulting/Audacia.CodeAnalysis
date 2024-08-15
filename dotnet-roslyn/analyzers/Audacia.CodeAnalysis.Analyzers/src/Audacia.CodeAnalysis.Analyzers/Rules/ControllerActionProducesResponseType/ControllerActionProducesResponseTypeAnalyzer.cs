@@ -75,7 +75,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
             {
                 var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
-                var nameSpaces = nodeAnalysisContext.SemanticModel.GetTypeInfo(methodDeclarationSyntax.ReturnType).Type.ContainingNamespace;
+                var returnTypeNamespace = nodeAnalysisContext.SemanticModel.GetTypeInfo(methodDeclarationSyntax.ReturnType).Type.ContainingNamespace;
 
                 var returnType = methodDeclarationSyntax.ReturnType;
 
@@ -85,7 +85,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
                 {
                     var genericTypeArgument = returnTypeSymbol.TypeArguments.FirstOrDefault();
 
-                    nameSpaces = genericTypeArgument.ContainingNamespace;
+                    returnTypeNamespace = genericTypeArgument.ContainingNamespace;
                 }
 
                 var methodAttributes = methodDeclarationSyntax.GetMethodAttributes();
@@ -98,7 +98,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
 
                 if (!hasProducesResponseType && 
                     !returnType.ToString().Contains("Results") && 
-                    !nameSpaces.ToDisplayString().Contains("Microsoft.AspNetCore.Http"))
+                    !returnTypeNamespace.ToDisplayString().Contains("Microsoft.AspNetCore.Http"))
                 {
                     var location = nodeAnalysisContext.Node.GetLocation();
 
