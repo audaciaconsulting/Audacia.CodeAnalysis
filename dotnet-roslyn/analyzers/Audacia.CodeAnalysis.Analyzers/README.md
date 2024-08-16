@@ -92,6 +92,92 @@ const decimal shippingCost = 2.5m;
 var totalPrice = price + shippingCost;
 ```
 
+This also applies to switch statements:
+
+Code with violation:
+```csharp
+ const int check = 11;
+
+switch (11):
+    {
+        case check:
+            return;
+        default:
+            return;
+    } 
+```
+
+Code with fix:
+```csharp
+const int check = 11;
+
+switch (check):
+    {
+        case check:
+            return;
+        default:
+            return;
+    } 
+```
+
+for loops:
+Code with violation:
+```csharp
+for(int testVar = 7; i > 0; i--)
+    {
+        continue;
+    }
+```
+Code with fix:
+```csharp
+const int check = 11;
+var iterator = 2;
+
+for (var counter = iterator; counter < check; counter++)
+    {
+
+    }
+```
+
+while loops:
+Code with violation:
+```csharp
+while(count < 11)
+    {
+        count++;
+    }
+```
+Code with fix:
+```csharp
+const int check = 11;
+var toCheck = 0;
+while(toCheck < check)
+    {
+        toCheck++;
+        return;
+    }
+```
+
+if statement:
+Code with violation:
+```csharp
+const int check = 11;
+
+if(check == 11 && check != 42)
+    {
+    }
+```
+Code with fix:
+```csharp
+const int check = 11;
+var iterator = 2;
+
+if(check != iterator)
+    {
+        return;
+    }
+```
+
 An exception to this rule is where the 'magic number' is 1. This is because it is extremely common to use 1 to increment/decrement values. Therefore the following code is allowed:
 
 ```csharp
@@ -238,6 +324,15 @@ public record Exam(int a, int b); // Record class
 public async Task MyMethodAsync(int a, int b, int c, int d, CancellationToken cancellationToken)
 {
 }
+```
+
+This does however exclude `this` params that are used as part of extension methods:
+```csharp
+// No parameter count violation.
+public static string ExampleExtension(this Person person, int a, int b, int c, int d);
+
+// Parameter Count Violation
+public static string ExampleExtension(this Person person, int a, int b, int c, int d, int e);
 ```
 
 ## ACL1004 - Don't use abbreviations
