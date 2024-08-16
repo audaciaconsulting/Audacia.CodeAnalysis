@@ -61,7 +61,7 @@ dotnet_diagnostic.ACL1005.severity = warning
 # Method overload should call another overload
 dotnet_diagnostic.ACL1009.severity = warning
 
-# Controller action should have at least one ProducesResponseType attribute
+# Controller action should have at least one ProducesResponseType attribute when not returning TypedResults
 dotnet_diagnostic.ACL1008.severity = warning
 
 # Disabling ASP.NET "Request Validation" feature is security-sensitive
@@ -96,3 +96,9 @@ dotnet_diagnostic.S2076.severity = warning
 
 # Server-side requests should not be vulnerable to forging attacks
 dotnet_diagnostic.S5144.severity = warning
+
+# Controller action should not have ProducesResponseType attribute when return type is TypedResults
+dotnet_diagnostic.ACL1015.severity = warning
+
+# Controller action should return TypedResults instead of IActionResult
+dotnet_diagnostic.ACL1016.severity = warning
