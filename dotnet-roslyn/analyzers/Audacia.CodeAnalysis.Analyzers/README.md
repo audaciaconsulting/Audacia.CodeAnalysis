@@ -96,28 +96,28 @@ This also applies to switch statements:
 
 Code with violation:
 ```csharp
- var check = 11;
+ const check = 11;
 
-  switch (11):
- {
- case check:
-     return;
- default:
-     return;
- } 
+switch (11):
+    {
+        case check:
+            return;
+        default:
+            return;
+    } 
 ```
 
 Code with fix:
 ```csharp
-var check = 11;
+const check = 11;
 
- switch (check):
-{
-case check:
-    return;
-default:
-    return;
-} 
+switch (check):
+    {
+        case check:
+            return;
+        default:
+            return;
+    } 
 ```
 
 for loops:
@@ -130,13 +130,13 @@ for(int testVar = 7; i > 0; i--)
 ```
 Code with fix:
 ```csharp
-var check = 11;
+const check = 11;
 var iterator = 2;
 
- for (var counter = iterator; counter < check; counter++)
-{
+for (var counter = iterator; counter < check; counter++)
+    {
 
-}
+    }
 ```
 
 while loops:
@@ -149,19 +149,19 @@ while(count < 11)
 ```
 Code with fix:
 ```csharp
-var check = 11;
+const check = 11;
 var toCheck = 0;
- while(toCheck < check)
+while(toCheck < check)
     {
         toCheck++;
-        return
+        return;
     }
 ```
 
 if statement:
 Code with violation:
 ```csharp
-var check = 11;
+const check = 11;
 
 if(check == 11 && check != 42)
     {
@@ -169,13 +169,13 @@ if(check == 11 && check != 42)
 ```
 Code with fix:
 ```csharp
-var check = 11;
+const check = 11;
 var iterator = 2;
 
 if(check != iterator)
-{
-    return;
-}
+    {
+        return;
+    }
 ```
 
 An exception to this rule is where the 'magic number' is 1. This is because it is extremely common to use 1 to increment/decrement values. Therefore the following code is allowed:
@@ -329,10 +329,10 @@ public async Task MyMethodAsync(int a, int b, int c, int d, CancellationToken ca
 This does however exclude `this` params that are used as part of extension methods:
 ```csharp
 // No parameter count violation.
-public static string ExampleExtension(this Person person, int a, int b, int c, int d, int e);
+public static string ExampleExtension(this Person person, int a, int b, int c, int d);
 
 // Parameter Count Violation
-public static string ExampleExtension(this Person person, int a, int b, int c, int d, int e, int f);
+public static string ExampleExtension(this Person person, int a, int b, int c, int d, int e);
 ```
 
 ## ACL1004 - Don't use abbreviations

@@ -313,7 +313,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostic_For_For_Loop_Magic_Number()
+        public void Diagnostic_For_For_Loop_With_Magic_Number()
         {
           
             var test = @"
@@ -335,7 +335,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostic_While_Iteriable_Magic_Number()
+        public void Diagnostic_For_While_Loop_Iterable_With_Magic_Number()
         {
 
             var test = @"
@@ -359,7 +359,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostic_Multi_Variable_While_Iteriable_Magic_Number()
+        public void Diagnostic_For_Multi_Variable_While_Iterable_With_Magic_Number()
         {
 
             var test = @"
@@ -384,7 +384,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostic_If_Magic_Number()
+        public void Diagnostic_For_If_With_Magic_Number()
         {
 
             var test = @"
@@ -407,7 +407,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostic_Multi_Variable_If_Magic_Number()
+        public void Diagnostic_For_Multi_Variable_If_With_Magic_Number()
         {
 
             var test = @"
@@ -432,7 +432,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostic_Case_Switch_Label_Magic_Number()
+        public void Diagnostic_For_Case_Switch_Label_With_Magic_Number()
         {
 
             var test = @"
@@ -461,7 +461,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void Diagnostic_Switch_Statement_Magic_Number()
+        public void Diagnostic_For_Switch_Statement_With_Magic_Number()
         {
 
             var test = @"
@@ -492,7 +492,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void No_Diagnostic_For_Switch_Statement_No_Magic_Number()
+        public void No_Diagnostic_For_Switch_Statement_With_No_Magic_Number()
         {
             var test = @"
     namespace ConsoleApplication1
@@ -517,7 +517,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void No_Diagnostic_For_While_Statement_No_Magic_Number()
+        public void No_Diagnostic_For_While_Statement_With_No_Magic_Number()
         {
             var test = @"
     namespace ConsoleApplication1
@@ -539,7 +539,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void No_Diagnostic_For_For_Statement_No_Magic_Number()
+        public void No_Diagnostic_For_For_Statement_With_No_Magic_Number()
         {
             var test = @"
     namespace ConsoleApplication1
@@ -562,7 +562,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
 
         [TestMethod]
-        public void No_Diagnostic_For_If_Statement_No_Magic_Number()
+        public void No_Diagnostic_For_If_Statement_With_No_Magic_Number()
         {
             var test = @"
     namespace ConsoleApplication1

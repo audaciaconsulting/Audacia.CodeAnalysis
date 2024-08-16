@@ -37,14 +37,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
 
         private static void AnalyzeLocalDeclarationSyntax(SyntaxNodeAnalysisContext context)
         {
-            var variableDeclaration = (LocalDeclarationStatementSyntax)context.Node;
+            var localDeclarationSyntax = (LocalDeclarationStatementSyntax)context.Node;
 
-            if (variableDeclaration.Modifiers.Any(SyntaxKind.ConstKeyword))
+            if (localDeclarationSyntax.Modifiers.Any(SyntaxKind.ConstKeyword))
             {
                 return;
             }
 
-            AnalyzeVariables(variableDeclaration.Declaration.Variables, context, SyntaxKind.LocalDeclarationStatement);
+            AnalyzeVariables(localDeclarationSyntax.Declaration.Variables, context, SyntaxKind.LocalDeclarationStatement);
         }
 
         private static void AnalyzeVariables(SeparatedSyntaxList<VariableDeclaratorSyntax> variables, SyntaxNodeAnalysisContext context, SyntaxKind kind)
@@ -65,34 +65,34 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
 
                 if (initializer.Value is BinaryExpressionSyntax binaryExpression)
                 {
-                    AnalyzeBinaryExpression(context, binaryExpression,variable);
+                    AnalyzeBinaryExpression(context, binaryExpression, variable);
                 }
             }
         }
 
         private static void AnalyzeForSyntax(SyntaxNodeAnalysisContext context)
         {
-            var variableDeclaration = (ForStatementSyntax)context.Node;
-            if (variableDeclaration.Declaration.Variables != null)
+            var forStatementSyntax = (ForStatementSyntax)context.Node;
+            if (forStatementSyntax.Declaration.Variables != null)
             {
-                AnalyzeVariables(variableDeclaration.Declaration.Variables, context, SyntaxKind.ForStatement);
+                AnalyzeVariables(forStatementSyntax.Declaration.Variables, context, SyntaxKind.ForStatement);
             }
         }
 
         private static void AnalyzeWhileSyntax(SyntaxNodeAnalysisContext context)
         {
-            var variableDeclaration = (WhileStatementSyntax)context.Node;
-            if(variableDeclaration.Condition is BinaryExpressionSyntax binarySyntax)
+            var whileStatementSyntax = (WhileStatementSyntax)context.Node;
+            if(whileStatementSyntax.Condition is BinaryExpressionSyntax binarySyntax)
             {
-                AnalyzeBinaryExpression(context,binarySyntax);
+                AnalyzeBinaryExpression(context, binarySyntax);
             }
             
         }
 
         private static void AnalyzeIfSyntax(SyntaxNodeAnalysisContext context)
         {
-            var variableDeclaration = (IfStatementSyntax)context.Node;
-            if (variableDeclaration.Condition is BinaryExpressionSyntax binarySyntax)
+            var ifStatementSyntax = (IfStatementSyntax)context.Node;
+            if (ifStatementSyntax.Condition is BinaryExpressionSyntax binarySyntax)
             {
                 AnalyzeBinaryExpression(context, binarySyntax);
             }
@@ -101,17 +101,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
 
         private static void AnalyzeCaseSwitchLabelSyntax(SyntaxNodeAnalysisContext context)
         {
-            var variableDeclaration = (CaseSwitchLabelSyntax)context.Node;
-            if (variableDeclaration.Value is LiteralExpressionSyntax numericLiteral)
+            var caseSwitchLabelSyntax = (CaseSwitchLabelSyntax)context.Node;
+            if (caseSwitchLabelSyntax.Value is LiteralExpressionSyntax numericLiteral)
             {
-                AnalyzeNumericLiteral(numericLiteral,context);
+                AnalyzeNumericLiteral(numericLiteral, context);
             }
         }
 
         private static void AnalyzeSwitchStatementSyntax(SyntaxNodeAnalysisContext context)
         {
-            var variableDeclaration = (SwitchStatementSyntax)context.Node;
-            if (variableDeclaration.Expression is LiteralExpressionSyntax numericLiteral)
+            var switchStatementSyntax = (SwitchStatementSyntax)context.Node;
+            if (switchStatementSyntax.Expression is LiteralExpressionSyntax numericLiteral)
             {
                 AnalyzeNumericLiteral(numericLiteral, context);
             }
@@ -142,7 +142,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
                 }
                 else if (syntaxNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 {
-                    AnalyzeNumericLiteral(syntaxNode, context,variable);
+                    AnalyzeNumericLiteral(syntaxNode, context, variable);
                 }
             }
         }
