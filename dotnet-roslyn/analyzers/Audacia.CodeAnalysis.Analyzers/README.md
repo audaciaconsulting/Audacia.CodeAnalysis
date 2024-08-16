@@ -96,7 +96,7 @@ This also applies to switch statements:
 
 Code with violation:
 ```csharp
- const check = 11;
+ const int check = 11;
 
 switch (11):
     {
@@ -109,7 +109,7 @@ switch (11):
 
 Code with fix:
 ```csharp
-const check = 11;
+const int check = 11;
 
 switch (check):
     {
@@ -130,7 +130,7 @@ for(int testVar = 7; i > 0; i--)
 ```
 Code with fix:
 ```csharp
-const check = 11;
+const int check = 11;
 var iterator = 2;
 
 for (var counter = iterator; counter < check; counter++)
@@ -149,7 +149,7 @@ while(count < 11)
 ```
 Code with fix:
 ```csharp
-const check = 11;
+const int check = 11;
 var toCheck = 0;
 while(toCheck < check)
     {
@@ -161,7 +161,7 @@ while(toCheck < check)
 if statement:
 Code with violation:
 ```csharp
-const check = 11;
+const int check = 11;
 
 if(check == 11 && check != 42)
     {
@@ -169,7 +169,7 @@ if(check == 11 && check != 42)
 ```
 Code with fix:
 ```csharp
-const check = 11;
+const int check = 11;
 var iterator = 2;
 
 if(check != iterator)

@@ -14,11 +14,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
     {
         public const string Id = DiagnosticId.MagicNumber;
 
-        private const string Title = "Variable declaration uses a magic number"; 
+        private const string Title = "Variable declaration uses a magic number";
         private const string MessageFormat = "Variable declaration for '{0}' should not use a magic number";
         private const string Description = "Variable declarations should not use a magic number. Move the number to a constant field with a descriptive name.";
         
-
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
