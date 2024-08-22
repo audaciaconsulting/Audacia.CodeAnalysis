@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.Logging.HandlerShouldInjectILogger
+namespace Audacia.CodeAnalysis.Analyzers.Rules.Observability.HandlerShouldInjectILogger
 {
     public class HandlerShouldInjectILoggerInfo
     {
@@ -9,7 +9,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.Logging.HandlerShouldInjectILogge
 
         public IMethodSymbol MethodSymbol { get; }
 
-        public IEnumerable<string> HandlerEndingTerms => _settings.HandlerEndingIdentifiers;
+        public IEnumerable<string> HandlerIdentifyingTerms => _settings.HandlerIdentifyingTerms;
 
         public HandlerShouldInjectILoggerInfo(
             IMethodSymbol methodSymbol,

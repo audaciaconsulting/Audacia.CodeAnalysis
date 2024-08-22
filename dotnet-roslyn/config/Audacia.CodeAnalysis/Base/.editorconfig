@@ -59,7 +59,7 @@ dotnet_diagnostic.ACL1014.severity = warning
 
 # [Observability] ACL1400: Command Handlers should inject ILogger
 dotnet_diagnostic.ACL1400.severity = warning
-dotnet_diagnostic.ACL1400.handler_ending_term = Handler,Command
+dotnet_diagnostic.ACL1400.handler_identifying_term = Handler,Command
 
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
@@ -10,14 +8,14 @@ using Audacia.CodeAnalysis.Analyzers.Settings;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.Logging.HandlerShouldInjectILogger
+namespace Audacia.CodeAnalysis.Analyzers.Rules.Observability.HandlerShouldInjectILogger
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class HandlerShouldInjectILoggerAnalyzer : DiagnosticAnalyzer
     {
         public const string Id = DiagnosticId.HandlerShouldInjectILogger;
 
-        public const string HandlerEndingIdentifiersSettingKey = "handler_ending_term";
+        public const string HandlerIdentifyingTermsSettingKey = "identifying";
 
         private const string Title = "Command Handlers should inject ILogger instance";
         private const string MessageFormat = "Handler '{0}' should inject ILogger";
@@ -42,7 +40,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.Logging.HandlerShouldInjectILogge
         private readonly bool _isSettingsReaderInjected;
         private ISettingsReader _settingsReader;
 
-        public static readonly IEnumerable<string> DefaultHandlerEndingIdentifiers = new List<string>()
+        public static readonly IEnumerable<string> DefaultHandlerIdentifiersTerms = new List<string>()
         {
             "Handler",
             "Command"
@@ -96,8 +94,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.Logging.HandlerShouldInjectILogge
             if (!method.IsPropertyOrEventAccessor() &&
                 MemberRequiresAnalysis(method, context.CancellationToken) &&
                 method.IsConstructor() &&
-                settings.HandlerEndingIdentifiers.Any(handlerEndingIdentifier =>
-                    memberName.EndsWith(handlerEndingIdentifier)))
+                settings.HandlerIdentifyingTerms.Any(handlerIdentifyingTerm =>
+                    memberName.EndsWith(handlerIdentifyingTerm)))
             {
                 var handlerShouldInjectILoggerInfo = new HandlerShouldInjectILoggerInfo(method, settings);
 
@@ -109,16 +107,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.Logging.HandlerShouldInjectILogge
             IMethodSymbol symbol,
             SyntaxTree syntaxTree)
         {
-            var handlerEndingIdentifiers = DefaultHandlerEndingIdentifiers;
+            var handlerIdentifyingTerms = DefaultHandlerIdentifiersTerms;
 
-            var rawHandlerEndingIdentifiers =
-                _settingsReader.TryGetValue(syntaxTree, new SettingsKey(Id, HandlerEndingIdentifiersSettingKey));
-            if (!string.IsNullOrEmpty(rawHandlerEndingIdentifiers))
+            var rawHandlerIdentifyingTerms =
+                _settingsReader.TryGetValue(syntaxTree, new SettingsKey(Id, HandlerIdentifyingTermsSettingKey));
+            if (!string.IsNullOrEmpty(rawHandlerIdentifyingTerms))
             {
-                handlerEndingIdentifiers = rawHandlerEndingIdentifiers.Split(',');
+                handlerIdentifyingTerms = rawHandlerIdentifyingTerms.Split(',');
             }
 
-            return new InjectILoggerSettings(handlerEndingIdentifiers);
+            return new InjectILoggerSettings(handlerIdentifyingTerms);
         }
 
         private static bool MemberRequiresAnalysis(
@@ -166,7 +164,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.Logging.HandlerShouldInjectILogge
                     HandlerShouldInjectILoggerRule,
                     handlerShouldInjectILoggerInfo.MethodSymbol.Locations[0],
                     name,
-                    handlerShouldInjectILoggerInfo.HandlerEndingTerms);
+                    handlerShouldInjectILoggerInfo.HandlerIdentifyingTerms);
 
                 context.ReportDiagnostic(diagnostic);
             }

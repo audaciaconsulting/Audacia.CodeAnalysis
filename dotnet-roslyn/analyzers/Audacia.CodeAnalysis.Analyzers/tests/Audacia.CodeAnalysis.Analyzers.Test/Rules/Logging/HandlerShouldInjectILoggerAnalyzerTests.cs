@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Audacia.CodeAnalysis.Analyzers.Rules.Logging.HandlerShouldInjectILogger;
 using Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations;
+using Audacia.CodeAnalysis.Analyzers.Rules.Observability.HandlerShouldInjectILogger;
 using Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount;
 using Audacia.CodeAnalysis.Analyzers.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
@@ -175,7 +175,7 @@ namespace TestNamespace
         _mockSettingsReader.Setup(settings => settings.TryGetValue(
                 It.IsAny<SyntaxTree>(),
                 new SettingsKey(HandlerShouldInjectILoggerAnalyzer.Id,
-                    HandlerShouldInjectILoggerAnalyzer.HandlerEndingIdentifiersSettingKey)))
+                    HandlerShouldInjectILoggerAnalyzer.HandlerIdentifyingTermsSettingKey)))
             .Returns("Random");
 
         var test = @"
@@ -207,7 +207,7 @@ namespace TestNamespace
         _mockSettingsReader.Setup(settings => settings.TryGetValue(
                 It.IsAny<SyntaxTree>(),
                 new SettingsKey(HandlerShouldInjectILoggerAnalyzer.Id,
-                    HandlerShouldInjectILoggerAnalyzer.HandlerEndingIdentifiersSettingKey)))
+                    HandlerShouldInjectILoggerAnalyzer.HandlerIdentifyingTermsSettingKey)))
             .Returns("Random");
 
         var test = @"

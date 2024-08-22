@@ -968,7 +968,7 @@ public Results<NotFound, Ok<string>> Get()
 </tr>
 </table>
 
-ACL1500 checks if a "CommandHandler" has a ILogger injected into it's constructor.
+ACL1400 checks if a "CommandHandler" has a ILogger injected into it's constructor.
 This applies by default to any class that ends with "Command" or "Handler".
 
 Code with diagnostic:
