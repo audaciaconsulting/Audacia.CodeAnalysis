@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations;
-using Audacia.CodeAnalysis.Analyzers.Rules.Observability.HandlerShouldInjectILogger;
-using Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.Observability.HandlerShouldInjectILogger;
 using Audacia.CodeAnalysis.Analyzers.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
@@ -10,7 +7,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.Logging;
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.Observability;
 
 [TestClass]
 public class HandlerShouldInjectILoggerAnalyzerTests : DiagnosticVerifier
