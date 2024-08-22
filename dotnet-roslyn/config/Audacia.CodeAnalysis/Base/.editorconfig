@@ -57,6 +57,10 @@ dotnet_diagnostic.ACL1013.severity = warning
 # [Naming] ACL1014: Don't include numbers in identifiers
 dotnet_diagnostic.ACL1014.severity = warning
 
+# [Observability] ACL1400: Command Handlers should inject ILogger
+dotnet_diagnostic.ACL1400.severity = warning
+dotnet_diagnostic.ACL1400.handler_ending_term = Handler,Command
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
@@ -572,6 +576,12 @@ dotnet_diagnostic.CA2245.severity = warning
 
 # [USAGE] Assigning symbol and its member in the same statement.
 dotnet_diagnostic.CA2246.severity = warning
+
+# [USAGE] Template should be a static expression
+dotnet_diagnostic.CA2254.severity = warning
+
+# [USAGE] Do not pass a non-nullable value to 'ArgumentNullException.ThrowIfNull'
+dotnet_diagnostic.CA2264.severity = warning
 
 # [SECURITY] Do not use insecure deserializer BinaryFormatter
 dotnet_diagnostic.CA2300.severity = warning

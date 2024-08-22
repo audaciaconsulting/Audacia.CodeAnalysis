@@ -19,6 +19,9 @@ dotnet_diagnostic.CA1812.severity = warning
 # [RELIABILITY] Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = warning
 
+# [USAGE] The ModuleInitializer attribute should not be used in libraries
+dotnet_diagnostic.CA2255.severity = warning
+
 # [MAINTAINABILITY] Add exception to documentation comment
 dotnet_diagnostic.RCS1140.severity = warning
 

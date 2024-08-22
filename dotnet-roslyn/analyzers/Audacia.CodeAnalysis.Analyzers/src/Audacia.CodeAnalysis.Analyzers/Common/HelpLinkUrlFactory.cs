@@ -56,6 +56,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Common
                     return $"{helpLinkUrlPrefix}controller-action-has-producesresponsetype-attribute-when-return-type-is-typedresults";
                 case DiagnosticId.UseTypedResultsInsteadOfIActionResult:
                     return $"{helpLinkUrlPrefix}controller-action-should-return-typedresults-instead-of-iactionresults";
+                case DiagnosticId.HandlerShouldInjectILogger:
+                    return $"{helpLinkUrlPrefix}handler-should-inject-ilogger";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),
