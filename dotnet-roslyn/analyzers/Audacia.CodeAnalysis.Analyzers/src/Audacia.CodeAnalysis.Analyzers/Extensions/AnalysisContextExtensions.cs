@@ -12,6 +12,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 {
     internal static class AnalysisContextExtensions
     {
+
+
+
         internal static void SkipEmptyName(this SymbolAnalysisContext context, Action<SymbolAnalysisContext> action)
         {
             if (!string.IsNullOrEmpty(context.Symbol.Name))
@@ -29,6 +32,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             {
                 action(context);
             }
+        }
+
+        public static void SkipEmptyName(SyntaxNodeAnalysisContext context, Action<SymbolAnalysisContext> action)
+        {
+            SymbolAnalysisContext symbolContext = context.ToSymbolContext();
+            SkipEmptyName(symbolContext, _ => action(symbolContext));
         }
 
         private static CompilationWithAnalyzers SyntaxToSymbolContext(SyntaxNodeAnalysisContext syntaxContext,
@@ -70,6 +79,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             }
 
             return methodSymbol.IsAsync;
+        }
+
+        public static void SafeRegisterSyntaxNodeAction(this AnalysisContext analysisContext, Action<SymbolAnalysisContext> action, params SyntaxKind[] syntaxKinds)
+        {
+            analysisContext.RegisterSyntaxNodeAction(context => SkipEmptyName(context, action), syntaxKinds);
         }
 
         /// <summary>
