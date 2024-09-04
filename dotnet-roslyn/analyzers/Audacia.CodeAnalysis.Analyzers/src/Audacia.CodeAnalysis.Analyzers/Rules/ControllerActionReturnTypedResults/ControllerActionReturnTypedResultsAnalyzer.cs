@@ -1,6 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
-using System.Xml.Linq;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
@@ -8,20 +8,21 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseType
+
+namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResults
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ControllerActionProducesResponseTypeAnalyzer : DiagnosticAnalyzer
+    public class ControllerActionReturnTypedResultsAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.ControllerActionProducesResponseType;
+        public const string Id = DiagnosticId.DoNotUseProducesResponseTypeWithTypedResults;
 
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
-        private const string MessageFormat = "Controller action name '{0}' has no [ProducesResponseType] attribute";
+        private const string MessageFormat = "[ProducesResponseType] attribute should not be applied when using TypedResults";
 
-        private const string Title = "Controller action has no [ProducesResponseType] attribute";
+        private const string Title = "Controller action has [ProducesResponseType] attribute when return type is TypedResult";
 
-        private const string Description = "Controller actions should have at least one [ProducesResponseType] attribute.";
+        private const string Description = "Controller actions should not use [ProducesResponseType] attribute when return type is TypedResult.";
 
         private const string Category = DiagnosticCategory.Maintainability;
 
@@ -62,9 +63,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
         /// <summary>
         /// The method declaration analysis includes the following checks:
         /// 1. determines whether the method is a controller
-        /// 2. determines whether the controller has at least one [ProducesResponseType] attribute when return type is not TypedResults
+        /// 2. determines whether the controller does not have [ProducesResponseType] attribute when return type is TypedResults
         ///
-        /// A diagnostic will be reported if a method is a controller but the method does not have a [ProducesResponseType] attribute when return type is not TypedResults.
+        /// A diagnostic will be reported if a method is a controller but the method has a [ProducesResponseType] attribute with TypesResults as return type.
         /// Please note, this ONLY applies to controller actions.
         /// </summary>
         private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext)
@@ -90,23 +91,24 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
 
                 var methodAttributes = methodDeclarationSyntax.GetMethodAttributes();
 
-                var hasProducesResponseType = methodAttributes
-                .Any(
-                    name =>
-                        name.Equals("ProducesResponseType")
-                );
+                var attribute = methodDeclarationSyntax.AttributeLists
+                    .SelectMany(al => al.Attributes)
+                    .FirstOrDefault(a => a.Name.ToString() == "ProducesResponseType");
 
-                if (!hasProducesResponseType && 
-                    !returnType.ToString().Contains("Results") && 
-                    !returnTypeNamespace.ToDisplayString().Contains("Microsoft.AspNetCore.Http"))
+                if (attribute != null)
                 {
-                    var location = nodeAnalysisContext.Node.GetLocation();
+                    var attributeNameSpace = nodeAnalysisContext.SemanticModel.GetTypeInfo(attribute).Type.ContainingNamespace;
 
-                    var methodName = nodeAnalysisContext.GetMethodName();
+                    if (attributeNameSpace.ToDisplayString().Contains("Microsoft.AspNetCore.Mvc") && 
+                        returnType.ToString().Contains("Results") &&
+                        returnTypeNamespace.ToDisplayString().Contains("Microsoft.AspNetCore.Http"))
+                    {
+                        var location = attribute.GetLocation();
 
-                    var diagnostic = Diagnostic.Create(Rule, location, methodName);
+                        var diagnostic = Diagnostic.Create(Rule, location, attribute.Name);
 
-                    nodeAnalysisContext.ReportDiagnostic(diagnostic);
+                        nodeAnalysisContext.ReportDiagnostic(diagnostic);
+                    }
                 }
             }
         }
