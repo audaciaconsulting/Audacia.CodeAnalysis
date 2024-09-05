@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## 1.10.0 - 2024-06-10
+## 1.10.0 - 2024-08-15
 ### Added
 - Add new rule "DoNotUseProducesResponseTypeWithTypedResults" (ACL1015) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
 - Add new rule "UseTypedResultsInsteadOfIActionResult " (ACL1016) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
