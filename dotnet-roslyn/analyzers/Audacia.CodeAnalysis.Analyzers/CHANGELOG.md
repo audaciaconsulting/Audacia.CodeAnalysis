@@ -2,16 +2,16 @@
 
 ## 1.10.0 - 2024-08-15
 ### Added
-- Add new rule "DoNotUseProducesResponseTypeWithTypedResults" (ACL1015) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
-- Add new rule "UseTypedResultsInsteadOfIActionResult " (ACL1016) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
+- Added new rule "DoNotUseProducesResponseTypeWithTypedResults" (ACL1015) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
+- Added new rule "UseTypedResultsInsteadOfIActionResult " (ACL1016) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
 
 ## 1.9.0 - 2024-06-10
 ### Added
-- Add new rule "DoNotUseNumberInIdentifierName" (ACL1014) ([026278f](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/28/commits/026278fa0f9ce31b0092b0b507f23ef793970061))
+- Added new rule "DoNotUseNumberInIdentifierName" (ACL1014) ([026278f](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/28/commits/026278fa0f9ce31b0092b0b507f23ef793970061))
 
 ## 1.8.0 - 2024-05-29
 ### Added
-- Add new rule "UseRecordTypes" (ACL1013) ([86cb060](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/24/commits/86cb06039e5156f56c0e1341ce81cabf6d2e8176))
+- Added new rule "UseRecordTypes" (ACL1013) ([86cb060](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/24/commits/86cb06039e5156f56c0e1341ce81cabf6d2e8176))
 
 ## 1.7.4 - 2024-03-15
 ### Added
@@ -22,7 +22,7 @@
 
 ## 1.7.3 - 2024-02-09
 ### Added
-Added help link urls for readme ([6ccd4f2](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/15/commits/6ccd4f245a4ab2c66b35b43e80dbf0a0caa27613))
+- Added help link urls for readme ([6ccd4f2](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/15/commits/6ccd4f245a4ab2c66b35b43e80dbf0a0caa27613))
 
 ## 1.7.2 - 2024-02-09
 ### Added
