@@ -92,16 +92,16 @@ module.exports = {
 
         function getIncludedEvent(node) {
             // Get angular outputs: i.e. `(click)="foobar()"`
-            const outputs = node.outputs.map((o) => o.name);
+            const outputs = node.outputs.map((o) => ({ name: o.name, loc: o.loc }));
 
             // Get attributes: i.e. `onclick="foobar()"`
-            const attributes = node.attributes?.map((a) => a.name)
-                .filter((a) => a.startsWith('on'))
-                .map((a) => a.slice(2));
+            const attributes = node.attributes
+                ?.filter((a) => a.name.startsWith('on'))
+                .map((o) => ({ name: o.name.slice(2), loc: o.loc }));
 
             // Combine outputs and attributes (by name)
             const events = outputs.concat(attributes)
-                .filter((n) => configuration.events.includes(n));
+                .filter((n) => configuration.events.includes(n.name));
 
             return events.length > 0
                 ? events[0]
@@ -126,10 +126,6 @@ module.exports = {
             }
 
             return true;
-        }
-
-        function getLocation(node) {
-            return node.loc;
         }
 
         function generateFixer(node, attribute) {
@@ -166,15 +162,25 @@ module.exports = {
         return {
             [`Element$1`](element) {
                 let message = '';
+                let loc;
 
                 if (isIncludedElement(element.name)) {
                     message = `${element.name} elements should include a '${configuration.testAttribute}' attribute`;
+                    // set the location to just include "<tagname"
+                    loc = {
+                        start: element.loc.start,
+                        end: {
+                            line: element.loc.start.line,
+                            column: element.loc.start.column + element.name.length + 1
+                        }
+                    }
                 }
                 else {
                     const event = getIncludedEvent(element);
 
                     if (event) {
-                        message = `Elements with ${event} events should include a '${configuration.testAttribute}' attribute`;
+                        message = `Elements with ${event.name} events should include a '${configuration.testAttribute}' attribute`;
+                        loc = event.loc;
                     }
                     else {
                         return;
@@ -192,8 +198,6 @@ module.exports = {
                 if (configuration.enableFixer) {
                     fix = generateFixer(element, attribute);
                 }
-
-                const loc = getLocation(element);
 
                 // Don't return node on it's own as the angular ESlint can be aggressive and highligh the whole file.
                 // Return the location instead to highlight only the issue.
