@@ -163,63 +163,47 @@ module.exports = {
             return fix;
         }
 
-        // declare the state of the rule
         return {
-            onCodePathStart: function (_, node) {
-                // At the start of analyzing a code path
-            },
-            onCodePathEnd: function (_, node) {
-                //https://astexplorer.net/#/gist/2f7851a58edbdc4aefacb48960923e06/80d646d3e697163b46e948c3139d4a2358347c05
-                let childNodes = node.templateNodes
-                    .filter(n => n.type == 'Element$1');
-
+            [`Element$1`](element) {
                 let message = '';
-                // Go through each node
-                for (var i = 0; i < childNodes.length; i++) {
-                    const currentNode = childNodes[i];
 
-                    // Add any children so they can be checked too
-                    childNodes.push(...currentNode.children.filter(n => n.type == 'Element$1'));
+                if (isIncludedElement(element.name)) {
+                    message = `${element.name} elements should include a '${configuration.testAttribute}' attribute`;
+                }
+                else {
+                    const event = getIncludedEvent(element);
 
-                    // Check element first
-                    if (isIncludedElement(currentNode.name)) {
-                        message = `${currentNode.name} elements should include a '${configuration.testAttribute}' attribute`;
+                    if (event) {
+                        message = `Elements with ${event} events should include a '${configuration.testAttribute}' attribute`;
                     }
                     else {
-                        const event = getIncludedEvent(currentNode);
-
-                        if (event) {
-                            message = `Elements with ${event} events should include a '${configuration.testAttribute}' attribute`;
-                        }
-                        else {
-                            continue;
-                        }
+                        return;
                     }
-
-                    const attribute = getDataTestAttribute(currentNode);
-
-                    if (isAttributeValid(attribute)) {
-                        continue;
-                    }
-
-                    let fix = null;
-
-                    if (configuration.enableFixer) {
-                        fix = generateFixer(currentNode, attribute);
-                    }
-
-                    const loc = getLocation(currentNode);
-
-                    // Don't return node on it's own as the angular ESlint can be aggressive and highligh the whole file.
-                    // Return the location instead to highlight only the issue.
-                    context.report({
-                        currentNode,
-                        message,
-                        fix,
-                        loc
-                    });
                 }
-            }
+
+                const attribute = getDataTestAttribute(element);
+
+                if (isAttributeValid(attribute)) {
+                    return;
+                }
+
+                let fix = null;
+
+                if (configuration.enableFixer) {
+                    fix = generateFixer(element, attribute);
+                }
+
+                const loc = getLocation(element);
+
+                // Don't return node on it's own as the angular ESlint can be aggressive and highligh the whole file.
+                // Return the location instead to highlight only the issue.
+                context.report({
+                    element,
+                    message,
+                    fix,
+                    loc
+                });
+            },
         };
     }
 };

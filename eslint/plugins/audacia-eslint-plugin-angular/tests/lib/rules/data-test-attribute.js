@@ -367,6 +367,35 @@ ruleTester.run("data-test-attribute", rule, {
             errors: ["Elements with click events should include a 'dataOtherAttribute' attribute"],
             output: '<template><div dataOtherAttribute="test-id" (click)="foobar()"></div></template>',
             options: [{ enableFixer: true, testAttribute: 'dataOtherAttribute' }],
-        }
+        },
+        // directives
+        {
+            name: 'div element without test attribute with an ngIf',
+            code: '<template><div *ngIf="true"></div></template>',
+            errors: ["div elements should include a 'data-test' attribute"],
+            output: '<template><div data-test="test-id" *ngIf="true"></div></template>',
+            options: [{ enableFixer: true, elements: ['div'] }],
+        },
+        {
+            name: 'input element without test attribute inside an ngIf',
+            code: '<template><div *ngIf="true"><input type="text"/></div></template>',
+            errors: ["input elements should include a 'data-test' attribute"],
+            output: '<template><div *ngIf="true"><input data-test="test-id" type="text"/></div></template>',
+            options: [{ enableFixer: true }],
+        },
+        {
+            name: 'div element without test attribute with an ngFor',
+            code: '<template><div *ngFor="let item of items"></div></template>',
+            errors: ["div elements should include a 'data-test' attribute"],
+            output: '<template><div data-test="test-id" *ngFor="let item of items"></div></template>',
+            options: [{ enableFixer: true, elements: ['div'] }],
+        },
+        {
+            name: 'li element without test attribute inside an ngFor',
+            code: '<template><ol *ngFor="let item of items"><li>{{ item }}</li></ol></template>',
+            errors: ["li elements should include a 'data-test' attribute"],
+            output: '<template><ol *ngFor="let item of items"><li data-test="test-id">{{ item }}</li></ol></template>',
+            options: [{ enableFixer: true, elements: ['li'] }],
+        },
     ],
 });
