@@ -5,7 +5,12 @@ trigger:
   paths:
     include:
       - 'eslint/plugins/audacia-eslint-plugin-vue/*'
-pr: { branches: { include: [master] } }
+pr: 
+  branches:
+    include: [master]
+  paths:
+    include:
+      - 'eslint/plugins/audacia-eslint-plugin-vue/*'
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
 pool: { vmImage: windows-2022 }
 
