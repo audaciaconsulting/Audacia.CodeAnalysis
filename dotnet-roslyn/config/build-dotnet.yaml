@@ -5,7 +5,12 @@ trigger:
   paths:
     include:
       - 'dotnet-roslyn/config/*'
-pr: { branches: { include: [master] } }
+pr: 
+  branches:
+    include: [master]
+  paths:
+    include:
+      - 'dotnet-roslyn/config/*'
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
 pool: { vmImage: windows-latest }
 
