@@ -5,7 +5,7 @@
 - No new functionality added
 
 ### Changed
-- Updated the `Audacia.CodeAnalysis` package to version 1.11.0 ([e685957](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/e685957748ac98304bdf3f0dc8c693848d928a7d))
+- Updated the `Audacia.CodeAnalysis.Analyzers` package to version 1.11.0 ([e685957](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/e685957748ac98304bdf3f0dc8c693848d928a7d))
 
 ### Fixed
 - No fixes implemented
