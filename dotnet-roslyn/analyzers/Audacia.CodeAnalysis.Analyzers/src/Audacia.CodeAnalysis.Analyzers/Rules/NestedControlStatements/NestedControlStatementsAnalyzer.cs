@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Settings;
 using Microsoft.CodeAnalysis;
@@ -25,6 +22,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
         private const string MessageFormat = "{0} contains {1} nested control flow statements, which exceeds the maximum of {2} nested control flow statements";
 
         private const string Description = "Don't nest too many control statements.";
+        
+        private const string ElseIfClauseType = "ElseIfClause";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -48,11 +47,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             SyntaxKind.ForEachStatement,
             SyntaxKind.ForEachVariableStatement,
             SyntaxKind.IfStatement,
+            SyntaxKind.ElseClause,
             SyntaxKind.SwitchExpression,
             SyntaxKind.SwitchStatement,
             SyntaxKind.TryStatement,
             SyntaxKind.CatchClause,
-            SyntaxKind.FinallyClause,
+            SyntaxKind.FinallyClause
         };
 
         public override void Initialize(AnalysisContext context)
@@ -130,10 +130,35 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
 
         private static void ReportAtContainingSymbol(int depth, int maxDepth, SyntaxNodeAnalysisContext context, SyntaxNode node)
         {
-            string kind = node.Kind().ToString();
+            var baseKind = node.Kind();
+            var kind = baseKind.ToString();
             var location = node.GetLocation();
 
             context.ReportDiagnostic(Diagnostic.Create(Rule, location, kind, depth, maxDepth));
+
+            // Else and If Else Clauses are considered to be a property of an IfStatement, so we need to handle them separately.
+            if (baseKind is SyntaxKind.IfStatement)
+            {
+                ReportElseStatement(baseKind, context, node, depth, maxDepth);
+            }
+        }
+        
+        private static void ReportElseStatement(SyntaxKind kind, SyntaxNodeAnalysisContext context, SyntaxNode node, int depth, int maxDepth)
+        {
+            var ifStatement = (IfStatementSyntax)node;
+            if (ifStatement.Else != null)
+            {
+                if (ifStatement.Else.Statement.IsKind(SyntaxKind.IfStatement))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Rule, ifStatement.Else.GetLocation(), ElseIfClauseType, depth, maxDepth));
+                    ReportElseStatement(kind, context, ifStatement.Else.Statement, depth, maxDepth);
+                }
+                else
+                {
+                    var elseKind = ifStatement.Else.Kind().ToString();
+                    context.ReportDiagnostic(Diagnostic.Create(Rule, ifStatement.Else.GetLocation(), elseKind, depth, maxDepth));
+                }
+            }
         }
     }
 }
