@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## 1.11.0 - 2024-09-25
+### Added
+- No new functionality added
+
+### Changed
+- Updated the `Audacia.CodeAnalysis.Analyzers` package to version 1.11.0 ([e685957](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/e685957748ac98304bdf3f0dc8c693848d928a7d))
+
+### Fixed
+- No fixes implemented
+
 ## 1.10.1 - 2024-09-23
 ### Added
 - No new functionality added
