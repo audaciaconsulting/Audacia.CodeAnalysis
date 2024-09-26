@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+# 1.11.1 - 2024-09-26
+### Added
+- No new functionality added
+
+### Changed
+- Wording updated to the messages on ACL1012 to replace the usage of the word 'Where' (as in Where Clauses) ([9ab0cb7](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/9ab0cb77308594955cfbb0141d688323e7a08db9))
+
 ## 1.11.0 - 2024-08-16
 ### Added
 - No new functionality added
