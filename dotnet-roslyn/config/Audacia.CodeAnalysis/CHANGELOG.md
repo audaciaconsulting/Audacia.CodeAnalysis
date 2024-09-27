@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+### 1.10.0.1 - 2024-09-27
+### Added
+- No new functionality added
+
+### Changed
+- Included missing Roslyn security analyzers to the base .editorconfig ([4742110](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/4742110aafc8de0df1e8def6150089c3aae9848c))
+
 ### 1.10.0.0 - 2024-08-21
 ### Added
 - Added new rule "DoNotUseProducesResponseTypeWithTypedResults" (ACL1015) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
