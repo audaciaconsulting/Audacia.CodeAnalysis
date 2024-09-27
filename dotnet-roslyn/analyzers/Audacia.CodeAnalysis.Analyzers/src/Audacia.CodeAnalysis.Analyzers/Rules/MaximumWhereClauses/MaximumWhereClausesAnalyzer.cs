@@ -14,13 +14,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
     {
         public const string Id = DiagnosticId.MaximumWhereClauses;
 
-        public const int DefaultMaximumClauses = 3;
+        private const int DefaultMaximumClauses = 3;
 
-        private const string Title = "'Where' method contains too many clauses, consisder separating out into separate chained 'Where' methods";
+        private const string Title = "Expression contains too many clauses, consisder separating out into separate chained expressions";
 
-        private const string MessageFormat = "'Where' contains {0} clauses, which exceeds the maximum of {1} clauses per 'Where'";
+        private const string MessageFormat = "Expression contains {0} clauses, which exceeds the maximum of {1} clauses per expression";
 
-        private const string Description = "Don't pass predicates into 'Where' methods with too many clauses.";
+        private const string Description = "Don't pass predicates into expressions with too many clauses.";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
