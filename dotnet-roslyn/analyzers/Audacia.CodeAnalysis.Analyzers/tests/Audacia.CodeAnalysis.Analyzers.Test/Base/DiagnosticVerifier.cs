@@ -111,69 +111,84 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         /// <param name="expectedResults">Diagnostic Results that should have appeared in the code</param>
         private static void VerifyDiagnosticResults(IEnumerable<Diagnostic> actualResults, DiagnosticAnalyzer analyzer, params DiagnosticResult[] expectedResults)
         {
-            int expectedCount = expectedResults.Count();
-            int actualCount = actualResults.Count();
-
-            if (expectedCount != actualCount)
+            var diagnosticsList = actualResults.ToList();
+            var diagnosticErrors = diagnosticsList.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
+            if (diagnosticErrors.Any())
             {
-                string diagnosticsOutput = actualResults.Any() ? FormatDiagnostics(analyzer, actualResults.ToArray()) : "    NONE.";
-
-                Assert.IsTrue(false,
-                    string.Format("Mismatch between number of diagnostics returned, expected \"{0}\" actual \"{1}\"\r\n\r\nDiagnostics:\r\n{2}\r\n", expectedCount, actualCount, diagnosticsOutput));
+                var stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine("Complication errors found in test code:");
+                foreach (var error in diagnosticErrors)
+                {
+                    stringBuilder.AppendLine(error.ToString());
+                }
+                Assert.Fail(stringBuilder.ToString());
             }
-
-            for (int i = 0; i < expectedResults.Length; i++)
+            else
             {
-                var actual = actualResults.ElementAt(i);
-                var expected = expectedResults[i];
-
-                if (expected.Line == -1 && expected.Column == -1)
+                var expectedCount = expectedResults.Length;
+                var actualCount = diagnosticsList.Count;
+    
+                if (expectedCount != actualCount)
                 {
-                    if (actual.Location != Location.None)
-                    {
-                        Assert.IsTrue(false,
-                            string.Format("Expected:\nA project diagnostic with No location\nActual:\n{0}",
-                            FormatDiagnostics(analyzer, actual)));
-                    }
+                    string diagnosticsOutput = diagnosticsList.Any() ? FormatDiagnostics(analyzer, diagnosticsList.ToArray()) : "    NONE.";
+    
+                    Assert.IsTrue(false,
+                        string.Format("Mismatch between number of diagnostics returned, expected \"{0}\" actual \"{1}\"\r\n\r\nDiagnostics:\r\n{2}\r\n", expectedCount, actualCount, diagnosticsOutput));
                 }
-                else
+    
+                for (int i = 0; i < expectedResults.Length; i++)
                 {
-                    VerifyDiagnosticLocation(analyzer, actual, actual.Location, expected.Locations.First());
-                    var additionalLocations = actual.AdditionalLocations.ToArray();
-
-                    if (additionalLocations.Length != expected.Locations.Length - 1)
+                    var actual = diagnosticsList.ElementAt(i);
+                    var expected = expectedResults[i];
+    
+                    if (expected.Line == -1 && expected.Column == -1)
                     {
-                        Assert.IsTrue(false,
-                            string.Format("Expected {0} additional locations but got {1} for Diagnostic:\r\n    {2}\r\n",
-                                expected.Locations.Length - 1, additionalLocations.Length,
+                        if (actual.Location != Location.None)
+                        {
+                            Assert.IsTrue(false,
+                                string.Format("Expected:\nA project diagnostic with No location\nActual:\n{0}",
                                 FormatDiagnostics(analyzer, actual)));
+                        }
                     }
-
-                    for (int j = 0; j < additionalLocations.Length; ++j)
+                    else
                     {
-                        VerifyDiagnosticLocation(analyzer, actual, additionalLocations[j], expected.Locations[j + 1]);
+                        VerifyDiagnosticLocation(analyzer, actual, actual.Location, expected.Locations.First());
+                        var additionalLocations = actual.AdditionalLocations.ToArray();
+    
+                        if (additionalLocations.Length != expected.Locations.Length - 1)
+                        {
+                            Assert.IsTrue(false,
+                                string.Format("Expected {0} additional locations but got {1} for Diagnostic:\r\n    {2}\r\n",
+                                    expected.Locations.Length - 1, additionalLocations.Length,
+                                    FormatDiagnostics(analyzer, actual)));
+                        }
+    
+                        for (int j = 0; j < additionalLocations.Length; ++j)
+                        {
+                            VerifyDiagnosticLocation(analyzer, actual, additionalLocations[j], expected.Locations[j + 1]);
+                        }
                     }
-                }
-
-                if (actual.Id != expected.Id)
-                {
-                    Assert.IsTrue(false,
-                        string.Format("Expected diagnostic id to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
-                            expected.Id, actual.Id, FormatDiagnostics(analyzer, actual)));
-                }
-
-                if (actual.Severity != expected.Severity)
-                {
-                    Assert.IsTrue(false,
-                        string.Format("Expected diagnostic severity to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
-                            expected.Severity, actual.Severity, FormatDiagnostics(analyzer, actual)));
-                }
-
-                if (actual.GetMessage() != expected.Message)
-                {
-                    Assert.IsTrue(false,
-                        string.Format("Expected diagnostic message to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
-                            expected.Message, actual.GetMessage(), FormatDiagnostics(analyzer, actual)));
+    
+                    if (actual.Id != expected.Id)
+                    {
+                        Assert.IsTrue(false,
+                            string.Format("Expected diagnostic id to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
+                                expected.Id, actual.Id, FormatDiagnostics(analyzer, actual)));
+                    }
+    
+                    if (actual.Severity != expected.Severity)
+                    {
+                        Assert.IsTrue(false,
+                            string.Format("Expected diagnostic severity to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
+                                expected.Severity, actual.Severity, FormatDiagnostics(analyzer, actual)));
+                    }
+    
+                    if (actual.GetMessage() != expected.Message)
+                    {
+                        Assert.IsTrue(false,
+                            string.Format("Expected diagnostic message to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
+                                expected.Message, actual.GetMessage(), FormatDiagnostics(analyzer, actual)));
+                    }
                 }
             }
         }
@@ -328,6 +343,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                         }
                     }
                 }
+
+                var diagnosticErrors = compilationWithAnalyzers.GetAllDiagnosticsAsync().Result
+                    .Where(d => d.Severity == DiagnosticSeverity.Error);
+                diagnostics.AddRange(diagnosticErrors);
             }
 
             var results = SortDiagnostics(diagnostics);
