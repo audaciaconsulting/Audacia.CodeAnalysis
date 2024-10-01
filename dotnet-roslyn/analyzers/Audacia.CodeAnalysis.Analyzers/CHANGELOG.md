@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+# 1.11.3 - 2024-10-01
+### Added
+- No new functionality added
+
+### Changed
+- Diagnostic Verifier updated to highlight compilation errors to test code. Unit test code updated to resolve any existing errors ([90dfb1b](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/90dfb1b0e855f9c47690da3363b62bf4cf3f9bf9))
+
 # 1.11.2 - 2024-09-26
 ### Added
 - No new functionality added
