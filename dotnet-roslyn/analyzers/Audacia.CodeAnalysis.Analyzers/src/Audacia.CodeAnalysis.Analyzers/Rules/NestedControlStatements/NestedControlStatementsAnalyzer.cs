@@ -91,7 +91,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
                 return;
             }
 
-            var nodesTooDeep = GetNodesInViolation(node, max).ToList();
+            var nodesTooDeep = GetNodesInViolation(node, max).ToList().Distinct();
 
             foreach (var deepNode in nodesTooDeep)
             {
@@ -110,6 +110,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             foreach (var block in blocks)
             {
                 var childStatements = block.ChildNodes().Where(n => ControlStatementKinds.Contains(n.Kind())).ToList();
+                var ifStatements = block.ChildNodes().Where(n => n.IsKind(SyntaxKind.IfStatement)).ToList();
+
+                if (ifStatements.Any())
+                {
+                    foreach (var internalNodes in ifStatements.Select(GetIfNodes))
+                    {
+                        childStatements.AddRange(internalNodes);
+                    }
+                }
 
                 foreach (var child in childStatements)
                 {
@@ -128,6 +137,31 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             }
         }
 
+        private static List<SyntaxNode> GetIfNodes(SyntaxNode node)
+        {
+            var result = new List<SyntaxNode>();
+            
+            if (node is IfStatementSyntax ifStatement)
+            {
+                result.Add(ifStatement);
+                
+                if (ifStatement.Else?.Statement is IfStatementSyntax elseIfStatement)
+                {
+                    result.AddRange(GetIfNodes(elseIfStatement));
+                }
+                else if (ifStatement.Else != null)
+                {
+                    result.Add(ifStatement.Else);
+                }
+            }
+            else if (node is ElseClauseSyntax elseClauseSyntax)
+            {
+                result.Add(elseClauseSyntax);
+            }
+
+            return result;
+        }
+
         private static void ReportAtContainingSymbol(int depth, int maxDepth, SyntaxNodeAnalysisContext context, SyntaxNode node)
         {
             var baseKind = node.Kind();
@@ -135,30 +169,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             var location = node.GetLocation();
 
             context.ReportDiagnostic(Diagnostic.Create(Rule, location, kind, depth, maxDepth));
-
-            // Else and If Else Clauses are considered to be a property of an IfStatement, so we need to handle them separately.
-            if (baseKind is SyntaxKind.IfStatement)
-            {
-                ReportElseStatement(baseKind, context, node, depth, maxDepth);
-            }
-        }
-        
-        private static void ReportElseStatement(SyntaxKind kind, SyntaxNodeAnalysisContext context, SyntaxNode node, int depth, int maxDepth)
-        {
-            var ifStatement = (IfStatementSyntax)node;
-            if (ifStatement.Else != null)
-            {
-                if (ifStatement.Else.Statement.IsKind(SyntaxKind.IfStatement))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, ifStatement.Else.GetLocation(), ElseIfClauseType, depth, maxDepth));
-                    ReportElseStatement(kind, context, ifStatement.Else.Statement, depth, maxDepth);
-                }
-                else
-                {
-                    var elseKind = ifStatement.Else.Kind().ToString();
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, ifStatement.Else.GetLocation(), elseKind, depth, maxDepth));
-                }
-            }
         }
     }
 }
