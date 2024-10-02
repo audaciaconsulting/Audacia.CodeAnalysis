@@ -22,8 +22,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
         private const string MessageFormat = "{0} contains {1} nested control flow statements, which exceeds the maximum of {2} nested control flow statements";
 
         private const string Description = "Don't nest too many control statements.";
-        
-        private const string ElseIfClauseType = "ElseIfClause";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -153,10 +151,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
                 {
                     result.Add(ifStatement.Else);
                 }
-            }
-            else if (node is ElseClauseSyntax elseClauseSyntax)
-            {
-                result.Add(elseClauseSyntax);
             }
 
             return result;
