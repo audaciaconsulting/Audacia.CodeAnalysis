@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+# 1.11.2 - 2024-09-26
+### Added
+- No new functionality added
+
+### Changed
+- Nested control statements analyser logic has been updated to include ELSE IF and ELSE clauses on IF statements ([24525f5](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/24525f54331a6c4d9fb52117db7d5a696c8fa269))
+
 # 1.11.1 - 2024-09-26
 ### Added
 - No new functionality added

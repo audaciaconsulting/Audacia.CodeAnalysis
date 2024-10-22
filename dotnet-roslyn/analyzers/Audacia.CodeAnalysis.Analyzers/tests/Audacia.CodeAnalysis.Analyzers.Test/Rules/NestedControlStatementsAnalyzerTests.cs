@@ -1,6 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.MethodLength;
-using Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements;
-using Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -187,6 +185,75 @@ namespace TestApp
             var expected = new[] {
                 BuildExpectedResult("IfStatement", 12, 21, 3),
                 BuildExpectedResult("IfStatement", 14, 25, 4),
+            };
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_If_Statements_With_Else_Clause()
+        {
+            var test = @"
+namespace TestApp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            if (true) 
+            {
+                if (true) 
+                {
+                    if (true) 
+                    {
+                    }
+                    else if (false)
+                    {
+                    }
+                    else
+                    {
+                    }
+                }
+            }
+        }
+    }
+}";
+            var expected = new[] {
+                BuildExpectedResult("IfStatement", 12, 21, 3),
+                BuildExpectedResult("IfStatement", 15, 26, 3),
+                BuildExpectedResult("ElseClause", 18, 21, 3)
+            };
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Statements_Within_Else_Clause()
+        {
+            var test = @"
+namespace TestApp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            if (true)
+            {
+                if (true)
+                {
+                }
+                else
+                {
+                    if (true)
+                    {
+                    }
+                }
+            }
+        }
+    }
+}";
+            var expected = new[] {
+                BuildExpectedResult("IfStatement", 15, 21, 3)
             };
 
             VerifyDiagnostic(test, expected);
