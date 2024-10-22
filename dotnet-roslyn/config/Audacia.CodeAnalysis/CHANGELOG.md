@@ -1,13 +1,26 @@
 ﻿# Changelog
 
-### 1.10.0.1 - 2024-09-27
+## 1.11.0 - 2024-09-25
 ### Added
 - No new functionality added
 
 ### Changed
-- Included missing Roslyn security analyzers to the base .editorconfig ([4742110](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/4742110aafc8de0df1e8def6150089c3aae9848c))
+- Updated the `Audacia.CodeAnalysis.Analyzers` package to version 1.11.0 ([e685957](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/e685957748ac98304bdf3f0dc8c693848d928a7d))
 
-### 1.10.0.0 - 2024-08-21
+### Fixed
+- No fixes implemented
+
+## 1.10.1 - 2024-09-23
+### Added
+- No new functionality added
+
+### Changed
+- No functionality changed
+
+### Fixed
+- Correct package reference for "CSharpGuidelinesAnalyzer" ([e843945](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/e843945f9a791fac19ab1e7fe0f53415a6839ae6))
+
+## 1.10.0.0 - 2024-08-21
 ### Added
 - Added new rule "DoNotUseProducesResponseTypeWithTypedResults" (ACL1015) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
 - Added new rule "UseTypedResultsInsteadOfIActionResult " (ACL1016) ([dc9869a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/31/commits/dc9869a388a3343ff6bedb613b224ec9a6205e86))
