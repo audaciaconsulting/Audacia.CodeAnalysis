@@ -225,29 +225,28 @@ class Program
         public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Statements_Within_Else_Clause()
         {
             var test = @"
-namespace TestApp
+namespace TestApp;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        if (true)
         {
             if (true)
             {
+            }
+            else
+            {
                 if (true)
                 {
-                }
-                else
-                {
-                    if (true)
-                    {
-                    }
                 }
             }
         }
     }
 }";
             var expected = new[] {
-                BuildExpectedResult("IfStatement", 15, 21, 3)
+                BuildExpectedResult("IfStatement", 15, 17, 3)
             };
 
             VerifyDiagnostic(test, expected);
