@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
@@ -10,6 +12,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Base
@@ -19,6 +22,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
     /// </summary>
     public abstract partial class DiagnosticVerifier
     {
+        private static readonly string AssemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
+        private static readonly MetadataReference CorLib =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "mscorlib.dll"));
+        private static readonly MetadataReference SystemRef =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.dll"));
+        private static readonly MetadataReference SystemCore =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Core.dll"));
+        private static readonly MetadataReference SystemRuntime =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Runtime.dll"));
         private static readonly MetadataReference CorlibReference = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
@@ -26,7 +38,18 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference AspNetCoreMvcReference = MetadataReference.CreateFromFile(typeof(ProducesResponseTypeAttribute).Assembly.Location);
         private static readonly MetadataReference IActionResultReference = MetadataReference.CreateFromFile(typeof(IActionResult).Assembly.Location);
         private static readonly MetadataReference TypedResultsReference = MetadataReference.CreateFromFile(typeof(Results).Assembly.Location);
-        internal static CompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.ConsoleApplication);
+        private static readonly MetadataReference TaskReference = MetadataReference.CreateFromFile(typeof(Task).Assembly.Location);
+        private static readonly MetadataReference ControllerBaseReference = MetadataReference.CreateFromFile(typeof(ControllerBase).Assembly.Location);
+        private static readonly MetadataReference HttpGetReference = MetadataReference.CreateFromFile(typeof(HttpGetAttribute).Assembly.Location);
+        private static readonly MetadataReference SystemConsoleReference = MetadataReference.CreateFromFile(typeof(Console).Assembly.Location);
+        private static readonly MetadataReference StatusCodesReference = MetadataReference.CreateFromFile(typeof(StatusCodes).Assembly.Location);
+        private static readonly MetadataReference LoggerReference = MetadataReference.CreateFromFile(typeof(ILogger<>).Assembly.Location);
+        private static readonly MetadataReference LoggerFactoryReference = MetadataReference.CreateFromFile(typeof(LoggerFactory).Assembly.Location);
+        private static readonly MetadataReference ControllerReference = MetadataReference.CreateFromFile(typeof(Controller).Assembly.Location);
+        private static readonly MetadataReference CancellationTokenReference = MetadataReference.CreateFromFile(typeof(System.Threading.CancellationToken).Assembly.Location);
+        
+        internal static CompilationOptions CompilationOptions = new CSharpCompilationOptions(
+            OutputKind.ConsoleApplication, assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default, allowUnsafe: true);
         internal static CSharpParseOptions ParseOptions = CSharpParseOptions.Default;
         internal static string DefaultFilePathPrefix = "Test";
         internal static string CSharpDefaultFileExt = "cs";
@@ -111,69 +134,84 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         /// <param name="expectedResults">Diagnostic Results that should have appeared in the code</param>
         private static void VerifyDiagnosticResults(IEnumerable<Diagnostic> actualResults, DiagnosticAnalyzer analyzer, params DiagnosticResult[] expectedResults)
         {
-            int expectedCount = expectedResults.Count();
-            int actualCount = actualResults.Count();
-
-            if (expectedCount != actualCount)
+            var diagnosticsList = actualResults.ToList();
+            var diagnosticErrors = diagnosticsList.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
+            if (diagnosticErrors.Any())
             {
-                string diagnosticsOutput = actualResults.Any() ? FormatDiagnostics(analyzer, actualResults.ToArray()) : "    NONE.";
-
-                Assert.IsTrue(false,
-                    string.Format("Mismatch between number of diagnostics returned, expected \"{0}\" actual \"{1}\"\r\n\r\nDiagnostics:\r\n{2}\r\n", expectedCount, actualCount, diagnosticsOutput));
+                var stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine("Complication errors found in test code:");
+                foreach (var error in diagnosticErrors)
+                {
+                    stringBuilder.AppendLine(error.ToString());
+                }
+                Assert.Fail(stringBuilder.ToString());
             }
-
-            for (int i = 0; i < expectedResults.Length; i++)
+            else
             {
-                var actual = actualResults.ElementAt(i);
-                var expected = expectedResults[i];
-
-                if (expected.Line == -1 && expected.Column == -1)
+                var expectedCount = expectedResults.Length;
+                var actualCount = diagnosticsList.Count;
+    
+                if (expectedCount != actualCount)
                 {
-                    if (actual.Location != Location.None)
-                    {
-                        Assert.IsTrue(false,
-                            string.Format("Expected:\nA project diagnostic with No location\nActual:\n{0}",
-                            FormatDiagnostics(analyzer, actual)));
-                    }
+                    string diagnosticsOutput = diagnosticsList.Any() ? FormatDiagnostics(analyzer, diagnosticsList.ToArray()) : "    NONE.";
+    
+                    Assert.IsTrue(false,
+                        string.Format("Mismatch between number of diagnostics returned, expected \"{0}\" actual \"{1}\"\r\n\r\nDiagnostics:\r\n{2}\r\n", expectedCount, actualCount, diagnosticsOutput));
                 }
-                else
+    
+                for (int i = 0; i < expectedResults.Length; i++)
                 {
-                    VerifyDiagnosticLocation(analyzer, actual, actual.Location, expected.Locations.First());
-                    var additionalLocations = actual.AdditionalLocations.ToArray();
-
-                    if (additionalLocations.Length != expected.Locations.Length - 1)
+                    var actual = diagnosticsList.ElementAt(i);
+                    var expected = expectedResults[i];
+    
+                    if (expected.Line == -1 && expected.Column == -1)
                     {
-                        Assert.IsTrue(false,
-                            string.Format("Expected {0} additional locations but got {1} for Diagnostic:\r\n    {2}\r\n",
-                                expected.Locations.Length - 1, additionalLocations.Length,
+                        if (actual.Location != Location.None)
+                        {
+                            Assert.IsTrue(false,
+                                string.Format("Expected:\nA project diagnostic with No location\nActual:\n{0}",
                                 FormatDiagnostics(analyzer, actual)));
+                        }
                     }
-
-                    for (int j = 0; j < additionalLocations.Length; ++j)
+                    else
                     {
-                        VerifyDiagnosticLocation(analyzer, actual, additionalLocations[j], expected.Locations[j + 1]);
+                        VerifyDiagnosticLocation(analyzer, actual, actual.Location, expected.Locations.First());
+                        var additionalLocations = actual.AdditionalLocations.ToArray();
+    
+                        if (additionalLocations.Length != expected.Locations.Length - 1)
+                        {
+                            Assert.IsTrue(false,
+                                string.Format("Expected {0} additional locations but got {1} for Diagnostic:\r\n    {2}\r\n",
+                                    expected.Locations.Length - 1, additionalLocations.Length,
+                                    FormatDiagnostics(analyzer, actual)));
+                        }
+    
+                        for (int j = 0; j < additionalLocations.Length; ++j)
+                        {
+                            VerifyDiagnosticLocation(analyzer, actual, additionalLocations[j], expected.Locations[j + 1]);
+                        }
                     }
-                }
-
-                if (actual.Id != expected.Id)
-                {
-                    Assert.IsTrue(false,
-                        string.Format("Expected diagnostic id to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
-                            expected.Id, actual.Id, FormatDiagnostics(analyzer, actual)));
-                }
-
-                if (actual.Severity != expected.Severity)
-                {
-                    Assert.IsTrue(false,
-                        string.Format("Expected diagnostic severity to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
-                            expected.Severity, actual.Severity, FormatDiagnostics(analyzer, actual)));
-                }
-
-                if (actual.GetMessage() != expected.Message)
-                {
-                    Assert.IsTrue(false,
-                        string.Format("Expected diagnostic message to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
-                            expected.Message, actual.GetMessage(), FormatDiagnostics(analyzer, actual)));
+    
+                    if (actual.Id != expected.Id)
+                    {
+                        Assert.IsTrue(false,
+                            string.Format("Expected diagnostic id to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
+                                expected.Id, actual.Id, FormatDiagnostics(analyzer, actual)));
+                    }
+    
+                    if (actual.Severity != expected.Severity)
+                    {
+                        Assert.IsTrue(false,
+                            string.Format("Expected diagnostic severity to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
+                                expected.Severity, actual.Severity, FormatDiagnostics(analyzer, actual)));
+                    }
+    
+                    if (actual.GetMessage() != expected.Message)
+                    {
+                        Assert.IsTrue(false,
+                            string.Format("Expected diagnostic message to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
+                                expected.Message, actual.GetMessage(), FormatDiagnostics(analyzer, actual)));
+                    }
                 }
             }
         }
@@ -328,6 +366,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                         }
                     }
                 }
+
+                var diagnosticErrors = compilationWithAnalyzers.GetAllDiagnosticsAsync().Result
+                    .Where(d => d.Severity == DiagnosticSeverity.Error);
+                diagnostics.AddRange(diagnosticErrors);
             }
 
             var results = SortDiagnostics(diagnostics);
@@ -402,13 +444,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddProject(projectId, TestProjectName, TestProjectName, language)
                 .WithProjectCompilationOptions(projectId, CompilationOptions)
                 .WithProjectParseOptions(projectId, ParseOptions)
+                .AddMetadataReference(projectId, CorLib)
+                .AddMetadataReference(projectId, SystemRef)
+                .AddMetadataReference(projectId, SystemCore)
+                .AddMetadataReference(projectId, SystemRuntime)
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, CSharpSymbolsReference)
                 .AddMetadataReference(projectId, CodeAnalysisReference)
                 .AddMetadataReference(projectId, AspNetCoreMvcReference)
                 .AddMetadataReference(projectId, IActionResultReference)
-                .AddMetadataReference(projectId, TypedResultsReference);
+                .AddMetadataReference(projectId, TypedResultsReference)
+                .AddMetadataReference(projectId, TaskReference)
+                .AddMetadataReference(projectId, ControllerBaseReference)
+                .AddMetadataReference(projectId, HttpGetReference)
+                .AddMetadataReference(projectId, SystemConsoleReference)
+                .AddMetadataReference(projectId, StatusCodesReference)
+                .AddMetadataReference(projectId, LoggerReference)
+                .AddMetadataReference(projectId, LoggerFactoryReference)
+                .AddMetadataReference(projectId, ControllerReference)
+                .AddMetadataReference(projectId, CancellationTokenReference);
 
             int count = 0;
             foreach (var source in sources)

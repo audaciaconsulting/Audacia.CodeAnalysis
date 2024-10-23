@@ -29,7 +29,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         [TestMethod]
         public void No_Diagnostics_For_Empty_Code()
         {
-            var test = @"";
+            var test = @"
+namespace ConsoleApplication1;
+
+public class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}";
 
             VerifyNoDiagnostic(test);
         }
@@ -38,17 +46,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Variable_With_Integer_Magic_Number_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+    
+class TypeName
+{
+    private int Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                var testVar = 45 + arg;
-            }
-        }
-    }";
-            var expected = BuildExpectedResult(8, 31);
+        var testVar = 45 + arg;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(8, 23);
 
             VerifyDiagnostic(test, expected);
         }
@@ -57,17 +69,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Variable_With_Double_Magic_Number_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private double Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                var testVar = 45.2 + arg;
-            }
-        }
-    }";
-            var expected = BuildExpectedResult(8, 31);
+        var testVar = 45.2 + arg;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(8, 23);
 
             VerifyDiagnostic(test, expected);
         }
@@ -76,17 +92,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Variable_With_Decimal_Magic_Number_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private decimal Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                var testVar = 45.2m + arg;
-            }
-        }
-    }";
-            var expected = BuildExpectedResult(8, 31);
+        var testVar = 45.2m + arg;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(8, 23);
 
             VerifyDiagnostic(test, expected);
         }
@@ -95,17 +115,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Variable_With_Float_Magic_Number_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private float Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                var testVar = 45.2f + arg;
-            }
-        }
-    }";
-            var expected = BuildExpectedResult(8, 31);
+        var testVar = 45.2f + arg;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(8, 23);
 
             VerifyDiagnostic(test, expected);
         }
@@ -114,17 +138,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Variable_With_Long_Magic_Number_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private long Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                var testVar = 45l + arg;
-            }
-        }
-    }";
-            var expected = BuildExpectedResult(8, 31);
+        var testVar = 45l + arg;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(8, 23);
 
             VerifyDiagnostic(test, expected);
         }
@@ -133,19 +161,23 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Variable_With_Partial_Magic_Number_Assignment_But_Also_Const_Field()
         {
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private const int Number = 66;
+namespace ConsoleApplication1;
 
-            private int Calculate(int arg)
-            {
-                var testVar = arg + 45 - Number;
-            }
-        }
-    }";
-            var expected = BuildExpectedResult(10, 37);
+class TypeName
+{
+    private const int Number = 66;
+
+    private int Calculate(int arg)
+    {
+        var testVar = arg + 45 - Number;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(10, 29);
 
             VerifyDiagnostic(test, expected);
         }
@@ -154,18 +186,22 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Variable_With_Partial_Magic_Number_Assignment_But_Also_Local_Const()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                const int number = 54;
-                var testVar = arg + 45 - number;
-            }
-        }
-    }";
-            var expected = BuildExpectedResult(9, 37);
+        const int number = 54;
+        var testVar = arg + 45 - number;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(9, 29);
 
             VerifyDiagnostic(test, expected);
         }
@@ -174,16 +210,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Variable_With_Single_Integer_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate()
     {
-        class TypeName
-        {
-            private int Calculate()
-            {
-                var testVar = 45;
-            }
-        }
-    }";
+        var testVar = 45;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
 
             VerifyNoDiagnostic(test);
         }
@@ -192,18 +232,22 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Variable_With_Const_Field_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private const int Number = 5;
+namespace ConsoleApplication1;
 
-            private int Calculate(int arg)
-            {
-                var testVar = arg + Number;
-            }
-        }
-    }";
+class TypeName
+{
+    private const int Number = 5;
+
+    private int Calculate(int arg)
+    {
+        var testVar = arg + Number;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -211,17 +255,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Variable_With_Local_Const_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                const int number = 5;
-                var testVar = arg + number;
-            }
-        }
-    }";
+        const int number = 5;
+        var testVar = arg + number;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -229,16 +277,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Variable_With_Hardcoded_String_Assignment()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private void DoStuff()
-            {
-                var testVar = ""Hello"";
-            }
-        }
-    }";
+        var testVar = ""Hello"";
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -246,16 +293,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Variable_With_Integer_Magic_Number_Assignment_If_The_Magic_Number_Is_1()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                var testVar = arg + 1;
-            }
-        }
-    }";
+        var testVar = arg + 1;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -263,17 +314,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Variable_With_Double_Magic_Number_Assignment_Even_If_The_Magic_Number_Is_1()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private double Calculate(int arg)
     {
-        class TypeName
-        {
-            private int Calculate(int arg)
-            {
-                var testVar = arg + 1.0;
-            }
-        }
-    }";
-            var expected = BuildExpectedResult(8, 37);
+        var testVar = arg + 1.0;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(8, 29);
 
             VerifyDiagnostic(test, expected);
         }
@@ -282,16 +337,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_0()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int? arg)
     {
-        class TypeName
-        {
-            private int Calculate(int? arg)
-            {
-                var testVar = arg ?? 0;
-            }
-        }
-    }";
+        var testVar = arg ?? 0;
+        return testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -299,16 +358,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_10()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int? arg)
     {
-        class TypeName
-        {
-            private int Calculate(int? arg)
-            {
-                var testVar = arg * 10;
-            }
-        }
-    }";
+        var testVar = arg * 10;
+        return (int)testVar;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -317,20 +380,25 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
           
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int? arg)
     {
-        class TypeName
+        for(int testVar = 7; testVar > 0; testVar--)
         {
-            private int Calculate(int? arg)
-            {
-                for(int testVar = 7; i > 0; i--)
-                    {
-                        continue;
-                    }
-            }
+            continue;
         }
-    }";
-            var expected = BuildExpectedResult(8, 35);
+
+        return 0;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(8, 27);
             VerifyDiagnostic(test, expected);
         }
 
@@ -339,22 +407,27 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
 
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private int Calculate(int? arg)
-            {
-                var count = 0;
+namespace ConsoleApplication1;
 
-                while(count < 11)
-                    {
-                        count++;
-                    }
-            }
+class TypeName
+{
+    private int Calculate(int? arg)
+    {
+        var count = 0;
+
+        while(count < 11)
+        {
+            count++;
         }
-    }";
-            var expected = BuildExpectedResult(10, 31, SyntaxKind.WhileStatement.ToString());
+
+        return count;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(10, 23, SyntaxKind.WhileStatement.ToString());
             VerifyDiagnostic(test, expected);
         }
 
@@ -363,24 +436,23 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
 
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private int Calculate(int? arg)
-            {
-                var count = 0;
+namespace ConsoleApplication1;
 
-                while(count < 11 || count == 11)
-                    {
-                        count++;
-                    }
-            }
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var count = 0;
+
+        while(count < 11 || count == 11)
+        {
+            count++;
         }
-    }";
-            var expected1 = BuildExpectedResult(10, 31, SyntaxKind.WhileStatement.ToString());
-            var expected2 = BuildExpectedResult(10, 46, SyntaxKind.WhileStatement.ToString());
-            VerifyDiagnostic(test, new[] { expected1, expected2 });
+    }
+}";
+            var expected1 = BuildExpectedResult(10, 23, SyntaxKind.WhileStatement.ToString());
+            var expected2 = BuildExpectedResult(10, 38, SyntaxKind.WhileStatement.ToString());
+            VerifyDiagnostic(test, expected1, expected2);
         }
 
         [TestMethod]
@@ -388,21 +460,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
 
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private int Calculate(int? arg)
-            {
-                var check = 11;
+namespace ConsoleApplication1;
 
-                if(check == 11)
-                    {
-                    }
-            }
+class TypeName
+{
+    private int Calculate(int? arg)
+    {
+        var check = 11;
+
+        if(check == 11)
+        {
         }
-    }";
-            var expected = BuildExpectedResult(10, 29, SyntaxKind.IfStatement.ToString());
+
+        return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            var expected = BuildExpectedResult(10, 21, SyntaxKind.IfStatement.ToString());
             VerifyDiagnostic(test, expected);
         }
 
@@ -411,24 +488,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
 
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private int Calculate(int? arg)
-            {
-                var check = 11;
+namespace ConsoleApplication1;
 
-                if(check == 11 && check != 42)
-                    {
-                    }
-            }w
+class TypeName
+{
+    private int Calculate(int? arg)
+    {
+        var check = 11;
+
+        if(check == 11 && check != 42)
+        {
         }
-    }";
+
+        return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
       
-            var expected1 = BuildExpectedResult(10, 29, SyntaxKind.IfStatement.ToString());
-            var expected2 = BuildExpectedResult(10, 44, SyntaxKind.IfStatement.ToString());
-            VerifyDiagnostic(test, new[] { expected1, expected2 });
+            var expected1 = BuildExpectedResult(10, 21, SyntaxKind.IfStatement.ToString());
+            var expected2 = BuildExpectedResult(10, 36, SyntaxKind.IfStatement.ToString());
+            VerifyDiagnostic(test, expected1, expected2);
         }
 
         [TestMethod]
@@ -436,26 +518,31 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
 
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int? arg)
     {
-        class TypeName
+        var check = 11;
+
+        switch (check)
         {
-            private int Calculate(int? arg)
-            {
-                var check = 11;
-
-                 switch (check):
-                {
-                case 11:
-                    return;
-                default:
-                    return;
-                } 
-            }
+            case 11:
+                return 0;
+            default:
+                return 0;
         }
-    }";
 
-            var expected = BuildExpectedResult(12, 22, SyntaxKind.CaseSwitchLabel.ToString());
+        return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+
+            var expected = BuildExpectedResult(12, 18, SyntaxKind.CaseSwitchLabel.ToString());
 
             VerifyDiagnostic(test, expected);
         }
@@ -465,26 +552,32 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
 
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int? arg)
     {
-        class TypeName
+        var check = 11;
+        const int checkValue = 11;
+
+        switch (11)
         {
-            private int Calculate(int? arg)
-            {
-                var check = 11;
-
-                 switch (11):
-                {
-                case check:
-                    return;
-                default:
-                    return;
-                } 
-            }
+            case checkValue:
+                return 0;
+            default:
+                return 0;
         }
-    }";
 
-            var expected = BuildExpectedResult(10, 26, SyntaxKind.SwitchStatement.ToString());
+        return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+
+            var expected = BuildExpectedResult(11, 17, SyntaxKind.SwitchStatement.ToString());
 
             VerifyDiagnostic(test, expected);
 
@@ -495,24 +588,30 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Switch_Statement_With_No_Magic_Number()
         {
             var test = @"
-    namespace ConsoleApplication1
-    {
-         class TypeName
-        {
-            private int Calculate(int? arg)
-            {
-                var check = 11;
+namespace ConsoleApplication1;
 
-                 switch (check):
-                {
-                case check:
-                    return;
-                default:
-                    return;
-                } 
-            }
+class TypeName
+{
+    private int Calculate(int? arg)
+    {
+        var check = 11;
+        const int checkValue = 11;
+
+        switch (check)
+        {
+            case checkValue:
+                return check;
+            default:
+                return check;
         }
-    }";
+
+        return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -520,21 +619,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_While_Statement_With_No_Magic_Number()
         {
             var test = @"
-    namespace ConsoleApplication1
-    {
-         class TypeName
-        {
-            private int Calculate(int? arg)
-            {
-                var check = 11;
+namespace ConsoleApplication1;
 
-                 while(check == check)
-                    {
-                        return
-                    }
-            }
+class TypeName
+{
+    private int Calculate(int? arg)
+    {
+        var check = 11;
+
+        while(check == check)
+        {
+            return check;
         }
-    }";
+
+        return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -542,22 +646,27 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_For_Statement_With_No_Magic_Number()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int? arg)
     {
-         class TypeName
+        var check = 11;
+        var iterator = 2;
+
+        for (var counter = iterator; counter < check; counter++)
         {
-            private int Calculate(int? arg)
-            {
-                var check = 11;
-                var iterator = 2;
 
-                 for (var counter = iterator; counter < check; counter++)
-                {
-
-                }
-            }
         }
-    }";
+
+        return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -565,23 +674,27 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_If_Statement_With_No_Magic_Number()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int Calculate(int? arg)
     {
-         class TypeName
+        var check = 11;
+        var iterator = 2;
+
+        if(check != iterator)
         {
-            private int Calculate(int? arg)
-            {
-                var check = 11;
-                var iterator = 2;
-
-                if(check != iterator)
-                {
-                    return;
-                }
-
-            }
+            return iterator;
         }
-    }";
+
+        return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 

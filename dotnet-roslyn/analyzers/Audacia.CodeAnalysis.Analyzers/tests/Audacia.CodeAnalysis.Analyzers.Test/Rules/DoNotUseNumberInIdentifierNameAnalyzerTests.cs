@@ -22,9 +22,9 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
             Message = $"{kind} '{identifierName}' contains one or more digits in its name",
             Severity = DiagnosticSeverity.Warning,
             Locations =
-                new[] {
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                }
+            [
+                new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+            ]
         };
     }
 
@@ -37,16 +37,19 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     public void No_Diagnostic_If_No_Numbers_Used()
     {
         var test = @"
-    namespace ConsoleApplication
+namespace ConsoleApplication;
+
+class TypeName
+{
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private void MethodName()
-            {
-                var noNumber = 1.0;
-            }
-        }
-    }";
+    }
+
+    private void MethodName()
+    {
+        var noNumber = 1.0;
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -55,18 +58,21 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     public void Diagnostic_If_Numbers_Used_For_Variable_Name()
     {
         var test = @"
-    namespace ConsoleApplication
-    {
-        class TypeName
-        {
-            private void MethodName()
-            {
-                var variable1 = 1.0;
-            }
-        }
-    }";
+namespace ConsoleApplication;
 
-        var expected = BuildExpectedResult(8, 21, "Variable", "variable1");
+class TypeName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void MethodName()
+    {
+        var variable1 = 1.0;
+    }
+};";
+
+        var expected = BuildExpectedResult(12, 13, "Variable", "variable1");
 
         VerifyDiagnostic(test, expected);
     }
@@ -75,17 +81,20 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     public void Diagnostic_If_Numbers_Used_For_Parameter_Name()
     {
         var test = @"
-    namespace ConsoleApplication
-    {
-        class TypeName
-        {
-            private void MethodName(string parameter1)
-            {
-            }
-        }
-    }";
+namespace ConsoleApplication;
 
-        var expected = BuildExpectedResult(6, 44, "Parameter", "parameter1");
+class TypeName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void MethodName(string parameter1)
+    {
+    }
+}";
+
+        var expected = BuildExpectedResult(10, 36, "Parameter", "parameter1");
 
         VerifyDiagnostic(test, expected);
     }
@@ -94,17 +103,20 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     public void Diagnostic_If_Numbers_Used_For_Class_Name()
     {
         var test = @"
-    namespace ConsoleApplication
-    {
-        class TypeName1
-        {
-            private void MethodName()
-            {
-            }
-        }
-    }";
+namespace ConsoleApplication;
 
-        var expected = BuildExpectedResult(4, 15, "Class", "TypeName1");
+class TypeName1
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void MethodName()
+    {
+    }
+}";
+
+        var expected = BuildExpectedResult(4, 7, "Class", "TypeName1");
 
         VerifyDiagnostic(test, expected);
     }
@@ -113,17 +125,23 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     public void Diagnostic_If_Numbers_Used_For_Record_Name()
     {
         var test = @"
-    namespace ConsoleApplication
-    {
-        record TypeName1
-        {
-            private void MethodName()
-            {
-            }
-        }
-    }";
+namespace ConsoleApplication;
 
-        var expected = BuildExpectedResult(4, 16, "Class", "TypeName1");
+class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}
+
+record TypeName1
+{
+    private void MethodName()
+    {
+    }
+}";
+
+        var expected = BuildExpectedResult(11, 8, "Class", "TypeName1");
 
         VerifyDiagnostic(test, expected);
     }
@@ -132,17 +150,23 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     public void Diagnostic_If_Numbers_Used_For_Interface_Name()
     {
         var test = @"
-    namespace ConsoleApplication
-    {
-        interface ITypeName1
-        {
-            private void MethodName()
-            {
-            }
-        }
-    }";
+namespace ConsoleApplication;
 
-        var expected = BuildExpectedResult(4, 19, "Interface", "ITypeName1");
+class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}
+
+interface ITypeName1
+{
+    private void MethodName()
+    {
+    }
+}";
+
+        var expected = BuildExpectedResult(11, 11, "Interface", "ITypeName1");
 
         VerifyDiagnostic(test, expected);
     }
@@ -151,14 +175,20 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     public void Diagnostic_If_Numbers_Used_For_Enum_Name()
     {
         var test = @"
-    namespace ConsoleApplication
-    {
-        enum TypeName1
-        {
-        }
-    }";
+namespace ConsoleApplication;
 
-        var expected = BuildExpectedResult(4, 14, "Enum", "TypeName1");
+class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}
+
+enum TypeName1
+{
+}";
+
+        var expected = BuildExpectedResult(11, 6, "Enum", "TypeName1");
 
         VerifyDiagnostic(test, expected);
     }
@@ -167,14 +197,20 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
     public void Diagnostic_If_Numbers_Used_For_Struct_Name()
     {
         var test = @"
-    namespace ConsoleApplication
-    {
-        struct TypeName1
-        {
-        }
-    }";
+namespace ConsoleApplication;
 
-        var expected = BuildExpectedResult(4, 16, "Structure", "TypeName1");
+class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}
+
+struct TypeName1
+{
+}";
+
+        var expected = BuildExpectedResult(11, 8, "Struct", "TypeName1");
 
         VerifyDiagnostic(test, expected);
     }
@@ -188,16 +224,19 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
             .Returns("B2C, 365");
 
         var test = @"
-    namespace ConsoleApplication
+namespace ConsoleApplication;
+
+class TypeNameB2C
+{
+    static void Main(string[] args)
     {
-        class TypeNameB2C
-        {
-            void Method365(int 365Url)
-            {
-                var azureB2CUrl = ""..."";
-            }            
-        }
-    }";
+    }
+
+    void Method365(int url365)
+    {
+        var azureB2CUrl = ""..."";
+    }            
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -211,16 +250,19 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
             .Returns("ABC123");
 
         var test = @"
-    namespace ConsoleApplication
+namespace ConsoleApplication;
+
+class TypeNameAbc123
+{
+    static void Main(string[] args)
     {
-        class TypeNameAbc123
-        {
-            void MethodAbC123(int abc123)
-            {
-                var anotherAbc123 = 1.0;
-            }
-        }
-    }";
+    }
+
+    void MethodAbC123(int abc123)
+    {
+        var anotherAbc123 = 1.0;
+    }
+}";
 
         VerifyNoDiagnostic(test);
     }
@@ -234,14 +276,16 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
             .Returns("B2C");
 
         var test = @"
-    namespace ConsoleApplication
-    {
-        class TypeNameB2CPart1
-        {
-        }
-    }";
+namespace ConsoleApplication;
 
-        var expected = BuildExpectedResult(4, 15, "Class", "TypeNameB2CPart1");
+class TypeNameB2CPart1
+{
+    static void Main(string[] args)
+    {
+    }
+}";
+
+        var expected = BuildExpectedResult(4, 7, "Class", "TypeNameB2CPart1");
 
         VerifyDiagnostic(test, expected);
     }

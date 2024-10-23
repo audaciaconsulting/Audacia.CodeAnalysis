@@ -19,7 +19,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         /// <summary>
         /// The project's default class. (A project must have at least one class for the fix to be registered).
         /// </summary>
-        private const string DefaultClass = @"";
+        private const string DefaultClass = @"
+namespace ConsoleApplication1;
+
+public class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}";
 
         /// <summary>
         /// Constructs the expected result when the analyzer is triggered.
@@ -35,9 +43,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 Message = "Nullable reference types should be enabled",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
             };
         }
 
@@ -90,7 +98,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 OutputKind.ConsoleApplication,
                 nullableContextOptions: NullableContextOptions.Disable);
 
-            VerifyDiagnostic(DefaultClass, BuildExpectedResult(1, 1));
+            VerifyDiagnostic(DefaultClass, BuildExpectedResult(2, 1));
 
             VerifyCodeFix(DefaultClass, DefaultClass);
         }

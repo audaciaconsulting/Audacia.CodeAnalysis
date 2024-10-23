@@ -32,7 +32,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         [TestMethod]
         public void No_Diagnostics_For_Empty_Code()
         {
-            const string testCode = @"";
+            const string testCode = @"
+namespace ConsoleApplication1;
+
+public class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
@@ -41,16 +49,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostics_For_Non_Controller_Method()
         {
             const string testCode = @"
-                namespace ConsoleApplication1
-                {
-                    class TestClass
-                    {
-                        void TestMethod()
-                        {
-                            Console.WriteLine(1234567890);
-                        }
-                    }
-                }";
+using System;
+
+namespace ConsoleApplication1;
+
+public class TestClass
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine(1234567890);
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
@@ -59,22 +68,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostics_For_Controller_With_TypedResult_ReturnType()
         {
             const string testCode = @"
-                using System.Threading.Tasks;
-                using Microsoft.AspNetCore.Mvc;
-                using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
-                namespace ConsoleApplication1
-                {
-                    public class TestController : ControllerBase
-                    {
-                        [HttpGet]
-                        public Results<NotFound, Ok<string>> Get()
-                        {
-                            var result = GetResult();
-                            return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
-                        }
-                    }
-                }";
+namespace ConsoleApplication1;
+
+public class TestController : ControllerBase
+{
+    static void Main(string[] args)
+    {
+    }
+
+    [HttpGet]
+    public Results<NotFound, Ok<string>> Get()
+    {
+        var result = Task.FromResult(""hello"").Result;
+        return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
@@ -83,22 +96,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostics_For_Controller_With_Async_Method_With_TypedResult_ReturnType()
         {
             const string testCode = @"
-                using System.Threading.Tasks;
-                using Microsoft.AspNetCore.Mvc;
-                using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
-                namespace ConsoleApplication1
-                {
-                    public class TestController : ControllerBase
-                    {
-                        [HttpGet]
-                        public async Task<Results<NotFound, Ok<string>>> Get()
-                        {
-                            var result = await GetResult();
-                            return result == null ? TypedResults.NotFound() : TypedResults.Ok(result); 
-                        }
-                    }
-                }";
+namespace ConsoleApplication1;
+
+public class TestController : ControllerBase
+{
+    static void Main(string[] args)
+    {
+    }
+
+    [HttpGet]
+    public async Task<Results<NotFound, Ok<string>>> Get()
+    {
+        var result = await Task.FromResult(""hello"");
+        return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
@@ -107,25 +124,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostics_For_Controller_With_IActionResult_ReturnType()
         {
             const string testCode = @"
-                using System.Threading.Tasks;
-                using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-                namespace ConsoleApplication1
-                {
-                    public class TestController : ControllerBase
-                    {
-                        [HttpGet]
-                        public IActionResult Get()
-                        {
-                            return Ok('hello');
-                        }
-                    }
-                }";
+namespace ConsoleApplication1;
+
+public class TestController : ControllerBase
+{
+    static void Main(string[] args)
+    {
+    }
+
+    [HttpGet]
+    public IActionResult Get()
+    {
+        return Ok(""hello"");
+    }
+}";
 
             const string expectedMessage
                 = "Controller action name 'Get' should return a TypedResult rather than an IActionResult";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 10, 32);
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 15, 12);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
@@ -134,26 +155,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostics_For_Controller_WithAsync_Method_with_IActionResult_ReturnType()
         {
             const string testCode = @"
-                using System.Threading.Tasks;
-                using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
-                namespace ConsoleApplication1
-                {
-                    public class TestController : ControllerBase
-                    {
-                        [HttpGet]
-                        public async Task<IActionResult> Get()
-                        {
-                            var result = await GetResult();
-                            return Ok(result);
-                        }
-                    }
-                }";
+namespace ConsoleApplication1;
+
+public class TestController : ControllerBase
+{
+    static void Main(string[] args)
+    {
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        var result = await Task.FromResult(""hello"");
+        return Ok(result);
+    }
+}";
 
             const string expectedMessage
                 = "Controller action name 'Get' should return a TypedResult rather than an IActionResult";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 10, 38);
+            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 14, 18);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
@@ -162,26 +186,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Multiple_Diagnostics_For_Controllers_With_Multiple_Methods_With_IActionResults_ReturnType_Instead_of_TypedResults()
         {
             const string testCode = @"
-                using System.Threading.Tasks;
-                using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
-                namespace ConsoleApplication1
-                {
-                    public class TestController : ControllerBase
-                    {
-                        [HttpGet]
-                        public IActionResult Get()
-                        {
-                            return Ok('hello');
-                        }
+namespace ConsoleApplication1;
 
-                        [HttpGet]
-                        public IActionResult Get()
-                        {
-                            return Ok('hello');
-                        }
-                    }
-                }";
+public class TestController : ControllerBase
+{
+    static void Main(string[] args)
+    {
+    }
+
+    [HttpGet]
+    public IActionResult Get()
+    {
+        return Ok(""hello"");
+    }
+
+    [HttpGet]
+    public IActionResult Get(string id)
+    {
+        return Ok(""hello"");
+    }
+}";
             const string expectedMessage1
                 = "Controller action name 'Get' should return a TypedResult rather than an IActionResult";
 
@@ -191,8 +218,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             var expectedDiagnostics
                 = new[]
                 {
-                    BuildExpectedResult(expectedMessage1, 10, 32),
-                    BuildExpectedResult(expectedMessage2, 16, 32)
+                    BuildExpectedResult(expectedMessage1, 14, 12),
+                    BuildExpectedResult(expectedMessage2, 20, 12)
                 };
 
             VerifyDiagnostic(testCode, expectedDiagnostics);
