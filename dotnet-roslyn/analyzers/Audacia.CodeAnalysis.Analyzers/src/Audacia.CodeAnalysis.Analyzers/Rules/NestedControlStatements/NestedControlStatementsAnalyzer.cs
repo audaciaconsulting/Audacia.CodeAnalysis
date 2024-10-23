@@ -91,7 +91,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
                 return;
             }
 
-            var nodesTooDeep = GetNodesInViolation(node, max).ToList();
+            var nodesTooDeep = GetNodesInViolation(node, max).ToList().Distinct();
 
             foreach (var deepNode in nodesTooDeep)
             {
@@ -110,6 +110,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             foreach (var block in blocks)
             {
                 var childStatements = block.ChildNodes().Where(n => ControlStatementKinds.Contains(n.Kind())).ToList();
+                var ifStatements = block.ChildNodes().Where(n => n.IsKind(SyntaxKind.IfStatement)).ToList();
+
+                if (ifStatements.Any())
+                {
+                    foreach (var internalNodes in ifStatements.Select(GetIfNodes))
+                    {
+                        childStatements.AddRange(internalNodes);
+                    }
+                }
 
                 foreach (var child in childStatements)
                 {
@@ -126,6 +135,27 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
                     }
                 }
             }
+        }
+
+        private static List<SyntaxNode> GetIfNodes(SyntaxNode node)
+        {
+            var result = new List<SyntaxNode>();
+            
+            if (node is IfStatementSyntax ifStatement)
+            {
+                result.Add(ifStatement);
+                
+                if (ifStatement.Else?.Statement is IfStatementSyntax elseIfStatement)
+                {
+                    result.AddRange(GetIfNodes(elseIfStatement));
+                }
+                else if (ifStatement.Else != null)
+                {
+                    result.Add(ifStatement.Else);
+                }
+            }
+
+            return result;
         }
 
         private static void ReportAtContainingSymbol(int depth, int maxDepth, SyntaxNodeAnalysisContext context, SyntaxNode node)

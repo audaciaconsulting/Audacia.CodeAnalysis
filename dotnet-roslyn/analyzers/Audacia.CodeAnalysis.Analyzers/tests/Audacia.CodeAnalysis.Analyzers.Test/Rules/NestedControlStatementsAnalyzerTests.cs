@@ -220,8 +220,40 @@ namespace TestApp
 }";
             var expected = new[] {
                 BuildExpectedResult("IfStatement", 12, 21, 3),
-                BuildExpectedResult("ElseIfClause", 15, 21, 3),
+                BuildExpectedResult("IfStatement", 15, 26, 3),
                 BuildExpectedResult("ElseClause", 18, 21, 3)
+            };
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Statements_Within_Else_Clause()
+        {
+            var test = @"
+namespace TestApp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            if (true)
+            {
+                if (true)
+                {
+                }
+                else
+                {
+                    if (true)
+                    {
+                    }
+                }
+            }
+        }
+    }
+}";
+            var expected = new[] {
+                BuildExpectedResult("IfStatement", 15, 21, 3)
             };
 
             VerifyDiagnostic(test, expected);
