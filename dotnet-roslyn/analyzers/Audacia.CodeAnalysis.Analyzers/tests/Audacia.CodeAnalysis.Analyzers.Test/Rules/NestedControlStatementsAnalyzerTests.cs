@@ -213,9 +213,9 @@ class Program
     }
 }";
             var expected = new[] {
-                BuildExpectedResult("IfStatement", 12, 21, 3),
-                BuildExpectedResult("IfStatement", 15, 26, 3),
-                BuildExpectedResult("ElseClause", 18, 21, 3)
+                BuildExpectedResult("IfStatement", 12, 17, 3),
+                BuildExpectedResult("IfStatement", 15, 22, 3),
+                BuildExpectedResult("ElseClause", 18, 17, 3)
             };
 
             VerifyDiagnostic(test, expected);
