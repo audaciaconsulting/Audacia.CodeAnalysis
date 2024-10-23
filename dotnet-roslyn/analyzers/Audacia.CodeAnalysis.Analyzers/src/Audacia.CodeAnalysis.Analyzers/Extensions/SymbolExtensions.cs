@@ -49,6 +49,23 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             return symbol.Kind.ToString();
         }
 
+        public static bool IsSymbolAccessibleFromRoot(this ISymbol symbol)
+        {
+            ISymbol container = symbol;
+
+            while (container != null)
+            {
+                if (container.DeclaredAccessibility == Accessibility.Private)
+                {
+                    return false;
+                }
+
+                container = container.ContainingType;
+            }
+
+            return true;
+        }
+
         private static string GetMethodKind(IMethodSymbol method)
         {
             switch (method.MethodKind)
@@ -73,10 +90,40 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 }
             }
         }
+        public static bool IsBooleanOrNullableBoolean(this ITypeSymbol type)
+        {
+            return type.SpecialType == SpecialType.System_Boolean || IsNullableBoolean(type);
+        }
+        public static bool IsNullableBoolean( this ITypeSymbol type)
+        {
+
+            if (type.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
+            {
+                var namedTypeSymbol = type as INamedTypeSymbol;
+
+                if (namedTypeSymbol?.TypeArguments[0].SpecialType == SpecialType.System_Boolean)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public static bool IsSynthesized(this ISymbol symbol)
         {
             return !symbol.Locations.Any();
+        }
+
+        public static bool IsDeconstructor(this ISymbol symbol)
+        {
+            if(symbol is IMethodSymbol)
+            {
+                var methodSymbol = (IMethodSymbol)symbol;
+                return methodSymbol.Name == "Deconstruct";
+            }
+
+            return false;
         }
 
         public static bool IsPropertyOrEventAccessor(this ISymbol symbol)
