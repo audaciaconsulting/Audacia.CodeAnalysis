@@ -19,16 +19,24 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 Message = "Field 'number' is not prefixed with an underscore",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
             };
         }
 
         [TestMethod]
         public void No_Diagnostics_For_Empty_Code()
         {
-            var test = @"";
+            var test = @"
+namespace ConsoleApplication1;
+
+public class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}";
 
             VerifyNoDiagnostic(test);
         }
@@ -37,25 +45,31 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_And_Code_Fix_For_Private_Field_In_A_Class()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int number;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private int number;
-        }
-    }";
-            var expected = BuildExpectedResult(6, 25);
+    }
+}";
+            var expected = BuildExpectedResult(6, 17);
 
             VerifyDiagnostic(test, expected);
 
             const string fixtest = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private int _number;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private int _number;
-        }
-    }";
+    }
+}";
             VerifyCodeFix(test, fixtest);
         }
 
@@ -63,25 +77,37 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_And_Code_Fix_For_Private_Field_In_A_Struct()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+struct TypeName
+{
+    private int number;
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
-        struct TypeName
-        {
-            private int number;
-        }
-    }";
-            var expected = BuildExpectedResult(6, 25);
+    }
+}";
+            var expected = BuildExpectedResult(6, 17);
 
             VerifyDiagnostic(test, expected);
 
             const string fixtest = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+struct TypeName
+{
+    private int _number;
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
-        struct TypeName
-        {
-            private int _number;
-        }
-    }";
+    }
+}";
             VerifyCodeFix(test, fixtest);
         }
 
@@ -89,25 +115,31 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_And_Code_Fix_For_Private_Readonly_Field()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private readonly int number;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private readonly int number;
-        }
-    }";
-            var expected = BuildExpectedResult(6, 34);
+    }
+}";
+            var expected = BuildExpectedResult(6, 26);
 
             VerifyDiagnostic(test, expected);
 
             const string fixtest = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private readonly int _number;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private readonly int _number;
-        }
-    }";
+    }
+}";
             VerifyCodeFix(test, fixtest);
         }
 
@@ -115,25 +147,31 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_And_Code_Fix_For_Private_Static_Field()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private static int number;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private static int number;
-        }
-    }";
-            var expected = BuildExpectedResult(6, 32);
+    }
+}";
+            var expected = BuildExpectedResult(6, 24);
 
             VerifyDiagnostic(test, expected);
 
             const string fixtest = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private static int _number;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private static int _number;
-        }
-    }";
+    }
+}";
             VerifyCodeFix(test, fixtest);
         }
 
@@ -141,13 +179,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Public_Field()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    public int Number;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            public int Number;
-        }
-    }";
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -155,13 +196,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Internal_Field()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    internal int Number;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            internal int Number;
-        }
-    }";
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -169,13 +213,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Private_Const_Field()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private const int Number = 4;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private const int Number = 4;
-        }
-    }";
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 
@@ -183,13 +230,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Private_Static_Readonly_Field()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    private static readonly int Number = 5;
+
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private static readonly int Number = 5;
-        }
-    }";
+    }
+}";
             VerifyNoDiagnostic(test);
         }
 

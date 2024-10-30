@@ -19,7 +19,7 @@ public class UseRecordTypesAnalyzerTests : CodeFixVerifier
         ParseOptions = new CSharpParseOptions(LanguageVersion.Latest);
     }
 
-    private readonly Mock<ISettingsReader> _mockSettingsReader = new Mock<ISettingsReader>();
+    private readonly Mock<ISettingsReader> _mockSettingsReader = new();
 
     private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string typeName, string suffix)
     {
@@ -29,10 +29,9 @@ public class UseRecordTypesAnalyzerTests : CodeFixVerifier
             Message = $"Type '{typeName}' has suffix '{suffix}', which should be a record type",
             Severity = DiagnosticSeverity.Warning,
             Locations =
-                new[]
-                {
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                }
+            [
+                new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+            ]
         };
     }
 
@@ -50,13 +49,16 @@ public class UseRecordTypesAnalyzerTests : CodeFixVerifier
     public void No_Diagnostic_If_Method_Uses_Suffix()
     {
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
 {
-    class TypeName
+    private void MethodNameDto()
     {
-        private void MethodNameDto()
-        {
-        }
+    }
+
+    static void Main(string[] args)
+    {
     }
 }";
 
@@ -67,9 +69,15 @@ namespace ConsoleApplication1
     public void No_Diagnostic_If_Record_Uses_Suffix()
     {
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+record TypeNameDto
 {
-    record TypeNameDto
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -81,11 +89,14 @@ namespace ConsoleApplication1
     public void No_Diagnostic_If_Property_Uses_Suffix()
     {
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
 {
-    class TypeName
+    public string PropertyNameDto { get; set; }
+
+    static void Main(string[] args)
     {
-        public string PropertyNameDto { get; set; }
     }
 }";
 
@@ -96,9 +107,15 @@ namespace ConsoleApplication1
     public void No_Diagnostic_If_Interface_Uses_Suffix()
     {
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+interface ITypeNameDto
 {
-    interface ITypeNameDto
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -110,9 +127,15 @@ namespace ConsoleApplication1
     public void No_Diagnostic_If_Class_Uses_Suffix_To_Lowercase()
     {
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeNamedto
 {
-    class TypeNamedto
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -129,9 +152,15 @@ namespace ConsoleApplication1
             .Returns("Command");
 
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeNameRequest
 {
-    class TypeNameRequest
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -148,9 +177,15 @@ namespace ConsoleApplication1
             .Returns("Request");
 
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeNameDto
 {
-    class TypeNameDto
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -167,9 +202,15 @@ namespace ConsoleApplication1
             .Returns(".");
 
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeNameDto
 {
-    class TypeNameDto
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -189,6 +230,13 @@ namespace ConsoleApplication1
     class TypeNameDto
     {
     }
+    
+    public class TestClass
+    {
+        static void Main(string[] args)
+        {
+        }
+    }
 }";
 
         VerifyNoDiagnostic(test);
@@ -198,9 +246,15 @@ namespace ConsoleApplication1
     public void Diagnostic_And_Code_Fix_If_Class_Uses_Suffix()
     {
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeNameDto
 {
-    class TypeNameDto
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -211,9 +265,15 @@ namespace ConsoleApplication1
         VerifyDiagnostic(test, expected);
 
         const string fixedTestCode = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+record TypeNameDto
 {
-    record TypeNameDto
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -229,9 +289,15 @@ namespace ConsoleApplication1
             .Returns("Command,Request");
 
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeNameCommand
 {
-    class TypeNameCommand
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -242,9 +308,15 @@ namespace ConsoleApplication1
         VerifyDiagnostic(test, expected);
 
         const string fixedTestCode = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+record TypeNameCommand
 {
-    record TypeNameCommand
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -260,9 +332,15 @@ namespace ConsoleApplication1
             .Returns("TypeName");
 
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
 {
-    class TypeName
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -273,9 +351,15 @@ namespace ConsoleApplication1
         VerifyDiagnostic(test, expected);
 
         const string fixedTestCode = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+record TypeName
 {
-    record TypeName
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -291,9 +375,15 @@ namespace ConsoleApplication1
             .Returns("TypeName");
 
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName(int Property1, int Property2)
 {
-    class TypeName(int Property1, int Property2)
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -304,9 +394,15 @@ namespace ConsoleApplication1
         VerifyDiagnostic(test, expected);
 
         const string fixedTestCode = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+record TypeName(int Property1, int Property2)
 {
-    record TypeName(int Property1, int Property2)
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -317,9 +413,15 @@ namespace ConsoleApplication1
     public void Diagnostic_And_Code_Fix_If_Class_With_Generic_Argument_Has_Suffix()
     {
         const string test = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeNameDto<T>
 {
-    class TypeNameDto<T>
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";
@@ -330,9 +432,15 @@ namespace ConsoleApplication1
         VerifyDiagnostic(test, expected);
 
         const string fixedTestCode = @"
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+record TypeNameDto<T>
 {
-    record TypeNameDto<T>
+}
+
+public class TestClass
+{
+    static void Main(string[] args)
     {
     }
 }";

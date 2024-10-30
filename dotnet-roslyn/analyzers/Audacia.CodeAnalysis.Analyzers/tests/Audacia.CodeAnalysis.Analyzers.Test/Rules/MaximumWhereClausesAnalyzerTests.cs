@@ -21,9 +21,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 Severity = ThenByDescendingAfterOrderByAnalyzer.Severity,
                 Message = message,
                 Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
             };
 
             return diagnosticResult;
@@ -32,7 +32,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         [TestMethod]
         public void No_Diagnostics_For_Empty_Code()
         {
-            const string testCode = @"";
+            const string testCode = @"
+namespace ConsoleApplication1;
+
+public class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
@@ -41,30 +49,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostics_For_Where_With_Single_Clause()
         {
             const string testCode = @"
-                using System;
-                using System.Linq;
+using System;
+using System.Linq;
 
-                namespace TestApp
-                {
-                    class Program
-                    {
-                        class TestClass
-                        {
-                            public string String { get; set; }
-                            public int Number { get; set; }
-                        }
+namespace TestApp;
 
-                        static void Main(string[] args)
-                        {
-                            TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
-                                   new TestClass { String = ""cba"", Number = 2 },
-                                   new TestClass { String = ""bac"", Number = 2 },
-                                   new TestClass { String = ""abc"", Number = 1 } };
+class Program
+{
+    class TestClass
+    {
+        public string String { get; set; }
+        public int Number { get; set; }
+    }
 
-                            tests.Where(t => t.String.Length > 1);
-                        }
-                    }
-                }";
+    static void Main(string[] args)
+    {
+        TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
+               new TestClass { String = ""cba"", Number = 2 },
+               new TestClass { String = ""bac"", Number = 2 },
+               new TestClass { String = ""abc"", Number = 1 } };
+
+        tests.Where(t => t.String.Length > 1);
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
@@ -73,30 +80,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostics_For_Where_With_Two_Clauses()
         {
             const string testCode = @"
-                using System;
-                using System.Linq;
+using System;
+using System.Linq;
 
-                namespace TestApp
-                {
-                    class Program
-                    {
-                        class TestClass
-                        {
-                            public string String { get; set; }
-                            public int Number { get; set; }
-                        }
+namespace TestApp;
 
-                        static void Main(string[] args)
-                        {
-                            TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
-                                   new TestClass { String = ""cba"", Number = 2 },
-                                   new TestClass { String = ""bac"", Number = 2 },
-                                   new TestClass { String = ""abc"", Number = 1 } };
+class Program
+{
+    class TestClass
+    {
+        public string String { get; set; }
+        public int Number { get; set; }
+    }
 
-                            tests.Where(t => true && true);
-                        }
-                    }
-                }";
+    static void Main(string[] args)
+    {
+        TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
+               new TestClass { String = ""cba"", Number = 2 },
+               new TestClass { String = ""bac"", Number = 2 },
+               new TestClass { String = ""abc"", Number = 1 } };
+
+        tests.Where(t => true && true);
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
@@ -105,30 +111,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostics_For_Where_With_Three_Clauses()
         {
             const string testCode = @"
-                using System;
-                using System.Linq;
+using System;
+using System.Linq;
 
-                namespace TestApp
-                {
-                    class Program
-                    {
-                        class TestClass
-                        {
-                            public string String { get; set; }
-                            public int Number { get; set; }
-                        }
+namespace TestApp;
 
-                        static void Main(string[] args)
-                        {
-                            TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
-                                   new TestClass { String = ""cba"", Number = 2 },
-                                   new TestClass { String = ""bac"", Number = 2 },
-                                   new TestClass { String = ""abc"", Number = 1 } };
+class Program
+{
+    class TestClass
+    {
+        public string String { get; set; }
+        public int Number { get; set; }
+    }
 
-                            tests.Where(t => true && true && true);
-                        }
-                    }
-                }";
+    static void Main(string[] args)
+    {
+        TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
+               new TestClass { String = ""cba"", Number = 2 },
+               new TestClass { String = ""bac"", Number = 2 },
+               new TestClass { String = ""abc"", Number = 1 } };
+
+        tests.Where(t => true && true && true);
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
@@ -137,33 +142,32 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_For_Where_With_Four_Clauses()
         {
             const string testCode = @"
-                using System;
-                using System.Linq;
+using System;
+using System.Linq;
 
-                namespace TestApp
-                {
-                    class Program
-                    {
-                        class TestClass
-                        {
-                            public string String { get; set; }
-                            public int Number { get; set; }
-                        }
+namespace TestApp;
 
-                        static void Main(string[] args)
-                        {
-                            TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
-                                   new TestClass { String = ""cba"", Number = 2 },
-                                   new TestClass { String = ""bac"", Number = 2 },
-                                   new TestClass { String = ""abc"", Number = 1 } };
+class Program
+{
+    class TestClass
+    {
+        public string String { get; set; }
+        public int Number { get; set; }
+    }
 
-                            tests.Where(t => true && true && true && true);
-                        }
-                    }
-                }";
+    static void Main(string[] args)
+    {
+        TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
+               new TestClass { String = ""cba"", Number = 2 },
+               new TestClass { String = ""bac"", Number = 2 },
+               new TestClass { String = ""abc"", Number = 1 } };
+
+        tests.Where(t => true && true && true && true);
+    }
+}";
 
             const string expectedMessage = "Expression contains 4 clauses, which exceeds the maximum of 3 clauses per expression";
-            var expectedDiagnostics = BuildExpectedResult(expectedMessage, 22, 29);
+            var expectedDiagnostics = BuildExpectedResult(expectedMessage, 22, 9);
 
             VerifyDiagnostic(testCode, expectedDiagnostics);
         }
@@ -172,30 +176,32 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_For_Where_With_Three_And_Symbols_But_Less_Than_Four_Clauses()
         {
             const string testCode = @"
-                using System;
-                using System.Linq;
+using System;
+using System.Linq;
 
-                namespace TestApp
-                {
-                    class Program
-                    {
-                        class TestClass
-                        {
-                            public string String { get; set; }
-                            public int Number { get; set; }
-                        }
+namespace TestApp;
 
-                        static void Main(string[] args)
-                        {
-                            TestClass[] tests = { new TestClass { String=""abc"", Number=2 },
-                                   new TestClass { String = ""cba"", Number = 2 },
-                                   new TestClass { String = ""bac"", Number = 2 },
-                                   new TestClass { String = ""abc"", Number = 1 } };
+class Program
+{
+    class TestClass
+    {
+        public string String { get; set; }
+        public int Number { get; set; }
+    }
 
-                            tests.Where(t => t.String == ""abc"" && t.Number == 2 && (t.String.Length > 0 || (t.String.Length > 1 && t.String.Contains(""ac"")) || (t.String.Length >2  && t.String.Contains(""cb"")));
-                        }
-                    }
-                }";
+    static void Main(string[] args)
+    {
+        TestClass[] tests =
+        [
+            new() { String=""abc"", Number=2 },
+            new() { String = ""cba"", Number = 2 },
+            new() { String = ""bac"", Number = 2 },
+            new() { String = ""abc"", Number = 1 }
+        ];
+
+        var testClasses = tests.Where(t => t.String == ""abc"" && t.Number == 2 && (t.String.Length > 0 || (t.String.Length > 1 && t.String.Contains(""ac"")) || (t.String.Length >2  && t.String.Contains(""cb""))));
+    }
+}";
 
             VerifyNoDiagnostic(testCode);
         }
