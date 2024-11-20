@@ -1,5 +1,13 @@
 ﻿# Changelog
 
+## 3.0.0 - 2024-11-20
+### Added
+- No new functionality added
+
+### Changes
+- Updated `eslint-config-airbnb-typescript` to v18 ([#57](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/57))
+- Updated `ESLint` to v8 only and `@typescript-eslint` to v7 ([#57](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/57))
+
 ## 2.2.0 - 2023-08-31
 ### Added
 - No new functionality added
