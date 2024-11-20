@@ -1,6 +1,6 @@
 {
   "name": "@audacia/eslint-config",
-  "version": "2.3.0-prerelease.1",
+  "version": "2.3.0-prerelease.2",
   "description": "ESLint Rules for Typescript projects.",
   "main": "index.js",
   "repository": {
@@ -10,8 +10,8 @@
   "author": "Audacia",
   "license": "ISC",
   "peerDependencies": {
-    "@typescript-eslint/eslint-plugin": ">=5.13.0",
-    "@typescript-eslint/parser": ">=5.0.0",
+    "@typescript-eslint/eslint-plugin": ">=5.13.0 <8.0.0",
+    "@typescript-eslint/parser": ">=5.13.0 <8.0.0",
     "eslint": "^7.32.0 || ^8.2.0",
     "eslint-plugin-import": "^2.25.3"
   },
