@@ -30,6 +30,7 @@ stages:
       parameters:
         projects: 'dotnet-roslyn/config/**/*.csproj'
         tests: 'dotnet-roslyn/config/**/*Tests.csproj'
+        workingDirectory: '$(Build.SourcesDirectory)\dotnet-roslyn\config'
 
 - stage: Stage_Release
   displayName: Release
