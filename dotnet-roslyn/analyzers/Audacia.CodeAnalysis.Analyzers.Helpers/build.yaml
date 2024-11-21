@@ -30,6 +30,7 @@ stages:
       parameters:
         projects: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers.Helpers/src/Audacia.CodeAnalysis.Analyzers.Helpers/Audacia.CodeAnalysis.Analyzers.Helpers.csproj'
         runTests: false
+        workingDirectory: '$(Build.SourcesDirectory)\dotnet-roslyn\analyzers\Audacia.CodeAnalysis.Analyzers.Helpers'
 
 - stage: Stage_Release
   displayName: Release
