@@ -41,4 +41,4 @@ stages:
       eq(dependencies.Stage_Build.outputs['Job_Build.UpdateVersions.ShouldPublish'], true)
     )
   jobs:
-  - template: src/deployment/npm/jobs/npm-package.job.yaml@templates
+  - template: src/deployment/npm/jobs/internal-public-npm-package.job.yaml@templates
