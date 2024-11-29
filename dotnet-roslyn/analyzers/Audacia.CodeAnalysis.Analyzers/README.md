@@ -20,6 +20,7 @@ Note the second PR is needed as `Audacia.CodeAnalysis.Analyzers` should be consu
 **Important:** The unit test project in this solution will fail to build if the path length of items in the bin folder exceeds 260 characters. (You will see errors similar to `Could not copy Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll`). Therefore, it is recommended to clone this repo into a high-level directory (e.g. C:\Projects).
 
 ## Help link URLs
+
 If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](./src/Audacia.CodeAnalysis.Analyzers/Common/HelpLinkUrlFactory.cs) is updated to reflect the new titles.
 
 ## Testing changes locally
@@ -76,7 +77,6 @@ public class MyClass
 </tr>
 </table>
 
-
 The ACL1001 rule checks for magic numbers being used in variable declarations. Magic numbers should generally be extracted to a well-named variable.
 
 Code with violation:
@@ -95,6 +95,7 @@ var totalPrice = price + shippingCost;
 This also applies to switch statements:
 
 Code with violation:
+
 ```csharp
  const int check = 11;
 
@@ -104,10 +105,11 @@ switch (11):
             return;
         default:
             return;
-    } 
+    }
 ```
 
 Code with fix:
+
 ```csharp
 const int check = 11;
 
@@ -117,18 +119,21 @@ switch (check):
             return;
         default:
             return;
-    } 
+    }
 ```
 
 for loops:
 Code with violation:
+
 ```csharp
 for(int testVar = 7; i > 0; i--)
     {
         continue;
     }
 ```
+
 Code with fix:
+
 ```csharp
 const int check = 11;
 var iterator = 2;
@@ -141,13 +146,16 @@ for (var counter = iterator; counter < check; counter++)
 
 while loops:
 Code with violation:
+
 ```csharp
 while(count < 11)
     {
         count++;
     }
 ```
+
 Code with fix:
+
 ```csharp
 const int check = 11;
 var toCheck = 0;
@@ -160,6 +168,7 @@ while(toCheck < check)
 
 if statement:
 Code with violation:
+
 ```csharp
 const int check = 11;
 
@@ -167,7 +176,9 @@ if(check == 11 && check != 42)
     {
     }
 ```
+
 Code with fix:
+
 ```csharp
 const int check = 11;
 var iterator = 2;
@@ -260,7 +271,7 @@ public void MyMethod(string arg)
     const int one = 1;
     const int two = 2;
     const int three = 3;
-    
+
     _logger.LogInformation("Finished method");
 }
 ```
@@ -305,6 +316,7 @@ dotnet_diagnostic.ACL1003.max_constructor_parameter_count = 5
 ```
 
 However, this does <b>not</b> work with the `record` reference type, and syntax synonyms (`record class`, `record struct`):
+
 ```csharp
 // No parameter count violation.
 public record Person(int a, int b, int c, int d, int e);
@@ -327,6 +339,7 @@ public async Task MyMethodAsync(int a, int b, int c, int d, CancellationToken ca
 ```
 
 This does however exclude `this` params that are used as part of extension methods:
+
 ```csharp
 // No parameter count violation.
 public static string ExampleExtension(this Person person, int a, int b, int c, int d);
@@ -363,12 +376,13 @@ var index = 4;
 ```
 
 The following is a full list of the abbreviations that are checked for:
+
 ```cs
 "Btn", "Ctrl", "Frm", "Chk", "Cmb",
-"Ctx", "Dg", "Pnl", "Dlg", "Ex", "Lbl", 
-"Txt", "Mnu", "Prg", "Rb", "Cnt", "Tv", 
+"Ctx", "Dg", "Pnl", "Dlg", "Ex", "Lbl",
+"Txt", "Mnu", "Prg", "Rb", "Cnt", "Tv",
 "Ddl", "Fld", "Lnk", "Img", "Lit",
-"Vw", "Gv", "Dts", "Rpt", "Vld", "Pwd", 
+"Vw", "Gv", "Dts", "Rpt", "Vld", "Pwd",
 "Ctl", "Tm", "Mgr", "Flt", "Len", "Idx", "Str"
 ```
 
@@ -590,6 +604,7 @@ public virtual void TestMethod(int i, string s, int j)
     var line = string.Format(s, i, j);
 }
 ```
+
 ### The order of parameters in an overloaded method does not match with the parameter order of the longest overload.
 
 Code with diagnostic:
@@ -665,7 +680,6 @@ All other values are permitted.
 
 ACL1010 also provides a code fix, which inserts or updates the <Nullable> node in a .csproj file with a default value of `enable`.
 
-
 ## ACL1011 - Don't nest too many control statements
 
 <table>
@@ -710,6 +724,7 @@ if (condition1 && condition2 && condition3 && condition4)
 ```
 
 This analyzer considers the following to be "control statements":
+
 - While loops: `while`
 - Do loops: `do`
 - For loops: `for` or `foreach`
@@ -806,11 +821,11 @@ dotnet_diagnostic.ACL1013.included_suffixes = Command,Request
 ```
 
 Note the following:
+
 - The diagnostic `Dto`s is removed unless explicitly included above.
 - The suffixes are case-sensitive, in case another word happens to end with the same letters.
 
 ## ACL1014 - Do not include numbers in identifier name
-
 
 <table>
 <tr>
@@ -823,19 +838,19 @@ Note the following:
 </tr>
 </table>
 
-ACL1014 is based on the CSharpGuidelinesAnalyzer rule [AV1704](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1704.md), which checks if identifiers contain numbers in their name. 
+ACL1014 is based on the CSharpGuidelinesAnalyzer rule [AV1704](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1704.md), which checks if identifiers contain numbers in their name.
 
 ACL1014 supports excluding words in the `.editorconfig` that are used in your domain terminology.
 
 Code with diagnostic:
 
 ```csharp
-public class Class1 
+public class Class1
 {
      public void Method1(int parameter1)
      {
          var variable1 = parameter1;
-     }    
+     }
 }
 ```
 
@@ -847,17 +862,20 @@ public class Class
      public void Method(int parameter)
      {
          var variable = parameter;
-     }    
+     }
 }
 ```
 
 ### Allowed words
+
 To override the default behaviour of prohibiting all numbers, you can specify what words are allowed as follows:
 
 ```
 dotnet_diagnostic.ACL1014.allowed_words = B2C,365
 ```
+
 Note the following:
+
 - These overrides are case-insensitive. For example. an identifier with 'b2c' in its name would not violate this rule.
 - These overrides can contain letters. For example, an identifier with '2' in its name would violate this rule.
 
@@ -934,5 +952,48 @@ public Results<NotFound, Ok<string>> Get()
 {
     var result = GetResult();
     return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
+
+## ACL1400 - Handler should inject ILogger
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Observability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>LOG-04.6</td>
+</tr>
+</table>
+
+ACL1400 checks if a "CommandHandler" has a ILogger injected into it's constructor.
+This applies by default to any class that ends with "Command" or "Handler".
+
+Code with diagnostic:
+
+```csharp
+public class GetUserHandler : IGetUserHandler
+{
+    public GetUserHandler() {}
+
+    public async Task<CommandResult> HandleAsync(CancellationToken cancellationToken) {}
+}
+```
+
+Code without diagnostic:
+
+```csharp
+public class GetUserHandler : IGetUserHandler
+{
+    private readonly ILogger<GetUserHandler> _logger;
+
+    public GetUserHandler(ILogger<GetUserHandler> logger)
+    {
+        _logger = logger;
+    }
+
+    public async Task<CommandResult> HandleAsync(CancellationToken cancellationToken) {}
 }
 ```
