@@ -33,7 +33,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
             context.RegisterSyntaxNodeAction(AnalyzeForSyntax, SyntaxKind.ForStatement);
             context.RegisterSyntaxNodeAction(AnalyzeWhileSyntax, SyntaxKind.WhileStatement);
         }
-
+        
         private static void AnalyzeLocalDeclarationSyntax(SyntaxNodeAnalysisContext context)
         {
             var localDeclarationSyntax = (LocalDeclarationStatementSyntax)context.Node;
