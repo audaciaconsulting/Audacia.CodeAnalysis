@@ -45,6 +45,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
     {
         class TypeName
         {
+
+          static void Main(string[] args)
+          {
+
+          }
           public record Test(bool shouldBeFine);
         }
     }";
@@ -59,16 +64,23 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             const string testCode = @"  
             namespace ConsoleApplication
                 {
+
                     class TypeName
                     {
-                        public void ShouldFail(bool imNotAllowed)
-                        {
 
-                        }
+                        static void Main(string[] args)
+                            {
+                                ShouldFail(true);
+                            }
+
+                            public static void ShouldFail(bool imNotAllowed)
+                            {
+
+                            }
                     }
                 }";
 
-            var expectedDiagnostic = BuildExpectedResult("Parameter 'imNotAllowed' is of type 'bool'", 6, 53);
+            var expectedDiagnostic = BuildExpectedResult("Parameter 'imNotAllowed' is of type 'bool'", 13, 64);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
