@@ -131,6 +131,11 @@ tester.run('data-test-attribute', rule, {
       code: '<template><input dataOtherAttribute="test-id"></template>',
       options: [{ testAttribute: 'dataOtherAttribute' }],
     },
+    // bound test attributes
+    {
+      name: 'input element with bound test attribute',
+      code: '<template><input :data-test="myVar"></template>',
+    },
   ],
   invalid: [
     // @click events
@@ -359,6 +364,21 @@ tester.run('data-test-attribute', rule, {
       errors: ["Elements with click events should include a 'dataOtherAttribute' attribute"],
       output: '<template><div @click="foobar()" dataOtherAttribute="test-id"></div></template>',
       options: [{ enableFixer: true, testAttribute: 'dataOtherAttribute' }],
-    }
+    },
+    // input elements with empty bound test attribute
+    {
+      name: 'input element with no value in bound test attribute are not fixed',
+      code: '<template><input :data-test></template>',
+      errors: ["input elements should include a 'data-test' attribute"],
+      output: '<template><input :data-test></template>',
+      options: [{ enableFixer: true }],
+    },
+    {
+      name: 'input element with empty value in bound test attribute are not fixed',
+      code: '<template><input :data-test=""></template>',
+      errors: ["input elements should include a 'data-test' attribute"],
+      output: '<template><input :data-test=""></template>',
+      options: [{ enableFixer: true }],
+    },
   ],
 });

@@ -1,25 +1,44 @@
 name: $(Year:yy)$(DayOfYear).$(Rev:r)
 trigger:
   branches:
-    include: [master]
+    include:
+      - master
   paths:
     include:
       - 'eslint/plugins/audacia-eslint-plugin-vue/*'
-pr: { branches: { include: [master] } }
-resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
-pool: { vmImage: windows-2022 }
+pr: 
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - 'eslint/plugins/audacia-eslint-plugin-vue/*'
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      endpoint: shared-github
+      name: audaciaconsulting/Audacia.Build
+pool:
+  vmImage: windows-2022
 
 stages:
-- stage: Build
+- stage: Stage_Build
   displayName: Build
   jobs:
   - template: src/build/npm/jobs/npm-package.job.yaml@templates
     parameters:
       path: 'eslint/plugins/audacia-eslint-plugin-vue'
-      test: true
+      runTests: true
 
-- stage: Release
+- stage: Stage_Release
   displayName: Release
+  dependsOn: Stage_Build
+  condition: >
+    and(
+      succeeded(),
+      notIn(variables['Build.Reason'], 'PullRequest', 'Schedule'),
+      eq(dependencies.Stage_Build.outputs['Job_Build.UpdateVersions.ShouldPublish'], true)
+    )
   jobs:
-  - template: src/deployment/npm/jobs/npm-package.job.yaml@templates
-  condition: and(succeeded(), and(not(eq(variables['Build.Reason'], 'PullRequest')), not(eq(variables['Build.Reason'], 'Schedule'))))
+  - template: src/deployment/npm/jobs/internal-public-npm-package.job.yaml@templates

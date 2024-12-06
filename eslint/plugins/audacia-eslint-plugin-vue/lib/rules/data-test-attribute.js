@@ -159,11 +159,17 @@ module.exports = {
     }
 
     function isAttributeValid(attribute) {
-      if (!attribute || !attribute.value || !attribute.value.value) {
+      if (!attribute || !attribute.value) {
         return false;
       }
 
-      return true;
+      // Check a bound attribute e.g. :data-test="123" has any form of expression
+      if (attribute.directive) {
+        return !!attribute.value.expression;
+      }
+
+      // If it is a static attribute, ensure some value is set
+      return !!attribute.value.value;
     }
 
     function generateFixer(node, attribute) {
@@ -177,6 +183,9 @@ module.exports = {
         const endOfStartTag = node.startTag.range[1] - (node.startTag.selfClosing ? 3 : 1);
         range = [endOfStartTag, endOfStartTag];
         fixValue = ` ${configuration.testAttribute}="${id}"`;
+      } else if (attribute.directive) {
+        // If the attribute is bound (e.g. :data-test) then do no fix
+        return undefined;
       } else if (attribute.value === null) {
         // The attribute exists but has no value so add the id
         range = [attribute.range[1], attribute.range[1]];

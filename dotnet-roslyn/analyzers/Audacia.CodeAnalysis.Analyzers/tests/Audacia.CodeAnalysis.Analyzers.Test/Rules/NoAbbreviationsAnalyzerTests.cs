@@ -12,7 +12,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
     [TestClass]
     public class NoAbbreviationsAnalyzerTests : DiagnosticVerifier
     {
-        private readonly Mock<ISettingsReader> _mockSettingsReader = new Mock<ISettingsReader>();
+        private readonly Mock<ISettingsReader> _mockSettingsReader = new();
 
         private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string kind, string abbreviationUsed)
         {
@@ -22,9 +22,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 Message = $"{kind} '{abbreviationUsed}' should have a more descriptive name",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
             };
         }
 
@@ -37,16 +37,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostic_If_No_Abbreviation_Used()
         {
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private void MethodName()
-            {
-                var noAbbreviation = 1.0;
-            }
-        }
-    }";
+        var noAbbreviation = 1.0;
+    }
+}";
 
             VerifyNoDiagnostic(test);
         }
@@ -55,18 +54,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_If_A_Single_Character_Variable_Name_Is_Used()
         {
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private void MethodName()
-            {
-                var d = 1.0;
-            }
-        }
-    }";
+namespace ConsoleApplication1;
 
-            var expected = BuildExpectedResult(8, 21, "Variable", "d");
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var d = 1.0;
+    }
+}";
+
+            var expected = BuildExpectedResult(8, 13, "Variable", "d");
 
             VerifyDiagnostic(test, expected);
         }
@@ -75,18 +73,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_If_A_Disallowed_Abbreviation_Variable_Name_Is_Used()
         {
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private void MethodName()
-            {
-                var len = 1.0;
-            }
-        }
-    }";
+namespace ConsoleApplication1;
 
-            var expected = BuildExpectedResult(8, 21, "Variable", "len");
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var len = 1.0;
+    }
+}";
+
+            var expected = BuildExpectedResult(8, 13, "Variable", "len");
 
             VerifyDiagnostic(test, expected);
         }
@@ -95,17 +92,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_If_A_Single_Character_Method_Parameter_Name_Is_Used()
         {
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private void MethodName(string s)
-            {
-            }
-        }
-    }";
+namespace ConsoleApplication1;
 
-            var expected = BuildExpectedResult(6, 44, "Parameter", "s");
+class TypeName
+{
+    private void MethodName(string s)
+    {
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+
+            var expected = BuildExpectedResult(6, 36, "Parameter", "s");
 
             VerifyDiagnostic(test, expected);
         }
@@ -114,18 +114,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void Diagnostic_If_A_Single_Character_Lambda_Expression_Parameter_Name_Is_Used()
         {
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private void MethodName(string[] args)
-            {
-                var result = args.Where(s => s.Length == 0);
-            }
-        }
-    }";
+using System.Linq;
 
-            var expected = BuildExpectedResult(8, 41, "Parameter", "s");
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var result = args.Where(s => s.Length == 0);
+    }
+}";
+
+            var expected = BuildExpectedResult(10, 33, "Parameter", "s");
 
             VerifyDiagnostic(test, expected);
         }
@@ -139,16 +140,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 .Returns(true);
 
             var test = @"
-    namespace ConsoleApplication1
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
     {
-        class TypeName
-        {
-            private void MethodName(string[] args)
-            {
-                var result = args.Where(s => s.Length == 0);
-            }
-        }
-    }";
+        var result = args.Where(s => s.Length == 0);
+    }
+}";
 
             VerifyNoDiagnostic(test);
         }
@@ -162,20 +164,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 .Returns("i");
 
             var test = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            private void MethodName(string[] args)
-            {
-                for (var a = 0; a < args.Length; a++)
-                {
-                }
-            }
-        }
-    }";
+namespace ConsoleApplication1;
 
-            var expected = BuildExpectedResult(8, 26, "Variable", "a");
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        for (var a = 0; a < args.Length; a++)
+        {
+        }
+    }
+}";
+
+            var expected = BuildExpectedResult(8, 18, "Variable", "a");
 
             VerifyDiagnostic(test, expected);
         }
@@ -189,18 +190,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 .Returns("i,j");
 
             var test = @"
-    namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
     {
-        class TypeName
+        for (var i = 0; i < args.Length; i++)
         {
-            private void MethodName(string[] args)
-            {
-                for (var i = 0; i < args.Length; i++)
-                {
-                }
-            }
         }
-    }";
+    }
+}";
 
             VerifyNoDiagnostic(test);
         }

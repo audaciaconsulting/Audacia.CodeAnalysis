@@ -1,6 +1,6 @@
 {
   "name": "@audacia/eslint-plugin-angular",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Custom ESLinting rules for Angular.",
   "main": "lib/index.js",
   "repository": {

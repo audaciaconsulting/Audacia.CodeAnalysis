@@ -1,6 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.MethodLength;
-using Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements;
-using Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -25,9 +23,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                 Message = $"{memberName} contains {statementCount} nested control flow statements, which exceeds the maximum of {maxStatementCount} nested control flow statements",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
             };
         }
 
@@ -35,17 +33,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         public void No_Diagnostics_For_Method_Body_Less_Than_Max_Allowed_Statements()
         {
             var test = @"
-namespace TestApp
+namespace TestApp;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        while (true) 
         {
             while (true) 
             {
-                while (true) 
-                {
-                }
             }
         }
     }
@@ -58,11 +55,13 @@ namespace TestApp
         public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_While_Statements()
         {
             var test = @"
-namespace TestApp
+namespace TestApp;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        while (true) 
         {
             while (true) 
             {
@@ -70,9 +69,6 @@ namespace TestApp
                 {
                     while (true) 
                     {
-                        while (true) 
-                        {
-                        }
                     }
                 }
             }
@@ -80,8 +76,8 @@ namespace TestApp
     }
 }";
             var expected = new[] {
-                BuildExpectedResult("WhileStatement", 12, 21, 3),
-                BuildExpectedResult("WhileStatement", 14, 25, 4),
+                BuildExpectedResult("WhileStatement", 12, 17, 3),
+                BuildExpectedResult("WhileStatement", 14, 21, 4),
             };
 
             VerifyDiagnostic(test, expected);
@@ -91,11 +87,13 @@ namespace TestApp
         public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_While_With_Multiple_Statement_In_Block_Statements()
         {
             var test = @"
-namespace TestApp
+namespace TestApp;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        while (true) 
         {
             while (true) 
             {
@@ -103,13 +101,10 @@ namespace TestApp
                 {
                     while (true) 
                     {
-                        while (true) 
-                        {
-                        }
+                    }
 
-                        while (true) 
-                        {
-                        }
+                    while (true) 
+                    {
                     }
                 }
             }
@@ -117,9 +112,9 @@ namespace TestApp
     }
 }";
             var expected = new[] {
-                BuildExpectedResult("WhileStatement", 12, 21, 3),
-                BuildExpectedResult("WhileStatement", 14, 25, 4),
-                BuildExpectedResult("WhileStatement", 18, 25, 4),
+                BuildExpectedResult("WhileStatement", 12, 17, 3),
+                BuildExpectedResult("WhileStatement", 14, 21, 4),
+                BuildExpectedResult("WhileStatement", 18, 21, 4),
             };
 
             VerifyDiagnostic(test, expected);
@@ -130,11 +125,13 @@ namespace TestApp
         public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Do_Statements()
         {
             var test = @"
-namespace TestApp
+namespace TestApp;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        do 
         {
             do 
             {
@@ -142,18 +139,15 @@ namespace TestApp
                 {
                     do 
                     {
-                        do 
-                        {
-                        } while (true)
-                    } while (true)
-                } while (true)
-            } while (true)
-        }
+                    } while (true);
+                } while (true);
+            } while (true);
+        } while (true);
     }
 }";
             var expected = new[] {
-                BuildExpectedResult("DoStatement", 12, 21, 3),
-                BuildExpectedResult("DoStatement", 14, 25, 4),
+                BuildExpectedResult("DoStatement", 12, 17, 3),
+                BuildExpectedResult("DoStatement", 14, 21, 4),
             };
 
             VerifyDiagnostic(test, expected);
@@ -163,11 +157,13 @@ namespace TestApp
         public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_If_Statements()
         {
             var test = @"
-namespace TestApp
+namespace TestApp;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        if (true) 
         {
             if (true) 
             {
@@ -175,9 +171,6 @@ namespace TestApp
                 {
                     if (true) 
                     {
-                        if (true) 
-                        {
-                        }
                     }
                 }
             }
@@ -185,8 +178,75 @@ namespace TestApp
     }
 }";
             var expected = new[] {
-                BuildExpectedResult("IfStatement", 12, 21, 3),
-                BuildExpectedResult("IfStatement", 14, 25, 4),
+                BuildExpectedResult("IfStatement", 12, 17, 3),
+                BuildExpectedResult("IfStatement", 14, 21, 4),
+            };
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_If_Statements_With_Else_Clause()
+        {
+            var test = @"
+namespace TestApp;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        if (true) 
+        {
+            if (true) 
+            {
+                if (true) 
+                {
+                }
+                else if (false)
+                {
+                }
+                else
+                {
+                }
+            }
+        }
+    }
+}";
+            var expected = new[] {
+                BuildExpectedResult("IfStatement", 12, 17, 3),
+                BuildExpectedResult("IfStatement", 15, 22, 3),
+                BuildExpectedResult("ElseClause", 18, 17, 3)
+            };
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Statements_Within_Else_Clause()
+        {
+            var test = @"
+namespace TestApp;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        if (true)
+        {
+            if (true)
+            {
+            }
+            else
+            {
+                if (true)
+                {
+                }
+            }
+        }
+    }
+}";
+            var expected = new[] {
+                BuildExpectedResult("IfStatement", 15, 17, 3)
             };
 
             VerifyDiagnostic(test, expected);
@@ -196,21 +256,20 @@ namespace TestApp
         public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_For_Loops()
         {
             var test = @"
-namespace TestApp
+namespace TestApp;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        for (int i = 0; i < 10; i++) 
         {
-            for (int i = 0; i < 10; i++) 
+            for (int j = 0; j < 10; j++) 
             {
-                for (int j = 0; j < 10; j++) 
+                for (int k = 0; k < 10; k++) 
                 {
-                    for (int k = 0; k < 10; k++) 
+                    for (int l = 0; l < 10; l++) 
                     {
-                        for (int l = 0; l < 10; l++) 
-                        {
-                        }
                     }
                 }
             }
@@ -218,8 +277,8 @@ namespace TestApp
     }
 }";
             var expected = new[] {
-                BuildExpectedResult("ForStatement", 12, 21, 3),
-                BuildExpectedResult("ForStatement", 14, 25, 4),
+                BuildExpectedResult("ForStatement", 12, 17, 3),
+                BuildExpectedResult("ForStatement", 14, 21, 4),
             };
 
             VerifyDiagnostic(test, expected);
@@ -229,23 +288,22 @@ namespace TestApp
         public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_ForEach_Loops()
         {
             var test = @"
-using System.Collections.Generic;
+using System.Linq;
 
-namespace TestApp
+namespace TestApp;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        foreach (var i in Enumerable.Range(0, 10)) 
         {
-            foreach (var i in Enumerable.Range(0, 10)) 
+            foreach (var j in Enumerable.Range(0, 10)) 
             {
-                foreach (var j in Enumerable.Range(0, 10)) 
+                foreach (var k in Enumerable.Range(0, 10)) 
                 {
-                    foreach (var k in Enumerable.Range(0, 10)) 
+                    foreach (var l in Enumerable.Range(0, 10)) 
                     {
-                        foreach (var l in Enumerable.Range(0, 10)) 
-                        {
-                        }
                     }
                 }
             }
@@ -253,8 +311,8 @@ namespace TestApp
     }
 }";
             var expected = new[] {
-                BuildExpectedResult("ForEachStatement", 14, 21, 3),
-                BuildExpectedResult("ForEachStatement", 16, 25, 4),
+                BuildExpectedResult("ForEachStatement", 14, 17, 3),
+                BuildExpectedResult("ForEachStatement", 16, 21, 4),
             };
 
             VerifyDiagnostic(test, expected);

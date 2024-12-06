@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Settings;
 using Microsoft.CodeAnalysis;
@@ -25,6 +22,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
         private const string MessageFormat = "{0} contains {1} nested control flow statements, which exceeds the maximum of {2} nested control flow statements";
 
         private const string Description = "Don't nest too many control statements.";
+        
+        private const string ElseIfClauseType = "ElseIfClause";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -48,11 +47,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             SyntaxKind.ForEachStatement,
             SyntaxKind.ForEachVariableStatement,
             SyntaxKind.IfStatement,
+            SyntaxKind.ElseClause,
             SyntaxKind.SwitchExpression,
             SyntaxKind.SwitchStatement,
             SyntaxKind.TryStatement,
             SyntaxKind.CatchClause,
-            SyntaxKind.FinallyClause,
+            SyntaxKind.FinallyClause
         };
 
         public override void Initialize(AnalysisContext context)
@@ -91,7 +91,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
                 return;
             }
 
-            var nodesTooDeep = GetNodesInViolation(node, max).ToList();
+            var nodesTooDeep = GetNodesInViolation(node, max).ToList().Distinct();
 
             foreach (var deepNode in nodesTooDeep)
             {
@@ -110,6 +110,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             foreach (var block in blocks)
             {
                 var childStatements = block.ChildNodes().Where(n => ControlStatementKinds.Contains(n.Kind())).ToList();
+                var ifStatements = block.ChildNodes().Where(n => n.IsKind(SyntaxKind.IfStatement)).ToList();
+
+                if (ifStatements.Any())
+                {
+                    foreach (var internalNodes in ifStatements.Select(GetIfNodes))
+                    {
+                        childStatements.AddRange(internalNodes);
+                    }
+                }
 
                 foreach (var child in childStatements)
                 {
@@ -128,9 +137,31 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
             }
         }
 
+        private static List<SyntaxNode> GetIfNodes(SyntaxNode node)
+        {
+            var result = new List<SyntaxNode>();
+            
+            if (node is IfStatementSyntax ifStatement)
+            {
+                result.Add(ifStatement);
+                
+                if (ifStatement.Else?.Statement is IfStatementSyntax elseIfStatement)
+                {
+                    result.AddRange(GetIfNodes(elseIfStatement));
+                }
+                else if (ifStatement.Else != null)
+                {
+                    result.Add(ifStatement.Else);
+                }
+            }
+
+            return result;
+        }
+
         private static void ReportAtContainingSymbol(int depth, int maxDepth, SyntaxNodeAnalysisContext context, SyntaxNode node)
         {
-            string kind = node.Kind().ToString();
+            var baseKind = node.Kind();
+            var kind = baseKind.ToString();
             var location = node.GetLocation();
 
             context.ReportDiagnostic(Diagnostic.Create(Rule, location, kind, depth, maxDepth));

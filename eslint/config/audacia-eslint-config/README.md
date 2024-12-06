@@ -2,13 +2,15 @@
 
 The `@audacia/eslint-config` npm package contains some default ESLint configuration for JavaScript and TypeScript projects.
 
+This package is for use with ESLint v8 and TypeScript ESLint v7.
+
 ## Getting started
 
-First, install the package from the private npm feed:
-`npm install @audacia/eslint-config --save-dev`
+Install with peer dependencies:
 
-The Audacia package has a number of peer dependencies which must also be installed:
-`npm install eslint eslint-plugin-import @typescript-eslint/eslint-plugin @typescript-eslint/parser --save-dev`
+```bash
+npm install @audacia/eslint-config eslint@8 @typescript-eslint/eslint-plugin@7 @typescript-eslint/parser@7 --save-dev
+```
 
 Next, modify your `ESLint` config file (usually either `.eslintrc.js` or `.eslintrc.json`) to extend the Audacia ESLint config package by adding it to the `extends` property. You also need to tell `ESLint` where your TypeScript configuration is located (i.e. your `tsconfig.json` file):
 
