@@ -40,14 +40,6 @@ When installing the `Audacia.CodeAnalysis` NuGet package in .NET Framework proje
 
 You must be using Visual Studio version 17.0+ (Visual Studio 2022) or Rider version 2021.3.2+.
 
-### Rider Support
-Rider doesn't fully support custom settings in .editorconfig. This issue has been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53508)), but in the meantime a workaround is documented
-[here](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/README.md&anchor=custom-.editorconfig-settings-in-rider&_a=preview).
-
- ##################### The above link does not seem to have an equivalent in Github. ######################
-
-There are a few rules that Rider's code analysis doesn't pick up, for example CA1033, CA1008 and AV1715. This issue has also been raised with JetBrains (see [here](https://youtrack.jetbrains.com/issue/RIDER-53376)).
-
 ## Including Microsoft Code Style Rules in Build
 
 By default, Microsoft's code style rules (prefixed `IDE`) don't get run during a build: they just run in the IDE itself. To include these code style rules in a build you must add the following to your .csproj file:
