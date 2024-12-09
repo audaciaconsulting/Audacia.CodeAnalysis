@@ -4,11 +4,11 @@
 
 This repository includes the source for three packages. Please follow the links below for more detailed information:
 
-- [.NET](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2Fdotnet-roslyn%2Fconfig%2FAudacia.CodeAnalysis%2FREADME.md)
+- [.NET](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/blob/master/dotnet-roslyn/config/Audacia.CodeAnalysis/README.md)
 
-- [ASP.NET Core](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2Fdotnet-roslyn%2Fconfig%2FAudacia.CodeAnalysis.AspNetCore%2FREADME.md) (based on the .NET Core package)
+- [ASP.NET Core](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/blob/master/dotnet-roslyn/config/Audacia.CodeAnalysis.AspNetCore/README.md) (based on the .NET Core package)
 
-- [EF Core](https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=%2Fdotnet-roslyn%2Fconfig%2FAudacia.CodeAnalysis.EntityFrameworkCore%2FREADME.md)
+- [EF Core](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/blob/master/dotnet-roslyn/config/Audacia.CodeAnalysis.EntityFrameworkCore/README.md)
 
 ## Custom .NET Analyzers
 

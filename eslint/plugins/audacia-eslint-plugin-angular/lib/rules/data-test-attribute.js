@@ -8,7 +8,7 @@ module.exports = {
             description: 'use data-test attributes for test automation',
             category: 'Suggestions',
             recommended: true,
-            url: 'https://dev.azure.com/audacia/Audacia/_git/Audacia.CodeAnalysis?path=/eslint/plugins/audacia-eslint-plugin-angular/docs/rules/data-test-attribute.md&_a=preview'
+            url: 'https://github.com/audaciaconsulting/Audacia.CodeAnalysis/blob/master/eslint/plugins/audacia-eslint-plugin-angular/docs/rules/data-test-attribute.md'
         },
         fixable: 'code',
         schema: [
