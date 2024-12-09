@@ -50,6 +50,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
           {
 
           }
+
           public record Test(bool shouldBeFine);
         }
     }";
@@ -57,8 +58,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         VerifyNoDiagnostic(testCode);
         }
 
+
         [TestMethod]
-        public void Diagnostics_For_Function_With_Boolean_Parameters()
+        public void Diagnostics_For_Method_With_Boolean_Parameters()
         {
 
             const string testCode = @"  
@@ -83,6 +85,97 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             var expectedDiagnostic = BuildExpectedResult("Parameter 'imNotAllowed' is of type 'bool'", 13, 64);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
+        }
+        
+        [TestMethod]
+        public void No_Diagnostics_For_Record_With_Multiple_Boolean_Positional_Syntax()
+        {
+
+            const string testCode = @"  
+    namespace ConsoleApplication
+    {
+        class TypeName
+        {
+
+          static void Main(string[] args)
+          {
+
+          }
+
+          public record Test(bool shouldBeFine, bool thisToo);
+        }
+    }";
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Private_Record_With_Boolean_Positional_Syntax()
+        {
+
+            const string testCode = @"  
+    namespace ConsoleApplication
+    {
+        class TypeName
+        {
+
+          static void Main(string[] args)
+          {
+
+          }
+
+          private record Test(bool shouldBeFine);
+        }
+    }";
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Internal_Record_With_Boolean_Positional_Syntax()
+        {
+
+            const string testCode = @"  
+    namespace ConsoleApplication
+    {
+        class TypeName
+        {
+
+          static void Main(string[] args)
+          {
+
+          }
+
+          internal record Test(bool shouldBeFine);
+        }
+    }";
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Primary_Constructor_With_Bool_Parameters()
+        {
+
+            const string testCode = @"  
+            namespace ConsoleApplication
+                {
+
+                    class TypeName
+                    {
+
+                        static void Main(string[] args)
+                            {
+                            }
+
+                        public record PrimaryCon(bool shouldBeOkay)
+                            {
+                                private bool testVar => shouldBeOkay;
+                            }
+                    }
+                }";
+
+            VerifyNoDiagnostic(testCode);
         }
     }
 }

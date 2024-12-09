@@ -90,13 +90,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 }
             }
         }
+        
         public static bool IsBooleanOrNullableBoolean(this ITypeSymbol type)
         {
             return type.SpecialType == SpecialType.System_Boolean || IsNullableBoolean(type);
         }
-        public static bool IsNullableBoolean( this ITypeSymbol type)
+        
+        public static bool IsNullableBoolean(this ITypeSymbol type)
         {
-
             if (type.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
             {
                 var namedTypeSymbol = type as INamedTypeSymbol;
