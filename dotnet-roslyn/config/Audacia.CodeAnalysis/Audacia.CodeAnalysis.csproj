@@ -9,7 +9,6 @@
     <Copyright>Copyright © Audacia $([System.DateTime]::Now.Year)</Copyright>
     <PackageIcon>package-icon.png</PackageIcon>
     <DevelopmentDependency>true</DevelopmentDependency>
-    <Version>1.11.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
