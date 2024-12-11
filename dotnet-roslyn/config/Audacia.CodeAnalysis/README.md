@@ -4,12 +4,6 @@ The `Audacia.CodeAnalysis` repository contains .NET analyzers and rulesets to pr
 
 ## Getting started
 
-There are three analyzer packages available:
-- A standard package
-- A package with extra analyzers specifically for ASP.NET Core projects
-- A package with extra analyzers specifically for Entity Framework Core projects
-
-Which one you install depends on the type of project you're working on.
 
 Once you've installed the `Audacia.CodeAnalysis`, `Audacia.CodeAnalysis.AspNetCore` or `Audacia.CodeAnalysis.EntityFrameworkCore` package you need to get one or more rulesets. The rulesets are provided as `.editorconfig` files. `.editorconfig` files should generally be located at the root of your repo or solution, however they can be located anywhere in the folder hierarchy, and the file closest a particular code file will be used. See [here](https://docs.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options?view=vs-2019#file-hierarchy-and-precedence) for more information.
 
