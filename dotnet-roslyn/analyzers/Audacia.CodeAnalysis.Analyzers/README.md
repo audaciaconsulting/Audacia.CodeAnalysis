@@ -936,3 +936,18 @@ public Results<NotFound, Ok<string>> Get()
     return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
 }
 ```
+
+## ACL1017 - Code analysis supression attribute requires Justification
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ALC1017 is based on the StyleCopAnalyzers Rules [SA1071](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1404.md). Which checks that the `SuppressMessage`, `MaxMethodLength` and `MaxParameterCount` attributes have a value supplied for their `Justification` argument.
