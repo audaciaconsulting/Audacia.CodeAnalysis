@@ -6,53 +6,76 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Audacia.CodeAnalysis.Analyzers.Rules.NullableReferenceTypes
 {
     /// <summary>
-    /// Analyzer that checks if nullable reference types are enabled at the project level.
-    /// If not, a warning is issued as a project-level diagnostic.
+    /// Analyzer that is triggered if nullable reference types are not enabled on a project.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class NullableReferenceTypesAnalyzer : DiagnosticAnalyzer
     {
         private const string Id = DiagnosticId.NullableReferenceTypesEnabled;
-
+        
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+        
+        /// <summary>
+        /// The diagnostic rule for the nullable reference type analyzer. 
+        /// </summary>
+        private static readonly DiagnosticDescriptor Rule
+            = new DiagnosticDescriptor(
+                Id,
+                DiagnosticMessages.NullableReferenceTypes.Title,
+                DiagnosticMessages.NullableReferenceTypes.MessageFormat,
+                DiagnosticCategory.Maintainability,
+                DiagnosticSeverity.Warning,
+                isEnabledByDefault: true,
+                DiagnosticMessages.NullableReferenceTypes.Description,
+                HelpLinkUrl);
 
         /// <summary>
-        /// Add the 'CompilationEnd' tag because we are reporting a compilation-level diagnostic.
+        /// The collection of diagnostics for this analyzer.
         /// </summary>
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-            Id,
-            DiagnosticMessages.NullableReferenceTypes.Title,
-            DiagnosticMessages.NullableReferenceTypes.MessageFormat,
-            DiagnosticCategory.Maintainability,
-            DiagnosticSeverity.Warning,
-            isEnabledByDefault: true,
-            description: DiagnosticMessages.NullableReferenceTypes.Description,
-            helpLinkUri: HelpLinkUrl,
-            customTags: new[] { WellKnownDiagnosticTags.CompilationEnd });
-
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
             => ImmutableArray.Create(Rule);
 
+        /// <summary>
+        /// Initializes the logic for this analyzer.
+        /// </summary>
+        /// <param name="context">The analysis context.</param>
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
+
+            // Since we're analyzing the .csproj file, this must be set to 'analyze'.
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
-            // Directly register a compilation action.
-            // This action runs once per compilation and is suitable for reporting a project-level diagnostic.
-            context.RegisterCompilationAction(AnalyzeCompilation);
+            context.RegisterCompilationStartAction(analysisContext => 
+                analysisContext.RegisterSemanticModelAction(AnalyzeNullableContextOptions));
         }
 
-        private static void AnalyzeCompilation(CompilationAnalysisContext context)
+        /// <summary>
+        /// Evaluates whether nullable options are enabled on the given <paramref name="context"/>.
+        /// If not, the diagnostic rule is triggered.
+        /// </summary>
+        /// <param name="context">The analysis context.</param>
+        private static void AnalyzeNullableContextOptions(SemanticModelAnalysisContext context)
         {
-            var nullableContextOptions = context.Compilation.Options.NullableContextOptions;
+            var nullableContextOptions = context.SemanticModel
+                .Compilation
+                .Options
+                .NullableContextOptions;
 
-            if (nullableContextOptions == NullableContextOptions.Disable)
+            // Allow all possible options, excluding 'Disable' (which is the assumed value if the node is missing altogether).
+            if (nullableContextOptions != NullableContextOptions.Disable)
             {
-                // Report a diagnostic with no location for a project-level warning.
-                var diagnostic = Diagnostic.Create(Rule, Location.None);
-                context.ReportDiagnostic(diagnostic);
+                return;
             }
+
+            var location = context.SemanticModel
+                .SyntaxTree
+                .GetRoot()
+                .GetLocation();
+
+            var diagnostic = Diagnostic.Create(Rule, location);
+
+            context.ReportDiagnostic(diagnostic);
         }
     }
 }
