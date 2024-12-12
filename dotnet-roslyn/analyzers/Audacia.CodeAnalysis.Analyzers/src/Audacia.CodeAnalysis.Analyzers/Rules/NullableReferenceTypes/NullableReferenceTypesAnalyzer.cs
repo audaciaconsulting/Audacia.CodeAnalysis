@@ -68,12 +68,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NullableReferenceTypes
                 return;
             }
 
-            var location = context.SemanticModel
-                .SyntaxTree
-                .GetRoot()
-                .GetLocation();
-
-            var diagnostic = Diagnostic.Create(Rule, location);
+            // Create a diagnostic with no specific source location, so it won't highlight lines in the source.
+            var diagnostic = Diagnostic.Create(Rule, Location.None);
 
             context.ReportDiagnostic(diagnostic);
         }
