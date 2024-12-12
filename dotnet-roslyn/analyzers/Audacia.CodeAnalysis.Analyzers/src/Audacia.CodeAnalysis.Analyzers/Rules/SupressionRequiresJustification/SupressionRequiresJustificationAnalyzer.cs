@@ -2,8 +2,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Audacia.CodeAnalysis.Analyzers.Common;
-using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
-using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -84,17 +82,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
             /// <summary>
             /// A lazily-initialized reference for <see cref="SuppressMessageAttribute"/>.
             /// </summary>
-            private INamedTypeSymbol suppressMessageAttribute;
+            private const string suppressMessageAttribute = "SuppressMessageAttribute";
 
             /// <summary>
             /// A lazily-initialized reference for <see cref="MaxMethodLengthAttribute"/>.
             /// </summary>
-            private INamedTypeSymbol maxMethodLengthAttribute;
+            private const string maxMethodLengthAttribute = "MaxMethodLengthAttribute";
 
             /// <summary>
             /// A lazily-initialized reference for <see cref="MaxParameterCountAttribute"/>.
             /// </summary>
-            private INamedTypeSymbol maxParameterCountAttribute;
+            private string maxParameterCountAttribute = "MaxParameterCountAttribute";
 
             public AnalyzerInstance()
             {
@@ -119,21 +117,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
             /// </summary>
             private void ValidateAttribute(SyntaxNodeAnalysisContext context, AttributeSyntax attribute, ISymbol symbol)
             {
-                if (suppressMessageAttribute == null)
-                {
-                    suppressMessageAttribute = context.SemanticModel.Compilation.GetTypeByMetadataName(typeof(SuppressMessageAttribute).FullName);
-                }
-
-                if (maxMethodLengthAttribute == null)
-                { 
-                    maxMethodLengthAttribute = context.SemanticModel.Compilation.GetTypeByMetadataName(typeof(MaxMethodLengthAttribute).FullName);
-                }
-
-                if (maxParameterCountAttribute == null)
-                {
-                    maxParameterCountAttribute = context.SemanticModel.Compilation.GetTypeByMetadataName(typeof(MaxParameterCountAttribute).FullName);
-                }
-
                 if (IsMatchingSymbol(symbol))
                 {
                     ValidateJustificationArgument(context, attribute, symbol);
@@ -177,9 +160,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
 
             private bool IsMatchingSymbol(ISymbol symbol)
             {
-                return SymbolEqualityComparer.Default.Equals(symbol.ContainingType, suppressMessageAttribute) ||
-                    SymbolEqualityComparer.Default.Equals(symbol.ContainingType, maxMethodLengthAttribute) ||
-                    SymbolEqualityComparer.Default.Equals(symbol.ContainingType, maxParameterCountAttribute);
+                return  symbol.ContainingType.Name == suppressMessageAttribute ||
+                        symbol.ContainingType.Name == maxMethodLengthAttribute ||
+                        symbol.ContainingType.Name == maxParameterCountAttribute;
             }
         }
     }
