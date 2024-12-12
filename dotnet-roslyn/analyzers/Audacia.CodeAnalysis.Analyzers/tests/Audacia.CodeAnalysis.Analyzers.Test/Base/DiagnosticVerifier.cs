@@ -14,6 +14,9 @@ using Microsoft.CodeAnalysis.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
+using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Base
 {
@@ -47,6 +50,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference LoggerFactoryReference = MetadataReference.CreateFromFile(typeof(LoggerFactory).Assembly.Location);
         private static readonly MetadataReference ControllerReference = MetadataReference.CreateFromFile(typeof(Controller).Assembly.Location);
         private static readonly MetadataReference CancellationTokenReference = MetadataReference.CreateFromFile(typeof(System.Threading.CancellationToken).Assembly.Location);
+        private static readonly MetadataReference MaxMethodLengthReference = MetadataReference.CreateFromFile(typeof(MaxMethodLengthAttribute).Assembly.Location);
+        private static readonly MetadataReference MaxParameterCountReference = MetadataReference.CreateFromFile(typeof(MaxParameterCountAttribute).Assembly.Location);
+        private static readonly MetadataReference SuppressMessageReference = MetadataReference.CreateFromFile(typeof(SuppressMessageAttribute).Assembly.Location);
         
         internal static CompilationOptions CompilationOptions = new CSharpCompilationOptions(
             OutputKind.ConsoleApplication, assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default, allowUnsafe: true);
@@ -139,7 +145,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
             if (diagnosticErrors.Any())
             {
                 var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine("Complication errors found in test code:");
+                stringBuilder.AppendLine("Compilation errors found in test code:");
                 foreach (var error in diagnosticErrors)
                 {
                     stringBuilder.AppendLine(error.ToString());
@@ -463,7 +469,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddMetadataReference(projectId, LoggerReference)
                 .AddMetadataReference(projectId, LoggerFactoryReference)
                 .AddMetadataReference(projectId, ControllerReference)
-                .AddMetadataReference(projectId, CancellationTokenReference);
+                .AddMetadataReference(projectId, CancellationTokenReference)
+                .AddMetadataReference(projectId, MaxMethodLengthReference)
+                .AddMetadataReference(projectId, MaxParameterCountReference)
+                .AddMetadataReference(projectId, SuppressMessageReference);
 
             int count = 0;
             foreach (var source in sources)
