@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
+namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
 {
     /// <summary>
     /// An analyzer which checks several attributes which suppress code analysis warnings/errors, validating that they have a justification.
@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class SupressionRequiresJustificationAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.SupressionMustHaveJustification;
+        public const string Id = DiagnosticId.SupressionRequiresJustification;
         
         /// <summary>
         /// The placeholder to insert as part of the code fix.
@@ -82,17 +82,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
         private sealed class AnalyzerInstance
         {
             /// <summary>
-            /// The symbol for <see cref="SuppressMessageAttribute"/>.
+            /// A lazily-initialized reference for <see cref="SuppressMessageAttribute"/>.
             /// </summary>
             private INamedTypeSymbol suppressMessageAttribute;
 
             /// <summary>
-            /// The symbol for <see cref="MaxMethodLengthAttribute"/>.
+            /// A lazily-initialized reference for <see cref="MaxMethodLengthAttribute"/>.
             /// </summary>
             private INamedTypeSymbol maxMethodLengthAttribute;
 
             /// <summary>
-            /// The symbol for <see cref="MaxParameterCountAttribute"/>.
+            /// A lazily-initialized reference for <see cref="MaxParameterCountAttribute"/>.
             /// </summary>
             private INamedTypeSymbol maxParameterCountAttribute;
 

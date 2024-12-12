@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
+namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SupressionRequiresJustificationFixProvider)), Shared]
     public sealed class SupressionRequiresJustificationFixProvider : CodeFixProvider
