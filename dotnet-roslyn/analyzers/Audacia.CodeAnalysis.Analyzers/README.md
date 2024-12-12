@@ -937,7 +937,7 @@ public Results<NotFound, Ok<string>> Get()
 }
 ```
 
-## ACL1017 - Code analysis supression attribute requires Justification
+## ACL1018 - Code analysis supression attribute requires Justification
 
 <table>
 <tr>
@@ -950,4 +950,36 @@ public Results<NotFound, Ok<string>> Get()
 </tr>
 </table>
 
-ALC1017 is based on the StyleCopAnalyzers Rules [SA1071](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1404.md). Which checks that the `SuppressMessage`, `MaxMethodLength` and `MaxParameterCount` attributes have a value supplied for their `Justification` argument.
+ACL1018 is based on the StyleCopAnalyzers Rules [SA1071](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1404.md). Which checks that the `SuppressMessage`, `MaxMethodLength` and `MaxParameterCount` attributes have a value supplied for their `Justification` argument.
+
+Code with violation (assuming configured maximum of 5 statements):
+
+```csharp
+[MaxMethodLength(6)]
+public void MyMethod()
+{
+    var one = 1;
+	var two = 2;
+	var three = 3;
+	var four = 4;
+	var five = 5;
+	var six = 6;
+}
+```
+
+Code without violation:
+
+```csharp
+[MaxMethodLength(
+    6, 
+    Justification = "Sequential declarations ensure clear readability")]
+public void MyMethod()
+{
+    var one = 1;
+	var two = 2;
+	var three = 3;
+	var four = 4;
+	var five = 5;
+	var six = 6;
+}
+```
