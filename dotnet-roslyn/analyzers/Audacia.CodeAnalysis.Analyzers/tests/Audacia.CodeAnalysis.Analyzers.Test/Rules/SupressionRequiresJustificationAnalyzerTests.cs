@@ -1,11 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 
@@ -28,7 +26,6 @@ public class SupressionRequiresJustificationAnalyzerTests : DiagnosticVerifier
         var testFileContents = $@"
 using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
 using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
-using System.Diagnostics.CodeAnalysis;
 
 namespace TestNamespace;
 
@@ -45,27 +42,18 @@ public class TestClass
     
     }}
 }}";
-        const int errorLine = 15;
+        const int errorLine = 14;
         const int errorColumn = 6;
+        var errorMessage = $"{attributeName} is missing a value for 'Justification'";
+        var expectedDiagnosticResult = CreateExpectedDiagnosticResult(errorMessage, errorLine, errorColumn);
 
-        var expected = new DiagnosticResult
-        {
-            Id = SupressionRequiresJustificationAnalyzer.Id,
-            Message = $"{attributeName} is missing a value for 'Justification'",
-            Severity = DiagnosticSeverity.Warning,
-            Locations =
-            [
-                new DiagnosticResultLocation("Test0.cs", errorLine, errorColumn)
-            ]
-        };
-
-        VerifyDiagnostic(testFileContents, expected);
+        VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
     [TestMethod]
     public void Diagnostics_For_Suppress_Message_Attribute_With_No_Justification()
     {
-        var testFileContents = @"
+        const string testFileContents = @"
 using System.Diagnostics.CodeAnalysis;
 
 namespace TestNamespace;
@@ -88,28 +76,21 @@ public class TestClass
         const int errorLine = 8;
         const int errorColumn = 6;
         const string errorMessage = "SuppressMessageAttribute is missing a value for 'Justification'";
-        var expected = new DiagnosticResult
-        {
-            Id = SupressionRequiresJustificationAnalyzer.Id,
-            Message = errorMessage,
-            Severity = DiagnosticSeverity.Warning,
-            Locations =
-            [
-                new DiagnosticResultLocation("Test0.cs", errorLine, errorColumn)
-            ]
-        };
+        var expectedDiagnosticResult = CreateExpectedDiagnosticResult(errorMessage, errorLine, errorColumn);
 
-        VerifyDiagnostic(testFileContents, expected);
+        VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
     [DataRow("MaxLengthSkip", "MaxMethodLengthAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength")]
     [DataRow("MaxParamSkip", "MaxParameterCountAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount")]
     [TestMethod]
-    public void Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_No_Justification(string alias, string attributeName, string attributeNameSpace)
+    public void Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_No_Justification(
+        string alias, 
+        string attributeName, 
+        string attributeNameSpace)
     {
         var testFileContents = $@"
 using {alias} = {attributeNameSpace}.{attributeName};
-
 
 namespace TestNamespace;
 
@@ -126,27 +107,18 @@ public class TestClass
     
     }}
 }}";
-        const int errorLine = 14;
+        const int errorLine = 13;
         const int errorColumn = 6;
+        var errorMessage = $"{attributeName} is missing a value for 'Justification'";
+        var expectedDiagnosticResult = CreateExpectedDiagnosticResult(errorMessage, errorLine, errorColumn);
 
-        var expected = new DiagnosticResult
-        {
-            Id = SupressionRequiresJustificationAnalyzer.Id,
-            Message = $"{attributeName} is missing a value for 'Justification'",
-            Severity = DiagnosticSeverity.Warning,
-            Locations =
-            [
-                new DiagnosticResultLocation("Test0.cs", errorLine, errorColumn)
-            ]
-        };
-
-        VerifyDiagnostic(testFileContents, expected);
+        VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
     [TestMethod]
     public void Diagnostics_For_SuppressMessage_Attribute_Alias_With_No_Justification()
     {
-        var testFileContents = @"
+        const string testFileContents = @"
 using Supress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace TestNamespace;
@@ -169,24 +141,15 @@ public class TestClass
         const int errorLine = 8;
         const int errorColumn = 6;
         const string errorMessage = "SuppressMessageAttribute is missing a value for 'Justification'";
-        var expected = new DiagnosticResult
-        {
-            Id = SupressionRequiresJustificationAnalyzer.Id,
-            Message = errorMessage,
-            Severity = DiagnosticSeverity.Warning,
-            Locations =
-            [
-                new DiagnosticResultLocation("Test0.cs", errorLine, errorColumn)
-            ]
-        };
+        var expectedDiagnosticResult = CreateExpectedDiagnosticResult(errorMessage, errorLine, errorColumn);
 
-        VerifyDiagnostic(testFileContents, expected);
+        VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
     [TestMethod]
     public void Diagnostics_For_Suppress_Message_Attribute_With_Placeholder_Justification()
     {
-        var testFileContents = @"
+        const string testFileContents = @"
 using System.Diagnostics.CodeAnalysis;
 
 namespace TestNamespace;
@@ -209,24 +172,18 @@ public class TestClass
         const int errorLine = 8;
         const int errorColumn = 6;
         const string errorMessage = "SuppressMessageAttribute is missing a value for 'Justification'";
-        var expected = new DiagnosticResult
-        {
-            Id = SupressionRequiresJustificationAnalyzer.Id,
-            Message = errorMessage,
-            Severity = DiagnosticSeverity.Warning,
-            Locations =
-            [
-                new DiagnosticResultLocation("Test0.cs", errorLine, errorColumn)
-            ]
-        };
+        var expectedDiagnosticResult = CreateExpectedDiagnosticResult(errorMessage, errorLine, errorColumn);
 
-        VerifyDiagnostic(testFileContents, expected);
+        VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
     [DataRow("MaxLengthSkip", "MaxMethodLengthAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength")]
     [DataRow("MaxParamSkip", "MaxParameterCountAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount")]
     [TestMethod]
-    public void Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_Placeholder_Justification(string alias, string attributeName, string attributeNameSpace)
+    public void Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_Placeholder_Justification(
+        string alias, 
+        string attributeName, 
+        string attributeNameSpace)
     {
         var testFileContents = $@"
 using {alias} = {attributeNameSpace}.{attributeName};
@@ -249,25 +206,16 @@ public class TestClass
 }}";
         const int errorLine = 14;
         const int errorColumn = 6;
+        var errorMessage = $"{attributeName} is missing a value for 'Justification'";
+        var expectedDiagnosticResult = CreateExpectedDiagnosticResult(errorMessage, errorLine, errorColumn);
 
-        var expected = new DiagnosticResult
-        {
-            Id = SupressionRequiresJustificationAnalyzer.Id,
-            Message = $"{attributeName} is missing a value for 'Justification'",
-            Severity = DiagnosticSeverity.Warning,
-            Locations =
-            [
-                new DiagnosticResultLocation("Test0.cs", errorLine, errorColumn)
-            ]
-        };
-
-        VerifyDiagnostic(testFileContents, expected);
+        VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
     [TestMethod]
     public void Diagnostics_For_Suppress_Message_Attribute_Alias_With_Placeholder_Justification()
     {
-        var testFileContents = @"
+        const string testFileContents = @"
 using Supress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace TestNamespace;
@@ -290,18 +238,9 @@ public class TestClass
         const int errorLine = 8;
         const int errorColumn = 6;
         const string errorMessage = "SuppressMessageAttribute is missing a value for 'Justification'";
-        var expected = new DiagnosticResult
-        {
-            Id = SupressionRequiresJustificationAnalyzer.Id,
-            Message = errorMessage,
-            Severity = DiagnosticSeverity.Warning,
-            Locations =
-            [
-                new DiagnosticResultLocation("Test0.cs", errorLine, errorColumn)
-            ]
-        };
+        var expectedDiagnosticResult = CreateExpectedDiagnosticResult(errorMessage, errorLine, errorColumn);
 
-        VerifyDiagnostic(testFileContents, expected);
+        VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
     [DataTestMethod]
@@ -312,7 +251,6 @@ public class TestClass
         var testFileContents = $@"
 using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
 using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
-using System.Diagnostics.CodeAnalysis;
 
 namespace TestNamespace;
 
@@ -336,7 +274,7 @@ public class TestClass
     [TestMethod]
     public void No_Diagnostics_For_Suppress_Message_Attribute_With_Justification()
     {
-        var testFileContents = @"
+        const string testFileContents = @"
 using System.Diagnostics.CodeAnalysis;
 
 namespace TestNamespace;
@@ -364,7 +302,10 @@ public class TestClass
     [DataRow("MaxLengthSkip", "MaxMethodLengthAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength")]
     [DataRow("MaxParamSkip", "MaxParameterCountAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount")]
     [TestMethod]
-    public void No_Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_No_Justification(string alias, string attributeName, string attributeNameSpace)
+    public void No_Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_No_Justification(
+        string alias, 
+        string attributeName, 
+        string attributeNameSpace)
     {
         var testFileContents = $@"
 using {alias} = {attributeNameSpace}.{attributeName};
@@ -392,7 +333,7 @@ public class TestClass
     [TestMethod]
     public void No_Diagnostics_For_Suppress_Message_Attribute_Alias_With_No_Justification()
     {
-        var testFileContents = @"
+        const string testFileContents = @"
 using Supress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace TestNamespace;
@@ -414,5 +355,19 @@ public class TestClass
 }";
 
         VerifyNoDiagnostic(testFileContents);
+    }
+
+    private static DiagnosticResult CreateExpectedDiagnosticResult(string message, int errorLine, int errorColumn)
+    {
+        return new DiagnosticResult
+        {
+            Id = SupressionRequiresJustificationAnalyzer.Id,
+            Message = message,
+            Severity = DiagnosticSeverity.Warning,
+            Locations =
+            [
+                new DiagnosticResultLocation("Test0.cs", errorLine, errorColumn)
+            ]
+        };
     }
 }
