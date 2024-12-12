@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Common;
-using Audacia.CodeAnalysis.Analyzers.Extensions;
 using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
 using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
 using Microsoft.CodeAnalysis;
@@ -15,6 +11,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
 {
+    /// <summary>
+    /// An analyzer which checks several attributes which suppress code analysis warnings/errors, validating that they have a justification.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class SupressionRequiresJustificationAnalyzer : DiagnosticAnalyzer
     {
@@ -26,21 +25,28 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
         public const string JustificationPlaceholder = "<Pending>";
 
         /// <summary>
-        /// The Title of the 
+        /// The title of the code analysis error.
         /// </summary>
         private const string Title = "Code analysis supression attribute requires a justification";
 
+        /// <summary>
+        /// The format of message displayed to the user, with the first argument representing the attribute's name.
+        /// </summary>
         private const string MessageFormat = "{0} is missing a value for 'Justification'";
 
+        /// <summary>
+        /// The description of this error.
+        /// </summary>
         private const string Description = "Justification is required when using analysis supression attributes.";
 
+        /// <summary>
+        /// The name of the arguement which requires a value.
+        /// </summary>
         private const string JustificationArguementName = "Justification";
 
-        private static ImmutableArray<Type> RelevantAttributes => ImmutableArray.Create(
-            typeof(SuppressMessageAttribute), 
-            typeof(MaxMethodLengthAttribute), 
-            typeof(MaxParameterCountAttribute));
-
+        /// <summary>
+        /// A URL to the README.md heading for this analyzer, on GitHub.
+        /// </summary>
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
@@ -69,52 +75,49 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
 
         private static void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
         {
-            var instance = new AnalyzerInstance(startContext.Compilation.GetOrCreateUsingAliasCache());
+            var instance = new AnalyzerInstance();
             startContext.RegisterSyntaxNodeAction(instance.HandleAttributeNode, SyntaxKind.Attribute);
-        }
-
-        private static Location GetMemberLocation(ISymbol member, SemanticModel semanticModel,
-            CancellationToken cancellationToken)
-        {
-            foreach (var arrowExpressionClause in member.DeclaringSyntaxReferences
-                         .Select(reference => reference.GetSyntax(cancellationToken))
-                         .OfType<ArrowExpressionClauseSyntax>())
-            {
-                var parentSymbol = semanticModel.GetDeclaredSymbol(arrowExpressionClause.Parent);
-
-                if (parentSymbol != null && parentSymbol.Locations.Any())
-                {
-                    return parentSymbol.Locations[0];
-                }
-            }
-
-            return member.Locations[0];
         }
 
         private sealed class AnalyzerInstance
         {
-            private readonly ConcurrentDictionary<SyntaxTree, bool> _usingAliasCache;
-
+            /// <summary>
+            /// The symbol for <see cref="SuppressMessageAttribute"/>.
+            /// </summary>
             private INamedTypeSymbol suppressMessageAttribute;
+
+            /// <summary>
+            /// The symbol for <see cref="MaxMethodLengthAttribute"/>.
+            /// </summary>
             private INamedTypeSymbol maxMethodLengthAttribute;
+
+            /// <summary>
+            /// The symbol for <see cref="MaxParameterCountAttribute"/>.
+            /// </summary>
             private INamedTypeSymbol maxParameterCountAttribute;
 
-            public AnalyzerInstance(ConcurrentDictionary<SyntaxTree, bool> usingAliasCache)
+            public AnalyzerInstance()
             {
-                _usingAliasCache = usingAliasCache;
             }
 
+            /// <summary>
+            /// Extracts the symbol of the current code and calls validation.
+            /// </summary>
+            /// <param name="context"></param>
             public void HandleAttributeNode(SyntaxNodeAnalysisContext context)
             {
                 var attribute = (AttributeSyntax)context.Node;
                 var symbol = context.SemanticModel.GetSymbolInfo(attribute).Symbol;
                 if (symbol != null)
                 {
-                    ValidateRelevantAttribute(context, attribute, symbol);
+                    ValidateAttribute(context, attribute, symbol);
                 }
             }
 
-            private void ValidateRelevantAttribute(SyntaxNodeAnalysisContext context, AttributeSyntax attribute, ISymbol symbol)
+            /// <summary>
+            /// Loads the symbols for each of the subject attributes and checks that this <see cref="Attribute"/> matches.
+            /// </summary>
+            private void ValidateAttribute(SyntaxNodeAnalysisContext context, AttributeSyntax attribute, ISymbol symbol)
             {
                 if (suppressMessageAttribute == null)
                 {
@@ -137,6 +140,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
                 }
             }
 
+            /// <summary>
+            /// Loops through the arguments of the attribute. 
+            /// </summary>
+            /// <returns>
+            /// A diagnostic error if
+            /// <list type="bullet">
+            /// <item>A justification is not found</item>
+            /// <item>A justification is found, but contains an empty or <see cref="JustificationPlaceholder"/> value.</item>
+            /// </list>
+            /// </returns>
             private void ValidateJustificationArgument(SyntaxNodeAnalysisContext context, AttributeSyntax attribute, ISymbol symbol)
             {
                 foreach (var attributeArgument in attribute.ArgumentList.Arguments)
@@ -167,27 +180,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MustHaveJustification
                 return SymbolEqualityComparer.Default.Equals(symbol.ContainingType, suppressMessageAttribute) ||
                     SymbolEqualityComparer.Default.Equals(symbol.ContainingType, maxMethodLengthAttribute) ||
                     SymbolEqualityComparer.Default.Equals(symbol.ContainingType, maxParameterCountAttribute);
-            }
-
-            private bool IsAliasOfRelevantAttribute(AttributeSyntax attribute)
-            {
-
-                if (!(attribute.Name is SimpleNameSyntax simpleNameSyntax))
-                {
-                    if (attribute.Name is AliasQualifiedNameSyntax aliasQualifiedNameSyntax)
-                    {
-                        simpleNameSyntax = aliasQualifiedNameSyntax.Name;
-                    }
-                    else
-                    {
-                        var qualifiedNameSyntax = attribute.Name as QualifiedNameSyntax;
-                        simpleNameSyntax = qualifiedNameSyntax.Right;
-                    }
-                }
-
-                var isAliasOfAttribute = RelevantAttributes.Any(relevantAttribute => relevantAttribute.Name == simpleNameSyntax.Identifier.ValueText);
-
-                return isAliasOfAttribute;
             }
         }
     }
