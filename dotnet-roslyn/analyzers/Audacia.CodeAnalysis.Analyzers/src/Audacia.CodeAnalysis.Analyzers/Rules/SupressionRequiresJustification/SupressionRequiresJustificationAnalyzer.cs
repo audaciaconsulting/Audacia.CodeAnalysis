@@ -15,8 +15,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class SupressionRequiresJustificationAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// The diagnostic Id.
+        /// </summary>
         public const string Id = DiagnosticId.SupressionRequiresJustification;
-        
+
+        /// <summary>
+        /// The name of the argument which requires a value.
+        /// </summary>
+        public const string JustificationName = "Justification";
+
         /// <summary>
         /// The placeholder to insert as part of the code fix.
         /// </summary>
@@ -36,11 +44,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
         /// The description of this error.
         /// </summary>
         private const string Description = "Justification is required when using analysis supression attributes.";
-
-        /// <summary>
-        /// The name of the arguement which requires a value.
-        /// </summary>
-        private const string JustificationArguementName = "Justification";
 
         /// <summary>
         /// A URL to the README.md heading for this analyzer, on GitHub.
@@ -137,7 +140,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
             {
                 foreach (var attributeArgument in attribute.ArgumentList.Arguments)
                 {
-                    if (attributeArgument.NameEquals?.Name?.Identifier.ValueText == JustificationArguementName)
+                    if (attributeArgument.NameEquals?.Name?.Identifier.ValueText == JustificationName)
                     {
                         // Check if the justification is not empty
                         var value = context.SemanticModel.GetConstantValue(attributeArgument.Expression);

@@ -1,6 +1,8 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -16,7 +18,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
         /// <summary>
         /// The title of the provided fix.
         /// </summary>
-        private const string Title = "Add the 'Justification' arguement to the attribute";
+        private const string Title = "Add the 'Justification' argument to the attribute";
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } =
@@ -38,24 +40,40 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
 
                 if (node is AttributeSyntax attribute)
                 {
-                    // In this case there is no justification at all
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
-                            Title,
-                            token => AddJustificationToAttributeAsync(context.Document, root, attribute),
-                            SupressionRequiresJustificationAnalyzer.Id),
-                        diagnostic);
+                    RegisterCodeFix(context, root, diagnostic, attribute);
                     return;
                 }
-                else if (node is AttributeArgumentSyntax argument)
+            }
+        }
+
+        private static void RegisterCodeFix(CodeFixContext context, SyntaxNode root, Diagnostic diagnostic, AttributeSyntax attribute)
+        {
+            var justificationArgument = attribute.ArgumentList.Arguments
+                .FirstOrDefault(argument =>
+                    argument.NameEquals?.Name.Identifier.ValueText == SupressionRequiresJustificationAnalyzer.JustificationName);
+
+            if (justificationArgument == null)
+            {
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        Title,
+                        token => AddJustificationToAttributeAsync(context.Document, root, attribute),
+                        SupressionRequiresJustificationAnalyzer.Id),
+                    diagnostic);
+            }
+            else
+            {
+                var valueEqualsPlaceholder = justificationArgument?.Expression is LiteralExpressionSyntax literal &&
+                    literal.Token.ValueText == SupressionRequiresJustificationAnalyzer.JustificationPlaceholder;
+
+                if (!valueEqualsPlaceholder)
                 {
                     context.RegisterCodeFix(
-                        CodeAction.Create(
-                            Title,
-                            token => UpdateValueOfArgumentAsync(context.Document, root, argument),
-                            SupressionRequiresJustificationAnalyzer.Id),
-                        diagnostic);
-                    return;
+                    CodeAction.Create(
+                        Title,
+                        token => UpdateValueOfArgumentAsync(context.Document, root, justificationArgument),
+                        SupressionRequiresJustificationAnalyzer.Id),
+                    diagnostic);
                 }
             }
         }
@@ -68,9 +86,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
 
         private static Task<Document> AddJustificationToAttributeAsync(Document document, SyntaxNode syntaxRoot, AttributeSyntax attribute)
         {
-            var arguementName = SyntaxFactory.IdentifierName(nameof(SuppressMessageAttribute.Justification));
-            var newArgument = SyntaxFactory.AttributeArgument(SyntaxFactory.NameEquals(arguementName), null, GetNewAttributeValue());
-
+            var argumentName = SyntaxFactory.IdentifierName(nameof(SuppressMessageAttribute.Justification));
+            var newArgument = SyntaxFactory.AttributeArgument(SyntaxFactory.NameEquals(argumentName), null, GetNewAttributeValue());
             var newArgumentList = attribute.ArgumentList.AddArguments(newArgument);
             return Task.FromResult(document.WithSyntaxRoot(syntaxRoot.ReplaceNode(attribute.ArgumentList, newArgumentList)));
         }
