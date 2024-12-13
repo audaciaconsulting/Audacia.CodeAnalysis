@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -8,14 +8,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 
 /// <summary>
-/// Unit tests for the <see cref="SupressionRequiresJustificationAnalyzer"/>.
+/// Unit tests for the <see cref="SuppressionRequiresJustificationAnalyzer"/>.
 /// </summary>
 [TestClass]
-public class SupressionRequiresJustificationAnalyzerTests : DiagnosticVerifier
+public class SuppressionRequiresJustificationAnalyzerTests : DiagnosticVerifier
 {
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        return new SupressionRequiresJustificationAnalyzer();
+        return new SuppressionRequiresJustificationAnalyzer();
     }
 
     [DataTestMethod]
@@ -119,13 +119,13 @@ public class TestClass
     public void Diagnostics_For_Suppress_Message_Attribute_Alias_With_No_Justification()
     {
         const string testFileContents = @"
-using Supress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
+using Suppress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace TestNamespace;
 
 public class TestClass 
 {
-    [Supress(""Unit Tests"", ""IDE0051"")]
+    [Suppress(""Unit Tests"", ""IDE0051"")]
     private readonly string _unusedMember;
 
     public TestClass() 
@@ -216,13 +216,13 @@ public class TestClass
     public void Diagnostics_For_Suppress_Message_Attribute_Alias_With_Placeholder_Justification()
     {
         const string testFileContents = @"
-using Supress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
+using Suppress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace TestNamespace;
 
 public class TestClass 
 {
-    [Supress(""Unused Private Variable"", ""IDE0051"", Justification = ""<Pending>"")]
+    [Suppress(""Unused Private Variable"", ""IDE0051"", Justification = ""<Pending>"")]
     private readonly string _unusedMember;
 
     public TestClass() 
@@ -334,13 +334,13 @@ public class TestClass
     public void No_Diagnostics_For_Suppress_Message_Attribute_Alias_With_No_Justification()
     {
         const string testFileContents = @"
-using Supress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
+using Suppress = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace TestNamespace;
 
 public class TestClass 
 {
-    [Supress(""Unused Private Variable"", ""IDE0051"", Justification = ""Suppressed for the purpose of a passing unit test."")]
+    [Suppress(""Unused Private Variable"", ""IDE0051"", Justification = ""Suppressed for the purpose of a passing unit test."")]
     private readonly string _unusedMember;
 
     public TestClass() 
@@ -361,7 +361,7 @@ public class TestClass
     {
         return new DiagnosticResult
         {
-            Id = SupressionRequiresJustificationAnalyzer.Id,
+            Id = SuppressionRequiresJustificationAnalyzer.Id,
             Message = message,
             Severity = DiagnosticSeverity.Warning,
             Locations =

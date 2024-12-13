@@ -10,10 +10,10 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
+namespace Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SupressionRequiresJustificationFixProvider)), Shared]
-    public sealed class SupressionRequiresJustificationFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SuppressionRequiresJustificationFixProvider)), Shared]
+    public sealed class SuppressionRequiresJustificationFixProvider : CodeFixProvider
     {
         /// <summary>
         /// The title of the provided fix.
@@ -22,7 +22,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-            ImmutableArray.Create(SupressionRequiresJustificationAnalyzer.Id);
+            ImmutableArray.Create(SuppressionRequiresJustificationAnalyzer.Id);
 
         /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider()
@@ -50,7 +50,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
         {
             var justificationArgument = attribute.ArgumentList.Arguments
                 .FirstOrDefault(argument =>
-                    argument.NameEquals?.Name.Identifier.ValueText == SupressionRequiresJustificationAnalyzer.JustificationName);
+                    argument.NameEquals?.Name.Identifier.ValueText == SuppressionRequiresJustificationAnalyzer.JustificationName);
 
             if (justificationArgument == null)
             {
@@ -58,13 +58,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
                     CodeAction.Create(
                         Title,
                         token => AddJustificationToAttributeAsync(context.Document, root, attribute),
-                        SupressionRequiresJustificationAnalyzer.Id),
+                        SuppressionRequiresJustificationAnalyzer.Id),
                     diagnostic);
             }
             else
             {
                 var valueEqualsPlaceholder = justificationArgument?.Expression is LiteralExpressionSyntax literal &&
-                    literal.Token.ValueText == SupressionRequiresJustificationAnalyzer.JustificationPlaceholder;
+                    literal.Token.ValueText == SuppressionRequiresJustificationAnalyzer.JustificationPlaceholder;
 
                 if (!valueEqualsPlaceholder)
                 {
@@ -72,7 +72,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
                     CodeAction.Create(
                         Title,
                         token => UpdateValueOfArgumentAsync(context.Document, root, justificationArgument),
-                        SupressionRequiresJustificationAnalyzer.Id),
+                        SuppressionRequiresJustificationAnalyzer.Id),
                     diagnostic);
                 }
             }
@@ -96,7 +96,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
         {
             return SyntaxFactory.LiteralExpression(
                 SyntaxKind.StringLiteralExpression,
-                SyntaxFactory.Literal(SupressionRequiresJustificationAnalyzer.JustificationPlaceholder));
+                SyntaxFactory.Literal(SuppressionRequiresJustificationAnalyzer.JustificationPlaceholder));
         }
     }
 }

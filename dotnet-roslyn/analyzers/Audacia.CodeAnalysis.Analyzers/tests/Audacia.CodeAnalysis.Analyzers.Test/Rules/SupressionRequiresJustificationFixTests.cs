@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -9,19 +9,19 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 
 /// <summary>
-/// Unit tests for the <see cref="SupressionRequiresJustificationAnalyzer"/>.
+/// Unit tests for the <see cref="SuppressionRequiresJustificationAnalyzer"/>.
 /// </summary>
 [TestClass]
 public class SupressionRequiresJustificationFixProviderTests : CodeFixVerifier
 {
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        return new SupressionRequiresJustificationAnalyzer();
+        return new SuppressionRequiresJustificationAnalyzer();
     }
 
     protected override CodeFixProvider GetCSharpCodeFixProvider()
     {
-        return new SupressionRequiresJustificationFixProvider();
+        return new SuppressionRequiresJustificationFixProvider();
     }
 
     [TestMethod]
