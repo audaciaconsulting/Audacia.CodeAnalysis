@@ -936,3 +936,21 @@ public Results<NotFound, Ok<string>> Get()
     return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
 }
 ```
+
+
+ACL1017 is based on AV1564 ( https://github.com/bkoelman/CSharpGuidelinesAnalyzer/blob/master/src/CSharpGuidelinesAnalyzer/CSharpGuidelinesAnalyzer/Rules/Maintainability/AvoidBooleanParameterAnalyzer.cs)
+which disallows all boolean parameters except ones in records defined using positional syntax.
+
+Code with diagnostic:
+
+```csharp
+public static void ShouldFail(bool imNotAllowed)
+{
+
+}
+```
+
+Code without diagnostic:
+```csharp
+public record Test(bool shouldBeFine);
+```
