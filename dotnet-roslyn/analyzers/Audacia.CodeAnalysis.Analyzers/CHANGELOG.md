@@ -1,10 +1,4 @@
 ﻿# CHANGELOG
-# 1.11.3 - 2024-12-06
-### Added
-- New analyzer ACL1017 has been added to supercede AV1564, boolean record parameters do not cause an analyzer warning now ([78989b](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/37/commits/78989b32845b149da470829e0f69725b1c863907))
-
-### Changed
-- Analyzer AV1564 deprecated in favor of ACL1017
 # 1.11.2 - 2024-11-01
 ### Added
 - No new functionality added
