@@ -1,10 +1,5 @@
 ﻿# CHANGELOG
 
-## 1.11.3 - 2024-12-12
-### Changed
-- Rewrote ACL1010 analyzer so that it diagnoses it once for the entire project at the compilation stage, producing a single, global warning rather than on a file-by-file basis using semantic model analysis like before.
-- This fixes the issue where the analyzer would highlight every line in a class in projects where nullable reference types is not enabled.
-
 ## 1.11.2 - 2024-11-01
 ### Added
 - No new functionality added
