@@ -1,7 +1,5 @@
 ﻿using Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
-using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
