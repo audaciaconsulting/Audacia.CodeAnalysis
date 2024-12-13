@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>This package supports workspaces operating a minimum version of C# 12 and .NET 8.</Description>
     <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
     <Authors>Audacia</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
