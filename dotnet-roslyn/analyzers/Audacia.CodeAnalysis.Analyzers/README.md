@@ -950,7 +950,7 @@ public Results<NotFound, Ok<string>> Get()
 </tr>
 </table>
 
-ACL1018 is based on the StyleCopAnalyzers Rules [SA1071](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1404.md). Which checks that the `SuppressMessage`, `MaxMethodLength` and `MaxParameterCount` attributes have a value supplied for their `Justification` argument.
+ACL1018 is based on the StyleCopAnalyzers Rule [SA1404](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1404.md), which checks that the `SuppressMessage`, `MaxMethodLength` and `MaxParameterCount` attributes have a value supplied for their `Justification` argument.
 
 Code with violation (assuming configured maximum of 5 statements):
 
