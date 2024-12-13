@@ -937,7 +937,7 @@ public Results<NotFound, Ok<string>> Get()
 }
 ```
 
-## ACL1018 - Code analysis supression attribute requires Justification
+## ACL1018 - Code analysis suppression attribute requires Justification
 
 <table>
 <tr>

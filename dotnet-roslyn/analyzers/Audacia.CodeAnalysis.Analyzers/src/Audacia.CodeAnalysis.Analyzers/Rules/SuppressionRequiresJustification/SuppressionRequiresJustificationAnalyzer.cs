@@ -7,18 +7,18 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
+namespace Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification
 {
     /// <summary>
     /// An analyzer which checks several attributes which suppress code analysis warnings/errors, validating that they have a justification.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class SupressionRequiresJustificationAnalyzer : DiagnosticAnalyzer
+    public sealed class SuppressionRequiresJustificationAnalyzer : DiagnosticAnalyzer
     {
         /// <summary>
         /// The diagnostic Id.
         /// </summary>
-        public const string Id = DiagnosticId.SupressionRequiresJustification;
+        public const string Id = DiagnosticId.SuppressionRequiresJustification;
 
         /// <summary>
         /// The name of the argument which requires a value.
@@ -33,7 +33,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
         /// <summary>
         /// The title of the code analysis error.
         /// </summary>
-        private const string Title = "Code analysis supression attribute requires a justification";
+        private const string Title = "Code analysis suppression attribute requires a justification";
 
         /// <summary>
         /// The format of message displayed to the user, with the first argument representing the attribute's name.
@@ -43,7 +43,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.SupressionRequiresJustification
         /// <summary>
         /// The description of this error.
         /// </summary>
-        private const string Description = "Justification is required when using analysis supression attributes.";
+        private const string Description = "Justification is required when using analysis suppression attributes.";
 
         /// <summary>
         /// A URL to the README.md heading for this analyzer, on GitHub.
