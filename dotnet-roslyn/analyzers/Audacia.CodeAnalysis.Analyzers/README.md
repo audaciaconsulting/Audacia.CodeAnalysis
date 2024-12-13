@@ -28,7 +28,7 @@ If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](
 
 To run VS experimentally set the `.Vsix` project as the startup project, which launches visual studio with the analysers installed. Depending on your use case create or open an existing project. Code that violates any analysers in this project should then be flagged.
 
-## Updating the workspace to support a new C# version
+## Updating the analyzers to support a new C# version
 If the Microsoft.CodeAnalysis.CSharp.Workspaces package is being upgraded to support a new C# version (as per the official [Roslyn NuGet-packages.md](https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md)), the major version of Audacia.CodeAnalysis.Analyzers must be incremented.
 
 The Description in the `.csproj` must be updated to include the minimum version of C#/.NET that is supported.
@@ -38,8 +38,6 @@ e.g
 ```csharp
     <PropertyGroup>
         <Description>This package supports C# 12 and .NET 8 as a minimum.</Description>
-        <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>12.0</LangVersion>
     </PropertyGroup>
 ```
 
