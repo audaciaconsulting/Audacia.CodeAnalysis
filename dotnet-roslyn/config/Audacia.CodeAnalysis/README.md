@@ -140,3 +140,20 @@ All rules are prefixed with `DOC`.
 [Microsoft.EntityFrameworkCore.Analyzers](https://github.com/dotnet/efcore/tree/main/src/EFCore.Analyzers) provides C# analyzers for Entity Framework Core.
 
 All rules are prefixed `EF`.
+
+# Contributing
+We welcome contributions! Please feel free to check our [Contribution Guidelines](https://github.com/audaciaconsulting/.github/blob/main/CONTRIBUTING.md) for feature requests, issue reporting and guidelines.
+
+## Updating the analyzers to support a new C# version
+
+If any of the dependent analyzer packages are being upgraded to reference a newer version of `Microsoft.CodeAnalysis.CSharp.Workspaces` that results in a new minimum supported C# version (as per the official [Roslyn NuGet-packages.md](https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md)), the major version of `Audacia.CodeAnalysis` must be incremented.
+
+The description in the `.csproj` must be updated to include the minimum version of C#/.NET that is supported.
+
+e.g
+
+```csharp
+    <PropertyGroup>
+        <Description>This package supports C# 12 and .NET 8 as a minimum.</Description>
+    </PropertyGroup>
+```
