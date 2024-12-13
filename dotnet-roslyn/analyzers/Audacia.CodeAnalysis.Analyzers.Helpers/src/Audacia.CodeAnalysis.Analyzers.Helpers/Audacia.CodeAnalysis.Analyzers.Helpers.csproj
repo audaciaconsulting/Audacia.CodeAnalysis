@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-	 <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-</PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
 
   <PropertyGroup>
     <Version>1.1.3</Version>
