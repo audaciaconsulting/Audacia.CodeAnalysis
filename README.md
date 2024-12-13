@@ -21,7 +21,7 @@ The `Audacia.CodeAnalysis` repository change history can be found in the followi
   - ES Lint Plugin Vue [changelog](eslint/plugins/audacia-eslint-plugin-vue/CHANGELOG.md)
 
 # Contributing
-We welcome contributions! Please feel free to check our [Contribution Guidlines](https://github.com/audaciaconsulting/.github/blob/main/CONTRIBUTING.md) for feature requests, issue reporting and guidelines.
+We welcome contributions! Please feel free to check our [Contribution Guidelines](https://github.com/audaciaconsulting/.github/blob/main/CONTRIBUTING.md) for feature requests, issue reporting and guidelines.
 
 ## Updating the analyzers to support a new C# version
 
