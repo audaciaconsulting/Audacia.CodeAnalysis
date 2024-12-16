@@ -5,7 +5,6 @@
         <Authors>Audacia</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <Version>1.11.0</Version>
         <Copyright>Copyright © Audacia $([System.DateTime]::Now.Year)</Copyright>
         <PackageIcon>package-icon.png</PackageIcon>
         <DevelopmentDependency>true</DevelopmentDependency>

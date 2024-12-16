@@ -28,6 +28,20 @@ If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](
 
 To run VS experimentally set the `.Vsix` project as the startup project, which launches visual studio with the analysers installed. Depending on your use case create or open an existing project. Code that violates any analysers in this project should then be flagged.
 
+## Updating the analyzers to support a new C# version
+If the Microsoft.CodeAnalysis.CSharp.Workspaces package is being upgraded to support a new C# version (as per the official [Roslyn NuGet-packages.md](https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md)), the major version of Audacia.CodeAnalysis.Analyzers must be incremented.
+
+The Description in the `.csproj` must be updated to include the minimum version of C#/.NET that is supported.
+
+e.g
+
+```xml
+    <PropertyGroup>
+        <Description>This package supports C# 12 and .NET 8 as a minimum.</Description>
+    </PropertyGroup>
+```
+
+
 # Analyzers
 
 ## ACL1000 - Private fields should be prefixed with an underscore
@@ -934,5 +948,52 @@ public Results<NotFound, Ok<string>> Get()
 {
     var result = GetResult();
     return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
+
+## ACL1018 - Code analysis suppression attribute requires Justification
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1018 is based on the StyleCopAnalyzers Rule [SA1404](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1404.md), which checks that the `SuppressMessage`, `MaxMethodLength` and `MaxParameterCount` attributes have a value supplied for their `Justification` argument.
+
+Code with violation (assuming configured maximum of 5 statements):
+
+```csharp
+[MaxMethodLength(6)]
+public void MyMethod()
+{
+    var one = 1;
+	var two = 2;
+	var three = 3;
+	var four = 4;
+	var five = 5;
+	var six = 6;
+}
+```
+
+Code without violation:
+
+```csharp
+[MaxMethodLength(
+    6, 
+    Justification = "Sequential declarations ensure clear readability")]
+public void MyMethod()
+{
+    var one = 1;
+	var two = 2;
+	var three = 3;
+	var four = 4;
+	var five = 5;
+	var six = 6;
 }
 ```

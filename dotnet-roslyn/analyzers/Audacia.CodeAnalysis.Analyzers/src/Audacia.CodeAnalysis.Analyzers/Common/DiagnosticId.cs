@@ -20,5 +20,6 @@
         public const string DoNotUseProducesResponseTypeWithTypedResults = "ACL1015";
         public const string UseTypedResultsInsteadOfIActionResult = "ACL1016";
         public const string AvoidBooleanParameters = "ACL1017";
+        public const string SuppressionRequiresJustification = "ACL1018";
     }
 }
