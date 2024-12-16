@@ -75,8 +75,8 @@ public class TestClass
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_With_No_Justification(string attributeName)
     {
         var testFileContents = $@"
-using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
-using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
+using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength;
+using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount;
 
 namespace ConsoleApplication1;
 
@@ -97,8 +97,8 @@ public class TestClass
 }}";
 
         var fixedTestFileContents = $@"
-using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
-using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
+using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength;
+using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount;
 
 namespace ConsoleApplication1;
 

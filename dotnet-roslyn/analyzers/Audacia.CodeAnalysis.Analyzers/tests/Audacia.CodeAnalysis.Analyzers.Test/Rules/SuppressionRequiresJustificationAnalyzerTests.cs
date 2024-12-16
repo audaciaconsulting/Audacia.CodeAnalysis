@@ -24,8 +24,8 @@ public class SuppressionRequiresJustificationAnalyzerTests : DiagnosticVerifier
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_With_No_Justification(string attributeName)
     {
         var testFileContents = $@"
-using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
-using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
+using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength;
+using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount;
 
 namespace TestNamespace;
 
@@ -81,8 +81,14 @@ public class TestClass
         VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
-    [DataRow("MaxLengthSkip", "MaxMethodLengthAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength")]
-    [DataRow("MaxParamSkip", "MaxParameterCountAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount")]
+    [DataRow(
+        "MaxLengthSkip",
+        "MaxMethodLengthAttribute",
+        "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength")]
+    [DataRow(
+        "MaxParamSkip", 
+        "MaxParameterCountAttribute",
+        "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount")]
     [TestMethod]
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_No_Justification(
         string alias, 
@@ -177,8 +183,14 @@ public class TestClass
         VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
-    [DataRow("MaxLengthSkip", "MaxMethodLengthAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength")]
-    [DataRow("MaxParamSkip", "MaxParameterCountAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount")]
+    [DataRow(
+        "MaxLengthSkip", 
+        "MaxMethodLengthAttribute",
+        "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength")]
+    [DataRow(
+        "MaxParamSkip", 
+        "MaxParameterCountAttribute",
+        "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount")]
     [TestMethod]
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_Placeholder_Justification(
         string alias, 
@@ -249,8 +261,8 @@ public class TestClass
     public void No_Diagnostics_For_Audacia_Code_Analysis_Attribute_With_Justification(string attributeName)
     {
         var testFileContents = $@"
-using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
-using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
+using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength;
+using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount;
 
 namespace TestNamespace;
 
@@ -299,8 +311,8 @@ public class TestClass
         VerifyNoDiagnostic(testFileContents);
     }
 
-    [DataRow("MaxLengthSkip", "MaxMethodLengthAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength")]
-    [DataRow("MaxParamSkip", "MaxParameterCountAttribute", "Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount")]
+    [DataRow("MaxLengthSkip", "MaxMethodLengthAttribute", "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength")]
+    [DataRow("MaxParamSkip", "MaxParameterCountAttribute", "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount")]
     [TestMethod]
     public void No_Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_No_Justification(
         string alias, 
