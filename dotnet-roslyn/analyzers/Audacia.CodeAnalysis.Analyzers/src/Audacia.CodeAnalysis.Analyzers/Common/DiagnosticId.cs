@@ -19,5 +19,8 @@
         public const string DoNotUseNumberInIdentifierName = "ACL1014";
         public const string DoNotUseProducesResponseTypeWithTypedResults = "ACL1015";
         public const string UseTypedResultsInsteadOfIActionResult = "ACL1016";
+
+        // 4. We build observable systems
+        public const string HandlerShouldInjectILogger = "ACL1400";
     }
 }
