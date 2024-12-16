@@ -15,7 +15,7 @@ If any of the dependent analyzer packages are being upgraded to reference a newe
 The Description in the `.csproj` must be updated to include the minimum version of C#/.NET that is supported.
 
 e.g
-```csharp
+```xml
     <PropertyGroup>
         <Description>This package supports C# 12 and .NET 8 as a minimum.</Description>
     </PropertyGroup>
