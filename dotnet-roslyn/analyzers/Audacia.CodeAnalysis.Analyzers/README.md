@@ -35,7 +35,7 @@ The Description in the `.csproj` must be updated to include the minimum version 
 
 e.g
 
-```csharp
+```xml
     <PropertyGroup>
         <Description>This package supports C# 12 and .NET 8 as a minimum.</Description>
     </PropertyGroup>
