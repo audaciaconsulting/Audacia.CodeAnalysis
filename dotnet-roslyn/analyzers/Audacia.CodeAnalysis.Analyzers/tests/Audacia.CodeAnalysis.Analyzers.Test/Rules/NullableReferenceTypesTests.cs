@@ -30,22 +30,17 @@ public class TestClass
 }";
 
         /// <summary>
-        /// Constructs the expected result when the analyzer is triggered.
+        /// Constructs the expected result when the analyzer is triggered, now with no location.
         /// </summary>
-        /// <param name="lineNumber">The line number at which the diagnostic is produced.</param>
-        /// <param name="column">The column index at which the diagnostic is produced.</param>
         /// <returns>A <see cref="DiagnosticResult"/> produced by the analyzer.</returns>
-        private static DiagnosticResult BuildExpectedResult(int lineNumber, int column)
+        private static DiagnosticResult BuildExpectedResult()
         {
             return new DiagnosticResult
             {
                 Id = DiagnosticId.NullableReferenceTypesEnabled,
                 Message = "Nullable reference types should be enabled",
                 Severity = DiagnosticSeverity.Warning,
-                Locations =
-                [
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                ]
+                // No Locations specified as this is a project-level diagnostic.
             };
         }
 
@@ -89,7 +84,7 @@ public class TestClass
         }
 
         /// <summary>
-        /// Asserts that a diagnostic is produced if nullable reference types are not enabled.
+        /// Asserts that a diagnostic is produced if nullable reference types are disabled.
         /// </summary>
         [TestMethod]
         public void Diagnostic_And_Code_Fix_For_Disabled()
@@ -98,8 +93,9 @@ public class TestClass
                 OutputKind.ConsoleApplication,
                 nullableContextOptions: NullableContextOptions.Disable);
 
-            VerifyDiagnostic(DefaultClass, BuildExpectedResult(2, 1));
+            VerifyDiagnostic(DefaultClass, BuildExpectedResult());
 
+            // The code fix may not actually alter the source code, but just confirm that applying the fix does not break anything.
             VerifyCodeFix(DefaultClass, DefaultClass);
         }
 
@@ -109,7 +105,6 @@ public class TestClass
         /// <returns>An instance of the <see cref="NullableReferenceTypesCodeFixProvider"/>.</returns>
         protected override CodeFixProvider GetCSharpCodeFixProvider()
             => new NullableReferenceTypesCodeFixProvider();
-
 
         /// <summary>
         /// Ensures the correct analyzer is returned.
