@@ -24,31 +24,40 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AvoidBooleanParameter
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
-        private static readonly Action<SyntaxNodeAnalysisContext> AnalyzeParameterAction = context => AnalysisContextExtensions.SkipEmptyName(context, AnalyzeParameter);
-
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
+            // Register an action that runs on each parameter syntax node.
             context.SafeRegisterSyntaxNodeAction(AnalyzeParameter, SyntaxKind.Parameter);
         }
 
         private static void AnalyzeParameter(SymbolAnalysisContext context)
         {
             var parameter = (IParameterSymbol)context.Symbol;
-            var isRecordParam = false; 
-            foreach (var references in context.Symbol.DeclaringSyntaxReferences)
+
+            // Determine if this parameter comes from a record’s positional parameter list
+            var isRecordParam = false;
+            foreach (var reference in context.Symbol.DeclaringSyntaxReferences)
             {
-                var reference = references.GetSyntax(context.CancellationToken);
-                isRecordParam = reference.Parent.Parent.IsKind(SyntaxKind.RecordDeclaration);
+                var referenceSyntax = reference.GetSyntax(context.CancellationToken);
+                // Check if the parameter syntax is inside a RecordDeclaration node.
+                // If it is from the primary constructor (positional record), the immediate parent will be a ParameterList, 
+                // and above that a RecordDeclaration. We check `referenceSyntax.Parent.Parent`:
+                isRecordParam = referenceSyntax.Parent?.Parent?.IsKind(SyntaxKind.RecordDeclaration) == true;
             }
-      
+
+            // We skip analysis if:
+            // 1. The containing symbol is a deconstructor (e.g., Deconstruct method on a record)
+            // 2. The parameter is synthesized by the compiler
+            // 3. The parameter belongs to a positional record (as per the new requirement)
             if (parameter.ContainingSymbol.IsDeconstructor() || parameter.IsSynthesized() || isRecordParam)
             {
                 return;
             }
 
+            // Check if the parameter is accessible and of bool or bool? type.
             if (IsParameterAccessible(parameter) && parameter.Type.IsBooleanOrNullableBoolean())
             {
                 AnalyzeBooleanParameter(parameter, context);
@@ -59,28 +68,34 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AvoidBooleanParameter
         {
             ISymbol containingMember = parameter.ContainingSymbol;
 
-            return containingMember.DeclaredAccessibility != Accessibility.Private && containingMember.IsSymbolAccessibleFromRoot();
+            // Check if the containing member is non-private and accessible from the root.
+            return containingMember.DeclaredAccessibility != Accessibility.Private &&
+                   containingMember.IsSymbolAccessibleFromRoot();
         }
 
         private static void AnalyzeBooleanParameter(IParameterSymbol parameter, SymbolAnalysisContext context)
         {
             ISymbol containingMember = parameter.ContainingSymbol;
 
-            if (!containingMember.IsOverride && !containingMember.HidesBaseMember(context.CancellationToken) && !parameter.IsInterfaceImplementation() &&
+            // We do not raise a diagnostic if the parameter is an override, hides a base member, implements an interface method, 
+            // or is part of a known disposable pattern (Dispose method with a bool named Disposing).
+            if (!containingMember.IsOverride &&
+                !containingMember.HidesBaseMember(context.CancellationToken) &&
+                !parameter.IsInterfaceImplementation() &&
                 !IsDisposablePattern(parameter))
             {
                 var diagnostic = Diagnostic.Create(Rule, parameter.Locations[0], parameter.Name, parameter.Type);
                 context.ReportDiagnostic(diagnostic);
             }
         }
-        
+
         private static bool IsDisposablePattern(IParameterSymbol parameter)
         {
+            // Special case: a Dispose(bool Disposing) pattern commonly found in certain classes
             try
             {
                 var containingSymbol = (IMethodSymbol)parameter.ContainingSymbol;
-                
-                if (parameter.Name == "Disposing" && (containingSymbol.Name == "Dispose"))
+                if (parameter.Name == "Disposing" && containingSymbol.Name == "Dispose")
                 {
                     if (containingSymbol.IsVirtual && containingSymbol.DeclaredAccessibility == Accessibility.Protected)
                     {
@@ -90,11 +105,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AvoidBooleanParameter
             }
             catch (InvalidCastException)
             {
-                //We cant cast this so its false
-                return false;
+                // If we cannot cast to IMethodSymbol, just return false.
             }
-
             return false;
         }
     }
+
 }
