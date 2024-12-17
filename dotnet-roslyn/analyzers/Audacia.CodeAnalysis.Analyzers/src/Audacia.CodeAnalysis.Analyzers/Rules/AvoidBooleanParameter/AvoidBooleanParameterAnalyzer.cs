@@ -2,12 +2,9 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.AvoidBooleanParameter
 {
