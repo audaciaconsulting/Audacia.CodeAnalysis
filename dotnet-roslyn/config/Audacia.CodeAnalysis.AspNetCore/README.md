@@ -16,7 +16,10 @@ The Description in the `.csproj` must be updated to include the minimum version 
 
 e.g
 ```xml
-    <PropertyGroup>
-        <Description>This package supports C# 12 and .NET 8 as a minimum.</Description>
-    </PropertyGroup>
+<PropertyGroup>
+    <Description>
+        Code analysis packages and rulesets for apps using Entity Framework Core.
+        This package supports projects operating a minimum version of C# 12 and .NET 8.
+    </Description>
+</PropertyGroup>
 ```
