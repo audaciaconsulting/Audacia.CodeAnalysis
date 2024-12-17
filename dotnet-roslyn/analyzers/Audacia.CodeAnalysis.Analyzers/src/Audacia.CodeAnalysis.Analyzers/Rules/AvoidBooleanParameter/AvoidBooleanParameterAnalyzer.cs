@@ -14,13 +14,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AvoidBooleanParameter
         private const string Title = "Parameter in public or internal member is of type bool or bool?";
         private const string MessageFormat = "Parameter '{0}' is of type '{1}'";
         private const string Description = "Avoid signatures that take a bool parameter.";
+        private const string Category = DiagnosticCategory.Maintainability;
 
-        private static string Category = DiagnosticCategory.Maintainability;
         public const string Id = DiagnosticId.AvoidBooleanParameters;
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true,
-            Description);
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
