@@ -49,6 +49,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             return symbol.Kind.ToString();
         }
 
+        /// <summary>
+        /// Checks if the symbol or any of its containing types are private, returning false if so.
+        /// This helps determine if a parameter is in a publicly visible method.
+        /// </summary>
+        /// <param name="symbol">The symbol to check.</param>
+        /// <returns>True if the symbol is accessible from the root; otherwise, false.</returns>
         public static bool IsSymbolAccessibleFromRoot(this ISymbol symbol)
         {
             ISymbol container = symbol;
@@ -116,9 +122,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             return !symbol.Locations.Any();
         }
 
+        /// <summary>
+        /// Determines whether the specified symbol is a method named Deconstruct, which is commonly used in C# records and tuples.
+        /// Deconstructors are a special case that should not trigger the diagnostic.
+        /// </summary>
+        /// <param name="symbol">The symbol to check.</param>
+        /// <returns><c>true</c> if the symbol is a deconstructor method; otherwise, <c>false</c>.</returns>
         public static bool IsDeconstructor(this ISymbol symbol)
         {
-            if(symbol is IMethodSymbol)
+            if (symbol is IMethodSymbol)
             {
                 var methodSymbol = (IMethodSymbol)symbol;
                 return methodSymbol.Name == "Deconstruct";
