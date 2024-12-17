@@ -1,15 +1,8 @@
 ﻿using Audacia.CodeAnalysis.Analyzers.Rules.AvoidBooleanParameter;
-using Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseType;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 {
