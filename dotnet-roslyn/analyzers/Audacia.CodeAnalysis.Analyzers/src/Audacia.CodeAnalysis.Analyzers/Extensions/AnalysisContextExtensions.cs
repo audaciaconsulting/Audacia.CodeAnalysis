@@ -31,19 +31,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             }
         }
 
-        /// <summary>
-        /// Skips the execution of the provided action if the symbol name in the given <see cref="SyntaxNodeAnalysisContext"/> is empty.
-        /// Some generated code or compiler scenarios can result in symbols with empty names, which can cause exceptions or incorrect analysis results.
-        /// This function helps avoid those issues.
-        /// </summary>
-        /// <param name="context">The <see cref="SyntaxNodeAnalysisContext"/> to analyze.</param>
-        /// <param name="action">The action to execute if the symbol name is not empty.</param>
-        public static void SkipEmptyName(SyntaxNodeAnalysisContext context, Action<SymbolAnalysisContext> action)
-        {
-            SymbolAnalysisContext symbolContext = context.ToSymbolContext();
-            SkipEmptyName(symbolContext, _ => action(symbolContext));
-        }
-
         private static CompilationWithAnalyzers SyntaxToSymbolContext(SyntaxNodeAnalysisContext syntaxContext,
             ISymbol symbol)
         {
@@ -83,18 +70,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             }
 
             return methodSymbol.IsAsync;
-        }
-
-        /// <summary>
-        /// Registers a syntax node action to the analyzer. Instead of handling the syntax node directly, it converts the SyntaxNodeAnalysisContext into a SymbolAnalysisContext,
-        /// making subsequent checks easier.
-        /// </summary>
-        /// <param name="analysisContext">The analysis context to register the action with.</param>
-        /// <param name="action">The action to execute if the symbol name is not empty.</param>
-        /// <param name="syntaxKinds">The syntax kinds to register the action for.</param>
-        public static void SafeRegisterSyntaxNodeAction(this AnalysisContext analysisContext, Action<SymbolAnalysisContext> action, params SyntaxKind[] syntaxKinds)
-        {
-            analysisContext.RegisterSyntaxNodeAction(context => SkipEmptyName(context, action), syntaxKinds);
         }
 
         /// <summary>
