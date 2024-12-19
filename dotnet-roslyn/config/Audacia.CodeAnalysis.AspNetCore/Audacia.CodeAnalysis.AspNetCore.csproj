@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
-        <Description>Code analysis packages and rulesets for ASP.NET Core apps.</Description>
+        <Description>
+            Code analysis packages and rulesets for ASP.NET Core apps.
+            This package supports projects operating a minimum version of C# 12 and .NET 8.
+        </Description>
         <Authors>Audacia</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
