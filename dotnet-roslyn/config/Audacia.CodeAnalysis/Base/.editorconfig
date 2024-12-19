@@ -2212,7 +2212,8 @@ dotnet_diagnostic.SA1402.severity = suggestion
 dotnet_diagnostic.SA1403.severity = warning
 
 # A Code Analysis SuppressMessage attribute does not include a justification.
-dotnet_diagnostic.SA1404.severity = warning
+# Disabled as this has now been superseded by ACL1018.
+dotnet_diagnostic.SA1404.severity = none
 
 # A call to Debug.Assert in C# code does not include a descriptive message.
 dotnet_diagnostic.SA1405.severity = none
