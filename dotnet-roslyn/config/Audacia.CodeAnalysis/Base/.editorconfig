@@ -1338,7 +1338,6 @@ dotnet_diagnostic.RCS1113.severity = suggestion
 # Remove redundant delegate creation
 dotnet_diagnostic.RCS1114.severity = suggestion
 
-
 # [GENERAL] Mark local variable as const
 dotnet_diagnostic.RCS1118.severity = warning
 
