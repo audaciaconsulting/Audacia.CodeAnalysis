@@ -1002,18 +1002,6 @@ dotnet_diagnostic.RCS1006.severity = warning
 # [STYLE] Add braces *** Suppress as covered by ACL1006 ***
 dotnet_diagnostic.RCS1007.severity = none
 
-# [READABILITY] Use explicit type instead of 'var' (when the type is not obvious)
-dotnet_diagnostic.RCS1008.severity = none
-
-# [READABILITY] Use explicit type instead of 'var' (foreach variable)
-dotnet_diagnostic.RCS1009.severity = none
-
-# [SIMPLIFICATION] Use 'var' instead of explicit type (when the type is obvious)
-dotnet_diagnostic.RCS1010.severity = warning
-
-# [READABILITY] Use explicit type instead of 'var' (when the type is obvious)
-dotnet_diagnostic.RCS1012.severity = none
-
 # [USAGE] Use predefined type
 dotnet_diagnostic.RCS1013.severity = warning
 
@@ -1025,9 +1013,6 @@ dotnet_diagnostic.RCS1015.severity = warning
 
 # [USAGE] Use expression-bodied member
 dotnet_diagnostic.RCS1016.severity = suggestion
-
-# [STYLE] Avoid multiline expression body
-dotnet_diagnostic.RCS1017.severity = none
 
 # [READABILITY] Add default access modifier *** Suppressed as covered by SA1400 ***
 dotnet_diagnostic.RCS1018.severity = none
@@ -1041,30 +1026,6 @@ dotnet_diagnostic.RCS1020.severity = none
 # [SIMPLIFICATION] Simplify lambda expression
 dotnet_diagnostic.RCS1021.severity = suggestion
 
-# [FORMATTING] Format empty block
-dotnet_diagnostic.RCS1023.severity = none
-
-# [FORMATTING] Format accessor list
-dotnet_diagnostic.RCS1024.severity = warning
-
-# [FORMATTING] Add new line before enum member
-dotnet_diagnostic.RCS1025.severity = none
-
-# [FORMATTING] Add new line before statement
-dotnet_diagnostic.RCS1026.severity = warning
-
-# [FORMATTING] Add new line before embedded statement
-dotnet_diagnostic.RCS1027.severity = none
-
-# [FORMATTING] Add new line after switch label
-dotnet_diagnostic.RCS1028.severity = none
-
-# [FORMATTING] Format binary operator on next line
-dotnet_diagnostic.RCS1029.severity = none
-
-# [FORMATTING] Add empty line after embedded statement
-dotnet_diagnostic.RCS1030.severity = warning
-
 # [REDUNDANCY] Remove unnecessary braces
 dotnet_diagnostic.RCS1031.severity = suggestion
 
@@ -1076,9 +1037,6 @@ dotnet_diagnostic.RCS1033.severity = warning
 
 # [REDUNDANCY] Remove redundant 'sealed' modifier
 dotnet_diagnostic.RCS1034.severity = warning
-
-# [REDUNDANCY] Remove redundant comma in initializer
-dotnet_diagnostic.RCS1035.severity = warning
 
 # [REDUNDANCY] Remove redundant empty line *** Suppressed as covered by SA1507 ***
 dotnet_diagnostic.RCS1036.severity = none
@@ -1097,9 +1055,6 @@ dotnet_diagnostic.RCS1043.severity = warning
 
 # [MAINTAINABILITY] Remove original exception from throw statement
 dotnet_diagnostic.RCS1044.severity = warning
-
-# [NAMING] Rename private field according to camel case with underscore *** Suppress as applies itself to static readonly fields ***
-dotnet_diagnostic.RCS1045.severity = none
 
 # [NAMING] Asynchronous method name should end with 'Async'
 dotnet_diagnostic.RCS1046.severity = warning
@@ -1128,9 +1083,6 @@ dotnet_diagnostic.RCS1055.severity = warning
 # [READABILITY] Avoid usage of using alias directive
 dotnet_diagnostic.RCS1056.severity = none
 
-# [FORMATTING] Add empty line between declarations
-dotnet_diagnostic.RCS1057.severity = warning
-
 # [SIMPLIFICATION] Use compound assignment
 dotnet_diagnostic.RCS1058.severity = warning
 
@@ -1142,21 +1094,6 @@ dotnet_diagnostic.RCS1060.severity = none
 
 # [SIMPLIFICATION] Merge if statement with nested if statement
 dotnet_diagnostic.RCS1061.severity = warning
-
-# [REDUNDANCY] Avoid interpolated string with no interpolation
-dotnet_diagnostic.RCS1062.severity = warning
-
-# [STYLE] Avoid usage of do statement to create an infinite loop
-dotnet_diagnostic.RCS1063.severity = warning
-
-# [STYLE] Avoid usage of for statement to create an infinite loop
-dotnet_diagnostic.RCS1064.severity = warning
-
-# [STYLE] Avoid usage of while statement to create an inifinite loop
-dotnet_diagnostic.RCS1065.severity = none
-
-# [STYLE] Remove argument list from object creation expression
-dotnet_diagnostic.RCS1067.severity = warning
 
 # [SIMPLIFICATION] Simplify logical negation
 dotnet_diagnostic.RCS1068.severity = warning
@@ -1179,9 +1116,6 @@ dotnet_diagnostic.RCS1074.severity = warning
 # [DESIGN] Avoid empty catch clause that catches System.Exception
 dotnet_diagnostic.RCS1075.severity = warning
 
-# [FORMATTING] Format declaration braces
-dotnet_diagnostic.RCS1076.severity = none
-
 # [PERFORMANCE] Optimize LINQ method call
 dotnet_diagnostic.RCS1077.severity = warning
 
@@ -1203,23 +1137,11 @@ dotnet_diagnostic.RCS1084.severity = warning
 # [SIMPLIFICATION] Use auto-implemented property
 dotnet_diagnostic.RCS1085.severity = warning
 
-# [GENERAL] Use linefeed as newline
-dotnet_diagnostic.RCS1086.severity = none
-
-# [GENERAL] Use carriage return + linefeed as newline
-dotnet_diagnostic.RCS1087.severity = warning
-
-# [GENERAL] Use space(s) instead of tab
-dotnet_diagnostic.RCS1088.severity = none
-
 # [SIMPLIFICATION] Use -/++ operator instead of assignment
 dotnet_diagnostic.RCS1089.severity = warning
 
 # [DESIGN] Call 'ConfigureAwait(false)' *** Suppress and only enforce for library code ***
 dotnet_diagnostic.RCS1090.severity = none
-
-# [FORMATTING] Add empty line before 'while' keyword in 'do' statement
-dotnet_diagnostic.RCS1092.severity = warning
 
 # [REDUNDANCY] Remove file with no code
 dotnet_diagnostic.RCS1093.severity = warning
@@ -1238,12 +1160,6 @@ dotnet_diagnostic.RCS1098.severity = warning
 
 # [READABILITY] Default label should be the last label in a switch section
 dotnet_diagnostic.RCS1099.severity = warning
-
-# [FORMATTING] Format documentation summary on a single line
-dotnet_diagnostic.RCS1100.severity = none
-
-# [FORMATTING] Format documentation summary on multiple lines
-dotnet_diagnostic.RCS1101.severity = none
 
 # [DESIGN] Make class static
 dotnet_diagnostic.RCS1102.severity = warning
@@ -1274,9 +1190,6 @@ dotnet_diagnostic.RCS1118.severity = warning
 
 # [READABILITY] Add parentheses according to operator precedence *** Suppress as clashes with ReSharper default ***
 dotnet_diagnostic.RCS1123.severity = none
-
-# [SIMPLIFICATION] Merge local declaration with assignment
-dotnet_diagnostic.RCS1127.severity = warning
 
 # [SIMPLIFICATION] Use coalesce expression
 dotnet_diagnostic.RCS1128.severity = warning
@@ -1386,12 +1299,6 @@ dotnet_diagnostic.RCS1174.severity = none
 # [REDUNDANCY] Unused this parameter
 dotnet_diagnostic.RCS1175.severity = suggestion
 
-# [SIMPLIFICATION] Use 'var' instead of explicit type (when the type is not obvious)
-dotnet_diagnostic.RCS1176.severity = suggestion
-
-# [SIMPLIFICATION] Use 'var' instead of explicit type (in foreach)
-dotnet_diagnostic.RCS1177.severity = suggestion
-
 # [SIMPLIFICATION] Use return instead of assignment
 dotnet_diagnostic.RCS1179.severity = suggestion
 
@@ -1403,15 +1310,6 @@ dotnet_diagnostic.RCS1181.severity = suggestion
 
 # [REDUNDANCY] Remove redundant base interface
 dotnet_diagnostic.RCS1182.severity = suggestion
-
-# [FORMATTING] Format initializer with single expression on single line *** Suppress as disagree ***
-dotnet_diagnostic.RCS1183.severity = none
-
-# [FORMATTING] Format conditional expression (format ? and : on next line)
-dotnet_diagnostic.RCS1184.severity = suggestion
-
-# [FORMATTING] Format single-line block
-dotnet_diagnostic.RCS1185.severity = suggestion
 
 # [DESIGN] Use constant instead of field *** Suppress as covered by CA1802 ***
 dotnet_diagnostic.RCS1187.severity = none
@@ -1494,9 +1392,6 @@ dotnet_diagnostic.RCS1217.severity = none
 # [READABILITY] Simplify code branching
 dotnet_diagnostic.RCS1218.severity = warning
 
-# [PERFORMANCE] Call 'Enumerable.Skip' and 'Enumerable.Any' instead of 'Enumerable.Count'
-dotnet_diagnostic.RCS1219.severity = suggestion
-
 # [USAGE] Use pattern matching instead of combination of 'is' operator and cast operator
 dotnet_diagnostic.RCS1220.severity = warning
 
@@ -1538,9 +1433,6 @@ dotnet_diagnostic.RCS1235.severity = suggestion
 
 # [USAGE] Use exception filter
 dotnet_diagnostic.RCS1236.severity = warning
-
-# [USAGE] Use bit shift operator
-dotnet_diagnostic.RCS1237.severity = suggestion
 
 # [READABILITY] Avoid nested ?: operators
 dotnet_diagnostic.RCS1238.severity = suggestion
