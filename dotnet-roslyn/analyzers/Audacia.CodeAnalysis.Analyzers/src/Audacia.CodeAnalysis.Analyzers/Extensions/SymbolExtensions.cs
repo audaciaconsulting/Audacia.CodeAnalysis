@@ -49,6 +49,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             return symbol.Kind.ToString();
         }
 
+        /// <summary>
+        /// Checks if the symbol or any of its containing types are private, returning false if so.
+        /// This helps determine if a parameter is in a publicly visible method.
+        /// </summary>
+        /// <param name="symbol">The symbol to check.</param>
+        /// <returns>True if the symbol is accessible from the root; otherwise, false.</returns>
+        public static bool IsSymbolAccessibleFromRoot(this ISymbol symbol)
+        {
+            ISymbol container = symbol;
+
+            while (container != null)
+            {
+                if (container.DeclaredAccessibility == Accessibility.Private)
+                {
+                    return false;
+                }
+
+                container = container.ContainingType;
+            }
+
+            return true;
+        }
+
         private static string GetMethodKind(IMethodSymbol method)
         {
             switch (method.MethodKind)
@@ -73,10 +96,47 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
                 }
             }
         }
+        
+        public static bool IsBooleanOrNullableBoolean(this ITypeSymbol type)
+        {
+            return type.SpecialType == SpecialType.System_Boolean || IsNullableBoolean(type);
+        }
+        
+        public static bool IsNullableBoolean(this ITypeSymbol type)
+        {
+            if (type.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
+            {
+                var namedTypeSymbol = type as INamedTypeSymbol;
+
+                if (namedTypeSymbol?.TypeArguments[0].SpecialType == SpecialType.System_Boolean)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public static bool IsSynthesized(this ISymbol symbol)
         {
             return !symbol.Locations.Any();
+        }
+
+        /// <summary>
+        /// Determines whether the specified symbol is a method named Deconstruct, which is commonly used in C# records and tuples.
+        /// Deconstructors are a special case that should not trigger the diagnostic.
+        /// </summary>
+        /// <param name="symbol">The symbol to check.</param>
+        /// <returns><c>true</c> if the symbol is a deconstructor method; otherwise, <c>false</c>.</returns>
+        public static bool IsDeconstructor(this ISymbol symbol)
+        {
+            if (symbol is IMethodSymbol)
+            {
+                var methodSymbol = (IMethodSymbol)symbol;
+                return methodSymbol.Name == "Deconstruct";
+            }
+
+            return false;
         }
 
         public static bool IsPropertyOrEventAccessor(this ISymbol symbol)
