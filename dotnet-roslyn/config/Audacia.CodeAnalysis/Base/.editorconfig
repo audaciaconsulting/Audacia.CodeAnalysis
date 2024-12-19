@@ -982,13 +982,13 @@ dotnet_diagnostic.IDISP022.severity = warning
 dotnet_diagnostic.IDISP023.severity = warning
 
 # Add blank line after embedded statement
-dotnet_diagnostic.RCS0001.severity = none
+dotnet_diagnostic.RCS0001.severity = warning
 
 # Add blank line after #region
 dotnet_diagnostic.RCS0002.severity = none
 
 # Add blank line after using directive list
-dotnet_diagnostic.RCS0003.severity = none
+dotnet_diagnostic.RCS0003.severity = warning
 
 # Add blank line before #endregion
 dotnet_diagnostic.RCS0005.severity = none
@@ -1000,22 +1000,22 @@ dotnet_diagnostic.RCS0006.severity = none
 dotnet_diagnostic.RCS0007.severity = none
 
 # Add blank line between closing brace and next statement
-dotnet_diagnostic.RCS0008.severity = none
+dotnet_diagnostic.RCS0008.severity = warning
 
 # Add blank line between declaration and documentation comment
 dotnet_diagnostic.RCS0009.severity = none
 
 # Add blank line between declarations
-dotnet_diagnostic.RCS0010.severity = none
+dotnet_diagnostic.RCS0010.severity = warning
 
 # Add/remove blank line between single-line accessors
 dotnet_diagnostic.RCS0011.severity = none
 
 # Add blank line between single-line declarations
-dotnet_diagnostic.RCS0012.severity = none
+dotnet_diagnostic.RCS0012.severity = warning
 
 # Add blank line between single-line declarations of different kind
-dotnet_diagnostic.RCS0013.severity = none
+dotnet_diagnostic.RCS0013.severity = warning
 
 # Add/remove blank line between using directives
 dotnet_diagnostic.RCS0015.severity = none
@@ -1033,13 +1033,14 @@ dotnet_diagnostic.RCS0021.severity = none
 dotnet_diagnostic.RCS0023.severity = none
 
 # Add new line after switch label
-dotnet_diagnostic.RCS0024.severity = none
+dotnet_diagnostic.RCS0024.severity = warning
 
 # Put full accessor on its own line
-dotnet_diagnostic.RCS0025.severity = none
+dotnet_diagnostic.RCS0025.severity = warning
 
 # Place new line after/before binary operator
 dotnet_diagnostic.RCS0027.severity = none
+roslynator_binary_operator_new_line = before
 
 # Place new line after/before '?:' operator
 dotnet_diagnostic.RCS0028.severity = none
@@ -1051,28 +1052,28 @@ dotnet_diagnostic.RCS0029.severity = none
 dotnet_diagnostic.RCS0030.severity = none
 
 # Put enum member on its own line
-dotnet_diagnostic.RCS0031.severity = none
+dotnet_diagnostic.RCS0031.severity = warning
 
 # Place new line after/before arrow token
 dotnet_diagnostic.RCS0032.severity = none
 
 # Put statement on its own line
-dotnet_diagnostic.RCS0033.severity = none
+dotnet_diagnostic.RCS0033.severity = warning
 
 # Put type parameter constraint on its own line
-dotnet_diagnostic.RCS0034.severity = none
+dotnet_diagnostic.RCS0034.severity = warning
 
 # Remove blank line between single-line declarations of same kind
 dotnet_diagnostic.RCS0036.severity = none
 
 # Remove new line before base list
-dotnet_diagnostic.RCS0039.severity = none
+dotnet_diagnostic.RCS0039.severity = warning
 
 # Remove new line between 'if' keyword and 'else' keyword
-dotnet_diagnostic.RCS0041.severity = none
+dotnet_diagnostic.RCS0041.severity = warning
 
 # Put auto-accessors on a single line
-dotnet_diagnostic.RCS0042.severity = none
+dotnet_diagnostic.RCS0042.severity = warning
 
 # Use carriage return + linefeed as new line
 dotnet_diagnostic.RCS0044.severity = none
@@ -1090,7 +1091,7 @@ dotnet_diagnostic.RCS0048.severity = none
 dotnet_diagnostic.RCS0049.severity = none
 
 # Add blank line before top declaration
-dotnet_diagnostic.RCS0050.severity = none
+dotnet_diagnostic.RCS0050.severity = warning
 
 # Add/remove new line before 'while' in 'do' statement
 dotnet_diagnostic.RCS0051.severity = none
@@ -1099,28 +1100,29 @@ dotnet_diagnostic.RCS0051.severity = none
 dotnet_diagnostic.RCS0052.severity = none
 
 # Fix formatting of a list
-dotnet_diagnostic.RCS0053.severity = none
+dotnet_diagnostic.RCS0053.severity = warning
 
 # Fix formatting of a call chain
-dotnet_diagnostic.RCS0054.severity = none
+dotnet_diagnostic.RCS0054.severity = warning
 
 # Fix formatting of a binary expression chain
-dotnet_diagnostic.RCS0055.severity = none
+dotnet_diagnostic.RCS0055.severity = warning
 
 # A line is too long
 dotnet_diagnostic.RCS0056.severity = none
 
 # Normalize whitespace at the beginning of a file
-dotnet_diagnostic.RCS0057.severity = none
+dotnet_diagnostic.RCS0057.severity = warning
 
 # Normalize whitespace at the end of a file
-dotnet_diagnostic.RCS0058.severity = none
+dotnet_diagnostic.RCS0058.severity = warning
 
 # Place new line after/before null-conditional operator
 dotnet_diagnostic.RCS0059.severity = none
 
 # Add/remove line after file scoped namespace declaration
-dotnet_diagnostic.RCS0060.severity = none
+dotnet_diagnostic.RCS0060.severity = warning
+roslynator_blank_line_after_file_scoped_namespace_declaration = true
 
 # Add/remove blank line between switch sections
 dotnet_diagnostic.RCS0061.severity = none
@@ -1333,10 +1335,10 @@ dotnet_diagnostic.RCS1111.severity = none
 dotnet_diagnostic.RCS1112.severity = none
 
 # Use 'string.IsNullOrEmpty' method
-dotnet_diagnostic.RCS1113.severity = suggestion
+dotnet_diagnostic.RCS1113.severity = warning
 
 # Remove redundant delegate creation
-dotnet_diagnostic.RCS1114.severity = suggestion
+dotnet_diagnostic.RCS1114.severity = warning
 
 # [GENERAL] Mark local variable as const
 dotnet_diagnostic.RCS1118.severity = warning
@@ -1345,7 +1347,7 @@ dotnet_diagnostic.RCS1118.severity = warning
 dotnet_diagnostic.RCS1123.severity = none
 
 # Inline local variable
-dotnet_diagnostic.RCS1124.severity = hidden
+dotnet_diagnostic.RCS1124.severity = warning
 
 # Add braces to if-else
 dotnet_diagnostic.RCS1126.severity = none
@@ -1354,7 +1356,7 @@ dotnet_diagnostic.RCS1126.severity = none
 dotnet_diagnostic.RCS1128.severity = warning
 
 # Remove redundant field initialization
-dotnet_diagnostic.RCS1129.severity = hidden
+dotnet_diagnostic.RCS1129.severity = suggestion
 
 # [GENERAL] Bitwise operation on enum without Flags attribute
 dotnet_diagnostic.RCS1130.severity = warning
@@ -1477,7 +1479,7 @@ dotnet_diagnostic.RCS1181.severity = suggestion
 dotnet_diagnostic.RCS1182.severity = suggestion
 
 # Use Regex instance instead of static method
-dotnet_diagnostic.RCS1186.severity = silent
+dotnet_diagnostic.RCS1186.severity = suggestion
 
 # [DESIGN] Use constant instead of field *** Suppress as covered by CA1802 ***
 dotnet_diagnostic.RCS1187.severity = none
@@ -1543,7 +1545,7 @@ dotnet_diagnostic.RCS1206.severity = warning
 dotnet_diagnostic.RCS1207.severity = warning
 
 # Reduce 'if' nesting
-dotnet_diagnostic.RCS1208.severity = none
+dotnet_diagnostic.RCS1208.severity = suggestion
 
 # [READABILITY] Order type parameter constraints
 dotnet_diagnostic.RCS1209.severity = warning
@@ -1645,7 +1647,7 @@ dotnet_diagnostic.RCS1242.severity = warning
 dotnet_diagnostic.RCS1243.severity = suggestion
 
 # Simplify 'default' expression
-dotnet_diagnostic.RCS1244.severity = silent
+dotnet_diagnostic.RCS1244.severity = suggestion
 
 # Use element access
 dotnet_diagnostic.RCS1246.severity = suggestion
@@ -1660,7 +1662,7 @@ dotnet_diagnostic.RCS1248.severity = none
 dotnet_diagnostic.RCS1249.severity = suggestion
 
 # Use implicit/explicit object creation
-dotnet_diagnostic.RCS1250.severity = none
+dotnet_diagnostic.RCS1250.severity = suggestion
 
 # Remove unnecessary braces from record declaration
 dotnet_diagnostic.RCS1251.severity = warning
@@ -1675,7 +1677,7 @@ dotnet_diagnostic.RCS1253.severity = none
 dotnet_diagnostic.RCS1254.severity = warning
 
 # Simplify argument null check
-dotnet_diagnostic.RCS1255.severity = none
+dotnet_diagnostic.RCS1255.severity = suggestion
 
 # Invalid argument null check
 dotnet_diagnostic.RCS1256.severity = suggestion
@@ -1702,7 +1704,7 @@ dotnet_diagnostic.RCS1262.severity = warning
 dotnet_diagnostic.RCS1263.severity = warning
 
 # Use 'var' or explicit type
-dotnet_diagnostic.RCS1264.severity = none
+dotnet_diagnostic.RCS1264.severity = suggestion
 
 # Remove redundant catch block
 dotnet_diagnostic.RCS1265.severity = warning
