@@ -1,5 +1,22 @@
 ﻿# Changelog
 
+## 1.12.0 - 2025-01-02
+### Added
+- Added configuration for several new rules in the `Audacia.CodeAnalysis` base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files))
+
+### Changed
+- All CodeAnalysis README files have been updated with a description to remind developers that if any of the dependent analyzer packages are being upgraded to reference a newer version of `Microsoft.CodeAnalysis.CSharp.Workspaces` that results in a new minimum supported C# version (as per https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md), the major version of Audacia.CodeAnalysis must be incremented.
+- All CodeAnalysis `.csproj` files have been updated to include the minimum version of C#/.NET that is supported.
+- Reduced the severity of several overzealous analyzers the base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files)).
+- The following packages have been updated ([3a34df9e](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/71/files)):
+  - `Audacia.CodeAnalysis.Analyzers` from version 1.11.0 to version 1.12.0.
+  - `IDisposableAnalyzers` from version 4.0.7 to version 4.0.8.
+  - `Roslynator.Analyzers` from version 4.12.3 to version 4.12.10.
+  - As part of the package updates the base editorconfig has been updated so that:
+    - any deprecated Roslynator rules between RCS1001 to RCS1268 have been removed.
+    - any new Roslynator rules between RCS1001 to RCS1268 have been added with an appropriate severity.
+    - the analyzer SA1404 has been suppressed as it has now been superseded by custom analyzer ACL1018.
+
 ## 1.11.0 - 2024-09-25
 ### Added
 - No new functionality added
