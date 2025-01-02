@@ -1,5 +1,18 @@
 ﻿# CHANGELOG
 
+## 1.12.0 - 2025-01-02
+### Added
+- Added new rule "SuppressionRequiresJustification" (ACL1018).
+  -  This extends StyleCopAnalyzers Rule SA1404, which checks that the SuppressMessage, MaxMethodLength and MaxParameterCount attributes have a value supplied for their Justification argument.
+  - [feat: ACL1018 - Code analysis suppression attribute requires Justification #183011 #66](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/66)
+- Added new rule "AvoidBooleanParameters" (ACL1017).
+    - This is similar to AV1564 but excludes positional syntax records, treating them as properties rather than parameters.
+    - [feat: exclude records defined using positional syntax #151091 #37](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/37)
+### Changed
+- Updated rule ACL1010 to issue a project-level warning if nullable reference types are disabled, avoiding file-wide highlighting and specific code markers.
+  - Added the new rule to the base `.editorConfig` file and suppressed rule AV1564 that it has now superseded.
+  - [fix: fix ACL1010 highlighting every line as a warning #183005 #64](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/64)
+
 ## 1.11.2 - 2024-11-01
 ### Added
 - No new functionality added
