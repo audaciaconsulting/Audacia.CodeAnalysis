@@ -5,6 +5,8 @@
 - Added configuration for several new rules in the `Audacia.CodeAnalysis` base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files))
 
 ### Changed
+- All CodeAnalysis README files have been updated with a description to remind developers that if any of the dependent analyzer packages are being upgraded to reference a newer version of `Microsoft.CodeAnalysis.CSharp.Workspaces` that results in a new minimum supported C# version (as per https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md), the major version of Audacia.CodeAnalysis must be incremented.
+- All CodeAnalysis `.csproj` files have been updated to include the minimum version of C#/.NET that is supported.
 - Reduced the severity of several overzealous analyzers the base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files)).
 - The following packages have been updated ([3a34df9e](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/71/files)):
   - `Audacia.CodeAnalysis.Analyzers` from version 1.11.0 to version 1.12.0.
