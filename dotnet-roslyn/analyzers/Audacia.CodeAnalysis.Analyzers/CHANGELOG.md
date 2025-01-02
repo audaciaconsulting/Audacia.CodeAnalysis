@@ -1,6 +1,6 @@
 ﻿# CHANGELOG
 
-# 1.11.2 - 2024-11-01
+## 1.11.2 - 2024-11-01
 ### Added
 - No new functionality added
 
