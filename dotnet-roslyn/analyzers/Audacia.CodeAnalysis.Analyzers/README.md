@@ -951,6 +951,52 @@ public Results<NotFound, Ok<string>> Get()
 }
 ```
 
+## ACL1017 - Avoid signatures that take a bool parameter but exclude positional syntax records
+
+ACL1017 performs the same analysis as the 'avoid boolean parameter' analyzer rule (AV1564) but excludes positional syntax records, treating them as properties rather than parameters.
+
+Diagnostic for method with boolean parameters:
+
+``` csharp
+     class TypeName
+     {
+         static void Main(string[] args)
+             {
+                 ShouldFail(true);
+             }
+             public static void ShouldFail(bool imNotAllowed)
+             {
+             }
+     }
+```
+
+No diagnostic for internal record with positional syntax:
+
+```csharp
+     class TypeName
+     {
+       static void Main(string[] args)
+       {
+       }
+       internal record Test(bool shouldBeFine);
+     }
+```
+
+No diagnostic for primary constructor with bool parameters:
+
+```csharp
+     class TypeName
+     {
+         static void Main(string[] args)
+             {
+             }
+         public record PrimaryCon(bool shouldBeOkay)
+             {
+                 private bool testVar => shouldBeOkay;
+             }
+     }
+```
+
 ## ACL1018 - Code analysis suppression attribute requires Justification
 
 <table>
