@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## 1.12.0 - 2025-01-02
+### Added
+- Added the following new rules to the `Audacia.CodeAnalysis` base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files)):
+  - ALC1018: Code analysis suppression requires justification.
+  - CA2254: [USAGE] Template should be a static expression.
+  - CA2255: [USAGE] The ModuleInitializer attribute should not be used in libraries.
+
+### Changed
+- Reduced the severity of the following overzealous Analyzers the base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files)):
+  - SA1404: A Code Analysis SuppressMessage attribute does not include a justification.
+    - This has been suppressed as it is now covered by custom analyzer ACL1018.
+  - IDE0046: Use conditional expression for return.
+  - IDE0058: Remove unused expression value.
+
 ## 1.11.0 - 2024-09-25
 ### Added
 - No new functionality added
