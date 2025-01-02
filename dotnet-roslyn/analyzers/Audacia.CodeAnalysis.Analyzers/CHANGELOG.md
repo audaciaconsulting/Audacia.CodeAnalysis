@@ -10,8 +10,7 @@
     - [feat: exclude records defined using positional syntax #151091 #37](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/37)
 ### Changed
 - Updated rule ACL1010 to issue a project-level warning if nullable reference types are disabled, avoiding file-wide highlighting and specific code markers.
-  - Added the new rule to the base `.editorConfig` file and suppressed rule AV1564 that it has now superseded.
-  - [fix: fix ACL1010 highlighting every line as a warning #183005 #64](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/64)
+
 
 ## 1.11.2 - 2024-11-01
 ### Added
