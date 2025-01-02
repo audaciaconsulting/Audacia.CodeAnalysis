@@ -16,10 +16,7 @@
     <PackageReference Include="CSharpGuidelinesAnalyzer" Version="3.8.5" />
     <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59" />
     <PackageReference Include="IDisposableAnalyzers" Version="4.0.8" />
-    <PackageReference Include="Roslynator.Analyzers" Version="4.12.10">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Roslynator.Analyzers" Version="4.12.10" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
   </ItemGroup>
 
