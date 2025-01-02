@@ -57,10 +57,6 @@ dotnet_diagnostic.ACL1013.severity = warning
 # [Naming] ACL1014: Don't include numbers in identifiers
 dotnet_diagnostic.ACL1014.severity = warning
 
-# Avoid signatures that take a bool parameter but exclude positional syntax records, treating them as properties rather than parameters.
-# Similar to AV1564
-dotnet_diagnostic.ACL1017.severity = warning
-
 # [Maintainability] ALC1018: Code analysis suppression requires justification.
 dotnet_diagnostic.ACL1018.severity = warning
 
@@ -145,8 +141,8 @@ dotnet_diagnostic.AV1561.severity = none
 # Don't use ref or out parameters
 dotnet_diagnostic.AV1562.severity = warning
 
-# Avoid signatures that take a bool parameter *** Suppressed as this rule has been superseded by custom analyzer ACL1017 ***
-dotnet_diagnostic.AV1564.severity = none
+# Avoid signatures that take a bool parameter
+dotnet_diagnostic.AV1564.severity = warning
 
 # Don't use parameters as temporary variables
 dotnet_diagnostic.AV1568.severity = suggestion
