@@ -2,17 +2,18 @@
 
 ## 1.12.0 - 2025-01-02
 ### Added
-- Added the following new rules to the `Audacia.CodeAnalysis` base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files)):
-  - ALC1018: Code analysis suppression requires justification.
-  - CA2254: [USAGE] Template should be a static expression.
-  - CA2255: [USAGE] The ModuleInitializer attribute should not be used in libraries.
+- Added configuration for several new rules in the `Audacia.CodeAnalysis` base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files))
 
 ### Changed
-- Reduced the severity of the following overzealous Analyzers the base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files)):
-  - SA1404: A Code Analysis SuppressMessage attribute does not include a justification.
-    - This has been suppressed as it is now covered by custom analyzer ACL1018.
-  - IDE0046: Use conditional expression for return.
-  - IDE0058: Remove unused expression value.
+- Reduced the severity of several overzealous analyzers the base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files)).
+- The following packages have been updated ([3a34df9e](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/71/files)):
+  - `Audacia.CodeAnalysis.Analyzers` from version 1.11.0 to version 1.12.0.
+  - `IDisposableAnalyzers` from version 4.0.7 to version 4.0.8.
+  - `Roslynator.Analyzers` from version 4.12.3 to version 4.12.10.
+  - As part of the package updates the base editorconfig has been updated so that:
+    - any deprecated Roslynator rules between RCS1001 to RCS1268 have been removed.
+    - any new Roslynator rules between RCS1001 to RCS1268 have been added with an appropriate severity.
+    - the analyzer SA1404 has been suppressed as it has now been superseded by custom analyzer ACL1018.
 
 ## 1.11.0 - 2024-09-25
 ### Added
