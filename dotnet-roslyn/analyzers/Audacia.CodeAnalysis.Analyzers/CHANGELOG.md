@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+# 1.11.2 - 2025-07-23
+### Added
+- No new functionality added
+
+### Changed
+- Fix Magic Number analyzer throwing exception when re-declaring a variable ([6cfca458](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/6cfca45873bd16ffbbe2a11904f69cb0f28baafc))
+
 # 1.11.1 - 2024-09-26
 ### Added
 - No new functionality added
