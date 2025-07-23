@@ -378,7 +378,7 @@ class TypeName
         [TestMethod]
         public void Diagnostic_For_For_Loop_With_Magic_Number()
         {
-          
+
             var test = @"
 namespace ConsoleApplication1;
 
@@ -507,7 +507,7 @@ class TypeName
     {
     }
 }";
-      
+
             var expected1 = BuildExpectedResult(10, 21, SyntaxKind.IfStatement.ToString());
             var expected2 = BuildExpectedResult(10, 36, SyntaxKind.IfStatement.ToString());
             VerifyDiagnostic(test, expected1, expected2);
@@ -689,6 +689,32 @@ class TypeName
         }
 
         return check;
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_For_For_Statement_With_Redeclared_Variable()
+        {
+            var test = @"
+using System;
+
+namespace ConsoleApplication1;
+
+class Program
+{
+    private void Calculate(int? arg)
+    {
+        var index = 0;
+        for (index = 0; index < 10; index++)
+        {
+            Console.WriteLine(index);
+        }
     }
 
     static void Main(string[] args)

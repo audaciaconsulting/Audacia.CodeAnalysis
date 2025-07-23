@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
         private const string Title = "Variable declaration uses a magic number";
         private const string MessageFormat = "Variable declaration for '{0}' should not use a magic number";
         private const string Description = "Variable declarations should not use a magic number. Move the number to a constant field with a descriptive name.";
-        
+
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
@@ -72,7 +72,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
         private static void AnalyzeForSyntax(SyntaxNodeAnalysisContext context)
         {
             var forStatementSyntax = (ForStatementSyntax)context.Node;
-            if (forStatementSyntax.Declaration.Variables != null)
+            if (forStatementSyntax.Declaration?.Variables != null)
             {
                 AnalyzeVariables(forStatementSyntax.Declaration.Variables, context, SyntaxKind.ForStatement);
             }
@@ -85,7 +85,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MagicNumber
             {
                 AnalyzeBinaryExpression(context, binarySyntax);
             }
-            
+
         }
 
         private static void AnalyzeIfSyntax(SyntaxNodeAnalysisContext context)
