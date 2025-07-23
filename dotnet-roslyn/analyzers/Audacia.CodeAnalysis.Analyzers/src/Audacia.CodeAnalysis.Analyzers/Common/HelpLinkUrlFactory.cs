@@ -55,7 +55,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Common
                 case DiagnosticId.DoNotUseProducesResponseTypeWithTypedResults:
                     return $"{helpLinkUrlPrefix}controller-action-has-producesresponsetype-attribute-when-return-type-is-typedresults";
                 case DiagnosticId.UseTypedResultsInsteadOfIActionResult:
-                    return $"{helpLinkUrlPrefix}controller-action-should-return-typedresults-instead-of-iactionresults";
+                    return $"{helpLinkUrlPrefix}controller-action-should-return-typedresults-instead-of-iactionresults";                
+                case DiagnosticId.SuppressionRequiresJustification:
+                    return $"{helpLinkUrlPrefix}code-analysis-suppression-attribute-requires-justification";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),

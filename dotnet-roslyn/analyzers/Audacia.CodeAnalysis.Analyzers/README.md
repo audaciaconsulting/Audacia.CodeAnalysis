@@ -28,6 +28,20 @@ If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](
 
 To run VS experimentally set the `.Vsix` project as the startup project, which launches visual studio with the analysers installed. Depending on your use case create or open an existing project. Code that violates any analysers in this project should then be flagged.
 
+## Updating the analyzers to support a new C# version
+If the Microsoft.CodeAnalysis.CSharp.Workspaces package is being upgraded to support a new C# version (as per the official [Roslyn NuGet-packages.md](https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md)), the major version of Audacia.CodeAnalysis.Analyzers must be incremented.
+
+The Description in the `.csproj` must be updated to include the minimum version of C#/.NET that is supported.
+
+e.g
+
+```xml
+    <PropertyGroup>
+        <Description>This package supports C# 12 and .NET 8 as a minimum.</Description>
+    </PropertyGroup>
+```
+
+
 # Analyzers
 
 ## ACL1000 - Private fields should be prefixed with an underscore
@@ -934,5 +948,98 @@ public Results<NotFound, Ok<string>> Get()
 {
     var result = GetResult();
     return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
+
+## ACL1017 - Avoid signatures that take a bool parameter but exclude positional syntax records
+
+ACL1017 performs the same analysis as the 'avoid boolean parameter' analyzer rule (AV1564) but excludes positional syntax records, treating them as properties rather than parameters.
+
+Diagnostic for method with boolean parameters:
+
+``` csharp
+     class TypeName
+     {
+         static void Main(string[] args)
+             {
+                 ShouldFail(true);
+             }
+             public static void ShouldFail(bool imNotAllowed)
+             {
+             }
+     }
+```
+
+No diagnostic for internal record with positional syntax:
+
+```csharp
+     class TypeName
+     {
+       static void Main(string[] args)
+       {
+       }
+       internal record Test(bool shouldBeFine);
+     }
+```
+
+No diagnostic for primary constructor with bool parameters:
+
+```csharp
+     class TypeName
+     {
+         static void Main(string[] args)
+             {
+             }
+         public record PrimaryCon(bool shouldBeOkay)
+             {
+                 private bool testVar => shouldBeOkay;
+             }
+     }
+```
+
+## ACL1018 - Code analysis suppression attribute requires Justification
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1018 is based on the StyleCopAnalyzers Rule [SA1404](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1404.md), which checks that the `SuppressMessage`, `MaxMethodLength` and `MaxParameterCount` attributes have a value supplied for their `Justification` argument.
+
+Code with violation (assuming configured maximum of 5 statements):
+
+```csharp
+[MaxMethodLength(6)]
+public void MyMethod()
+{
+    var one = 1;
+	var two = 2;
+	var three = 3;
+	var four = 4;
+	var five = 5;
+	var six = 6;
+}
+```
+
+Code without violation:
+
+```csharp
+[MaxMethodLength(
+    6, 
+    Justification = "Sequential declarations ensure clear readability")]
+public void MyMethod()
+{
+    var one = 1;
+	var two = 2;
+	var three = 3;
+	var four = 4;
+	var five = 5;
+	var six = 6;
 }
 ```

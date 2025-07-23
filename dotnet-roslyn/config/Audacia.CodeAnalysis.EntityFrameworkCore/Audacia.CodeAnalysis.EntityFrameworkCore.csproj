@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0</TargetFrameworks>
-        <Description>Code analysis packages and rulesets for apps using Entity Framework Core.</Description>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Description>
+            Code analysis packages and rulesets for apps using Entity Framework Core.
+            This package supports projects operating a minimum version of C# 12 and .NET 8.
+        </Description>
         <Authors>Audacia</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <Version>1.11.0.0</Version>
         <Copyright>Copyright © Audacia $([System.DateTime]::Now.Year)</Copyright>
         <PackageIcon>package-icon.png</PackageIcon>
         <DevelopmentDependency>true</DevelopmentDependency>

@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+        <Description>This package supports projects operating a minimum version of C# 12 and .NET 8.</Description>
         <TargetFramework>netstandard2.0</TargetFramework>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -7,6 +8,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <Version>1.12.1</Version>
         <PackageId>Audacia.CodeAnalysis.Analyzers</PackageId>
         <Authors>Audacia</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -17,7 +19,6 @@
         <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>package-icon.png</PackageIcon>
-        <Version>1.11.2</Version>
     </PropertyGroup>
 
     <ItemGroup>
