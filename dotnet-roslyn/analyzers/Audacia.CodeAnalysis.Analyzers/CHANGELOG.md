@@ -1,5 +1,12 @@
 ﻿# CHANGELOG
 
+# 1.12.1 - 2025-07-23
+### Added
+- No new functionality added
+
+### Changed
+- Fix Magic Number analyzer throwing exception when re-declaring a variable ([6cfca458](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/commit/6cfca45873bd16ffbbe2a11904f69cb0f28baafc))
+
 ## 1.12.0 - 2025-01-02
 ### Added
 - Added new rule "SuppressionRequiresJustification" (ACL1018).
