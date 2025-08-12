@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## 1.21.1 - 2025-08-12
+### Added
+- No new functionality added
+
+### Changed
+- Upgraded `Audacia.CodeAnalysis.Analyzers` to version 1.12.1 ([ff91dd9a](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/75/commits/ff91dd9a476dabd6e84ece3675e0770c24212048))
+
 ## 1.12.0 - 2025-01-02
 ### Added
 - Added configuration for several new rules in the `Audacia.CodeAnalysis` base .editorconfig ([05a1b94](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/pull/68/files))
