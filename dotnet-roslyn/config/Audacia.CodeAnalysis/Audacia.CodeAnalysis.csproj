@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Audacia.CodeAnalysis.Analyzers" Version="1.12.0" />
+    <PackageReference Include="Audacia.CodeAnalysis.Analyzers" Version="1.12.1" />
     <PackageReference Include="CSharpGuidelinesAnalyzer" Version="3.8.5" />
     <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59" />
     <PackageReference Include="IDisposableAnalyzers" Version="4.0.8" />
