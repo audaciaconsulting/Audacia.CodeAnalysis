@@ -4,6 +4,7 @@
     <Description>This package supports projects operating a minimum version of C# 12 and .NET 8.</Description>
     <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
     <Authors>Audacia</Authors>
+    <Version>1.12.1</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Code analysis packages and rulesets for .NET libraries and apps.</Description>

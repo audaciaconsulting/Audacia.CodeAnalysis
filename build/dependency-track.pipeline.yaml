@@ -1,0 +1,151 @@
+name: $(Date:yyyyMMdd)
+trigger: none
+pr: none
+schedules:
+  - cron: "30 1 * * 1" # 1:30 am every Monday
+    displayName: Weekly Dependency Check
+    branches:
+      include:
+        - dev
+    always: true
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      endpoint: shared-github
+      name: audaciaconsulting/Audacia.Build
+
+pool:
+  vmImage: windows-latest
+
+# ---------------------------------------------------------------------------------
+# NOTE: Ensure your application / project names in package.json and .csproj files
+# are sensible and representative. These names are used as the Project name in
+# Dependency-Track when SBOMs are uploaded.
+# ---------------------------------------------------------------------------------
+
+# Central variables
+variables:
+  - group: Audacia.Libraries.Dependency-Track
+
+  # Secrets / env
+  - name: DT_API_KEY
+    value: $(DT-API-KEY)
+  - name: DT_API_URL
+    value: $(DT-API-URL)
+
+  # Template-parameter variables
+  - name: systemName
+    value: Audacia-Libraries-Code-Analysis
+  - name: projectVersion
+    value: $(Build.SourceBranchName)
+  - name: deactivateOld
+    value: true
+
+  # Optional parent project wiring
+  - name: parentProjectName
+    value: 'Audacia - Code Analysis'
+  - name: parentProjectVersion
+    value: ''
+
+  # Project paths and settings
+  - name: audaciaCodeAnalysisProjectPaths
+    value: |
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers/Audacia.CodeAnalysis.Analyzers.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/tests/Audacia.CodeAnalysis.Analyzers.Test/Audacia.CodeAnalysis.Analyzers.Test.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers.Helpers/src/Audacia.CodeAnalysis.Analyzers.Helpers/Audacia.CodeAnalysis.Analyzers.Helpers.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/config/Audacia.CodeAnalysis/Audacia.CodeAnalysis.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/config/Audacia.CodeAnalysis.AspNetCore/Audacia.CodeAnalysis.AspNetCore.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/config/Audacia.CodeAnalysis.EntityFrameworkCore/Audacia.CodeAnalysis.EntityFrameworkCore.csproj
+
+  - name: audaciaCodeAnalysisNpmRoots
+    value: |
+      $(System.DefaultWorkingDirectory)/eslint/config/audacia-eslint-config
+      $(System.DefaultWorkingDirectory)/eslint/plugins/audacia-eslint-plugin-angular
+      $(System.DefaultWorkingDirectory)/eslint/plugins/audacia-eslint-plugin-vue
+
+  - name: nodeVersion # Check if the node version needs to be reduced
+    value: '22.x'
+  - name: artifactName
+    value: 'sbom-files'
+  - name: publishArtifact
+    value: true               # Keep true here; we publish once (combined) after both generators
+  - name: failOnUploadError
+    value: true
+  - name: tryDownloadArtifact
+    value: true
+
+  - name: vstsFeed
+    value: 'Audacia.Public/AudaciaPublic'
+
+
+stages:
+  # =========================
+  # 1) GENERATE STAGE
+  # =========================
+  - stage: generate
+    displayName: "Generate SBOMs (npm + .NET via CycloneDX)"
+    jobs:
+      - job: generate_sbom
+        displayName: "Generate SBOMs & publish artifact"
+        steps:
+          # Generate npm SBOMs
+          - template: /src/security/dependency-track/steps/generate-npm-sbom.steps.yaml@templates
+            parameters:
+              npmRoots: $(audaciaCodeAnalysisNpmRoots)
+              nodeVersion: $(nodeVersion)
+              includeLicenseTexts: true
+              artifactName: $(artifactName)
+
+          # Generate .NET SBOMs
+          - template: /src/security/dependency-track/steps/generate-dotnet-sbom.steps.yaml@templates
+            parameters:
+              dotnetProjects: $(audaciaCodeAnalysisProjectPaths)
+              vstsFeed: $(vstsFeed)
+              artifactName: $(artifactName)
+
+          # Publish the combined SBOM folder as one artifact if toggled on
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish SBOM artifact (combined)"
+            condition: and(succeeded(), eq(variables['publishArtifact'], 'true'))
+            inputs:
+              targetPath: "$(Agent.TempDirectory)/sbom"
+              publishLocation: pipeline
+              artifact: $(artifactName)
+
+  # =========================
+  # 2) UPLOAD STAGE
+  # =========================
+  - stage: upload
+    displayName: "Upload SBOMs to Dependency-Track"
+    dependsOn: generate
+    jobs:
+      - job: upload_sbom
+        displayName: "Upload SBOM & Log Summary"
+        steps:
+          - checkout: none
+          - template: /src/security/dependency-track/steps/upload-sbom.steps.yaml@templates
+            parameters:
+              version: $(projectVersion)
+              systemName: $(systemName)
+              failOnUploadError: ${{ variables.failOnUploadError }}
+              parentProjectName: ${{ variables.parentProjectName }}
+              parentProjectVersion: ${{ variables.parentProjectVersion }}
+
+  # =========================
+  # 3) DEACTIVATE STAGE (run standalone or after upload)
+  # =========================
+  - stage: deactivate
+    displayName: "Deactivate old Dependency-Track project versions"
+    dependsOn: upload
+    condition: and(succeeded('upload'), eq(variables['deactivateOld'], true))
+    jobs:
+      - job: deactivate_old_versions
+        displayName: "Set non-latest versions to inactive"
+        steps:
+          - checkout: none
+          - template: /src/security/dependency-track/steps/deactivate-nonlatest.steps.yaml@templates
+            parameters:
+              artifactName: $(artifactName)
+              tryDownloadArtifact: ${{ variables.tryDownloadArtifact }}
+              parentProjectName: ${{ variables.parentProjectName }}

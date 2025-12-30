@@ -6,6 +6,7 @@
             This package supports projects operating a minimum version of C# 12 and .NET 8.
         </Description>
         <Authors>Audacia</Authors>
+        <Version>1.12.1</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <Copyright>Copyright © Audacia $([System.DateTime]::Now.Year)</Copyright>
