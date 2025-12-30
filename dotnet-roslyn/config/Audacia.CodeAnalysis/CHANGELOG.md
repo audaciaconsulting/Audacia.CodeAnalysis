@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## 1.21.1 - 2025-08-12
+## 1.12.1 - 2025-08-12
 ### Added
 - No new functionality added
 
