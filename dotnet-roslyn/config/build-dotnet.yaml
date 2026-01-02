@@ -38,8 +38,6 @@ stages:
         serviceConnection: 'Audacia Code Signing'
         excludePaths: '*.Tests.csproj'
         projects: 'dotnet-roslyn/config/**/*.csproj'
-        testPath: 'dotnet-roslyn/config/**/*Tests.csproj'
-        workingDirectory: '$(Build.SourcesDirectory)\dotnet-roslyn\config'
 
 - stage: Stage_Release
   displayName: Release
