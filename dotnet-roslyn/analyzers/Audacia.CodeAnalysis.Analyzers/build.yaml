@@ -37,7 +37,6 @@ stages:
         fileToSignPattern: 'Audacia.CodeAnalysis.Analyzers.dll'
         serviceConnection: 'Audacia Code Signing'
         projects: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers/Audacia.CodeAnalysis.Analyzers.csproj'
-        tests: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/tests/Audacia.CodeAnalysis.Analyzers.Test/Audacia.CodeAnalysis.Analyzers.Test.csproj'
         workingDirectory: '$(Build.SourcesDirectory)\dotnet-roslyn\analyzers\Audacia.CodeAnalysis.Analyzers'
         excludePaths: '*.Test.csproj'
 
