@@ -21,15 +21,22 @@ resources:
       name: audaciaconsulting/Audacia.Build
 pool:
   vmImage: windows-latest
+variables:
+  - group: Code Signing
 
 stages:
 - stage: Stage_Build
   displayName: Build
   jobs:
-    - template: src/build/dotnet/jobs/nuget-package.job.yaml@templates
+    - template: src/build/dotnet/jobs/signed-nuget-package.job.yaml@templates
       parameters:
+        trustedSigningEndpoint: $(TrustedSigningEndpoint)
+        trustedSigningAccount: $(TrustedSigningAccount)
+        trustedSigningCertificateProfile: $(TrustedSigningCertificateProfile)
+        directory: $(Build.SourcesDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers.Helpers
+        fileToSignPattern: 'Audacia.CodeAnalysis.Analyzers.Helpers.dll'
+        serviceConnection: 'Audacia Code Signing'
         projects: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers.Helpers/src/Audacia.CodeAnalysis.Analyzers.Helpers/Audacia.CodeAnalysis.Analyzers.Helpers.csproj'
-        runTests: false
         workingDirectory: '$(Build.SourcesDirectory)\dotnet-roslyn\analyzers\Audacia.CodeAnalysis.Analyzers.Helpers'
 
 - stage: Stage_Release
@@ -42,4 +49,4 @@ stages:
       eq(dependencies.Stage_Build.outputs['Job_Build.UpdateVersions.ShouldPublish'], true)
     )
   jobs:
-    - template: src/deployment/nuget/jobs/internal-public-nuget-package.job.yaml@templates
+    - template: src/deployment/nuget/jobs/public-nuget-package.job.yaml@templates
