@@ -4,8 +4,6 @@ module.exports = {
     es6: true,
   },
   extends: [
-    'airbnb-base',
-    'airbnb-typescript/base',
     'plugin:import/recommended',
     'plugin:import/typescript',
     require.resolve('./rules/best-practices'),
@@ -14,7 +12,8 @@ module.exports = {
     require.resolve('./rules/style'),
     require.resolve('./rules/variables'),
     require.resolve('./rules/imports'),
+    require.resolve('./rules/typescript'),
   ],
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint']
 };

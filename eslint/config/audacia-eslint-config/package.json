@@ -15,12 +15,6 @@
     "eslint": "^8.56.0",
     "eslint-plugin-import": "^2.25.3"
   },
-  "eslintConfig": {
-    "rules": {
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "error"
-    }
-  },
   "dependencies": {
     "confusing-browser-globals": "^1.0.11"
   }
