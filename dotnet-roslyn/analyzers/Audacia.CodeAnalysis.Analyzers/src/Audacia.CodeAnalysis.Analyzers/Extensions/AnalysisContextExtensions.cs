@@ -12,6 +12,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 {
     internal static class AnalysisContextExtensions
     {
+        //todo: some comment about work in progreess
+        private static string[] controllerActionAttributeNames
+            = new string[]
+            {
+                    "HttpDelete",
+                    "HttpGet",
+                    "HttpHead",
+                    "HttpOptions",
+                    "HttpPatch",
+                    "HttpPost",
+                    "HttpPut"
+            };
+        
         internal static void SkipEmptyName(this SymbolAnalysisContext context, Action<SymbolAnalysisContext> action)
         {
             if (!string.IsNullOrEmpty(context.Symbol.Name))
@@ -119,17 +132,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             var methodAttributes = GetMethodAttributes(methodDeclarationSyntax);
 
-            var controllerActionAttributeNames
-                = new List<string>
-                {
-                    "HttpDelete",
-                    "HttpGet",
-                    "HttpHead",
-                    "HttpOptions",
-                    "HttpPatch",
-                    "HttpPost",
-                    "HttpPut"
-                };
 
             var isControllerAction = methodAttributes
                 .Any(
