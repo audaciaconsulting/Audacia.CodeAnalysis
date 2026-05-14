@@ -287,5 +287,43 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             return statement;
         }
+
+        /// <summary>
+        /// Returns the simple (unqualified) method name from an invocation expression, handling
+        /// plain identifiers, member-access expressions, and generic method calls.
+        /// Returns <see langword="null"/> when the expression form is not recognised.
+        /// The following examples will return <c>ShouldBe</c>:
+        /// <list type="bullet">
+        ///     <item><c>result.ShouldBe(42)</c></item>
+        ///     <item><c>ShouldBe(42)</c></item>
+        ///     <item><c>result.ShouldBe&lt;IFoo&gt;()</c></item>
+        ///     <item><c>result?.ShouldBe(42)</c></item>
+        /// </list>
+        /// </summary>
+        /// <param name="invocation">The invocation whose method name should be resolved.</param>
+        internal static string GetSimpleMethodName(this InvocationExpressionSyntax invocation)
+        {
+            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+            {
+                return memberAccess.Name.Identifier.ValueText;
+            }
+
+            if (invocation.Expression is IdentifierNameSyntax identifier)
+            {
+                return identifier.Identifier.ValueText;
+            }
+
+            if (invocation.Expression is GenericNameSyntax generic)
+            {
+                return generic.Identifier.ValueText;
+            }
+
+            if (invocation.Expression is MemberBindingExpressionSyntax memberBinding)
+            {
+                return memberBinding.Name.Identifier.ValueText;
+            }
+
+            return null;
+        }
     }
 }

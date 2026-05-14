@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -214,6 +215,33 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         internal static SyntaxTree GetSyntaxTree(this SymbolAnalysisContext context)
         {
             return context.Compilation.SyntaxTrees.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Checks whether the method is decorated with a [Fact] or [Theory] attribute, which are used to denote test methods in xUnit.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns><c>true</c> if the method is an xUnit test method; otherwise, <c>false</c>.</returns>
+        internal static bool IsXunitTestMethod(this SyntaxNodeAnalysisContext context)
+        {
+            var methodDeclarationSyntax = (MethodDeclarationSyntax)context.Node;
+
+            var methodAttributes = GetMethodAttributes(methodDeclarationSyntax);
+
+            var testMethodAttributeNames
+                = new List<string>
+                {
+                    "Fact",
+                    "Theory"
+                };
+
+            var isTestMethod = methodAttributes
+                .Any(
+                    attribute =>
+                        testMethodAttributeNames.Any(name => attribute.Equals(name))
+                );
+
+            return isTestMethod;
         }
 
         /// <summary>

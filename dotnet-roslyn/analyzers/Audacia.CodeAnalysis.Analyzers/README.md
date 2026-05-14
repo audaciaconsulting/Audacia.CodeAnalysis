@@ -1043,3 +1043,94 @@ public void MyMethod()
 	var six = 6;
 }
 ```
+
+## ACL1019 - Use an assertion scope with more than two assertions in a test method
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1019 checks if a test method has more than two assertions and will produce a warning if an assertion scope is not used not encapsulate them.
+This is because assertion scopes provide better diagnostics when multiple assertions fail in a test method, and therefore should be used when there are more than two assertions.
+
+This applies to `Xunit`, `FluentAssertions`, and `Shouldly` assertions/assertion scopes.  The assertions must be contained within the scope construct from the same framework, as mixing assertion scopes from different frameworks is not supported/a code smell and will produce a warning.
+
+:warning: This analyzer is not guaranteed to work with `FluentAssertions` versions 8.0.0 and above.
+
+Code with diagnostic:
+
+```csharp
+[Fact]
+public void XunitTestMethod()
+{
+    var foo = "Foo";
+    Assert.NotEmpty(foo);
+    Assert.Equal(foo, "Foo");
+    Assert.IsType<string>(foo);
+}
+
+[Fact]
+public void ShouldlyTestMethod()
+{
+    var foo = "Foo";
+    foo.ShouldNotBeEmpty();
+    foo.ShouldBe(foo, "Foo");
+    foo.ShouldNotBe("Bar");
+}
+
+[Fact]
+public void FluentAssertionsTestMethod()
+{
+    var foo = "Foo";
+    foo.Should().NotBeEmpty();
+    foo.Should().Be(foo, "Foo");
+    foo.Should().NotBe("Bar");
+}
+```
+
+Code without diagnostic:
+
+```csharp
+[Fact]
+public void XunitTestMethod()
+{
+    var foo = "Foo";
+    Assert.Multiple(() => {
+        Assert.NotEmpty(foo);
+        Assert.Equal(foo, "Foo");
+        Assert.IsType<string>(foo);
+    });
+}
+
+[Fact]
+public void ShouldlyTestMethod()
+{
+    var foo = "Foo";
+
+    foo.ShouldSatisfyAllConditions(
+        () => foo.ShouldNotBeEmpty(),
+        () => foo.ShouldBe("Foo"),
+        () => foo.ShouldNotBe("Bar")
+    );
+}
+
+[Fact]
+public void FluentAssertionsTestMethod()
+{
+    var foo = "Foo";
+    using (new AssertionScope())
+    {
+        foo.Should().NotBeEmpty();
+        foo.Should().Be("Foo");
+        foo.Should().NotBe("Bar");
+    }
+}
+```
+
