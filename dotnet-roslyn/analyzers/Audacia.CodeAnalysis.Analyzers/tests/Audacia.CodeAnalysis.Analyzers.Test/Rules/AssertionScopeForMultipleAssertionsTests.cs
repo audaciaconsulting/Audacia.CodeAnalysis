@@ -301,6 +301,175 @@ public void TestMethod2()
         }
 
         [TestMethod]
+        public void No_Diagnostics_For_TestMethod_With_Scope_In_Separate_Xunit_Assertion_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assertion(foo);
+}
+
+private void Assertion(string foo)
+{
+    Assert.Multiple(() => {
+        Assert.NotEmpty(foo);
+        Assert.Equal(foo, ""Foo"");
+        Assert.IsType<string>(foo);
+    });
+}";
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_TestMethod_With_Scope_In_Separate_Shouldly_Assertion_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assertion(foo);
+}
+
+private void Assertion(string foo)
+{
+    foo.ShouldSatisfyAllConditions(
+        () => foo.ShouldNotBeNullOrEmpty(),
+        () => foo.ShouldBe<string>(""Foo""),
+        () => foo.ShouldNotBe(""Foo"")
+    );
+}";
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_TestMethod_With_Scope_In_Separate_FluentAssertions_Assertion_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assertion(foo);
+}
+
+private void Assertion(string foo)
+{
+    using (new AssertionScope())
+    {
+        foo.Should().NotBeEmpty();
+        foo.Should().Be(""Foo"");
+        foo.Should().NotBe(""Bar"");
+    }
+}";
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_TestMethod_With_Inline_Scope_In_Separate_FluentAssertions_Assertion_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assertion(foo);
+}
+
+private void Assertion(string foo)
+{
+    using var _  = new AssertionScope();
+    foo.Should().NotBeEmpty();
+    foo.Should().Be(""Foo"");
+    foo.Should().NotBe(""Bar"");
+}";
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_TestMethod_With_Scope_Outside_Separate_Xunit_Assertion_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assert.Multiple(() => {
+        Assertion(foo);
+    });
+}
+
+private void Assertion(string foo)
+{
+    Assert.NotEmpty(foo);
+    Assert.Equal(foo, ""Foo"");
+    Assert.IsType<string>(foo);
+}";
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+
+        [TestMethod]
+        public void No_Diagnostics_For_TestMethod_With_Scope_Outside_Separate_FluentAssertions_Assertion_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    using (new AssertionScope())
+    {
+        Assertion(foo);
+    }
+}
+
+private void Assertion(string foo)
+{
+    foo.Should().NotBeEmpty();
+    foo.Should().Be(""Foo"");
+    foo.Should().NotBe(""Bar"");
+}";
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_TestMethod_With_Inline_Scope_Outside_Separate_FluentAssertions_Assertion_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    using var _  = new AssertionScope();
+    Assertion(foo);
+}
+
+private void Assertion(string foo)
+{
+    foo.Should().NotBeEmpty();
+    foo.Should().Be(""Foo"");
+    foo.Should().NotBe(""Bar"");
+}";
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
         public void Diagnostics_For_TestMethod_With_Xunit_AssertionScope_With_Shouldly_Assertions()
         {
             const string testMethod = @"
@@ -573,6 +742,101 @@ public void TestMethod()
             var expectedDiagnostic = BuildExpectedResult(18, 13);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_TestMethod_With_Separate_Xunit_Assertions_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assertion(foo);
+}
+
+private void Assertion(string foo)
+{
+    Assert.NotEmpty(foo);
+    Assert.Equal(foo, ""Foo"");
+    Assert.IsType<string>(foo);
+}";
+            var testCode = BuildTestCode(testMethod);
+            var expectedDiagnostic = BuildExpectedResult(18, 13);
+
+            VerifyDiagnostic(testCode, expectedDiagnostic);
+
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_TestMethod_With_Separate_Shouldly_Assertions_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assertion(foo);
+}
+
+private void Assertion(string foo)
+{
+    foo.ShouldNotBeNullOrEmpty();
+    foo.ShouldBe<string>(""Foo"");
+    foo.ShouldNotBe(""Foo"");
+}";
+            var testCode = BuildTestCode(testMethod);
+            var expectedDiagnostic = BuildExpectedResult(18, 13);
+
+            VerifyDiagnostic(testCode, expectedDiagnostic);
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_TestMethod_With_Separate_FluentAssertions_Assertions_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assertion(foo);
+}
+
+private void Assertion(string foo)
+{
+    foo.Should().NotBeEmpty();
+    foo.Should().Be(""Foo"");
+    foo.Should().NotBe(""Foo"");
+}";
+            var testCode = BuildTestCode(testMethod);
+            var expectedDiagnostic = BuildExpectedResult(18, 13);
+
+            VerifyDiagnostic(testCode, expectedDiagnostic);
+
+        }
+
+        [TestMethod]
+        public void Diagnostics_For_TestMethod_With_Xunit_Scope_Outside_Separate_Shouldly_Assertion_Method()
+        {
+            const string testMethod = @"
+[Fact]
+public void TestMethod()
+{
+    var foo = ""Foo"";
+    Assert.Multiple(() => {
+        Assertion(foo);
+    });
+}
+
+private void Assertion(string foo)
+{
+    foo.ShouldNotBeNullOrEmpty();
+    foo.ShouldBe<string>(""Foo"");
+    foo.ShouldNotBe(""Foo"");
+}";
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
         }
     }
 }
