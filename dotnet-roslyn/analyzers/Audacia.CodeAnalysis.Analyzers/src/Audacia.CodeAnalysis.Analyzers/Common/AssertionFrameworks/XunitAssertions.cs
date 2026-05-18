@@ -2,7 +2,7 @@ using System;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertions.AssertionFrameworks
+namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
 {
     /// <summary>
     /// Identifies xUnit assertion calls and assertion scopes.

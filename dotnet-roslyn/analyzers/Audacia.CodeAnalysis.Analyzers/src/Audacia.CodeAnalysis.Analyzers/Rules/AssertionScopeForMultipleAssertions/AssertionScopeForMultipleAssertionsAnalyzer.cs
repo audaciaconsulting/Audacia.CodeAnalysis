@@ -2,8 +2,8 @@
 using System.Collections.Immutable;
 using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Common;
+using Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
-using Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertions.AssertionFrameworks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -83,14 +83,23 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
             SyntaxNode body = (SyntaxNode)method.Body ?? method.ExpressionBody;
             var allInvocations = body.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
 
+            IAssertionFramework methodFramework = null;
+
             var count = 0;
             foreach (var invocation in allInvocations)
             {
-                var framework = GetAssertionFramework(invocation);
-
-                if (framework != null)
+                var validAssertion = false;
+                if (methodFramework == null)
                 {
-                    var isInsideScope = invocation.Ancestors().Any(ancestor => framework.IsAssertionScopeExpression(ancestor, invocation));
+                    methodFramework = GetAssertionFramework(invocation);
+                    validAssertion = methodFramework != null;
+                }
+
+                validAssertion = validAssertion || methodFramework?.IsAssertionCall(invocation) == true;
+
+                if (validAssertion)
+                {
+                    var isInsideScope = invocation.Ancestors().Any(ancestor => methodFramework.IsAssertionScopeExpression(ancestor, invocation));
 
                     if (!isInsideScope)
                     {

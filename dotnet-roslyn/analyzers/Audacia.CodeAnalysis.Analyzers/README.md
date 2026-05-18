@@ -1060,7 +1060,7 @@ public void MyMethod()
 ACL1019 checks if a test method has more than two assertions and will produce a warning if an assertion scope is not used not encapsulate them.
 This is because assertion scopes provide better diagnostics when multiple assertions fail in a test method, and therefore should be used when there are more than two assertions.
 
-This applies to `Xunit`, `FluentAssertions`, and `Shouldly` assertions/assertion scopes.  The assertions must be contained within the scope construct from the same framework, as mixing assertion scopes from different frameworks is not supported/a code smell and will produce a warning.
+This applies to `Xunit`, `FluentAssertions`, and `Shouldly` assertions/assertion scopes.  The assertions must be contained within the scope construct from the same framework, and each test method must only use a single framework for its assertions, as mixing frameworks is not supported/a code smell and will produce a warning.
 
 :warning: This analyzer is not guaranteed to work with `FluentAssertions` versions 8.0.0 and above.
 

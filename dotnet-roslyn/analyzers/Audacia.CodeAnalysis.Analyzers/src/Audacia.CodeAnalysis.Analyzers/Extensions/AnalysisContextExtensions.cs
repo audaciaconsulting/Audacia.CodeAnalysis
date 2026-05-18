@@ -13,6 +13,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 {
     internal static class AnalysisContextExtensions
     {
+        private static readonly ImmutableArray<string> TestMethodAttributeNames = ImmutableArray.Create("Fact", "Theory");
+
         internal static void SkipEmptyName(this SymbolAnalysisContext context, Action<SymbolAnalysisContext> action)
         {
             if (!string.IsNullOrEmpty(context.Symbol.Name))
@@ -228,17 +230,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             var methodAttributes = GetMethodAttributes(methodDeclarationSyntax);
 
-            var testMethodAttributeNames
-                = new List<string>
-                {
-                    "Fact",
-                    "Theory"
-                };
-
             var isTestMethod = methodAttributes
                 .Any(
                     attribute =>
-                        testMethodAttributeNames.Any(name => attribute.Equals(name))
+                        TestMethodAttributeNames.Any(name => attribute.Equals(name))
                 );
 
             return isTestMethod;
