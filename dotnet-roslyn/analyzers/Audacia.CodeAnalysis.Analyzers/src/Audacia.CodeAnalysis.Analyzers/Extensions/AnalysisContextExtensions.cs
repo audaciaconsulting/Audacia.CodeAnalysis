@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -12,6 +13,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 {
     internal static class AnalysisContextExtensions
     {
+        private static readonly ImmutableArray<string> TestMethodAttributeNames = ImmutableArray.Create("Fact", "Theory");
+
         internal static void SkipEmptyName(this SymbolAnalysisContext context, Action<SymbolAnalysisContext> action)
         {
             if (!string.IsNullOrEmpty(context.Symbol.Name))
@@ -214,6 +217,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         internal static SyntaxTree GetSyntaxTree(this SymbolAnalysisContext context)
         {
             return context.Compilation.SyntaxTrees.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Checks whether the method is decorated with a [Fact] or [Theory] attribute, which are used to denote test methods in xUnit.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns><c>true</c> if the method is an xUnit test method; otherwise, <c>false</c>.</returns>
+        internal static bool IsXunitTestMethod(this SyntaxNodeAnalysisContext context)
+        {
+            var methodDeclarationSyntax = (MethodDeclarationSyntax)context.Node;
+
+            var methodAttributes = GetMethodAttributes(methodDeclarationSyntax);
+
+            var isTestMethod = methodAttributes
+                .Any(
+                    attribute =>
+                        TestMethodAttributeNames.Any(name => attribute.Equals(name))
+                );
+
+            return isTestMethod;
         }
 
         /// <summary>

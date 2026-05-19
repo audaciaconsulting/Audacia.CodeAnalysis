@@ -16,7 +16,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Base
 {
@@ -26,6 +26,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
     public abstract partial class DiagnosticVerifier
     {
         private static readonly string AssemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
+        private static readonly MetadataReference NetStandardReference =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "netstandard.dll"));
         private static readonly MetadataReference CorLib =
             MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "mscorlib.dll"));
         private static readonly MetadataReference SystemRef =
@@ -34,6 +36,18 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
             MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Core.dll"));
         private static readonly MetadataReference SystemRuntime =
             MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Runtime.dll"));
+        private static readonly MetadataReference SystemXmlXDocumentReference =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Xml.XDocument.dll"));
+        private static readonly MetadataReference SystemXmlReaderWriterReference =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Xml.ReaderWriter.dll"));
+        private static readonly MetadataReference SystemPrivateXmlLinqReference =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Private.Xml.Linq.dll"));
+        private static readonly MetadataReference SystemPrivateXmlReference =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Private.Xml.dll"));
+        private static readonly MetadataReference SystemNetHttpReference =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Net.Http.dll"));
+        private static readonly MetadataReference SystemDataCommonReference =
+            MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Data.Common.dll"));
         private static readonly MetadataReference CorlibReference = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
@@ -53,7 +67,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference MaxMethodLengthReference = MetadataReference.CreateFromFile(typeof(MaxMethodLengthAttribute).Assembly.Location);
         private static readonly MetadataReference MaxParameterCountReference = MetadataReference.CreateFromFile(typeof(MaxParameterCountAttribute).Assembly.Location);
         private static readonly MetadataReference SuppressMessageReference = MetadataReference.CreateFromFile(typeof(SuppressMessageAttribute).Assembly.Location);
-        
+        private static readonly MetadataReference XunitFactReference = MetadataReference.CreateFromFile(typeof(Xunit.FactAttribute).Assembly.Location);
+        private static readonly MetadataReference XunitAssertReference = MetadataReference.CreateFromFile(typeof(Xunit.Assert).Assembly.Location);
+        private static readonly MetadataReference ShouldlyReference = MetadataReference.CreateFromFile(typeof(Shouldly.Should).Assembly.Location);
+        private static readonly MetadataReference FluentAssertionsAssertionScopeReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Execution.AssertionScope).Assembly.Location);
+        private static readonly MetadataReference FluentAssertionsAssertionExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.AssertionExtensions).Assembly.Location);
+        private static readonly MetadataReference FluentAssertionsStringExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Primitives.StringAssertions).Assembly.Location);
+
         internal static CompilationOptions CompilationOptions = new CSharpCompilationOptions(
             OutputKind.ConsoleApplication, assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default, allowUnsafe: true);
         internal static CSharpParseOptions ParseOptions = CSharpParseOptions.Default;
@@ -451,9 +471,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .WithProjectCompilationOptions(projectId, CompilationOptions)
                 .WithProjectParseOptions(projectId, ParseOptions)
                 .AddMetadataReference(projectId, CorLib)
+                .AddMetadataReference(projectId, NetStandardReference)
                 .AddMetadataReference(projectId, SystemRef)
                 .AddMetadataReference(projectId, SystemCore)
                 .AddMetadataReference(projectId, SystemRuntime)
+                .AddMetadataReference(projectId, SystemXmlXDocumentReference)
+                .AddMetadataReference(projectId, SystemXmlReaderWriterReference)
+                .AddMetadataReference(projectId, SystemPrivateXmlLinqReference)
+                .AddMetadataReference(projectId, SystemPrivateXmlReference)
+                .AddMetadataReference(projectId, SystemNetHttpReference)
+                .AddMetadataReference(projectId, SystemDataCommonReference)
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, CSharpSymbolsReference)
@@ -472,7 +499,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddMetadataReference(projectId, CancellationTokenReference)
                 .AddMetadataReference(projectId, MaxMethodLengthReference)
                 .AddMetadataReference(projectId, MaxParameterCountReference)
-                .AddMetadataReference(projectId, SuppressMessageReference);
+                .AddMetadataReference(projectId, SuppressMessageReference)
+                .AddMetadataReference(projectId, XunitFactReference)
+                .AddMetadataReference(projectId, XunitAssertReference)
+                .AddMetadataReference(projectId, ShouldlyReference)
+                .AddMetadataReference(projectId, FluentAssertionsAssertionScopeReference)
+                .AddMetadataReference(projectId, FluentAssertionsAssertionExtensionsReference)
+                .AddMetadataReference(projectId, FluentAssertionsStringExtensionsReference);
 
             int count = 0;
             foreach (var source in sources)

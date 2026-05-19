@@ -1,5 +1,14 @@
 ﻿# CHANGELOG
 
+# TBC - TBC
+### Added
+- Added new rule "AssertionScopeForMultipleAssertions" (ACL1019).
+    - This rule checks that if there are more than 2 assertions within a test method then they are wrapped in an AssertionScope. This provides better failure messages and allows all assertions to be evaluated even if one fails.
+    - This rule works with Xunit, Shouldly, and FluentAssertions syntax.
+
+### Changed
+- No changes to existing functionality
+
 # 1.12.1 - 2025-07-23
 ### Added
 - No new functionality added
