@@ -22,5 +22,6 @@
         public const string AvoidBooleanParameters = "ACL1017";
         public const string SuppressionRequiresJustification = "ACL1018";
         public const string AssertionScopeForMultipleAssertions = "ACL1019";
+        public const string AssertionRequired = "ACL1020";
     }
 }
