@@ -56,6 +56,69 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// FluentAssertions uses a parameter named <c>because</c> on every assertion method,
+        /// e.g. <c>result.Should().Be(42, because: "reason")</c>.
+        /// If no <c>because</c> parameter exists on the resolved overload the method returns
+        /// <see langword="true"/> so no spurious diagnostic is raised.
+        /// </remarks>
+        public bool HasReasonArgument(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+        {
+            return HasNamedReasonParameter(invocation, semanticModel, "because");
+        }
+
+        /// <summary>
+        /// Returns <see langword="true"/> when the resolved method symbol for <paramref name="invocation"/>
+        /// declares a parameter with <paramref name="parameterName"/> and the caller either passes a
+        /// positional argument at that parameter's index or uses a named argument with that name.
+        /// </summary>
+        private static bool HasNamedReasonParameter(
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel,
+            string parameterName)
+        {
+            var symbolInfo = semanticModel.GetSymbolInfo(invocation);
+            var method = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
+
+            if (method == null)
+            {
+                return false;
+            }
+
+            // Find the index of the target parameter in the resolved overload.
+            var paramIndex = -1;
+            for (var i = 0; i < method.Parameters.Length; i++)
+            {
+                if (string.Equals(method.Parameters[i].Name, parameterName, StringComparison.Ordinal))
+                {
+                    paramIndex = i;
+                    break;
+                }
+            }
+
+            // This overload does not have the reason parameter at all — nothing to check.
+            if (paramIndex == -1)
+            {
+                return true;
+            }
+
+            var arguments = invocation.ArgumentList.Arguments;
+
+            // Check for an explicit named argument first (can appear anywhere).
+            foreach (var arg in arguments)
+            {
+                if (arg.NameColon != null &&
+                    string.Equals(arg.NameColon.Name.Identifier.ValueText, parameterName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            // Fall back to positional: the caller supplied an argument at the parameter's position.
+            return arguments.Count > paramIndex;
+        }
+
+        /// <inheritdoc />
         public bool IsAssertionScopeExpression(SyntaxNode ancestor, InvocationExpressionSyntax invocation)
         {
             if (ancestor is UsingStatementSyntax usingStatement && IsAssertionScopeUsing(usingStatement))
