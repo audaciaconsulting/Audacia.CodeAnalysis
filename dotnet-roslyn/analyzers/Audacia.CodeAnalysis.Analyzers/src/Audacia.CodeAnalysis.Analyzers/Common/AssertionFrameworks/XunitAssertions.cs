@@ -54,7 +54,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
                 var typeName = memberAccess.Expression.ToString();
                 var methodName = memberAccess.Name.Identifier.ValueText;
 
-                return string.Equals(typeName, AssertClass, StringComparison.Ordinal) &&
+                return (string.Equals(typeName, $"Xunit.{AssertClass}", StringComparison.Ordinal) ||
+                       string.Equals(typeName, AssertClass, StringComparison.Ordinal)) &&
                        string.Equals(methodName, MultipleMethod, StringComparison.Ordinal);
             }
 
