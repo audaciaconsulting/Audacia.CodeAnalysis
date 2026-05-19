@@ -1,5 +1,6 @@
 ﻿using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Rules.NullableReferenceTypes;
+using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -16,6 +17,18 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
     [TestClass]
     public class NullableReferenceTypesTests : CodeFixVerifier
     {
+        /// <summary>
+        /// Resets the shared static <see cref="DiagnosticVerifier.CompilationOptions"/> back to the default after
+        /// each test, because this class intentionally mutates it to vary the nullable context. Without this reset
+        /// any test that runs after this class in a full suite run would inherit the last-written options (which
+        /// lack <c>assemblyIdentityComparer</c> and <c>allowUnsafe</c>) and fail with compilation errors.
+        /// </summary>
+        [TestCleanup]
+        public void ResetCompilationOptions()
+        {
+            CompilationOptions = DefaultCompilationOptions;
+        }
+
         /// <summary>
         /// The project's default class. (A project must have at least one class for the fix to be registered).
         /// </summary>
@@ -97,7 +110,7 @@ public class TestClass
 
             // The code fix may not actually alter the source code, but just confirm that applying the fix does not break anything.
             VerifyCodeFix(DefaultClass, DefaultClass);
-        }
+        }        
 
         /// <summary>
         /// Ensures the correct code fix provider is associated with this analyzer.
