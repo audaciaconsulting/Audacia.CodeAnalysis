@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,6 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
         private const string ShouldlyMethodPrefix = "Should";
         private const string FluentAssertionsShouldMethod = "Should";
         private const string ScopeMethod = "ShouldSatisfyAllConditions";
+        private const string ReasonParameterName = "customMessage";
 
         /// <inheritdoc />
         public bool IsAssertionCall(InvocationExpressionSyntax invocation)
@@ -48,6 +50,27 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
             }
 
             return false;
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// Shouldly uses a parameter named <c>customMessage</c> on overloads that accept a message,
+        /// e.g. <c>foo.ShouldBe(42, "reason")</c> maps to <c>customMessage</c>.
+        /// If no <c>customMessage</c> parameter exists on the resolved overload the method returns
+        /// <see langword="true"/> so no spurious diagnostic is raised.
+        /// </remarks>
+        public bool HasReasonArgument(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+        {
+            var paramIndex = invocation.FindParameterIndex(ReasonParameterName, semanticModel);
+
+            // For Shouldly, if there is no parameter named "customMessage", then the assertion does not support a reason (the methods are not overloaded, but use default parameter values).
+            // So we should not report a diagnostic.
+            if (paramIndex == -1)
+            {
+                return true;
+            }
+
+            return invocation.HasExplicitlyNamedParameter(ReasonParameterName, paramIndex);
         }
 
         private static bool IsScopeCall(InvocationExpressionSyntax invocation)
