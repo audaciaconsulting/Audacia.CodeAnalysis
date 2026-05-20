@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks;
 
 namespace Audacia.CodeAnalysis.Analyzers.Extensions
 {
@@ -11,6 +12,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
     /// </summary>
     internal static class SyntaxExtensions
     {
+        private static readonly IAssertionFramework[] AssertionFrameworks =
+        {
+            new XunitAssertions(),
+            new FluentAssertions(),
+            new ShouldlyAssertions()
+        };
+
         /// <summary>
         /// Checks whether the given <paramref name="statementSyntax"/> represents an argument null check,
         /// i.e. a construct like this:
@@ -324,6 +332,44 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="IAssertionFramework"/> that recognises <paramref name="invocation"/> as one
+        /// of its assertion calls, or <see langword="null"/> if the invocation is not a known assertion.
+        /// </summary>
+        internal static IAssertionFramework GetAssertionFramework(this InvocationExpressionSyntax invocation)
+        {
+
+            return AssertionFrameworks.FirstOrDefault(framework => framework.IsAssertionCall(invocation));
+        }
+
+        /// <summary>
+        /// Returns the <see cref="IAssertionFramework"/> that recognises <paramref name="invocation"/> as being
+        /// nested inside one of its assertion scopes, or <see langword="null"/> if the invocation is not nested inside any known assertion scope.
+        /// </summary>
+        internal static IAssertionFramework GetAssertionScopeFramework(this InvocationExpressionSyntax invocation)
+        {
+            return AssertionFrameworks.FirstOrDefault(framework => 
+                invocation.Ancestors().Any(ancestor => framework.IsAssertionScopeExpression(ancestor, invocation)));
+        }
+
+        /// <summary>
+        /// Uses the semantic model to resolve <paramref name="invocation"/> to the <see cref="MethodDeclarationSyntax"/>
+        /// declared in the same compilation, or returns <see langword="null"/> if not found.
+        /// </summary>
+        internal static MethodDeclarationSyntax ResolveHelperMethodDeclaration(this InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+        {
+            var symbolInfo = semanticModel.GetSymbolInfo(invocation);
+            var symbol = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
+
+            if (symbol == null)
+            {
+                return null;
+            }
+
+            var methodDeclaration = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
+            return methodDeclaration;
         }
     }
 }

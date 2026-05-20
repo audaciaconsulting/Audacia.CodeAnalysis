@@ -19,6 +19,18 @@ public class UseRecordTypesAnalyzerTests : CodeFixVerifier
         ParseOptions = new CSharpParseOptions(LanguageVersion.Latest);
     }
 
+    /// <summary>
+    /// Resets the shared static <see cref="DiagnosticVerifier.ParseOptions"/> back to the default after each test,
+    /// because <see cref="No_Diagnostic_If_Using_Unsupported_Language_Version"/> intentionally sets it to C# 8.0.
+    /// Without this reset, any test class that runs after this one in a full suite run would inherit C# 8.0 parse
+    /// options and fail with errors on modern syntax (e.g. file-scoped namespaces).
+    /// </summary>
+    [TestCleanup]
+    public void ResetParseOptions()
+    {
+        ParseOptions = CSharpParseOptions.Default;
+    }
+
     private readonly Mock<ISettingsReader> _mockSettingsReader = new();
 
     private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string typeName, string suffix)

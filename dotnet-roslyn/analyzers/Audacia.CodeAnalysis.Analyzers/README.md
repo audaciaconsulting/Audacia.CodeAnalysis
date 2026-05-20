@@ -1049,7 +1049,7 @@ public void MyMethod()
 <table>
 <tr>
     <td>Category:</td>
-    <td>Maintainability</td>
+    <td>Unit Testing</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
@@ -1134,3 +1134,47 @@ public void FluentAssertionsTestMethod()
 }
 ```
 
+## ACL1020 - Test methods must contain at least one assertion
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Unit Testing</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>UT-01.1</td>
+</tr>
+</table>
+
+ACL1020 checks if a test method contains at least one assertion and will produce a warning if no assertions are found.
+This is because test methods without assertions do not validate any behavior and are therefore not useful.
+
+This applies to `Xunit`, `FluentAssertions`, and `Shouldly` assertions.
+
+:warning: This analyzer is not guaranteed to work with `FluentAssertions` versions 8.0.0 and above.
+
+Code with diagnostic:
+
+```csharp
+[Fact]
+public void TestMethod()
+{
+    var foo = "Foo";
+}
+```
+
+Code without diagnostic:
+
+```csharp
+[Fact]
+public void TestMethod()
+{
+    var foo = "Foo";
+    Assert.NotEmpty(foo);
+    // or
+    foo.ShouldNotBeEmpty();
+    // or
+    foo.Should().NotBeEmpty();
+}
+```

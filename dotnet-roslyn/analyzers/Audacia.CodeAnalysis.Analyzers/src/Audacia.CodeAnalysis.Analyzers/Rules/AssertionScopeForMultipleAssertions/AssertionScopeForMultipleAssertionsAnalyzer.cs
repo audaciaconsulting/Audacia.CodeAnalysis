@@ -22,13 +22,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
 
         private const int MaxAssertionsOutsideScope = 2;
 
-        private static readonly IAssertionFramework[] AssertionFrameworks =
-        {
-            new XunitAssertions(),
-            new FluentAssertions(),
-            new ShouldlyAssertions()
-        };
-
         private static readonly DiagnosticDescriptor Rule
             = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Maintainability, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
@@ -51,11 +44,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
             }
 
             var methodDeclaration = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
-
-            if (methodDeclaration.Body == null && methodDeclaration.ExpressionBody == null)
-            {
-                return;
-            }
 
             // Count the number of assertions outside of an assertion scope. If there are more than two, report a diagnostic.
             var assertionCount = CountAssertionsOutsideAssertionScopes(
@@ -81,6 +69,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
             HashSet<IMethodSymbol> visitedMethods)
         {
             SyntaxNode body = (SyntaxNode)method.Body ?? method.ExpressionBody;
+
+            if (body == null)
+            {
+                return 0;
+            }
+
             var allInvocations = body.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
 
             IAssertionFramework methodFramework = null;
@@ -91,7 +85,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
                 var validAssertion = false;
                 if (methodFramework == null)
                 {
-                    methodFramework = GetAssertionFramework(invocation);
+                    methodFramework = invocation.GetAssertionFramework();
                     validAssertion = methodFramework != null;
                 }
 
@@ -111,13 +105,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
 
                 // Not a known assertion call — check whether it is a helper method call that contains assertions.
                 // If the call site itself is already inside a scope, we treat all assertions inside the helper as scoped.
-                var isCallSiteInsideScope = IsInvocationInsideAnyAssertionScope(invocation);
+                var isCallSiteInsideScope = invocation.GetAssertionScopeFramework() != null;
                 if (isCallSiteInsideScope)
                 {
                     continue;
                 }
 
-                var helperMethod = ResolveHelperMethodDeclaration(invocation, semanticModel);
+                var helperMethod = invocation.ResolveHelperMethodDeclaration(semanticModel);
                 if (helperMethod == null)
                 {
                     continue;
@@ -133,44 +127,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
             }
 
             return count;
-        }
-
-        /// <summary>
-        /// Returns true if the invocation is nested inside any known assertion scope expression.
-        /// </summary>
-        private static bool IsInvocationInsideAnyAssertionScope(InvocationExpressionSyntax invocation)
-        {
-            return invocation.Ancestors().Any(ancestor =>
-                AssertionFrameworks.Any(framework => framework.IsAssertionScopeExpression(ancestor, invocation)));
-        }
-
-        /// <summary>
-        /// Uses the semantic model to resolve <paramref name="invocation"/> to the <see cref="MethodDeclarationSyntax"/>
-        /// declared in the same compilation, or returns <see langword="null"/> if not found.
-        /// </summary>
-        private static MethodDeclarationSyntax ResolveHelperMethodDeclaration(
-            InvocationExpressionSyntax invocation,
-            SemanticModel semanticModel)
-        {
-            var symbolInfo = semanticModel.GetSymbolInfo(invocation);
-            var symbol = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
-
-            if (symbol == null)
-            {
-                return null;
-            }
-
-            var declaration = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
-            return declaration;
-        }
-
-        /// <summary>
-        /// Returns the <see cref="IAssertionFramework"/> that recognises <paramref name="invocation"/> as one
-        /// of its assertion calls, or <see langword="null"/> if the invocation is not a known assertion.
-        /// </summary>
-        private static IAssertionFramework GetAssertionFramework(InvocationExpressionSyntax invocation)
-        {
-            return AssertionFrameworks.FirstOrDefault(framework => framework.IsAssertionCall(invocation));
         }
     }
 }

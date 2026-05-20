@@ -74,8 +74,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference FluentAssertionsAssertionExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.AssertionExtensions).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsStringExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Primitives.StringAssertions).Assembly.Location);
 
-        internal static CompilationOptions CompilationOptions = new CSharpCompilationOptions(
+        internal static readonly CompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(
             OutputKind.ConsoleApplication, assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default, allowUnsafe: true);
+        internal static CompilationOptions CompilationOptions = DefaultCompilationOptions;
         internal static CSharpParseOptions ParseOptions = CSharpParseOptions.Default;
         internal static string DefaultFilePathPrefix = "Test";
         internal static string CSharpDefaultFileExt = "cs";
