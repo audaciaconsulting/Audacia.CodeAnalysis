@@ -1178,3 +1178,52 @@ public void TestMethod()
     foo.Should().NotBeEmpty();
 }
 ```
+## ACL1021 - Assertions must contain a reason where supported
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Unit Testing</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>UT-01.1</td>
+</tr>
+</table>
+
+ACL1021 checks if an assertion call supports providing a reason and will produce a warning if not set.
+This is because providing a reason in assertions provides better diagnostics when an assertion fails, and therefore should be used where supported.
+
+This applies to `Xunit` v3, `FluentAssertions` v7, and `Shouldly` v4 assertions.
+
+:warning: Other major versions of these frameworks may not be supported.
+
+Code with diagnostic:
+
+```csharp
+[Fact]
+public void TestMethod()
+{
+    var foo = true;
+    Assert.True(foo);
+    // or
+    foo.ShouldBeTrue();
+    // or
+    foo.Should().BeTrue();
+}
+```
+
+Code without diagnostic:
+
+```csharp
+[Fact]
+public void TestMethod()
+{
+    var foo = true;
+    Assert.True(foo, "Reason");
+    // or
+    foo.ShouldBeTrue("Reason");
+    // or
+    foo.Should().BeTrue("Reason");
+}
+```

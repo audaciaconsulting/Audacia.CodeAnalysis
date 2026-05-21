@@ -46,10 +46,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
             var methodDeclaration = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
             // Count the number of assertions outside of an assertion scope. If there are more than two, report a diagnostic.
+            IAssertionFramework assertionFramework = null;
             var assertionCount = CountAssertionsOutsideAssertionScopes(
                 methodDeclaration,
                 nodeAnalysisContext.SemanticModel,
-                new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default));
+                new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default),
+                ref assertionFramework);
 
             if (assertionCount > MaxAssertionsOutsideScope)
             {
@@ -66,7 +68,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
         private static int CountAssertionsOutsideAssertionScopes(
             MethodDeclarationSyntax method,
             SemanticModel semanticModel,
-            HashSet<IMethodSymbol> visitedMethods)
+            HashSet<IMethodSymbol> visitedMethods,
+            ref IAssertionFramework assertionFramework)
         {
             SyntaxNode body = (SyntaxNode)method.Body ?? method.ExpressionBody;
 
@@ -77,23 +80,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
 
             var allInvocations = body.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
 
-            IAssertionFramework methodFramework = null;
-
             var count = 0;
             foreach (var invocation in allInvocations)
             {
-                var validAssertion = false;
-                if (methodFramework == null)
+                if (invocation.IsValidAssertion(ref assertionFramework))
                 {
-                    methodFramework = invocation.GetAssertionFramework();
-                    validAssertion = methodFramework != null;
-                }
-
-                validAssertion = validAssertion || methodFramework?.IsAssertionCall(invocation) == true;
-
-                if (validAssertion)
-                {
-                    var isInsideScope = invocation.Ancestors().Any(ancestor => methodFramework.IsAssertionScopeExpression(ancestor, invocation));
+                    var isInsideScope = invocation.IsInsideAssertionScope(assertionFramework);
 
                     if (!isInsideScope)
                     {
@@ -123,7 +115,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
                     continue;
                 }
 
-                count += CountAssertionsOutsideAssertionScopes(helperMethod, semanticModel, visitedMethods);
+                count += CountAssertionsOutsideAssertionScopes(helperMethod, semanticModel, visitedMethods, ref assertionFramework);
             }
 
             return count;

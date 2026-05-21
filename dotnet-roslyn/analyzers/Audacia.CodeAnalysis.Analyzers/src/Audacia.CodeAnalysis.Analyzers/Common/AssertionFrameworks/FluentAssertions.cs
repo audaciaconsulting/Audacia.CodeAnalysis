@@ -17,6 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
     {
         private const string ShouldMethod = "Should";
         private const string AssertionScopeType = "AssertionScope";
+        private const string ReasonParameterName = "because";
 
         /// <inheritdoc />
         public bool IsAssertionCall(InvocationExpressionSyntax invocation)
@@ -53,6 +54,27 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
             }
 
             return false;
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// FluentAssertions uses a parameter named <c>because</c> on every assertion method,
+        /// e.g. <c>result.Should().Be(42, because: "reason")</c>.
+        /// If no <c>because</c> parameter exists on the resolved overload the method returns
+        /// <see langword="true"/> so no spurious diagnostic is raised.
+        /// </remarks>
+        public bool HasReasonArgument(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+        {
+            var paramIndex = invocation.FindParameterIndex(ReasonParameterName, semanticModel);
+
+            // For FluentAssertions, if there is no parameter named "because", then the assertion does not support a reason (the methods are not overloaded, but use default parameter values).
+            // So we should not report a diagnostic.
+            if (paramIndex == -1)
+            {
+                return true;
+            }
+
+            return invocation.HasExplicitlyNamedParameter(ReasonParameterName, paramIndex);
         }
 
         /// <inheritdoc />

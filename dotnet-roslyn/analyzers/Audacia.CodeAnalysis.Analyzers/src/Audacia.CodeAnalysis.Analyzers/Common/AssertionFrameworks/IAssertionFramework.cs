@@ -20,5 +20,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
         /// scope for this framework that encloses <paramref name="invocation"/>.
         /// </summary>
         bool IsAssertionScopeExpression(SyntaxNode ancestor, InvocationExpressionSyntax invocation);
+
+        /// <summary>
+        /// Returns <see langword="true"/> if <paramref name="invocation"/> supplies a reason/message
+        /// argument. The <paramref name="semanticModel"/> is used to resolve the parameter name so
+        /// the check is correct regardless of argument position or overload.
+        /// </summary>
+        bool HasReasonArgument(InvocationExpressionSyntax invocation, SemanticModel semanticModel);
     }
 }
