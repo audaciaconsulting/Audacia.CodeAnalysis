@@ -355,6 +355,23 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         }
 
         /// <summary>
+        /// Determines whether the <paramref name="invocation"/> is a valid test assertion call, using the <paramref name="assertionFramework"/> if set.
+        /// If it is found to be a valid assertion then <paramref name="assertionFramework"/> is set to the framework which it is valid for, if it wasn't
+        /// already set.
+        /// </summary>
+        internal static bool IsValidAssertion(this InvocationExpressionSyntax invocation, ref IAssertionFramework assertionFramework)
+        {
+            var validAssertion = false;
+            if (assertionFramework == null)
+            {
+                assertionFramework = invocation.GetAssertionFramework();
+                validAssertion = assertionFramework != null;
+            }
+
+            return validAssertion || assertionFramework?.IsAssertionCall(invocation) == true;
+        }
+
+        /// <summary>
         /// Uses the semantic model to resolve <paramref name="invocation"/> to the <see cref="MethodDeclarationSyntax"/>
         /// declared in the same compilation, or returns <see langword="null"/> if not found.
         /// </summary>

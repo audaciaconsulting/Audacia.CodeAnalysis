@@ -83,16 +83,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
             var count = 0;
             foreach (var invocation in allInvocations)
             {
-                var validAssertion = false;
-                if (assertionFramework == null)
-                {
-                    assertionFramework = invocation.GetAssertionFramework();
-                    validAssertion = assertionFramework != null;
-                }
-
-                validAssertion = validAssertion || assertionFramework?.IsAssertionCall(invocation) == true;
-
-                if (validAssertion)
+                if (invocation.IsValidAssertion(ref assertionFramework))
                 {
                     var isInsideScope = invocation.IsInsideAssertionScope(assertionFramework);
 

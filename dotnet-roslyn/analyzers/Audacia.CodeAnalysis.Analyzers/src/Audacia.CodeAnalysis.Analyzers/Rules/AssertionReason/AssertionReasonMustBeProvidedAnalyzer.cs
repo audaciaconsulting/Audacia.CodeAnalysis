@@ -68,16 +68,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason
 
             foreach (var invocation in allInvocations)
             {
-                var validAssertion = false;
-                if (assertionFramework == null)
-                {
-                    assertionFramework = invocation.GetAssertionFramework();
-                    validAssertion = assertionFramework != null;
-                }
-
-                validAssertion = validAssertion || assertionFramework?.IsAssertionCall(invocation) == true;
-
-                if (validAssertion && !assertionFramework.HasReasonArgument(invocation, nodeAnalysisContext.SemanticModel))
+                if (invocation.IsValidAssertion(ref assertionFramework) && !assertionFramework.HasReasonArgument(invocation, nodeAnalysisContext.SemanticModel))
                 {
                     var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
                     nodeAnalysisContext.ReportDiagnostic(diagnostic);
