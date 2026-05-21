@@ -167,7 +167,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
                 return throwStatements.Any(statement => statement.IsThrowArgumentNullExceptionStatement());
             }
-            
+
             // If we get here it must be a throw statement.
             throwStatement = (ThrowStatementSyntax)innerStatement;
 
@@ -350,7 +350,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         /// </summary>
         internal static IAssertionFramework GetAssertionScopeFramework(this InvocationExpressionSyntax invocation)
         {
-            return AssertionFrameworks.FirstOrDefault(framework => 
+            return AssertionFrameworks.FirstOrDefault(framework =>
                 invocation.Ancestors().Any(ancestor => framework.IsAssertionScopeExpression(ancestor, invocation)));
         }
 
@@ -370,6 +370,67 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             var methodDeclaration = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
             return methodDeclaration;
+        }
+
+        /// <summary>
+        /// Determines whether the given <paramref name="invocation"/> is nested inside an assertion scope of the given <paramref name="framework"/>.
+        /// </summary>
+        /// <returns></returns>
+        internal static bool IsInsideAssertionScope(this InvocationExpressionSyntax invocation, IAssertionFramework framework)
+        {
+            return invocation.Ancestors().Any(ancestor => framework.IsAssertionScopeExpression(ancestor, invocation));
+        }
+
+        /// <summary>
+        /// Returns the index of the parameter named <paramref name="parameterName"/> in the resolved method overload for <paramref name="invocation"/>,
+        /// using the <paramref name="semanticModel"/> to resolve the method symbol and its parameters.
+        /// </summary>
+        internal static int FindParameterIndex(this InvocationExpressionSyntax invocation, string parameterName, SemanticModel semanticModel)
+        {
+            var symbolInfo = semanticModel.GetSymbolInfo(invocation);
+            var method = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
+
+            if (method == null)
+            {
+                return -1;
+            }
+
+            // Find the index of the target parameter in the resolved overload.
+            var paramIndex = -1;
+            for (var i = 0; i < method.Parameters.Length; i++)
+            {
+                if (string.Equals(method.Parameters[i].Name, parameterName, StringComparison.Ordinal))
+                {
+                    paramIndex = i;
+                    break;
+                }
+            }
+
+            return paramIndex;
+        }
+
+        /// <summary>
+        /// Determines whether the specified invocation includes an argument explicitly named for the given <paramref name="parameterName"/>,
+        /// or supplies an argument at the <paramref name="parameterIndex"/> position.
+        /// </summary>
+        /// <remarks>This method first checks for an explicitly named argument matching the provided
+        /// parameter name. If no such argument is found, it checks whether an argument is supplied at the specified
+        /// parameter index, treating it as a positional argument.</remarks>
+        internal static bool HasExplicitlyNamedParameter(this InvocationExpressionSyntax invocation, string parameterName, int parameterIndex)
+        {
+            var arguments = invocation.ArgumentList.Arguments;
+
+            foreach (var arg in arguments)
+            {
+                if (arg.NameColon != null &&
+                    string.Equals(arg.NameColon.Name.Identifier.ValueText, parameterName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            // Fall back to positional: the caller supplied an argument at the parameter's position.
+            return arguments.Count > parameterIndex;
         }
     }
 }

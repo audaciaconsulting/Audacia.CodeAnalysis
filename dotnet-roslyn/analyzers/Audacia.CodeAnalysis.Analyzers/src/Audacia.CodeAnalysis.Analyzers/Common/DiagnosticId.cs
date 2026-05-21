@@ -23,5 +23,7 @@
         public const string SuppressionRequiresJustification = "ACL1018";
         public const string AssertionScopeForMultipleAssertions = "ACL1019";
         public const string AssertionRequired = "ACL1020";
+        public const string AssertionReasonMustBeProvided = "ACL1021";
+        public const string TestNamesMustBeConsistent = "ACL1022";
     }
 }

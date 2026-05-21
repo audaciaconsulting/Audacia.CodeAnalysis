@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using Audacia.CodeAnalysis.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -13,6 +15,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
     {
         private const string AssertClass = "Assert";
         private const string MultipleMethod = "Multiple";
+
+        /// <summary>
+        /// Maps the names of xUnit <c>Assert</c> methods that support a user-facing failure message
+        /// to the name of the parameter that carries that message.
+        /// Methods absent from this map do not accept a failure message in any overload and are
+        /// therefore excluded from the reason check.
+        /// </summary>
+        private static readonly System.Collections.Generic.Dictionary<string, string> MessageParameterByMethod =
+            new System.Collections.Generic.Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "True",  "userMessage" },
+                { "False", "userMessage" },
+                { "Fail",  "message" },
+            };
 
         /// <inheritdoc />
         public bool IsAssertionCall(InvocationExpressionSyntax invocation)
@@ -45,6 +61,39 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
             }
 
             return false;
+        }
+
+        /// <inheritdoc/>
+        /// <remarks>
+        /// Only the xUnit methods listed in <see cref="MessageParameterByMethod"/> support a
+        /// user-facing failure message. All other <c>Assert.*</c> methods have no such parameter
+        /// in any overload, so they are excluded from the reason check and always return
+        /// <see langword="true"/>.
+        /// </remarks>
+        public bool HasReasonArgument(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+        {
+            if (!(invocation.Expression is MemberAccessExpressionSyntax memberAccess))
+            {
+                return true;
+            }
+
+            var methodName = memberAccess.Name.Identifier.ValueText;
+
+            if (!MessageParameterByMethod.TryGetValue(methodName, out var parameterName))
+            {
+                // This method has no message parameter in any overload — nothing to enforce.
+                return true;
+            }
+
+            var paramIndex = invocation.FindParameterIndex(parameterName, semanticModel);
+
+            // The invocation is using an overload without the reason parameter, so report that it is missing.
+            if (paramIndex == -1)
+            {
+                return false;
+            }
+
+            return invocation.HasExplicitlyNamedParameter(parameterName, paramIndex);
         }
 
         private static bool IsAssertMultipleCall(InvocationExpressionSyntax invocation)
