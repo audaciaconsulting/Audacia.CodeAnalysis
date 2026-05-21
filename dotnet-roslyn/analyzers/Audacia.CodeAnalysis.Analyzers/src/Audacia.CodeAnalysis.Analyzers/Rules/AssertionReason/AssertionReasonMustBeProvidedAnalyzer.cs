@@ -91,7 +91,5 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason
                 AnalyzeMethodInvocations(helperMethod, nodeAnalysisContext, visitedMethods, ref assertionFramework);
             }
         }
-
-
     }
 }
