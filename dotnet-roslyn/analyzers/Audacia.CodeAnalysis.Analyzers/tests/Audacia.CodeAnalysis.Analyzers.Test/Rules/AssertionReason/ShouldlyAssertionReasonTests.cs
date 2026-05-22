@@ -27,10 +27,18 @@ public void NonTestMethod()
         }
 
         [TestMethod]
-        public void No_Diagnostics_For_TestMethod_With_Assertion_Reason()
+        [DataRow("Fact")]
+        [DataRow("Theory")]
+        [DataRow("Xunit.Fact")]
+        [DataRow("Xunit.Theory")]
+        [DataRow("FactAttribute")]
+        [DataRow("TheoryAttribute")]
+        [DataRow("Xunit.FactAttribute")]
+        [DataRow("Xunit.TheoryAttribute")]
+        public void No_Diagnostics_For_TestMethod_With_Assertion_Reason(string attributeName)
         {
-            const string testMethod = @"
-[Fact]
+            var testMethod = @"
+[" + attributeName + @"]
 public void TestMethod()
 {
     var foo = ""Foo"";
@@ -81,10 +89,18 @@ private void Assertion(string foo)
         }
 
         [TestMethod]
-        public void Diagnostics_For_Assertion_Without_Reason()
+        [DataRow("Fact")]
+        [DataRow("Theory")]
+        [DataRow("Xunit.Fact")]
+        [DataRow("Xunit.Theory")]
+        [DataRow("FactAttribute")]
+        [DataRow("TheoryAttribute")]
+        [DataRow("Xunit.FactAttribute")]
+        [DataRow("Xunit.TheoryAttribute")]
+        public void Diagnostics_For_Assertion_Without_Reason(string attributeName)
         {
-            const string testMethod = @"
-[Fact]
+            var testMethod = @"
+[" + attributeName + @"]
 public void TestMethod()
 {
     var foo = ""Foo"";

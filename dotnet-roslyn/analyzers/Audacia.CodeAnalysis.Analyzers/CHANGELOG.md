@@ -8,9 +8,12 @@
 - Added new rule "AssertionRequired" (ACL1020).
     - This rule checks that all Xunit test methods have at least one assertion, ensuring that tests are meaningful and validate expected outcomes.
     - This rule works with Xunit, Shouldly, and FluentAssertions syntax.
-- Added new rule 'AssertionReasonMustBeProvided' (ACL1021).
+- Added new rule "AssertionReasonMustBeProvided" (ACL1021).
     - This rule checks that all assertions which support a reason have a value provided, providing clarity on the intent of the assertion and improving test readability.
     - This rule works with Xunit, Shouldly, and FluentAssertions syntax.
+- Added new rule "TestNamesMustBeConsistent" (ACL1022).
+    - This rule checks that all test method names follow a consistent naming convention, improving readability and maintainability of test code.
+    - The regex pattern for the naming convention can be configured within .editorconfig, e.g. `dotnet_diagnostic.ACL1022.test_method_name_format = ^[a-zA-Z]+$`
 
 ### Changed
 - No changes to existing functionality
