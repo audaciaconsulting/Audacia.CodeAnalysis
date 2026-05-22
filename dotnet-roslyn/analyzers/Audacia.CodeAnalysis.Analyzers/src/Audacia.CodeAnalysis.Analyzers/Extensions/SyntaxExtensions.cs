@@ -413,10 +413,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             }
 
             // Find the index of the target parameter in the resolved overload.
+            return FindParameterIndex(invocation, parameterName, method);
+        }
+
+        /// <summary>
+        /// Returns the index of the parameter named <paramref name="parameterName"/> in the resolved method overload for <paramref name="invocation"/>,
+        /// using the <paramref name="methodSymbol"/> to resolve its parameters.
+        /// </summary>
+        internal static int FindParameterIndex(this InvocationExpressionSyntax invocation, string parameterName, IMethodSymbol methodSymbol)
+        {
             var paramIndex = -1;
-            for (var i = 0; i < method.Parameters.Length; i++)
+            for (var i = 0; i < methodSymbol.Parameters.Length; i++)
             {
-                if (string.Equals(method.Parameters[i].Name, parameterName, StringComparison.Ordinal))
+                if (string.Equals(methodSymbol.Parameters[i].Name, parameterName, StringComparison.Ordinal))
                 {
                     paramIndex = i;
                     break;

@@ -14,6 +14,9 @@
 - Added new rule "TestNamesMustBeConsistent" (ACL1022).
     - This rule checks that all test method names follow a consistent naming convention, improving readability and maintainability of test code.
     - The regex pattern for the naming convention can be configured within .editorconfig, e.g. `dotnet_diagnostic.ACL1022.test_method_name_format = ^[a-zA-Z]+$`
+- Added new rule "LogMessagesNamedPropertiesPascalCase" (ACL1023).
+    - This rule checks that all log message named properties are in PascalCase, ensuring consistency and readability in log messages.
+    - This rule works with `Microsoft.Extensions.Logging.ILogger` methods.
 
 ### Changed
 - No changes to existing functionality
