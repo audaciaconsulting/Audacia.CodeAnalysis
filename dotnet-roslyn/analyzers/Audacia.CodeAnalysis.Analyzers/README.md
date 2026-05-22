@@ -1243,31 +1243,14 @@ public void TestMethod()
 
 ACL1022 checks if Xunit test method names (ones decorated with `Fact` and `Theory`) are consistent with the specified naming convention and will produce a warning if not.
 
-The project naming convention can be configured in `.editorconfig` using a regex expression:
-```
-dotnet_diagnostic.ACL1022.test_method_name_format = ^(?!_|.*[^_][A-Z]).*(?<!_)$
-```
+The project naming convention can be configured in `.editorconfig` using regex: `dotnet_diagnostic.ACL1022.test_method_name_format = <Regex>`
 
-Code with diagnostic (for regex above):
-```csharp
-[Fact]
-public void ALongMethodNameWithoutUnderscores()
-{
-    // etc.
-}
+Some examples of common conventions and their regex patterns are as follows:
 
-[Fact]
-public void ALongMethod_NameWithSome_Underscores()
-{
-    // etc.
-}
-```
-
-Code without diagnostic:
-```csharp
-[Fact]
-public void A_Long_Method_Name_With_Underscores()
-{
-    // etc.
-}
-```
+| Naming Convention | Pattern | Explanation |
+| ---- | ---- | ---- |
+| `WhenAUserDoesX_WithSomething_ThenThisHappens_123` | `^([A-Z0-9][a-zA-Z0-9]*)?(_[A-Z0-9][a-zA-Z0-9]*)*$` | The first character must be an upper case character or digit. Underscores are allowed. After an underscore there must be an upper case letter or digit. No other characters are allowed. |
+| `When_A_User_Does_X_With_Something_Then_This_Happens_123` | `^([A-Z0-9][a-z0-9]*)?(_[A-Z0-9][a-z0-9]*)*$` | Only upper case characters can appear at the beginning of the name or immediately following an underscore, and they are not valid elsewhere in the method name. Only digits and characters are allowed. |
+| `whenAUserDoesX_withSomething_thenThisHappens123` | `^[a-z][a-zA-Z0-9]*(_[a-z][a-zA-Z0-9]*)*$` | camelCase segments separated by underscores. The first character of each segment must be lower case. Capital letters are permitted freely within a segment. No leading or trailing underscores. |
+| `WhenAUserDoesXWithSomethingThenThisHappens123` | `^[A-Z][a-zA-Z0-9]*$` | PascalCase only. No underscores permitted anywhere. The first character must be an upper case letter. |
+| `when_a_user_does_x_with_something_then_this_happens_123` | `^[a-z][a-z0-9]*(_[a-z][a-z0-9]*)*$` | snake_case only. All characters must be lower case letters or digits. Each underscore-separated segment must start with a lower case letter. No leading or trailing underscores. |
