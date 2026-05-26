@@ -72,32 +72,24 @@ public void NonTestMethod()
         }
 
         [TestMethod]
-        public void Diagnostics_For_Empty_Fact_TestMethod()
+        [DataRow("Fact")]
+        [DataRow("Theory")]
+        [DataRow("Xunit.Fact")]
+        [DataRow("Xunit.Theory")]
+        [DataRow("FactAttribute")]
+        [DataRow("TheoryAttribute")]
+        [DataRow("Xunit.FactAttribute")]
+        [DataRow("Xunit.TheoryAttribute")]
+        public void Diagnostics_For_Empty_TestMethod(string attributeName)
         {
-            const string testMethod = @"
-[Fact]
+            var testMethod = @"
+[" + attributeName + @"]
 public void TestMethod()
 {
 }";
 
             var testCode = BuildTestCode(testMethod);
             var expectedDiagnostic = BuildExpectedResult(18, 13);
-
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Empty_Theory_TestMethod()
-        {
-            const string testMethod = @"
-[Theory]
-[InlineData(""Foo"")]
-public void TestMethod(string foo)
-{
-}";
-
-            var testCode = BuildTestCode(testMethod);
-            var expectedDiagnostic = BuildExpectedResult(19, 13);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }

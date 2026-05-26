@@ -177,20 +177,27 @@ public void TestMethod()
         }
 
         [TestMethod]
-        public void Diagnostics_For_Theory_Multiple_Assertions_Without_AssertionScope()
+        [DataRow("Theory")]
+        [DataRow("Xunit.Fact")]
+        [DataRow("Xunit.Theory")]
+        [DataRow("FactAttribute")]
+        [DataRow("TheoryAttribute")]
+        [DataRow("Xunit.FactAttribute")]
+        [DataRow("Xunit.TheoryAttribute")]
+        public void Diagnostics_For_Other_Xunit_Method_Attributes_Without_AssertionScope(string attributeName)
         {
-            const string testMethod = @"
-[Theory]
-[InlineData(""Foo"")]
-public void TestMethod(string foo)
+            var testMethod = @"
+[" + attributeName + @"]
+public void TestMethod()
 {
+    var foo = ""Foo"";
     foo.ShouldNotBeNullOrEmpty();
     foo.ShouldBe<string>(""Foo"");
     foo.ShouldNotBe(""Foo"");
 }";
 
             var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(19, 13);
+            var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }

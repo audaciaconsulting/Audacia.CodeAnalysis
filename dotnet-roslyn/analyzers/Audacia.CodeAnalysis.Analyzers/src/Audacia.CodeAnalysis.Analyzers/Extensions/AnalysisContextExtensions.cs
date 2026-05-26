@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -13,7 +12,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 {
     internal static class AnalysisContextExtensions
     {
-        private static readonly ImmutableArray<string> TestMethodAttributeNames = ImmutableArray.Create("Fact", "Theory");
+        private static readonly ImmutableArray<string> TestMethodAttributeNames = ImmutableArray.Create(
+            "Fact",
+            "Theory",
+            "Xunit.Fact",
+            "Xunit.Theory",
+            "FactAttribute",
+            "TheoryAttribute",
+            "Xunit.FactAttribute",
+            "Xunit.TheoryAttribute"
+        );
 
         internal static void SkipEmptyName(this SymbolAnalysisContext context, Action<SymbolAnalysisContext> action)
         {
@@ -198,7 +206,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             var methodAttributes = methodDeclarationSyntax
                 .AttributeLists
                 .SelectMany(attrListSyntax => attrListSyntax.Attributes)
-                .Select(attribute => attribute.Name.TryGetInferredMemberName() ?? string.Empty)
+                .Select(attribute => attribute.Name.TryGetInferredMemberName() ?? attribute.Name.ToString() ?? string.Empty)
                 .ToList();
 
             return methodAttributes;
