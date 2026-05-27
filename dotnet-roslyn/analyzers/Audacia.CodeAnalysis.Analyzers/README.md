@@ -1271,17 +1271,25 @@ Some examples of common conventions and their regex patterns are as follows:
 ACL1023 checks if named properties within log messages are in PascalCase and will produce a warning if not.
 It also supports Serilog's destructuring operator (@), and will ignore this when checking the case of the property name.
 
+Positional properties will trigger a diagnostic as named properties should always be used.
+
 All log methods from `Microsoft.Extensions.Logging` are supported.
 
 Code with diagnostic:
 ```csharp
     _logger.LogInformation("User {userId} logged in with IP {ip_address}", userId, ipAddress);
+    _logger.LogInformation("User {0} logged in with IP {1}", userId, ipAddress);
     _logger.LogInformation("User {@user} performed an action", user);
+    _logger.LogInformation("{{UserId}}: {userId}", userId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{userId}}", userId);
+    _logger.LogInformation("UserId: {userId:N0}", userId);
 ```
 
 Code without diagnostic:
 ```csharp
     _logger.LogInformation("User {UserId} logged in with IP {IpAddress}", userId, ipAddress);
-    _logger.LogInformation("User {0} logged in with IP {1}", userId, ipAddress);
     _logger.LogInformation("User {@User} performed an action", user);
+    _logger.LogInformation("{{UserId}}: {UserId}", userId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}}", userId);
+    _logger.LogInformation("UserId: {UserId:N0}", userId);
 ```

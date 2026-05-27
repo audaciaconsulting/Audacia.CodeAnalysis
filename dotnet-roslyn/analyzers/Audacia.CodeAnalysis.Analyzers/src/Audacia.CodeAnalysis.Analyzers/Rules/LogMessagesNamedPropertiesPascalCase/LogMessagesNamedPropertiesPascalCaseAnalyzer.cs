@@ -19,7 +19,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
         private const string MessageFormat = "Log message property '{0}' does not use PascalCase";
         private const string Description = "When using log message named properties, ensure they are in PascalCase.";
 
-        private const string InvalidNamedPropertyPattern = @"\{(?!@?[A-Z][a-zA-Z0-9]*\})(?!\d+[}:])([^}]+)\}";
+        private const string InvalidNamedPropertyPattern = @"(?<!\{)\{(?!\{)(?!@?[A-Z][a-zA-Z0-9]*[}:])([^{}:]+)[^{}]*\}(?!\})";
+
+        // In interpolated strings, log template placeholders are double-braced in source: {{Name}} => {Name} at runtime.
+        // This pattern matches {{name}} but not {{{{...}}}} (which are escaped literal braces).
+        private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!@?[A-Z][a-zA-Z0-9]*[}:])([^{}:]+)[^{}]*\}\}(?!\})";
 
         private const string LoggerTypeName = "Microsoft.Extensions.Logging.ILogger";
         private const string LoggerMessageParameterName = "message";
@@ -50,9 +54,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
                 return;
             }
 
-            var receiverType = methodSymbol.ReceiverType.ToDisplayString();
-            // Check if the method is called on an Microsoft.Extensions.Logging.ILogger instance
-            if (!string.Equals(receiverType, LoggerTypeName, System.StringComparison.Ordinal))
+            var receiverType = methodSymbol.ReceiverType;
+            // Check if the method is called on a type that is, or implements, Microsoft.Extensions.Logging.ILogger
+            if (!IsOrImplementsILogger(receiverType))
             {
                 return;
             }
@@ -68,8 +72,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
             var messageArgument = invocation.ArgumentList.Arguments[paramIndex];
             var messageParameterValue = messageArgument.ToString();
 
+            var isInterpolated = messageArgument.Expression is InterpolatedStringExpressionSyntax;
+            var pattern = isInterpolated ? InvalidNamedPropertyPatternInterpolated : InvalidNamedPropertyPattern;
+
             // Use regex to find all named properties in the message template that do not follow PascalCase
-            var invalidNamedProperties = Regex.Matches(messageParameterValue, InvalidNamedPropertyPattern);
+            var invalidNamedProperties = Regex.Matches(messageParameterValue, pattern);
 
             foreach (Match namedProperty in invalidNamedProperties)
             {
@@ -83,6 +90,29 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
                 var diagnostic = Diagnostic.Create(Rule, location, propertyName);
                 nodeAnalysisContext.ReportDiagnostic(diagnostic);
             }
+        }
+
+        private static bool IsOrImplementsILogger(ITypeSymbol typeSymbol)
+        {
+            if(typeSymbol == null)
+            {
+                return false;
+            }
+
+            if (typeSymbol.ToDisplayString().Equals(LoggerTypeName, System.StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            foreach (var iface in typeSymbol.AllInterfaces)
+            {
+                if (iface.ToDisplayString().Equals(LoggerTypeName, System.StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
