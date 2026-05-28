@@ -478,5 +478,30 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             return false;
         }
+
+        /// <summary>
+        /// Determines whether the specified type symbol is, or implements, an interface with the given name.
+        /// </summary>
+        public static bool IsOrImplementsInterface(this ITypeSymbol typeSymbol, string interfaceName)
+        {
+            if (typeSymbol == null)
+            {
+                return false;
+            }
+            if (typeSymbol.ToDisplayString().Equals(interfaceName, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            foreach (var iface in typeSymbol.AllInterfaces)
+            {
+                if (iface.ToDisplayString().Equals(interfaceName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

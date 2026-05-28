@@ -26,5 +26,6 @@
         public const string AssertionReasonMustBeProvided = "ACL1021";
         public const string TestNamesMustBeConsistent = "ACL1022";
         public const string LogMessagesNamedPropertiesPascalCase = "ACL1023";
+        public const string LogMessagesNoDuplicateParameters = "ACL1024";
     }
 }

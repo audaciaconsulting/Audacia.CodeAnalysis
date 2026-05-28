@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -8,22 +10,24 @@ using Microsoft.CodeAnalysis.Text;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalCase
+namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoDuplicateParameters
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class LogMessagesNamedPropertiesPascalCaseAnalyzer : DiagnosticAnalyzer
+    public sealed class LogMessagesNoDuplicateParametersAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.LogMessagesNamedPropertiesPascalCase;
+        public const string Id = DiagnosticId.LogMessagesNoDuplicateParameters;
 
-        private const string Title = "Log message property is not in PascalCase";
-        private const string MessageFormat = "Log message property '{0}' does not use PascalCase";
-        private const string Description = "When using log message named properties, ensure they are in PascalCase.";
+        private const string Title = "Log message property is duplicated";
+        private const string MessageFormat = "Log message property '{0}' is duplicated";
+        private const string Description = "When using log message named properties ensure they are unique within a message template.";
 
-        private const string InvalidNamedPropertyPattern = @"(?<!\{)\{(?!\{)(?!@?[A-Z][a-zA-Z0-9]*[}:])([^{}:]+)[^{}]*\}(?!\})";
+        // Matches named (non-positional) log message properties in regular strings, capturing the property name in group 1.
+        // Excludes escaped braces ({{...}}) and positional placeholders ({0}, {1:N0}).
+        private const string NamedPropertyPattern = @"(?<!\{)\{(?!\{)(@?\D[^:{}]*)(?:[^{}]*)?\}(?!\})";
 
         // In interpolated strings, log template placeholders are double-braced in source: {{Name}} => {Name} at runtime.
         // This pattern matches {{name}} but not {{{{...}}}} (which are escaped literal braces).
-        private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!@?[A-Z][a-zA-Z0-9]*[}:])([^{}:]+)[^{}]*\}\}(?!\})";
+        private const string NamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(@?\D[^:{}]*)(?:[^{}]*)?\}\}(?!\})";
 
         private const string LoggerTypeName = "Microsoft.Extensions.Logging.ILogger";
         private const string LoggerMessageParameterName = "message";
@@ -73,22 +77,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
             var messageParameterValue = messageArgument.ToString();
 
             var isInterpolated = messageArgument.Expression is InterpolatedStringExpressionSyntax;
-            var pattern = isInterpolated ? InvalidNamedPropertyPatternInterpolated : InvalidNamedPropertyPattern;
+            var pattern = isInterpolated ? NamedPropertyPatternInterpolated : NamedPropertyPattern;
 
-            // Use regex to find all named properties in the message template that do not follow PascalCase
-            var invalidNamedProperties = Regex.Matches(messageParameterValue, pattern);
+            var allNamedProperties = Regex.Matches(messageParameterValue, pattern);
 
-            foreach (Match namedProperty in invalidNamedProperties)
+            // Track which property names have been seen (case-insensitive).
+            // Every occurrence after the first is a duplicate and gets its own diagnostic.
+            var seenNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (Match namedProperty in allNamedProperties)
             {
                 var propertyName = namedProperty.Groups[1].Value;
 
-                // Set the diagnostic location to the position of the named property with the correct row and column
-                var matchStart = messageArgument.SpanStart + namedProperty.Index;
-                var matchSpan = new TextSpan(matchStart, namedProperty.Length);
-                var location = Location.Create(nodeAnalysisContext.Node.SyntaxTree, matchSpan);
+                if (!seenNames.Add(propertyName))
+                {
+                    var matchStart = messageArgument.SpanStart + namedProperty.Index;
+                    var matchSpan = new TextSpan(matchStart, namedProperty.Length);
+                    var location = Location.Create(nodeAnalysisContext.Node.SyntaxTree, matchSpan);
 
-                var diagnostic = Diagnostic.Create(Rule, location, propertyName);
-                nodeAnalysisContext.ReportDiagnostic(diagnostic);
+                    nodeAnalysisContext.ReportDiagnostic(Diagnostic.Create(Rule, location, propertyName));
+                }
             }
         }
     }
