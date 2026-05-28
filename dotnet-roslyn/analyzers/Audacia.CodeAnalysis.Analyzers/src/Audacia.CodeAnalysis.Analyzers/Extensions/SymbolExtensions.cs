@@ -503,5 +503,31 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
             return false;
         }
+
+        /// <summary>
+        /// Determines whether the specified type symbol is of the given type or inherits from a type with the
+        /// specified name.
+        /// </summary>
+        public static bool IsOrInheritsFrom(this ITypeSymbol typeSymbol, string baseTypeName)
+        {
+            if (typeSymbol == null)
+            {
+                return false;
+            }
+            if (typeSymbol.ToDisplayString().Equals(baseTypeName, StringComparison.Ordinal))
+            {
+                return true;
+            }
+            ITypeSymbol currentBase = typeSymbol.BaseType;
+            while (currentBase != null)
+            {
+                if (currentBase.ToDisplayString().Equals(baseTypeName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+                currentBase = currentBase.BaseType;
+            }
+            return false;
+        }
     }
 }
