@@ -1293,3 +1293,38 @@ Code without diagnostic:
     _logger.LogInformation($"{{{{UserId}}}}: {{UserId}}", userId);
     _logger.LogInformation("UserId: {UserId:N0}", userId);
 ```
+
+## ACL1024 - Named properties within log messages should not be duplicated
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1024 checks if named properties within a log message are duplicated and will produce a warning for each if so.
+
+All log methods from `Microsoft.Extensions.Logging` are supported.
+
+Code with diagnostic:
+```csharp
+    _logger.LogInformation("User {UserId} logged in with IP {UserId}", userId, ipAddress);
+    _logger.LogInformation("User {@User} performed an action for {@User}", user, targetUser);
+    _logger.LogInformation("{{UserId}}: {UserId} and {UserId}", userId, targetUserId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{UserId}}", userId, targetUserId);
+    _logger.LogInformation("UserId: {UserId:N0} and {UserId:c}", userId, targetUserId);
+```
+
+Code without diagnostic:
+```csharp
+    _logger.LogInformation("User {UserId} logged in with IP {IpAddress}", userId, ipAddress);
+    _logger.LogInformation("User {@User} performed an action for {@TargetUser}", user, targetUser);
+    _logger.LogInformation("{{UserId}}: {UserId} and {TargetUserId}", userId, targetUserId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{TargetUserId}}", userId, targetUserId);
+    _logger.LogInformation("UserId: {UserId:N0} and {TargetUserId:c}", userId, targetUserId);
+```

@@ -17,6 +17,9 @@
 - Added new rule "LogMessagesNamedPropertiesPascalCase" (ACL1023).
     - This rule checks that all log message named properties are in PascalCase, ensuring consistency and readability in log messages.
     - This rule works with `Microsoft.Extensions.Logging.ILogger` methods.
+- Added new rule "LogMessagesNoDuplicateParameters" (ACL1024).
+    - This rule checks that there are no duplicate parameter names in log messages, preventing confusion and ensuring clarity in log messages.
+    - This rule works with `Microsoft.Extensions.Logging.ILogger` methods.
 
 ### Changed
 - No changes to existing functionality
