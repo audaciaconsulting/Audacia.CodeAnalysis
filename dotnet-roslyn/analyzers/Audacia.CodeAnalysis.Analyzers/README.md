@@ -1254,3 +1254,42 @@ Some examples of common conventions and their regex patterns are as follows:
 | `whenAUserDoesX_withSomething_thenThisHappens123` | `^[a-z][a-zA-Z0-9]*(_[a-z][a-zA-Z0-9]*)*$` | camelCase segments separated by underscores. The first character of each segment must be lower case. Capital letters are permitted freely within a segment. No leading or trailing underscores. |
 | `WhenAUserDoesXWithSomethingThenThisHappens123` | `^[A-Z][a-zA-Z0-9]*$` | PascalCase only. No underscores permitted anywhere. The first character must be an upper case letter. |
 | `when_a_user_does_x_with_something_then_this_happens_123` | `^[a-z][a-z0-9]*(_[a-z][a-z0-9]*)*$` | snake_case only. All characters must be lower case letters or digits. Each underscore-separated segment must start with a lower case letter. No leading or trailing underscores. |
+
+## ACL1023 - Named properties within log messages should use PascalCase
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1023 checks if named properties within log messages are in PascalCase and will produce a warning if not.
+It also supports Serilog's destructuring operator (@), and will ignore this when checking the case of the property name.
+
+Positional properties will trigger a diagnostic as named properties should always be used.
+
+All log methods from `Microsoft.Extensions.Logging` are supported.
+
+Code with diagnostic:
+```csharp
+    _logger.LogInformation("User {userId} logged in with IP {ip_address}", userId, ipAddress);
+    _logger.LogInformation("User {0} logged in with IP {1}", userId, ipAddress);
+    _logger.LogInformation("User {@user} performed an action", user);
+    _logger.LogInformation("{{UserId}}: {userId}", userId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{userId}}", userId);
+    _logger.LogInformation("UserId: {userId:N0}", userId);
+```
+
+Code without diagnostic:
+```csharp
+    _logger.LogInformation("User {UserId} logged in with IP {IpAddress}", userId, ipAddress);
+    _logger.LogInformation("User {@User} performed an action", user);
+    _logger.LogInformation("{{UserId}}: {UserId}", userId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}}", userId);
+    _logger.LogInformation("UserId: {UserId:N0}", userId);
+```
