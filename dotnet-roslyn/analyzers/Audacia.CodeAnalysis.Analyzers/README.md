@@ -1354,6 +1354,7 @@ Code with diagnostic:
     _logger.LogInformation("Error: {Error}", anError);
     _logger.LogInformation("Error occurred for user {UserId}: {Error}", userId, anError);
     _logger.LogInformation("Error: {@Error}", anError);
+    _logger.LogInformation(args: [new System.Exception()], message: "Error: {Error}");
 ```
 
 Code without diagnostic:
@@ -1362,4 +1363,5 @@ Code without diagnostic:
 
     _logger.LogInformation(anError, "An error occurred");
     _logger.LogInformation(anError, "An error occurred for user {UserId}", userId);
+    _logger.LogInformation(exception: [new System.Exception()], message: "An error occurred");
 ```

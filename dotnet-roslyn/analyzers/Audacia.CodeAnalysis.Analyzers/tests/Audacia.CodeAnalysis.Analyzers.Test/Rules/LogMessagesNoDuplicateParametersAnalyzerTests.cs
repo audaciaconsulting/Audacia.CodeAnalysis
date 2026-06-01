@@ -260,6 +260,32 @@ class CustomLogger : ILogger
         }
 
         [TestMethod]
+        public void No_Diagnostics_When_Using_Arguments_Out_Of_Position()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+    
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        var x = 1 + 2;
+        var y = x + 3;
+
+        logger.LogInformation(args: new []{ x, y }, message: ""Message: {Value} and {ValueTwo}"");
+    }
+}";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
         [DataRow("Property")]
         [DataRow("@Property")]
         public void Diagnostic_When_Log_Message_Property_Is_Duplicated(string propertyName)
@@ -525,6 +551,33 @@ class ClassName
             var expectedThree = BuildExpectedResult(20, 64, "Property");
 
             VerifyDiagnostic(test, expectedOne, expectedTwo, expectedThree);
+        }
+
+        [TestMethod]
+        public void Diagnostics_When_Using_Arguments_Out_Of_Position()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+    
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        var x = 1 + 2;
+        var y = x + 3;
+
+        logger.LogInformation(args: new []{ x, y }, message: ""Message: {Value} and {Value}"");
+    }
+}";
+            var expected = BuildExpectedResult(18, 84, "Value");
+            VerifyDiagnostic(test, expected);
         }
     }
 }
