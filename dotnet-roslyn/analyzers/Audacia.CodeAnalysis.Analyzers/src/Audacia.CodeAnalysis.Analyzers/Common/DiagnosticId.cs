@@ -28,5 +28,6 @@
         public const string LogMessagesNamedPropertiesPascalCase = "ACL1023";
         public const string LogMessagesNoDuplicateParameters = "ACL1024";
         public const string LogMessagesNoExceptionsAsTemplateParameters = "ACL1025";
+        public const string LogMessagesNamedPropertiesMustBeUsed = "ACL1026";
     }
 }

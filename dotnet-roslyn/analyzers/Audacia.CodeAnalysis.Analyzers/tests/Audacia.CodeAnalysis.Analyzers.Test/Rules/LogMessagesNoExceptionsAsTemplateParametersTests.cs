@@ -168,6 +168,29 @@ class CustomLogger
         }
 
         [TestMethod]
+        public void No_Diagnostics_When_Using_Arguments_Out_Of_Position()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+    
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        logger.LogInformation(message: ""Error"", exception: new System.Exception());
+    }
+}";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
         public void Diagnostics_When_Log_Message_Uses_Exception_In_Positional_Properties()
         {
             var test = @"
@@ -478,6 +501,30 @@ class ClassName
             var expectedFour = BuildExpectedResult(21, 77, "errorFour");
 
             VerifyDiagnostic(test, expectedOne, expectedTwo, expectedThree, expectedFour);
+        }
+
+        [TestMethod]
+        public void Diagnostics_When_Using_Arguments_Out_Of_Position()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        logger.LogInformation(args: new object[]{ new System.Exception(), 123 }, message: ""Error: {Error}"");
+    }
+}";
+            var expected = BuildExpectedResult(15, 51, "new System.Exception()");
+            VerifyDiagnostic(test, expected);
         }
     }
 }

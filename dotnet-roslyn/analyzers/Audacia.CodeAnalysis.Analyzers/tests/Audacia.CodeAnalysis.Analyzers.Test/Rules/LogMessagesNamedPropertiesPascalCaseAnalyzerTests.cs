@@ -271,7 +271,7 @@ class CustomLogger : ILogger
         }
 
         [TestMethod]
-        public void Diagnostics_When_Log_Message_Uses_Positional_Properties()
+        public void No_Diagnostics_When_Log_Message_Uses_Positional_Properties()
         {
             var test = @"
 using Microsoft.Extensions.Logging;
@@ -292,9 +292,32 @@ class ClassName
         logger.LogInformation(""Calculated value: {0} {1:N0}"", x, y);
     }
 }";
-            var expectedOne = BuildExpectedResult(17, 50, "0");
-            var expectedTwo = BuildExpectedResult(17, 54, "1");
-            VerifyDiagnostic(test, expectedOne, expectedTwo);
+            
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_When_Using_Arguments_Out_Of_Position()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+    
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        var x = 1 + 2;
+        logger.LogInformation(args: new []{ x }, message: ""Message: {CalculatedValue}"");
+    }
+}";
+            VerifyNoDiagnostic(test);
         }
 
         [TestMethod]
@@ -500,6 +523,31 @@ class ClassName
             var expectedFour = BuildExpectedResult(17, 62, "Value!Four");
 
             VerifyDiagnostic(test, expectedOne, expectedTwo, expectedThree, expectedFour);
+        }
+
+        [TestMethod]
+        public void Diagnostics_When_Using_Arguments_Out_Of_Position()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+    
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        var x = 1 + 2;
+        logger.LogInformation(args: new []{ x }, message: ""Message: {calculatedValue}"");
+    }
+}";
+            var expected = BuildExpectedResult(16, 69, "calculatedValue");
+            VerifyDiagnostic(test, expected);
         }
     }
 }

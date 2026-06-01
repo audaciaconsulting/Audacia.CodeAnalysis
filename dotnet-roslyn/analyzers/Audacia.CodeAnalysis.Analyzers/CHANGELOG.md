@@ -23,6 +23,9 @@
 - Added new rule "LogMessagesNoExceptionsAsTemplateParameters" (ACL1025).
     - This rule checks that exceptions are not included as template parameters in log messages, ensuring that exception details are properly logged and not lost in the message formatting.
     - This rule works with `Microsoft.Extensions.Logging.ILogger` methods.
+- Added new rule "LogMessagesNamedPropertiesMustBeUsed" (ACL1026)
+    - This rule checks that positional properties are not included as template parameters in log messages, ensuring that all properties are named and improving readability of log messages.
+    - This rule works with `Microsoft.Extensions.Logging.ILogger` methods.
 
 ### Changed
 - No changes to existing functionality

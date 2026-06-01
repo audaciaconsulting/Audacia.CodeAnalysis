@@ -1,11 +1,11 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
+using Audacia.CodeAnalysis.Analyzers.Common;
+using Audacia.CodeAnalysis.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Audacia.CodeAnalysis.Analyzers.Common;
-using Audacia.CodeAnalysis.Analyzers.Extensions;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoExceptionsAsTemplateParameters
 {
@@ -18,7 +18,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoExceptionsAsTemplate
         private const string MessageFormat = "Log message property '{0}' is an exception";
         private const string Description = "Do not use exceptions as log message template parameters. These should use the correct overload of the logging method with an exception parameter.";
 
-        private const string LoggerTypeName = "Microsoft.Extensions.Logging.ILogger";
         private const string LoggerArgsParameterName = "args";
 
         private const string ExceptionTypeName = "System.Exception";
@@ -39,20 +38,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoExceptionsAsTemplate
         {
             var invocation = (InvocationExpressionSyntax)nodeAnalysisContext.Node;
 
-            var semanticModel = nodeAnalysisContext.SemanticModel;
-
-            // Resolve the method symbol for the invocation
-            var methodSymbol = semanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
-
-            if (methodSymbol == null)
+            if (!invocation.TryGetLoggerMethodSymbol(nodeAnalysisContext.SemanticModel, out var methodSymbol))
             {
                 return;
             }
 
-            var receiverType = methodSymbol.ReceiverType;
-            // Check if the method is called on a type that is, or implements, Microsoft.Extensions.Logging.ILogger
-            if (!receiverType.IsOrImplementsInterface(LoggerTypeName))
+            // If 'args' is passed as an explicit named argument it will be a single array expression
+            // rather than individual positional arguments — inspect the array initializer elements instead.
+            if (invocation.TryGetExplicitlyNamedParameter(LoggerArgsParameterName, out var namedArgsArgument))
             {
+                AnalyzeExplicitArgsArray(nodeAnalysisContext, namedArgsArgument);
                 return;
             }
 
@@ -64,18 +59,53 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoExceptionsAsTemplate
                 return;
             }
 
-            // Check if any of the arguments passed to the 'args' parameter is or inherits from System.Exception
-            // Args is always the last parameter, so we can check all arguments from paramIndex to the end of the argument list
+            // Args is always the last parameter, so all arguments from paramIndex onwards belong to it.
             foreach (var argument in invocation.ArgumentList.Arguments.Skip(paramIndex))
             {
-                var argumentType = semanticModel.GetTypeInfo(argument.Expression).Type;
-                if (argumentType != null && argumentType.IsOrInheritsFrom(ExceptionTypeName))
+                ReportIfException(nodeAnalysisContext, argument);
+            }
+        }
+
+        /// <summary>
+        /// Inspects the elements of an explicitly-passed args array (e.g. <c>args: new object[]{ ex, 1 }</c>)
+        /// and reports a diagnostic for any element whose type is or inherits from <see cref="ExceptionTypeName"/>.
+        /// </summary>
+        private static void AnalyzeExplicitArgsArray(SyntaxNodeAnalysisContext context, ArgumentSyntax argsArgument)
+        {
+            InitializerExpressionSyntax initializer = null;
+
+            if (argsArgument.Expression is ArrayCreationExpressionSyntax arrayCreation)
+            {
+                initializer = arrayCreation.Initializer;
+            }
+            else if (argsArgument.Expression is ImplicitArrayCreationExpressionSyntax implicitArrayCreation)
+            {
+                initializer = implicitArrayCreation.Initializer;
+            }
+
+            if (initializer == null)
+            {
+                return;
+            }
+
+            foreach (var element in initializer.Expressions)
+            {
+                var elementType = context.SemanticModel.GetTypeInfo(element).Type;
+                if (elementType != null && elementType.IsOrInheritsFrom(ExceptionTypeName))
                 {
-                    // Get the name of the log message property from the argument expression
-                    var propertyName = argument.Expression.ToString();
-                    var diagnostic = Diagnostic.Create(Rule, argument.GetLocation(), propertyName);
-                    nodeAnalysisContext.ReportDiagnostic(diagnostic);
+                    var diagnostic = Diagnostic.Create(Rule, element.GetLocation(), element.ToString());
+                    context.ReportDiagnostic(diagnostic);
                 }
+            }
+        }
+
+        private static void ReportIfException(SyntaxNodeAnalysisContext context, ArgumentSyntax argument)
+        {
+            var argumentType = context.SemanticModel.GetTypeInfo(argument.Expression).Type;
+            if (argumentType != null && argumentType.IsOrInheritsFrom(ExceptionTypeName))
+            {
+                var diagnostic = Diagnostic.Create(Rule, argument.GetLocation(), argument.Expression.ToString());
+                context.ReportDiagnostic(diagnostic);
             }
         }
     }

@@ -7,27 +7,25 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalCase
+namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesMustBeUsed
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class LogMessagesNamedPropertiesPascalCaseAnalyzer : DiagnosticAnalyzer
+    public sealed class LogMessagesNamedPropertiesMustBeUsedAnalyzer : DiagnosticAnalyzer
     {
-        public const string Id = DiagnosticId.LogMessagesNamedPropertiesPascalCase;
+        public const string Id = DiagnosticId.LogMessagesNamedPropertiesMustBeUsed;
 
-        private const string Title = "Log message property is not in PascalCase";
-        private const string MessageFormat = "Log message property '{0}' does not use PascalCase";
-        private const string Description = "When using log message named properties, ensure they are in PascalCase.";
+        private const string Title = "Log message template format uses positional parameters";
+        private const string MessageFormat = "Log message property '{0}' is a positional parameter";
+        private const string Description = "Do not use positional parameters in log message templates. Use named properties instead.";
 
-        private const string InvalidNamedPropertyPattern = @"(?<!\{)\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])([^{}:]+)[^{}]*\}(?!\})";
+        private const string InvalidPositionalPropertyPattern = @"(?<!\{)\{(?!\{)(@?\d+(?=[}:,])[^{}]*)\}(?!\})";
 
-        // In interpolated strings, log template placeholders are double-braced in source: {{Name}} => {Name} at runtime.
-        // This pattern matches {{name}} but not {{{{...}}}} (which are escaped literal braces).
-        private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])([^{}:]+)[^{}]*\}\}(?!\})";
+        private const string InvalidPositionalPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(@?\d+(?=[}:,])[^{}]*)\}\}(?!\})";
 
         private const string LoggerMessageParameterName = "message";
 
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -54,10 +52,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
 
             var messageParameterValue = messageArgument.ToString();
             var pattern = messageArgument.Expression is InterpolatedStringExpressionSyntax
-                ? InvalidNamedPropertyPatternInterpolated
-                : InvalidNamedPropertyPattern;
+                ? InvalidPositionalPropertyPatternInterpolated
+                : InvalidPositionalPropertyPattern;
 
-            // Use regex to find all named properties in the message template that do not follow PascalCase
+            // Use regex to find all named properties which are positional identifiers
             var invalidNamedProperties = Regex.Matches(messageParameterValue, pattern);
 
             foreach (Match namedProperty in invalidNamedProperties)
