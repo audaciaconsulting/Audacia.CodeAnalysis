@@ -518,16 +518,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             {
                 return true;
             }
-            ITypeSymbol currentBase = typeSymbol.BaseType;
-            while (currentBase != null)
-            {
-                if (currentBase.ToDisplayString().Equals(baseTypeName, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-                currentBase = currentBase.BaseType;
-            }
-            return false;
+
+            return typeSymbol.BaseType.IsOrInheritsFrom(baseTypeName);
         }
     }
 }

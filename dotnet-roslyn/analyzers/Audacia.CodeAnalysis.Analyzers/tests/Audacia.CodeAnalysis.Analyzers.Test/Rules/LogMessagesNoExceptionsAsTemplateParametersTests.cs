@@ -406,6 +406,43 @@ class ClassName
 
 class MyException : System.ArgumentException
 {
+}
+
+class MySuperException : MyException
+{
+}";
+            var expected = BuildExpectedResult(16, 49, "error");
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_When_Exception_Is_Custom_Type_Inherited_From_Another_Type_Inheriting_From_System_Exception()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        var error = new MySuperException();
+        logger.LogInformation(""Error: {Error}"", error);
+    }
+}
+
+class MyException : System.ArgumentException
+{
+}
+
+class MySuperException : MyException
+{
 }";
             var expected = BuildExpectedResult(16, 49, "error");
             VerifyDiagnostic(test, expected);
