@@ -3,8 +3,8 @@
 # AspNetCore Rules
 # Description: Ruleset with rule overrides for AspNetCore apps
 
-# Code files
-[*.cs]
+is_global = true
+global_level = 1
 
 
 # Parameter name does not match the name specified by the route parameter.

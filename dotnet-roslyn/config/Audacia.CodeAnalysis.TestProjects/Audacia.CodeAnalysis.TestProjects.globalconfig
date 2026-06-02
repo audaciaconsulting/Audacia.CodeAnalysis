@@ -3,8 +3,8 @@
 # Unit Test Rules
 # Description: Ruleset with rule overrides for test projects
 
-# Code files
-[*.cs]
+is_global = true
+global_level = 4
 
 # Methods should not exceed a predefined number of statements.
 dotnet_diagnostic.ACL1002.max_statement_count = 20 # Increase max count for tests, as they may contain complex setup

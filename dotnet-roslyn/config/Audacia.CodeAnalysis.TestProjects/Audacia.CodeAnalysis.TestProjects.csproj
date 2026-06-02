@@ -2,11 +2,10 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Description>
-            Code analysis packages and rulesets for apps using Entity Framework Core.
+            Code analysis packages and rulesets for test projects.
             This package supports projects operating a minimum version of C# 12 and .NET 8.
         </Description>
         <Authors>Audacia</Authors>
-        <Version>1.12.1</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <Copyright>Copyright © Audacia $([System.DateTime]::Now.Year)</Copyright>
@@ -19,23 +18,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
         <None Include="../../../package-icon.png" Pack="true" PackagePath="\" />
 
         <!-- Global config: placed in build/ alongside the .props file -->
-        <None Include="Audacia.CodeAnalysis.EntityFrameworkCore.globalconfig"
+        <None Include="Audacia.CodeAnalysis.TestProjects.globalconfig"
             Pack="true"
             PackagePath="build\" />
 
         <!-- MSBuild props: auto-imported by NuGet for direct consumers -->
-        <None Include="build/Audacia.CodeAnalysis.EntityFrameworkCore.props"
+        <None Include="build/Audacia.CodeAnalysis.TestProjects.props"
             Pack="true"
             PackagePath="build\" />
 
-        <None Include="build/Audacia.CodeAnalysis.EntityFrameworkCore.targets"
+        <None Include="build/Audacia.CodeAnalysis.TestProjects.targets"
             Pack="true"
             PackagePath="build\" />
     </ItemGroup>
