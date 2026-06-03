@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Text;
 using Audacia.CodeAnalysis.Analyzers.Common;
 using Audacia.CodeAnalysis.Analyzers.Extensions;
 
@@ -25,7 +24,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
         // This pattern matches {{name}} but not {{{{...}}}} (which are escaped literal braces).
         private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!@?[A-Z][a-zA-Z0-9]*[}:])([^{}:]+)[^{}]*\}\}(?!\})";
 
-        private const string LoggerTypeName = "Microsoft.Extensions.Logging.ILogger";
         private const string LoggerMessageParameterName = "message";
 
         private static readonly DiagnosticDescriptor Rule
@@ -44,36 +42,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
         {
             var invocation = (InvocationExpressionSyntax)nodeAnalysisContext.Node;
 
-            var semanticModel = nodeAnalysisContext.SemanticModel;
-
-            // Resolve the method symbol for the invocation
-            var methodSymbol = semanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
-
-            if (methodSymbol == null)
+            if (!invocation.TryGetLoggerMethodSymbol(nodeAnalysisContext.SemanticModel, out var methodSymbol))
             {
                 return;
             }
 
-            var receiverType = methodSymbol.ReceiverType;
-            // Check if the method is called on a type that is, or implements, Microsoft.Extensions.Logging.ILogger
-            if (!receiverType.IsOrImplementsInterface(LoggerTypeName))
+            if (!invocation.TryGetNamedParameterArgument(methodSymbol, LoggerMessageParameterName, out var messageArgument))
             {
                 return;
             }
 
-            // Find the paramIndex where the parameter is called 'message'
-            var paramIndex = invocation.FindParameterIndex(LoggerMessageParameterName, methodSymbol);
-
-            if (paramIndex == -1)
-            {
-                return;
-            }
-
-            var messageArgument = invocation.ArgumentList.Arguments[paramIndex];
             var messageParameterValue = messageArgument.ToString();
-
-            var isInterpolated = messageArgument.Expression is InterpolatedStringExpressionSyntax;
-            var pattern = isInterpolated ? InvalidNamedPropertyPatternInterpolated : InvalidNamedPropertyPattern;
+            var pattern = messageArgument.Expression is InterpolatedStringExpressionSyntax
+                ? InvalidNamedPropertyPatternInterpolated
+                : InvalidNamedPropertyPattern;
 
             // Use regex to find all named properties in the message template that do not follow PascalCase
             var invalidNamedProperties = Regex.Matches(messageParameterValue, pattern);
@@ -81,12 +63,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
             foreach (Match namedProperty in invalidNamedProperties)
             {
                 var propertyName = namedProperty.Groups[1].Value;
-
-                // Set the diagnostic location to the position of the named property with the correct row and column
-                var matchStart = messageArgument.SpanStart + namedProperty.Index;
-                var matchSpan = new TextSpan(matchStart, namedProperty.Length);
-                var location = Location.Create(nodeAnalysisContext.Node.SyntaxTree, matchSpan);
-
+                var location = messageArgument.CreateMatchLocation(nodeAnalysisContext.Node.SyntaxTree, namedProperty);
                 var diagnostic = Diagnostic.Create(Rule, location, propertyName);
                 nodeAnalysisContext.ReportDiagnostic(diagnostic);
             }

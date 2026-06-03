@@ -74,7 +74,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
                 return true;
             }
 
-            return invocation.HasExplicitlyNamedParameter(ReasonParameterName, paramIndex);
+            return invocation.HasParameter(ReasonParameterName, paramIndex);
         }
 
         /// <inheritdoc />

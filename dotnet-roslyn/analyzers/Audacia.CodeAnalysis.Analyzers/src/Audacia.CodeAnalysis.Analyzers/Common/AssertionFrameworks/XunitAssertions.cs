@@ -93,7 +93,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks
                 return false;
             }
 
-            return invocation.HasExplicitlyNamedParameter(parameterName, paramIndex);
+            return invocation.HasParameter(parameterName, paramIndex);
         }
 
         private static bool IsAssertMultipleCall(InvocationExpressionSyntax invocation)

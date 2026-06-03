@@ -271,6 +271,30 @@ class CustomLogger : ILogger
         }
 
         [TestMethod]
+        public void No_Diagnostics_When_Using_Arguments_Out_Of_Position()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+    
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        var x = 1 + 2;
+        logger.LogInformation(args: new []{ x }, message: ""Message: {CalculatedValue}"");
+    }
+}";
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
         public void Diagnostics_When_Log_Message_Uses_Positional_Properties()
         {
             var test = @"
@@ -500,6 +524,31 @@ class ClassName
             var expectedFour = BuildExpectedResult(17, 62, "Value!Four");
 
             VerifyDiagnostic(test, expectedOne, expectedTwo, expectedThree, expectedFour);
+        }
+
+        [TestMethod]
+        public void Diagnostics_When_Using_Arguments_Out_Of_Position()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+    
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+
+        var x = 1 + 2;
+        logger.LogInformation(args: new []{ x }, message: ""Message: {calculatedValue}"");
+    }
+}";
+            var expected = BuildExpectedResult(16, 69, "calculatedValue");
+            VerifyDiagnostic(test, expected);
         }
     }
 }

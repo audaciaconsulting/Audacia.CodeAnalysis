@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using Audacia.CodeAnalysis.Analyzers.Common.AssertionFrameworks;
 
 namespace Audacia.CodeAnalysis.Analyzers.Extensions
@@ -18,6 +20,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
             new FluentAssertions(),
             new ShouldlyAssertions()
         };
+
+        // The fully qualified name of the ILogger interface, used to identify logger method invocations.
+        private const string LoggerTypeName = "Microsoft.Extensions.Logging.ILogger";
 
         /// <summary>
         /// Checks whether the given <paramref name="statementSyntax"/> represents an argument null check,
@@ -442,21 +447,112 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         /// <remarks>This method first checks for an explicitly named argument matching the provided
         /// parameter name. If no such argument is found, it checks whether an argument is supplied at the specified
         /// parameter index, treating it as a positional argument.</remarks>
-        internal static bool HasExplicitlyNamedParameter(this InvocationExpressionSyntax invocation, string parameterName, int parameterIndex)
+        internal static bool HasParameter(this InvocationExpressionSyntax invocation, string parameterName, int parameterIndex)
+        {
+            if (invocation.TryGetExplicitlyNamedParameter(parameterName, out _))
+            {
+                return true;
+            }
+
+            // Fall back to positional: the caller supplied an argument at the parameter's position.
+            return invocation.ArgumentList.Arguments.Count > parameterIndex;
+        }
+
+        /// <summary>
+        /// Tries to find an argument in the given <paramref name="invocation"/> that is explicitly named for the specified <paramref name="parameterName"/>.
+        /// </summary>
+        /// <returns>
+        /// <see cref="true"/> and a non-null <paramref name="argument"/> when an explicitly named argument is found; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool TryGetExplicitlyNamedParameter(this InvocationExpressionSyntax invocation, string parameterName, out ArgumentSyntax argument)
         {
             var arguments = invocation.ArgumentList.Arguments;
+            argument = null;
 
             foreach (var arg in arguments)
             {
                 if (arg.NameColon != null &&
                     string.Equals(arg.NameColon.Name.Identifier.ValueText, parameterName, StringComparison.Ordinal))
                 {
+                    argument = arg;
                     return true;
                 }
             }
 
-            // Fall back to positional: the caller supplied an argument at the parameter's position.
-            return arguments.Count > parameterIndex;
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to resolve the method symbol for <paramref name="invocation"/> and verifies that its
+        /// receiver is, or implements, <c>Microsoft.Extensions.Logging.ILogger</c>.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> and a non-null <paramref name="methodSymbol"/> when the invocation
+        /// targets a logger method; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool TryGetLoggerMethodSymbol(
+            this InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel,
+            out IMethodSymbol methodSymbol)
+        {
+            methodSymbol = semanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
+
+            if (methodSymbol == null)
+            {
+                return false;
+            }
+
+            return methodSymbol.ReceiverType.IsOrImplementsInterface(LoggerTypeName);
+        }
+
+        /// <summary>
+        /// Tries to find the argument corresponding to the parameter named <paramref name="parameterName"/>
+        /// in <paramref name="invocation"/>.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> and a non-null <paramref name="argument"/> when the parameter is
+        /// found; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool TryGetNamedParameterArgument(
+            this InvocationExpressionSyntax invocation,
+            IMethodSymbol methodSymbol,
+            string parameterName,
+            out ArgumentSyntax argument)
+        {
+            argument = null;
+
+            if (invocation.TryGetExplicitlyNamedParameter(parameterName, out argument))
+            {
+                return true;
+            }
+
+            var paramIndex = invocation.FindParameterIndex(parameterName, methodSymbol);
+            if (paramIndex == -1 || invocation.ArgumentList.Arguments.Count <= paramIndex)
+            {
+                return false;
+            }
+
+            var candidate = invocation.ArgumentList.Arguments[paramIndex];
+            // If this is a named argument, we can't safely treat it as positional.
+            if (candidate.NameColon != null)
+            {
+                return false;
+            }
+
+            argument = candidate;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Location"/> that spans the regex <paramref name="match"/> within
+        /// the source text of <paramref name="argument"/>.
+        /// </summary>
+        internal static Location CreateMatchLocation(this ArgumentSyntax argument, SyntaxTree syntaxTree, Match match)
+        {
+            var matchStart = argument.SpanStart + match.Index;
+            var matchSpan = new TextSpan(matchStart, match.Length);
+            return Location.Create(syntaxTree, matchSpan);
         }
     }
 }

@@ -1328,3 +1328,40 @@ Code without diagnostic:
     _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{TargetUserId}}", userId, targetUserId);
     _logger.LogInformation("UserId: {UserId:N0} and {TargetUserId:c}", userId, targetUserId);
 ```
+
+## ACL1025 - Exceptions should not be used in log message templates
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1025 checks if exceptions are included in log message templates and will produce a warning if so.
+Exceptions should be passed as the 'exception' parameter to the log method rather than included in the message template.
+
+All log methods from `Microsoft.Extensions.Logging` are supported.
+
+Code with diagnostic:
+```csharp
+    var anError = new System.ArgumentException("This is an error");
+
+    _logger.LogInformation("Error: {Error}", anError);
+    _logger.LogInformation("Error occurred for user {UserId}: {Error}", userId, anError);
+    _logger.LogInformation("Error: {@Error}", anError);
+    _logger.LogInformation(args: [new System.Exception()], message: "Error: {Error}");
+```
+
+Code without diagnostic:
+```csharp
+    var anError = new System.ArgumentException("This is an error");
+
+    _logger.LogInformation(anError, "An error occurred");
+    _logger.LogInformation(anError, "An error occurred for user {UserId}", userId);
+    _logger.LogInformation(exception: [new System.Exception()], message: "An error occurred");
+```
