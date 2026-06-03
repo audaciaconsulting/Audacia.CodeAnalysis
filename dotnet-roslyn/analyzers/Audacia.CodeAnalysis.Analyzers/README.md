@@ -1271,14 +1271,13 @@ Some examples of common conventions and their regex patterns are as follows:
 ACL1023 checks if named properties within log messages are in PascalCase and will produce a warning if not.
 It also supports Serilog's destructuring operator (@), and will ignore this when checking the case of the property name.
 
-Positional properties will trigger a diagnostic as named properties should always be used.
+Positional properties will not trigger a diagnostic as ACL1026 handles these separately.
 
 All log methods from `Microsoft.Extensions.Logging` are supported.
 
 Code with diagnostic:
 ```csharp
     _logger.LogInformation("User {userId} logged in with IP {ip_address}", userId, ipAddress);
-    _logger.LogInformation("User {0} logged in with IP {1}", userId, ipAddress);
     _logger.LogInformation("User {@user} performed an action", user);
     _logger.LogInformation("{{UserId}}: {userId}", userId);
     _logger.LogInformation($"{{{{UserId}}}}: {{userId}}", userId);
@@ -1288,6 +1287,7 @@ Code with diagnostic:
 Code without diagnostic:
 ```csharp
     _logger.LogInformation("User {UserId} logged in with IP {IpAddress}", userId, ipAddress);
+    _logger.LogInformation("User {0} logged in with IP {1}", userId, ipAddress);
     _logger.LogInformation("User {@User} performed an action", user);
     _logger.LogInformation("{{UserId}}: {UserId}", userId);
     _logger.LogInformation($"{{{{UserId}}}}: {{UserId}}", userId);
@@ -1364,4 +1364,37 @@ Code without diagnostic:
     _logger.LogInformation(anError, "An error occurred");
     _logger.LogInformation(anError, "An error occurred for user {UserId}", userId);
     _logger.LogInformation(exception: [new System.Exception()], message: "An error occurred");
+```
+
+## ACL1026 - Named properties should be used in logging messages
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1026 checks whether positional properties are used within logging message templates and will produce a warning if so.
+
+All log methods from `Microsoft.Extensions.Logging` are supported.
+
+Code with diagnostic:
+```csharp
+    _logger.LogInformation("Message: {0}", message);
+    _logger.LogInformation("Message: {@0}", message);
+    _logger.LogInformation("Amount: {0:c}", amount);
+    _logger.LogInformation("Message: {0} Info: {1}", message, info);
+    _logger.LogInformation("Message: {Message} Info: {0}", message, info);
+```
+
+Code without diagnostic:
+```csharp
+    _logger.LogInformation("Message: {Message}", message);
+    _logger.LogInformation("Amount: {Amount:c}", amount);
+    _logger.LogInformation("Message: {Message} Info: {Info}", message, info);
 ```

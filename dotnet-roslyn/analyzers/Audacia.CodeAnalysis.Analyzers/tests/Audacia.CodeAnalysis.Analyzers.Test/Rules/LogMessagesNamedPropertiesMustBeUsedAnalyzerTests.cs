@@ -1,23 +1,21 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalCase;
+using Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesMustBeUsed;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
-using System;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 {
     [TestClass]
-    public class LogMessagesNamedPropertiesPascalCaseAnalyzerTests : DiagnosticVerifier
+    public class LogMessagesNamedPropertiesMustBeUsedAnalyzerTests : DiagnosticVerifier
     {
         private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string propertyName)
         {
             return new DiagnosticResult
             {
-                Id = LogMessagesNamedPropertiesPascalCaseAnalyzer.Id,
-                Message = $"Log message property '{propertyName}' does not use PascalCase",
+                Id = LogMessagesNamedPropertiesMustBeUsedAnalyzer.Id,
+                Message = $"Log message property '{propertyName}' is a positional parameter",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [
@@ -28,7 +26,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new LogMessagesNamedPropertiesPascalCaseAnalyzer();
+            return new LogMessagesNamedPropertiesMustBeUsedAnalyzer();
         }
 
         [TestMethod]
@@ -36,7 +34,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         {
             var test = @"
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
@@ -52,13 +49,11 @@ class ClassName
         {
             var test = @"
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
     {
     }
-
     private void Method()
     {
         var x = 1 + 2;
@@ -71,15 +66,20 @@ class ClassName
         [TestMethod]
         [DataRow("CalculatedValue")]
         [DataRow("@CalculatedValue")]
+        [DataRow("calculated_value")]
+        [DataRow("calculated-value")]
+        [DataRow("CalculatedValue1")]
         [DataRow("CLCValue")]
-        [DataRow("X")]
+        [DataRow("x")]
+        [DataRow("0calculatedValue")]
+        [DataRow("0calculatedValue:N0")]
+        [DataRow("Calculated:c")]
         [DataRow("")]
-        public void No_Diagnostics_When_Log_Message_Properties_Pascal_Case(string propertyName)
+        public void No_Diagnostics_When_Log_Message_Properties_Not_Positional(string propertyName)
         {
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
@@ -89,21 +89,19 @@ class ClassName
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation(""Calculated value: {" + propertyName + @"}"", x);
+        logger.LogInformation(""123: {" + propertyName + @"}"", x);
     }
 }";
             VerifyNoDiagnostic(test);
         }
 
         [TestMethod]
-        public void No_Diagnostics_When_Log_Message_Properties_Pascal_Case_With_Escaped_Braces()
+        public void No_Diagnostics_When_Log_Message_Properties_Not_Positional_With_Escaped_Braces()
         {
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
@@ -113,21 +111,27 @@ class ClassName
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation(""{{Calculated value}}: {CalculatedValue}"", x);
+        logger.LogInformation(""{{123}}: {CalculatedValue}"", x);
     }
 }";
             VerifyNoDiagnostic(test);
         }
 
         [TestMethod]
-        public void No_Diagnostics_When_Log_Message_Properties_Pascal_Case_With_Interpolated_Placeholders()
+        [DataRow("CalculatedValue")]
+        [DataRow("@CalculatedValue")]
+        [DataRow("CLCValue")]
+        [DataRow("x")]
+        [DataRow("0calculatedValue")]
+        [DataRow("0calculatedValue:N0")]
+        [DataRow("Calculated:c")]
+        [DataRow("")]
+        public void No_Diagnostics_When_Log_Message_Properties_Not_Positional_With_Interpolated_Placeholders(string propertyName)
         {
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
@@ -137,35 +141,8 @@ class ClassName
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation($""{{{{Calculated value}}}}: {{CalculatedValue}}"", x);
-    }
-}";
-            VerifyNoDiagnostic(test);
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_When_Log_Message_Properties_Pascal_Case_With_Formatting()
-        {
-            var test = @"
-using System;
-using Microsoft.Extensions.Logging;
-namespace ConsoleApplication;
-
-class ClassName
-{
-    static void Main(string[] args)
-    {
-    }
-    
-    private void Method()
-    {
-        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
-        var x = 1 + 2;
-        logger.LogInformation(""Calculated value: {CalculatedValue:N0}"", x);
-        logger.LogInformation(""Date: {DateNow:MMMM dd, yyyy}"", DateTime.UtcNow);
+        logger.LogInformation($""{{{{123}}}}: {{" + propertyName + @"}}"", x);
     }
 }";
             VerifyNoDiagnostic(test);
@@ -177,7 +154,6 @@ class ClassName
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
@@ -187,12 +163,10 @@ class ClassName
     private void Method()
     {
         var logger = new CustomLogger();
-
         var x = 1 + 2;
         logger.LogInformation(""Calculated value: {calculatedValue}"", x);
     }
 }
-
 class CustomLogger
 {
     public void LogInformation(string message, params object[] args)
@@ -204,62 +178,24 @@ class CustomLogger
         }
 
         [TestMethod]
-        public void Diagnostic_When_Log_Method_Called_On_Type_Implementing_ILogger()
+        public void No_Diagnostics_When_Log_Method_Called_On_Type_Implementing_ILogger_With_No_Positional_Properties()
         {
             var test = @"
 using System;
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
     {
     }
-
     private void Method()
     {
         ILogger logger = new CustomLogger();
-
         var x = 1 + 2;
-        logger.LogInformation(""Calculated value: {calculatedValue}"", x);
+        logger.LogInformation(""123: {CalculatedValue}"", x);
     }
 }
-
-class CustomLogger : ILogger
-{
-    public IDisposable BeginScope<TState>(TState state) => null;
-    public bool IsEnabled(LogLevel logLevel) => true;
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) { }
-}";
-
-            var expected = BuildExpectedResult(17, 50, "calculatedValue");
-            VerifyDiagnostic(test, expected);
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_When_Log_Method_Called_On_Type_Implementing_ILogger_With_Pascal_Case()
-        {
-            var test = @"
-using System;
-using Microsoft.Extensions.Logging;
-namespace ConsoleApplication;
-
-class ClassName
-{
-    static void Main(string[] args)
-    {
-    }
-
-    private void Method()
-    {
-        ILogger logger = new CustomLogger();
-
-        var x = 1 + 2;
-        logger.LogInformation(""Calculated value: {CalculatedValue}"", x);
-    }
-}
-
 class CustomLogger : ILogger
 {
     public IDisposable BeginScope<TState>(TState state) => null;
@@ -276,7 +212,6 @@ class CustomLogger : ILogger
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
@@ -286,81 +221,77 @@ class ClassName
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation(args: new []{ x }, message: ""Message: {CalculatedValue}"");
+        logger.LogInformation(args: new []{ x }, message: ""Message: {Value}"");
     }
 }";
             VerifyNoDiagnostic(test);
         }
 
         [TestMethod]
-        public void No_Diagnostics_When_Log_Message_Uses_Positional_Properties()
+        public void Diagnostic_When_Log_Method_Called_On_Type_Implementing_ILogger()
         {
             var test = @"
+using System;
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
     {
     }
-    
     private void Method()
     {
-        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
+        ILogger logger = new CustomLogger();
         var x = 1 + 2;
-        var y = x + 3;
-        logger.LogInformation(""Calculated value: {0} {1:N0}"", x, y);
+        logger.LogInformation(""Calculated value: {0}"", x);
     }
+}
+class CustomLogger : ILogger
+{
+    public IDisposable BeginScope<TState>(TState state) => null;
+    public bool IsEnabled(LogLevel logLevel) => true;
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) { }
 }";
 
-            VerifyNoDiagnostic(test);
+            var expected = BuildExpectedResult(14, 50, "0");
+            VerifyDiagnostic(test, expected);
         }
 
         [TestMethod]
-        [DataRow("calculatedValue")]
-        [DataRow("@calculatedValue")]
-        [DataRow("calculated-value")]
-        [DataRow("Calculated_Value")]
-        [DataRow("Calculated!Value")]
-        [DataRow("x")]
-        [DataRow(" CalculatedValue ")]
-        [DataRow("1CalculatedValue")]
-        public void Diagnostic_When_Log_Message_Property_Not_Pascal_Case(string propertyName)
+        [DataRow("0")]
+        [DataRow("@0")]
+        [DataRow("123")]
+        [DataRow("0:c")]
+        [DataRow("0:N0")]
+        public void Diagnostic_When_Log_Message_Uses_Positional_Property(string propertyName)
         {
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
     {
     }
-
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
         logger.LogInformation(""Calculated value: {" + propertyName + @"}"", x);
     }
 }";
 
-            var expected = BuildExpectedResult(16, 50, propertyName);
+            var expected = BuildExpectedResult(13, 50, propertyName);
             VerifyDiagnostic(test, expected);
         }
 
         [TestMethod]
-        public void Diagnostics_When_Log_Message_Properties_Not_Pascal_Case_With_Escaped_Braces()
+        public void Diagnostics_When_Log_Message_Uses_Positional_Property_With_Escaped_Braces()
         {
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
@@ -370,37 +301,39 @@ class ClassName
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation(""{{Calculated value}}: {calculatedValue}"", x);
+        logger.LogInformation(""{{Calculated value}}: {0}"", x);
     }
 }";
-            var expected = BuildExpectedResult(16, 54, "calculatedValue");
+            var expected = BuildExpectedResult(14, 54, "0");
             VerifyDiagnostic(test, expected);
         }
 
         [TestMethod]
-        public void Diagnostics_When_Log_Message_Properties_Not_Pascal_Case_With_Interpolated_Placeholders()
+        [DataRow("0")]
+        [DataRow("@0")]
+        [DataRow("123")]
+        [DataRow("0:c")]
+        [DataRow("0:N0")]
+        public void Diagnostic_When_Log_Message_Uses_Positional_Property_With_Interpolated_Placeholders(string propertyName)
         {
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
     {
     }
-    
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation($""{{{{Calculated value}}}}: {{calculatedValue}}"", x);
+        logger.LogInformation($""{{{{Calculated value}}}}: {{" + propertyName + @"}}"", x);
     }
 }";
-            var expected = BuildExpectedResult(16, 59, "calculatedValue");
+
+            var expected = BuildExpectedResult(13, 59, propertyName);
             VerifyDiagnostic(test, expected);
         }
 
@@ -445,84 +378,75 @@ class ClassName
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
     {
     }
-
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger." + overloadPrefix + @"""Calculated value: {calculatedValue}"", x);
+        logger." + overloadPrefix + @"""Calculated value: {0}"", x);
     }
 }";
-            var logger = (new LoggerFactory()).CreateLogger<LogMessagesNamedPropertiesPascalCaseAnalyzerTests>();
 
-
-            var expected = BuildExpectedResult(16, 35 + overloadPrefix.Length, "calculatedValue");
+            var expected = BuildExpectedResult(13, 35 + overloadPrefix.Length, "0");
             VerifyDiagnostic(test, expected);
         }
 
+
         [TestMethod]
-        public void Multiple_Diagnostics_When_Log_Message_Properties_Not_Pascal_Case()
+        public void Multiple_Diagnostics_When_Log_Message_Properties_Are_Positional()
         {
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
     {
     }
-
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation(""Calculated value: {valueOne} and {Value_Two}"", x);
+        var y = x + 3;
+        logger.LogInformation(""Calculated value: {0} and {1}"", x, y);
     }
 }";
 
-            var expectedOne = BuildExpectedResult(16, 50, "valueOne");
-            var expectedTwo = BuildExpectedResult(16, 65, "Value_Two");
+            var expectedOne = BuildExpectedResult(14, 50, "0");
+            var expectedTwo = BuildExpectedResult(14, 58, "1");
             VerifyDiagnostic(test, expectedOne, expectedTwo);
         }
 
         [TestMethod]
-        public void Multiple_Diagnostics_When_Multiple_Log_Message_Properties_Not_Pascal_Case()
+        public void Multiple_Diagnostics_When_Multiple_Log_Message_Properties_Are_Positional()
         {
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
     {
     }
-
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation(""Calculated value: {valueOne} and {Value_Two}"", x);
-        logger.LogDebug(""Calculated value: {value-three} and {Value!Four}"", x);
+        var y = x + 3;
+        logger.LogInformation(""Calculated value: {0} and {1}"", x, y);
+        logger.LogDebug(""Calculated value: {value} and {0}"", x, y);
     }
 }";
 
-            var expectedOne = BuildExpectedResult(16, 50, "valueOne");
-            var expectedTwo = BuildExpectedResult(16, 65, "Value_Two");
-            var expectedThree = BuildExpectedResult(17, 44, "value-three");
-            var expectedFour = BuildExpectedResult(17, 62, "Value!Four");
+            var expectedOne = BuildExpectedResult(14, 50, "0");
+            var expectedTwo = BuildExpectedResult(14, 58, "1");
+            var expectedThree = BuildExpectedResult(15, 56, "0");
 
-            VerifyDiagnostic(test, expectedOne, expectedTwo, expectedThree, expectedFour);
+            VerifyDiagnostic(test, expectedOne, expectedTwo, expectedThree);
         }
 
         [TestMethod]
@@ -531,7 +455,6 @@ class ClassName
             var test = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication;
-
 class ClassName
 {
     static void Main(string[] args)
@@ -541,12 +464,11 @@ class ClassName
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
-
         var x = 1 + 2;
-        logger.LogInformation(args: new []{ x }, message: ""Message: {calculatedValue}"");
+        logger.LogInformation(args: new []{ x }, message: ""Message: {0}"");
     }
 }";
-            var expected = BuildExpectedResult(16, 69, "calculatedValue");
+            var expected = BuildExpectedResult(14, 69, "0");
             VerifyDiagnostic(test, expected);
         }
     }
