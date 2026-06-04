@@ -546,13 +546,48 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
 
         /// <summary>
         /// Creates a <see cref="Location"/> that spans the regex <paramref name="match"/> within
-        /// the source text of <paramref name="argument"/>.
+        /// the source text of <paramref name="expression"/>.
         /// </summary>
-        internal static Location CreateMatchLocation(this ArgumentSyntax argument, SyntaxTree syntaxTree, Match match)
+        internal static Location CreateMatchLocation(this ExpressionSyntax expression, SyntaxTree syntaxTree, Match match)
         {
-            var matchStart = argument.SpanStart + match.Index;
+            var matchStart = expression.SpanStart + match.Index;
             var matchSpan = new TextSpan(matchStart, match.Length);
             return Location.Create(syntaxTree, matchSpan);
+        }
+
+        /// <summary>
+        /// If <paramref name="expression"/> is a reference to a local variable initialised with a
+        /// string or interpolated-string literal, sets <paramref name="resolvedExpression"/> to that
+        /// literal and returns <see langword="true"/>; otherwise returns <see langword="false"/>.
+        /// </summary>
+        internal static bool TryResolveToStringLiteral(
+            this ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            out ExpressionSyntax resolvedExpression)
+        {
+            resolvedExpression = null;
+
+            if (!(expression is IdentifierNameSyntax))
+            {
+                return false;
+            }
+
+            var symbol = semanticModel.GetSymbolInfo(expression).Symbol as ILocalSymbol;
+            if (symbol == null)
+            {
+                return false;
+            }
+
+            var declarator = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as VariableDeclaratorSyntax;
+
+            var initValue = declarator?.Initializer?.Value;
+            if (initValue is LiteralExpressionSyntax || initValue is InterpolatedStringExpressionSyntax)
+            {
+                resolvedExpression = initValue;
+                return true;
+            }
+
+            return false;
         }
     }
 }
