@@ -18,12 +18,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
         private const string MessageFormat = "Log message property '{0}' does not use PascalCase";
         private const string Description = "When using log message named properties, ensure they are in PascalCase.";
 
-        private const string InvalidNamedPropertyPattern = @"(?<!\{)\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])([^{}:]+)[^{}]*\}(?!\})";
+        private const string InvalidNamedPropertyPattern = @"(?<!\{)\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])(?'propertyName'[^{}:]+)[^{}]*\}(?!\})";
 
         // In interpolated strings, log template placeholders are double-braced in source: {{Name}} => {Name} at runtime.
         // This pattern matches {{name}} but not {{{{...}}}} (which are escaped literal braces).
-        private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])([^{}:]+)[^{}]*\}\}(?!\})";
-
+        private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])(?'propertyName'[^{}:]+)[^{}]*\}\}(?!\})";
         private const string LoggerMessageParameterName = "message";
 
         private static readonly DiagnosticDescriptor Rule
@@ -52,8 +51,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
                 return;
             }
 
-            var messageParameterValue = messageArgument.ToString();
-            var pattern = messageArgument.Expression is InterpolatedStringExpressionSyntax
+            // If the argument is a local variable, try to resolve it back to its initializer string literal.
+            var messageExpression = messageArgument.Expression.TryResolveToStringLiteral(nodeAnalysisContext.SemanticModel, out var resolvedExpression)
+                ? resolvedExpression
+                : messageArgument.Expression;
+
+            var messageParameterValue = messageExpression.ToString();
+            var pattern = messageExpression is InterpolatedStringExpressionSyntax
                 ? InvalidNamedPropertyPatternInterpolated
                 : InvalidNamedPropertyPattern;
 
@@ -62,8 +66,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalC
 
             foreach (Match namedProperty in invalidNamedProperties)
             {
-                var propertyName = namedProperty.Groups[1].Value;
-                var location = messageArgument.CreateMatchLocation(nodeAnalysisContext.Node.SyntaxTree, namedProperty);
+                var propertyName = namedProperty.Groups["propertyName"].Value;
+                var location = messageExpression.CreateMatchLocation(messageExpression.SyntaxTree, namedProperty);
                 var diagnostic = Diagnostic.Create(Rule, location, propertyName);
                 nodeAnalysisContext.ReportDiagnostic(diagnostic);
             }

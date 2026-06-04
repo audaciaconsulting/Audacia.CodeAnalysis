@@ -565,7 +565,7 @@ class ClassName
     static void Main(string[] args)
     {
     }
-    
+
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
@@ -577,6 +577,31 @@ class ClassName
     }
 }";
             var expected = BuildExpectedResult(18, 84, "Value");
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_When_Log_Message_Is_Variable_With_Duplicate_Property()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+        var x = 1 + 2;
+        var message = ""Calculated value: {Value} and {Value}"";
+        logger.LogInformation(message, x, x);
+    }
+}";
+            var expected = BuildExpectedResult(15, 54, "Value");
             VerifyDiagnostic(test, expected);
         }
     }

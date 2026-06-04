@@ -1282,6 +1282,10 @@ Code with diagnostic:
     _logger.LogInformation("{{UserId}}: {userId}", userId);
     _logger.LogInformation($"{{{{UserId}}}}: {{userId}}", userId);
     _logger.LogInformation("UserId: {userId:N0}", userId);
+
+    // Variables storing the message template are also checked
+    var message = "User {userId} logged in";
+    _logger.LogInformation(message, userId);
 ```
 
 Code without diagnostic:
@@ -1292,6 +1296,10 @@ Code without diagnostic:
     _logger.LogInformation("{{UserId}}: {UserId}", userId);
     _logger.LogInformation($"{{{{UserId}}}}: {{UserId}}", userId);
     _logger.LogInformation("UserId: {UserId:N0}", userId);
+
+    // Variables storing the message template are also checked
+    var message = "User {UserId} logged in";
+    _logger.LogInformation(message, userId);
 ```
 
 ## ACL1024 - Named properties within log messages should not be duplicated
@@ -1318,6 +1326,10 @@ Code with diagnostic:
     _logger.LogInformation("{{UserId}}: {UserId} and {UserId}", userId, targetUserId);
     _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{UserId}}", userId, targetUserId);
     _logger.LogInformation("UserId: {UserId:N0} and {UserId:c}", userId, targetUserId);
+
+    // Variables storing the message template are also checked
+    var message = "User {UserId} logged in with IP {UserId}";
+    _logger.LogInformation(message, userId, ipAddress);
 ```
 
 Code without diagnostic:
@@ -1327,6 +1339,10 @@ Code without diagnostic:
     _logger.LogInformation("{{UserId}}: {UserId} and {TargetUserId}", userId, targetUserId);
     _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{TargetUserId}}", userId, targetUserId);
     _logger.LogInformation("UserId: {UserId:N0} and {TargetUserId:c}", userId, targetUserId);
+
+    // Variables storing the message template are also checked
+    var message = "User {UserId} logged in with IP {IpAddress}";
+    _logger.LogInformation(message, userId, ipAddress);
 ```
 
 ## ACL1025 - Exceptions should not be used in log message templates
@@ -1390,6 +1406,10 @@ Code with diagnostic:
     _logger.LogInformation("Amount: {0:c}", amount);
     _logger.LogInformation("Message: {0} Info: {1}", message, info);
     _logger.LogInformation("Message: {Message} Info: {0}", message, info);
+
+    // Variables storing the message template are also checked
+    var template = "Message: {0}";
+    _logger.LogInformation(template, message);
 ```
 
 Code without diagnostic:
@@ -1397,4 +1417,8 @@ Code without diagnostic:
     _logger.LogInformation("Message: {Message}", message);
     _logger.LogInformation("Amount: {Amount:c}", amount);
     _logger.LogInformation("Message: {Message} Info: {Info}", message, info);
+
+    // Variables storing the message template are also checked
+    var template = "Message: {Message}";
+    _logger.LogInformation(template, message);
 ```

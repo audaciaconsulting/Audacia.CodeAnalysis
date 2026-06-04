@@ -18,9 +18,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesMustBeU
         private const string MessageFormat = "Log message property '{0}' is a positional parameter";
         private const string Description = "Do not use positional parameters in log message templates. Use named properties instead.";
 
-        private const string InvalidPositionalPropertyPattern = @"(?<!\{)\{(?!\{)(@?\d+(?=[}:,])[^{}]*)\}(?!\})";
+        private const string InvalidPositionalPropertyPattern = @"(?<!\{)\{(?!\{)(?'propertyName'@?\d+(?=[}:,])[^{}]*)\}(?!\})";
 
-        private const string InvalidPositionalPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(@?\d+(?=[}:,])[^{}]*)\}\}(?!\})";
+        private const string InvalidPositionalPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?'propertyName'@?\d+(?=[}:,])[^{}]*)\}\}(?!\})";
 
         private const string LoggerMessageParameterName = "message";
 
@@ -50,8 +50,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesMustBeU
                 return;
             }
 
-            var messageParameterValue = messageArgument.ToString();
-            var pattern = messageArgument.Expression is InterpolatedStringExpressionSyntax
+            // If the argument is a local variable, try to resolve it back to its initializer string literal.
+            var messageExpression = messageArgument.Expression.TryResolveToStringLiteral(nodeAnalysisContext.SemanticModel, out var resolvedExpression)
+                ? resolvedExpression
+                : messageArgument.Expression;
+
+            var messageParameterValue = messageExpression.ToString();
+            var pattern = messageExpression is InterpolatedStringExpressionSyntax
                 ? InvalidPositionalPropertyPatternInterpolated
                 : InvalidPositionalPropertyPattern;
 
@@ -60,8 +65,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesMustBeU
 
             foreach (Match namedProperty in invalidNamedProperties)
             {
-                var propertyName = namedProperty.Groups[1].Value;
-                var location = messageArgument.CreateMatchLocation(nodeAnalysisContext.Node.SyntaxTree, namedProperty);
+                var propertyName = namedProperty.Groups["propertyName"].Value;
+                var location = messageExpression.CreateMatchLocation(messageExpression.SyntaxTree, namedProperty);
                 var diagnostic = Diagnostic.Create(Rule, location, propertyName);
                 nodeAnalysisContext.ReportDiagnostic(diagnostic);
             }

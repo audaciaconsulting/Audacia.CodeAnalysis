@@ -22,11 +22,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoDuplicateParameters
 
         // Matches named (non-positional) log message properties in regular strings, capturing the property name in group 1.
         // Excludes escaped braces ({{...}}) and positional placeholders ({0}, {1:N0}).
-        private const string NamedPropertyPattern = @"(?<!\{)\{(?!\{)(@?\D[^:{}]*)(?:[^{}]*)?\}(?!\})";
+        private const string NamedPropertyPattern = @"(?<!\{)\{(?!\{)(?'propertyName'@?\D[^:{}]*)(?:[^{}]*)?\}(?!\})";
 
         // In interpolated strings, log template placeholders are double-braced in source: {{Name}} => {Name} at runtime.
         // This pattern matches {{name}} but not {{{{...}}}} (which are escaped literal braces).
-        private const string NamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(@?\D[^:{}]*)(?:[^{}]*)?\}\}(?!\})";
+        private const string NamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?'propertyName'@?\D[^:{}]*)(?:[^{}]*)?\}\}(?!\})";
 
         private const string LoggerMessageParameterName = "message";
 
@@ -56,8 +56,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoDuplicateParameters
                 return;
             }
 
-            var messageParameterValue = messageArgument.ToString();
-            var pattern = messageArgument.Expression is InterpolatedStringExpressionSyntax
+            // If the argument is a local variable, try to resolve it back to its initializer string literal.
+            var messageExpression = messageArgument.Expression.TryResolveToStringLiteral(nodeAnalysisContext.SemanticModel, out var resolvedExpression)
+                ? resolvedExpression
+                : messageArgument.Expression;
+
+            var messageParameterValue = messageExpression.ToString();
+            var pattern = messageExpression is InterpolatedStringExpressionSyntax
                 ? NamedPropertyPatternInterpolated
                 : NamedPropertyPattern;
 
@@ -69,11 +74,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoDuplicateParameters
 
             foreach (Match namedProperty in allNamedProperties)
             {
-                var propertyName = namedProperty.Groups[1].Value;
+                var propertyName = namedProperty.Groups["propertyName"].Value;
 
                 if (!seenNames.Add(propertyName))
                 {
-                    var location = messageArgument.CreateMatchLocation(nodeAnalysisContext.Node.SyntaxTree, namedProperty);
+                    var location = messageExpression.CreateMatchLocation(messageExpression.SyntaxTree, namedProperty);
                     nodeAnalysisContext.ReportDiagnostic(Diagnostic.Create(Rule, location, propertyName));
                 }
             }

@@ -537,7 +537,7 @@ class ClassName
     static void Main(string[] args)
     {
     }
-    
+
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
@@ -547,6 +547,31 @@ class ClassName
     }
 }";
             var expected = BuildExpectedResult(16, 69, "calculatedValue");
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_When_Log_Message_Is_Variable_With_Non_PascalCase_Property()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+        var x = 1 + 2;
+        var message = ""Calculated value: {calculatedValue}"";
+        logger.LogInformation(message, x);
+    }
+}";
+            var expected = BuildExpectedResult(15, 42, "calculatedValue");
             VerifyDiagnostic(test, expected);
         }
     }

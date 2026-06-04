@@ -460,7 +460,7 @@ class ClassName
     static void Main(string[] args)
     {
     }
-    
+
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
@@ -469,6 +469,101 @@ class ClassName
     }
 }";
             var expected = BuildExpectedResult(14, 69, "0");
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_When_Log_Message_Uses_Positional_Property_In_Interpolated_String_With_Mixed_Content()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+        var x = 1 + 2;
+        logger.LogInformation($""Calculated value: {{0}} for {x}"", x);
+    }
+}";
+            var expected = BuildExpectedResult(14, 51, "0");
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_When_Log_Message_Is_Variable_With_Positional_Property()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+        var x = 1 + 2;
+        var message = ""Calculated value: {0}"";
+        logger.LogInformation(message, x);
+    }
+}";
+            var expected = BuildExpectedResult(14, 42, "0");
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        [DataRow("0,10")]
+        [DataRow("0,10:N0")]
+        public void Diagnostic_When_Log_Message_Uses_Positional_Property_With_Alignment_Or_Format(string propertyName)
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+        var x = 1 + 2;
+        logger.LogInformation(""Value: {" + propertyName + @"}"", x);
+    }
+}";
+            var expected = BuildExpectedResult(14, 39, propertyName);
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_When_Log_Message_Uses_Positional_Property_With_Named_Args()
+        {
+            var test = @"
+using Microsoft.Extensions.Logging;
+namespace ConsoleApplication;
+class ClassName
+{
+    static void Main(string[] args)
+    {
+    }
+
+    private void Method()
+    {
+        var logger = (new LoggerFactory()).CreateLogger<ClassName>();
+        var x = 1 + 2;
+        logger.LogInformation(message: ""Calculated value: {0}"", args: new[] { x });
+    }
+}";
+            var expected = BuildExpectedResult(14, 59, "0");
             VerifyDiagnostic(test, expected);
         }
     }
