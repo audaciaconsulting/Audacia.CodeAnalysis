@@ -4,7 +4,6 @@
     <Description>This package supports projects operating a minimum version of C# 12 and .NET 8.</Description>
     <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
     <Authors>Audacia</Authors>
-    <Version>1.12.1</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Code analysis packages and rulesets for .NET libraries and apps.</Description>
@@ -24,5 +23,19 @@
 
   <ItemGroup>
     <None Include="../../../package-icon.png" Pack="true" PackagePath="\" />
+
+    <!-- Global config: placed in buildTransitive/ alongside the .props file -->
+    <None Include="Base/Audacia.CodeAnalysis.globalconfig"
+          Pack="true"
+          PackagePath="buildTransitive\" />
+
+    <!-- MSBuild props: auto-imported by NuGet for direct consumers -->
+    <None Include="buildTransitive/Audacia.CodeAnalysis.props"
+          Pack="true"
+          PackagePath="buildTransitive\" />
+
+    <None Include="buildTransitive/Audacia.CodeAnalysis.targets"
+          Pack="true"
+          PackagePath="buildTransitive\" />
   </ItemGroup>
 </Project>

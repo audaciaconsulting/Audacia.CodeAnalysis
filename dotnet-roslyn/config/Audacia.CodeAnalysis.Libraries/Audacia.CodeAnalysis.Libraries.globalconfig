@@ -3,8 +3,8 @@
 # Library rules
 # Description: Ruleset with rule overrides for code libraries
 
-# Code files
-[*.cs]
+is_global = true
+global_level = 3
 
 
 # [DESIGN] Implement standard exception constructors

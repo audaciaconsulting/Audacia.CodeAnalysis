@@ -3,8 +3,8 @@
 # EntityFrameworkCore Rules
 # Description: Ruleset with rule overrides for AspNetCore apps using Entity Framework Core
 
-# Code files
-[*.cs]
+is_global = true
+global_level = 2
 
 # Internal EF Core API usage.
 dotnet_diagnostic.EF1001.severity = warning
