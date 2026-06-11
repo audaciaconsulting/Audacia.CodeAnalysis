@@ -2,6 +2,7 @@
   <Target Name="AddGlobalAnalyzerConfigForPackage_AudaciaCodeAnalysis" BeforeTargets="CoreCompile">
     <ItemGroup>
       <EditorConfigFiles Include="$(MSBuildThisFileDirectory)Audacia.CodeAnalysis.globalconfig" Condition="Exists('$(MSBuildThisFileDirectory)Audacia.CodeAnalysis.globalconfig')" />
+	  <AdditionalFiles Include="$(MSBuildThisFileDirectory)vs-threading.LegacyThreadSwitchingMembers.txt" Condition="Exists('$(MSBuildThisFileDirectory)vs-threading.LegacyThreadSwitchingMembers.txt')" />
     </ItemGroup>
   </Target>
 </Project>

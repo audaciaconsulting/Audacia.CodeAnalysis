@@ -1,0 +1,2 @@
+[System.Windows.Threading.Dispatcher]::Invoke
+[Microsoft.VisualStudio.Shell.ThreadHelper]::Invoke
