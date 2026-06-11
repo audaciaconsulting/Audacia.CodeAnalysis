@@ -1,0 +1,7 @@
+<Project>
+  <Target Name="AddGlobalAnalyzerConfigForPackage_AudaciaCodeAnalysis" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <EditorConfigFiles Include="$(MSBuildThisFileDirectory)Audacia.CodeAnalysis.globalconfig" Condition="Exists('$(MSBuildThisFileDirectory)Audacia.CodeAnalysis.globalconfig')" />
+    </ItemGroup>
+  </Target>
+</Project>

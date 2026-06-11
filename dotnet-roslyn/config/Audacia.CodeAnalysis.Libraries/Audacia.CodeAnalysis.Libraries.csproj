@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <Description>
-            Code analysis packages and rulesets for ASP.NET Core apps.
+            Code analysis packages and rulesets for code libraries.
             This package supports projects operating a minimum version of C# 12 and .NET 8.
         </Description>
         <Authors>Audacia</Authors>
@@ -18,23 +18,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCoreAnalyzers" Version="0.2.0.1-dev" />
-    </ItemGroup>
-
-    <ItemGroup>
         <None Include="../../../package-icon.png" Pack="true" PackagePath="\" />
 
         <!-- Global config: placed in build/ alongside the .props file -->
-        <None Include="Audacia.CodeAnalysis.AspNetCore.globalconfig"
+        <None Include="Audacia.CodeAnalysis.Libraries.globalconfig"
             Pack="true"
             PackagePath="build\" />
 
         <!-- MSBuild props: auto-imported by NuGet for direct consumers -->
-        <None Include="build/Audacia.CodeAnalysis.AspNetCore.props"
+        <None Include="build/Audacia.CodeAnalysis.Libraries.props"
             Pack="true"
             PackagePath="build\" />
 
-        <None Include="build/Audacia.CodeAnalysis.AspNetCore.targets"
+        <None Include="build/Audacia.CodeAnalysis.Libraries.targets"
             Pack="true"
             PackagePath="build\" />
     </ItemGroup>

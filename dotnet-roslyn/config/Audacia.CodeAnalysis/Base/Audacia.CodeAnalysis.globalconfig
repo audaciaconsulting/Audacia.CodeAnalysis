@@ -3,10 +3,8 @@
 # Default Rules
 # Description: CodeAnalysis.ruleset
 
-root = true
-
-# Code files
-[*.cs]
+is_global = true
+global_level = 0
 
 # New files created with file-scoped namespaces
 csharp_style_namespace_declarations = file_scoped
