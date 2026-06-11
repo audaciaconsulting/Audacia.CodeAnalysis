@@ -4,7 +4,7 @@
 
 ### Added
 
-- No new functionality added
+- Added analyzers with default severities from ([Microsoft.VisualStudio.Threading.Analyzers](https://microsoft.github.io/vs-threading/analyzers/index.html))
 
 ### Changed
 

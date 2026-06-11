@@ -17,6 +17,10 @@
     <PackageReference Include="CSharpGuidelinesAnalyzer" Version="3.8.5" />
     <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59" />
     <PackageReference Include="IDisposableAnalyzers" Version="4.0.8" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Roslynator.Analyzers" Version="4.12.10" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
   </ItemGroup>
@@ -25,17 +29,13 @@
     <None Include="../../../package-icon.png" Pack="true" PackagePath="\" />
 
     <!-- Global config: placed in buildTransitive/ alongside the .props file -->
-    <None Include="Base/Audacia.CodeAnalysis.globalconfig"
-          Pack="true"
-          PackagePath="buildTransitive\" />
+    <None Include="Base/Audacia.CodeAnalysis.globalconfig" Pack="true" PackagePath="buildTransitive\" />
 
     <!-- MSBuild props: auto-imported by NuGet for direct consumers -->
-    <None Include="buildTransitive/Audacia.CodeAnalysis.props"
-          Pack="true"
-          PackagePath="buildTransitive\" />
+    <None Include="buildTransitive/Audacia.CodeAnalysis.props" Pack="true" PackagePath="buildTransitive\" />
 
-    <None Include="buildTransitive/Audacia.CodeAnalysis.targets"
-          Pack="true"
-          PackagePath="buildTransitive\" />
+	<None Include="buildTransitive/Audacia.CodeAnalysis.targets" Pack="true" PackagePath="buildTransitive\" />
+
+	<None Include="buildTransitive/vs-threading.LegacyThreadSwitchingMembers.txt" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 </Project>

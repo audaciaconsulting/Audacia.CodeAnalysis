@@ -135,6 +135,11 @@ All rules are prefixed with `DOC`.
 
 All rules are prefixed `EF`.
 
+### Threading Analyzers
+[Microsoft.VisualStudio.Threading.Analyzers](https://microsoft.github.io/vs-threading/analyzers/index.html) provides analyzers for potential issues regarding threading and async coding.
+
+All rules are prefixed with `VSTHRD`.
+
 # Contributing
 
 We welcome contributions! Please feel free to check our [Contribution Guidelines](https://github.com/audaciaconsulting/.github/blob/main/CONTRIBUTING.md) for feature requests, issue reporting and guidelines.

@@ -96,3 +96,6 @@ dotnet_diagnostic.SA1650.severity = warning
 
 # The documentation for the element contains one or more `<placeholder>` elements.
 dotnet_diagnostic.SA1651.severity = warning
+
+# VSTHRD111: Use .ConfigureAwait(bool)
+dotnet_diagnostic.VSTHRD111.severity = warning
