@@ -2809,3 +2809,75 @@ dotnet_diagnostic.IDE1005.severity = warning
 
 # Naming styles
 dotnet_diagnostic.IDE1006.severity = warning
+
+# Avoid legacy thread switching Methods
+dotnet_diagnostic.VSTHRD001.severity = warning
+
+# Avoid problematic synchronous waits
+dotnet_diagnostic.VSTHRD002.severity = warning
+
+# Avoid awaiting foreign Tasks
+dotnet_diagnostic.VSTHRD003.severity = warning
+
+# Await SwitchToMainThreadAsync
+dotnet_diagnostic.VSTHRD004.severity = error
+
+# Invoke single-threaded types on Main thread
+dotnet_diagnostic.VSTHRD010.severity = warning
+
+# Use AsyncLazy<T>
+dotnet_diagnostic.VSTHRD011.severity = error
+
+# Provide JoinableTaskFactory where allowed
+dotnet_diagnostic.VSTHRD012.severity = warning
+
+# Avoid async void methods
+dotnet_diagnostic.VSTHRD100.severity = warning
+
+# Avoid unsupported async delegates
+dotnet_diagnostic.VSTHRD101.severity = warning
+
+# Implement internal logic asynchronously
+dotnet_diagnostic.VSTHRD102.severity = suggestion
+
+# Call async methods when in an async method
+dotnet_diagnostic.VSTHRD103.severity = warning
+
+# Offer async option
+dotnet_diagnostic.VSTHRD104.severity = suggestion
+
+# Avoid method overloads that assume TaskScheduler.Current
+dotnet_diagnostic.VSTHRD105.severity = warning
+
+# Use InvokeAsync to raise async events
+dotnet_diagnostic.VSTHRD106.severity = warning
+
+# Await Task within using expression
+dotnet_diagnostic.VSTHRD107.severity = error
+
+# Assert thread affinity unconditionally
+dotnet_diagnostic.VSTHRD108.severity = warning
+
+# Switch instead of assert in async methods
+dotnet_diagnostic.VSTHRD109.severity = error
+
+# Observe result of async calls
+dotnet_diagnostic.VSTHRD110.severity = warning
+
+# Use .ConfigureAwait(bool)
+dotnet_diagnostic.VSTHRD111.severity = none
+
+# Implement System.IAsyncDisposable
+dotnet_diagnostic.VSTHRD112.severity = suggestion
+
+# Check for System.IAsyncDisposable
+dotnet_diagnostic.VSTHRD113.severity = suggestion
+
+# Avoid returning null from a Task-returning method.
+dotnet_diagnostic.VSTHRD114.severity = warning
+
+# Avoid creating a JoinableTaskContext with an explicit null SynchronizationContext
+dotnet_diagnostic.VSTHRD115.severity = warning
+
+# Use Async naming convention
+dotnet_diagnostic.VSTHRD200.severity = warning
