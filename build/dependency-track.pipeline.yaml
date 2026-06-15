@@ -39,7 +39,7 @@ variables:
   - name: systemName
     value: Audacia-Libraries-Code-Analysis
   - name: projectVersion
-    value: $(Build.SourceBranchName)
+    value: ''
   - name: deactivateOld
     value: true
 
