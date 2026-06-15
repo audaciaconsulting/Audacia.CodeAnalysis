@@ -2903,5 +2903,5 @@ dotnet_diagnostic.ACL1024.severity = warning
 # Log messages should not contain exceptions as template parameters
 dotnet_diagnostic.ACL1025.severity = warning
 
-# Positional prooperties should be avoided in log message parameters
+# Positional properties should be avoided in log message parameters
 dotnet_diagnostic.ACL1026.severity = warning
