@@ -9,6 +9,19 @@ global_level = 4
 # Methods should not exceed a predefined number of statements.
 dotnet_diagnostic.ACL1002.max_statement_count = 20 # Increase max count for tests, as they may contain complex setup
 
+# Use assertion scope in tests
+dotnet_diagnostic.ACL1019.severity = warning
+
+# Tests should contain at least one assertion
+dotnet_diagnostic.ACL1020.severity = warning
+
+# Assertion reasons must be provided
+dotnet_diagnostic.ACL1021.severity = warning
+
+# Test names must be consistent
+dotnet_diagnostic.ACL1022.severity = warning
+dotnet_diagnostic.ACL1022.test_method_name_format = ^([A-Z0-9][a-zA-Z0-9]*)?(_[A-Z0-9][a-zA-Z0-9]*)*$
+
 # A property, method or local function should do only one thing *** Suppress as test methods may contain 'And' to make them more descriptive ***
 dotnet_diagnostic.AV1115.severity = none
 
@@ -32,16 +45,3 @@ dotnet_diagnostic.RCS1046.severity = none
 
 # VSTHRD200: Use `Async` naming convention
 dotnet_diagnostic.VSTHRD200.severity = none
-
-# Use assertion scope in tests
-dotnet_diagnostic.ACL1019.severity = warning
-
-# Tests should contain at least one assertion
-dotnet_diagnostic.ACL1020.severity = warning
-
-# Assertion reasons must be provided
-dotnet_diagnostic.ACL1021.severity = warning
-
-# Test names must be consistent
-dotnet_diagnostic.ACL1022.severity = warning
-dotnet_diagnostic.ACL1022.test_method_name_format = ^([A-Z0-9][a-zA-Z0-9]*)?(_[A-Z0-9][a-zA-Z0-9]*)*$

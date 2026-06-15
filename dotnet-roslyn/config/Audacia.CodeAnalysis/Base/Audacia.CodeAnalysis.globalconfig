@@ -62,6 +62,30 @@ dotnet_diagnostic.ACL1017.severity = warning
 # [Maintainability] ALC1018: Code analysis suppression requires justification.
 dotnet_diagnostic.ACL1018.severity = warning
 
+# Use assertion scope in tests
+dotnet_diagnostic.ACL1019.severity = none
+
+# Tests should contain at least one assertion
+dotnet_diagnostic.ACL1020.severity = none
+
+# Assertion reasons must be provided
+dotnet_diagnostic.ACL1021.severity = none
+
+# Test names must be consistent
+dotnet_diagnostic.ACL1022.severity = none
+
+# Log message properties must be PascalCase
+dotnet_diagnostic.ACL1023.severity = warning
+
+# Log messages should not contain duplicate named parameters
+dotnet_diagnostic.ACL1024.severity = warning
+
+# Log messages should not contain exceptions as template parameters
+dotnet_diagnostic.ACL1025.severity = warning
+
+# Positional properties should be avoided in log message parameters
+dotnet_diagnostic.ACL1026.severity = warning
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
@@ -2881,27 +2905,3 @@ dotnet_diagnostic.VSTHRD115.severity = warning
 
 # Use Async naming convention
 dotnet_diagnostic.VSTHRD200.severity = warning
-
-# Use assertion scope in tests
-dotnet_diagnostic.ACL1019.severity = none
-
-# Tests should contain at least one assertion
-dotnet_diagnostic.ACL1020.severity = none
-
-# Assertion reasons must be provided
-dotnet_diagnostic.ACL1021.severity = none
-
-# Test names must be consistent
-dotnet_diagnostic.ACL1022.severity = none
-
-# Log message properties must be PascalCase
-dotnet_diagnostic.ACL1023.severity = warning
-
-# Log messages should not contain duplicate named parameters
-dotnet_diagnostic.ACL1024.severity = warning
-
-# Log messages should not contain exceptions as template parameters
-dotnet_diagnostic.ACL1025.severity = warning
-
-# Positional properties should be avoided in log message parameters
-dotnet_diagnostic.ACL1026.severity = warning
