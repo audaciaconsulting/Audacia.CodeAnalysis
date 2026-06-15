@@ -14,6 +14,7 @@ resources:
       type: github
       endpoint: shared-github
       name: audaciaconsulting/Audacia.Build
+      ref: refs/heads/feature/211576-Add-inferred-Versioning-from-Directory.Build.props 
 
 pool:
   vmImage: windows-latest
