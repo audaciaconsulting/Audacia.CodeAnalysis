@@ -32,3 +32,16 @@ dotnet_diagnostic.RCS1046.severity = none
 
 # VSTHRD200: Use `Async` naming convention
 dotnet_diagnostic.VSTHRD200.severity = none
+
+# Use assertion scope in tests
+dotnet_diagnostic.ACL1019.severity = warning
+
+# Tests should contain at least one assertion
+dotnet_diagnostic.ACL1020.severity = warning
+
+# Assertion reasons must be provided
+dotnet_diagnostic.ACL1021.severity = warning
+
+# Test names must be consistent
+dotnet_diagnostic.ACL1022.severity = warning
+dotnet_diagnostic.ACL1022.test_method_name_format = ^([A-Z0-9][a-zA-Z0-9]*)?(_[A-Z0-9][a-zA-Z0-9]*)*$

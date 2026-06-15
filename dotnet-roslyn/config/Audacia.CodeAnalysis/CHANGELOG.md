@@ -1,10 +1,13 @@
 ﻿# Changelog
 
-## TBC - TBC
+## 2.0.0 - 2026-06-15
 
 ### Added
 
 - Added analyzers with default severities from ([Microsoft.VisualStudio.Threading.Analyzers](https://microsoft.github.io/vs-threading/analyzers/index.html))
+- Upgraded to ([Audacia.CodeAnalysis.Analyzers v1.13.0](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/blob/master/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/CHANGELOG.md#1130---2026-06-04)) which brings in further unit test and logging analysis rules.
+  - Logging analyzers have been set to `warning`.
+  - Unit test analyzers have been suppressed in the base `Audacia.CodeAnalysis` package, but set to `warning` in the `Audacia.CodeAnalysis.TestProjects` package.
 
 ### Changed
 
