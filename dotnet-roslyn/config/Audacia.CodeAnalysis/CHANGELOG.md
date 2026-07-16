@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## 2.0.1 - 2026-07-16
+
+### Added
+
+- No new functionality added
+
+### Changed
+
+- Suppressed VSTHRD200 as functionality is covered by RCS1046 and ACL1005
+
 ## 2.0.0 - 2026-06-15
 
 ### Added

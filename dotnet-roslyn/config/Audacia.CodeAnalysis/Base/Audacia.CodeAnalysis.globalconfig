@@ -2903,5 +2903,5 @@ dotnet_diagnostic.VSTHRD114.severity = warning
 # Avoid creating a JoinableTaskContext with an explicit null SynchronizationContext
 dotnet_diagnostic.VSTHRD115.severity = warning
 
-# Use Async naming convention
-dotnet_diagnostic.VSTHRD200.severity = warning
+# Use Async naming convention *** Suppress as covered by RCS1046 normally and ACL1005 in the AspNetCore ruleset ***
+dotnet_diagnostic.VSTHRD200.severity = none
