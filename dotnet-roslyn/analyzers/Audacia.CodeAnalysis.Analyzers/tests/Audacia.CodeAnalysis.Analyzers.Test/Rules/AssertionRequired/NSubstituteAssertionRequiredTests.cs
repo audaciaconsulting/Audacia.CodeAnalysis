@@ -12,10 +12,32 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionRequired
             => new AssertionRequiredAnalyzer();
 
         private static string BuildTestCode(string testMethod)
-            => BaseAssertionRequiredTests.BuildTestCode(testMethod);
+            => BaseAssertionRequiredTests.BuildTestCode(testMethod, "using NSubstitute;");
 
         [TestMethod]
         public void No_Diagnostics_For_NSubstitute_Received_Verification()
+        {
+            const string testMethod = @"
+private interface IFoo
+{
+    void Bar();
+}
+
+[Fact]
+public void TestMethod()
+{
+    var substitute = NSubstitute.Substitute.For<IFoo>();
+    substitute.Bar();
+    substitute.Received(1).Bar();
+}";
+
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_NSubstitute_Received_Verification_Called_As_Extension_Method()
         {
             const string testMethod = @"
 private interface IFoo
@@ -49,7 +71,7 @@ private interface IFoo
 public void TestMethod()
 {
     var substitute = NSubstitute.Substitute.For<IFoo>();
-    NSubstitute.SubstituteExtensions.ReceivedWithAnyArgs(substitute).Bar();
+    substitute.ReceivedWithAnyArgs().Bar();
 }";
 
             var testCode = BuildTestCode(testMethod);
@@ -70,7 +92,7 @@ private interface IFoo
 public void TestMethod()
 {
     var substitute = NSubstitute.Substitute.For<IFoo>();
-    NSubstitute.SubstituteExtensions.DidNotReceive(substitute).Bar();
+    substitute.DidNotReceive().Bar();
 }";
 
             var testCode = BuildTestCode(testMethod);
@@ -91,7 +113,7 @@ private interface IFoo
 public void TestMethod()
 {
     var substitute = NSubstitute.Substitute.For<IFoo>();
-    NSubstitute.SubstituteExtensions.DidNotReceiveWithAnyArgs(substitute).Bar();
+    substitute.DidNotReceiveWithAnyArgs().Bar();
 }";
 
             var testCode = BuildTestCode(testMethod);
@@ -131,7 +153,7 @@ private interface IFoo
 
 private static void VerifyReceived(IFoo substitute)
 {
-    NSubstitute.SubstituteExtensions.Received(substitute, 1).Bar();
+    substitute.Received(1).Bar();
 }
 
 [Fact]
@@ -162,7 +184,7 @@ private static void Received()
 }";
 
             var testCode = BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionRequiredTests.BuildExpectedResult(18, 13);
+            var expectedDiagnostic = BaseAssertionRequiredTests.BuildExpectedResult(19, 13);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }
