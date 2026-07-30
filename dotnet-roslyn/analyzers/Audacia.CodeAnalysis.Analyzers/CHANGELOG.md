@@ -1,5 +1,14 @@
 ﻿# CHANGELOG
 
+# 1.14.0 - 2026-07-30
+### Added
+- No new functionality added
+
+### Changed
+- Updated ACL1020 ("AssertionRequired") so mock verification calls are treated as assertions.
+    - Added support for `Moq` verification methods (`Verify*`).
+    - Added support for `NSubstitute` verification methods (`Received*`, `DidNotReceive*`, and `InOrder`).
+
 # 1.13.0 - 2026-06-04
 ### Added
 - Added new rule "AssertionScopeForMultipleAssertions" (ACL1019).
