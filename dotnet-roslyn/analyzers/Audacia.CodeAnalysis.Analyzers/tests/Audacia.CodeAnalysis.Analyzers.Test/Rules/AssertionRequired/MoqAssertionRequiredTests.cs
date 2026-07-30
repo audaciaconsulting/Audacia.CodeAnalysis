@@ -37,6 +37,29 @@ public void TestMethod()
         }
 
         [TestMethod]
+        public void No_Diagnostics_For_Moq_VerifyAll()
+        {
+            const string testMethod = @"
+private interface IFoo
+{
+    void Bar();
+}
+
+[Fact]
+public void TestMethod()
+{
+    var mock = new Moq.Mock<IFoo>();
+    mock.Setup(foo => foo.Bar()).Verifiable();
+    mock.Object.Bar();
+    mock.VerifyAll();
+}";
+
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
         public void No_Diagnostics_For_Moq_VerifyNoOtherCalls()
         {
             const string testMethod = @"
@@ -52,6 +75,96 @@ public void TestMethod()
     mock.Object.Bar();
     mock.Verify(foo => foo.Bar(), Moq.Times.Once());
     mock.VerifyNoOtherCalls();
+}";
+
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Moq_VerifyGet()
+        {
+            const string testMethod = @"
+private interface IFoo
+{
+    string Value { get; }
+}
+
+[Fact]
+public void TestMethod()
+{
+    var mock = new Moq.Mock<IFoo>();
+    _ = mock.Object.Value;
+    mock.VerifyGet(foo => foo.Value, Moq.Times.Once());
+}";
+
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Moq_VerifySet()
+        {
+            const string testMethod = @"
+private interface IFoo
+{
+    string Value { get; set; }
+}
+
+[Fact]
+public void TestMethod()
+{
+    var mock = new Moq.Mock<IFoo>();
+    mock.Object.Value = ""Bar"";
+    mock.VerifySet(foo => foo.Value = ""Bar"", Moq.Times.Once());
+}";
+
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Moq_VerifyAdd()
+        {
+            const string testMethod = @"
+private interface IFoo
+{
+    event EventHandler Changed;
+}
+
+[Fact]
+public void TestMethod()
+{
+    var mock = new Moq.Mock<IFoo>();
+    EventHandler handler = (_, _) => { };
+    mock.Object.Changed += handler;
+    mock.VerifyAdd(foo => foo.Changed += Moq.It.IsAny<EventHandler>(), Moq.Times.Once());
+}";
+
+            var testCode = BuildTestCode(testMethod);
+
+            VerifyNoDiagnostic(testCode);
+        }
+
+        [TestMethod]
+        public void No_Diagnostics_For_Moq_VerifyRemove()
+        {
+            const string testMethod = @"
+private interface IFoo
+{
+    event EventHandler Changed;
+}
+
+[Fact]
+public void TestMethod()
+{
+    var mock = new Moq.Mock<IFoo>();
+    EventHandler handler = (_, _) => { };
+    mock.Object.Changed -= handler;
+    mock.VerifyRemove(foo => foo.Changed -= Moq.It.IsAny<EventHandler>(), Moq.Times.Once());
 }";
 
             var testCode = BuildTestCode(testMethod);

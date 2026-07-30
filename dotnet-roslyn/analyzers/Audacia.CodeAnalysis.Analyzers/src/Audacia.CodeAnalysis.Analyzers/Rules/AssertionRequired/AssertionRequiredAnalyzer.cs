@@ -14,6 +14,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionRequired
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class AssertionRequiredAnalyzer : DiagnosticAnalyzer
     {
+        private static readonly ISet<string> MoqVerificationMethodNames = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "Verify",
+            "VerifyAll",
+            "VerifyGet",
+            "VerifySet",
+            "VerifyAdd",
+            "VerifyRemove",
+            "VerifyNoOtherCalls",
+        };
+
         private static readonly ISet<string> NSubstituteVerificationMethodNames = new HashSet<string>(StringComparer.Ordinal)
         {
             "Received",
@@ -135,7 +146,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionRequired
 
             return (string.Equals(containingNamespace, "Moq", StringComparison.Ordinal) ||
                     containingNamespace.StartsWith("Moq.", StringComparison.Ordinal)) &&
-                   methodSymbol.Name.StartsWith("Verify", StringComparison.Ordinal);
+                   MoqVerificationMethodNames.Contains(methodSymbol.Name);
         }
 
         private static bool IsNSubstituteVerificationCall(IMethodSymbol methodSymbol)
