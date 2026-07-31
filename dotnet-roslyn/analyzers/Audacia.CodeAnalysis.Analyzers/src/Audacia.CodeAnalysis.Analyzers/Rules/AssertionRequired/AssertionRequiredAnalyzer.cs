@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -13,6 +14,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionRequired
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class AssertionRequiredAnalyzer : DiagnosticAnalyzer
     {
+        private static readonly ISet<string> MoqVerificationMethodNames = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "Verify",
+            "VerifyAll",
+            "VerifyGet",
+            "VerifySet",
+            "VerifyAdd",
+            "VerifyRemove",
+            "VerifyNoOtherCalls",
+        };
+
+        private static readonly ISet<string> NSubstituteVerificationMethodNames = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "Received",
+            "ReceivedWithAnyArgs",
+            "DidNotReceive",
+            "DidNotReceiveWithAnyArgs",
+            "InOrder",
+        };
+
         public const string Id = DiagnosticId.AssertionRequired;
 
         private const string Title = "Test method name '{0}' has no assertions";
@@ -76,6 +97,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionRequired
                     return true;
                 }
 
+                if (IsMockVerificationCall(invocation, semanticModel))
+                {
+                    return true;
+                }
+
                 // Not a known assertion call — check whether it is a helper method call that contains assertions.
                 var helperMethod = invocation.ResolveHelperMethodDeclaration(semanticModel);
                 if (helperMethod == null)
@@ -96,6 +122,44 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionRequired
             }
 
             return false;
+        }
+
+        private static bool IsMockVerificationCall(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+        {
+            var symbolInfo = semanticModel.GetSymbolInfo(invocation);
+            var methodSymbol = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
+            if (methodSymbol == null)
+            {
+                return false;
+            }
+
+            return IsMoqVerificationCall(methodSymbol) || IsNSubstituteVerificationCall(methodSymbol);
+        }
+
+        private static bool IsMoqVerificationCall(IMethodSymbol methodSymbol)
+        {
+            var containingNamespace = methodSymbol.ContainingNamespace?.ToDisplayString();
+            if (containingNamespace == null)
+            {
+                return false;
+            }
+
+            return (string.Equals(containingNamespace, "Moq", StringComparison.Ordinal) ||
+                    containingNamespace.StartsWith("Moq.", StringComparison.Ordinal)) &&
+                   MoqVerificationMethodNames.Contains(methodSymbol.Name);
+        }
+
+        private static bool IsNSubstituteVerificationCall(IMethodSymbol methodSymbol)
+        {
+            var containingNamespace = methodSymbol.ContainingNamespace?.ToDisplayString();
+            if (containingNamespace == null)
+            {
+                return false;
+            }
+
+            return (string.Equals(containingNamespace, "NSubstitute", StringComparison.Ordinal) ||
+                    containingNamespace.StartsWith("NSubstitute.", StringComparison.Ordinal)) &&
+                   NSubstituteVerificationMethodNames.Contains(methodSymbol.Name);
         }
     }
 }

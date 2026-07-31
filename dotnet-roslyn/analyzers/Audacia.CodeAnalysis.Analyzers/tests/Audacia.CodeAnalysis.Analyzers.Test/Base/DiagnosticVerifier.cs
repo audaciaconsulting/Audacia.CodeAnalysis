@@ -44,6 +44,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
             MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Private.Xml.Linq.dll"));
         private static readonly MetadataReference SystemPrivateXmlReference =
             MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Private.Xml.dll"));
+        private static readonly MetadataReference SystemLinqExpressionsReference =
+            MetadataReference.CreateFromFile(typeof(System.Linq.Expressions.Expression).Assembly.Location);
         private static readonly MetadataReference SystemNetHttpReference =
             MetadataReference.CreateFromFile(Path.Combine(AssemblyPath, "System.Net.Http.dll"));
         private static readonly MetadataReference SystemDataCommonReference =
@@ -73,6 +75,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference FluentAssertionsAssertionScopeReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Execution.AssertionScope).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsAssertionExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.AssertionExtensions).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsStringExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Primitives.StringAssertions).Assembly.Location);
+        private static readonly MetadataReference MoqReference = MetadataReference.CreateFromFile(typeof(Moq.Mock).Assembly.Location);
+        private static readonly MetadataReference NSubstituteReference = MetadataReference.CreateFromFile(typeof(NSubstitute.Substitute).Assembly.Location);
 
         internal static readonly CompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(
             OutputKind.ConsoleApplication, assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default, allowUnsafe: true);
@@ -480,6 +484,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddMetadataReference(projectId, SystemXmlReaderWriterReference)
                 .AddMetadataReference(projectId, SystemPrivateXmlLinqReference)
                 .AddMetadataReference(projectId, SystemPrivateXmlReference)
+                .AddMetadataReference(projectId, SystemLinqExpressionsReference)
                 .AddMetadataReference(projectId, SystemNetHttpReference)
                 .AddMetadataReference(projectId, SystemDataCommonReference)
                 .AddMetadataReference(projectId, CorlibReference)
@@ -506,7 +511,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddMetadataReference(projectId, ShouldlyReference)
                 .AddMetadataReference(projectId, FluentAssertionsAssertionScopeReference)
                 .AddMetadataReference(projectId, FluentAssertionsAssertionExtensionsReference)
-                .AddMetadataReference(projectId, FluentAssertionsStringExtensionsReference);
+                .AddMetadataReference(projectId, FluentAssertionsStringExtensionsReference)
+                .AddMetadataReference(projectId, MoqReference)
+                .AddMetadataReference(projectId, NSubstituteReference);
 
             int count = 0;
             foreach (var source in sources)

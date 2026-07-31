@@ -13,14 +13,16 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionRequired
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
             => new AssertionRequiredAnalyzer();
 
-        internal static string BuildTestCode(string testMethod)
+        internal static string BuildTestCode(string testMethod, string additionalUsings = null)
         {
+            var usings = string.IsNullOrWhiteSpace(additionalUsings) ? string.Empty : "\n" + additionalUsings;
+
             return @"
 using System;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Shouldly;
-using Xunit;
+using Xunit;" + usings + @"
 
 namespace ConsoleApplication1;
 

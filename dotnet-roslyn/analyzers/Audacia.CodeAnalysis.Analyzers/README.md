@@ -1150,7 +1150,7 @@ public void FluentAssertionsTestMethod()
 ACL1020 checks if a test method contains at least one assertion and will produce a warning if no assertions are found.
 This is because test methods without assertions do not validate any behavior and are therefore not useful.
 
-This applies to `Xunit`, `FluentAssertions`, and `Shouldly` assertions.
+This applies to `Xunit`, `FluentAssertions`, and `Shouldly` assertions, as well as mock verification assertions using `Moq` (`Verify`, `VerifyAll`, `VerifyGet`, `VerifySet`, `VerifyAdd`, `VerifyRemove`, `VerifyNoOtherCalls`) and `NSubstitute` (`Received*`, `DidNotReceive*`, `InOrder`).
 
 :warning: This analyzer is not guaranteed to work with `FluentAssertions` versions 8.0.0 and above.
 
