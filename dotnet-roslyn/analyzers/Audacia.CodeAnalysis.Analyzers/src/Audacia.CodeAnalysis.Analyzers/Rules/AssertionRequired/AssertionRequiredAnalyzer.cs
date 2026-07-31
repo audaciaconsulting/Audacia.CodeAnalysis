@@ -103,19 +103,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionRequired
                 }
 
                 // Not a known assertion call — check whether it is a helper method call that contains assertions.
-                var helperMethod = invocation.ResolveHelperMethodDeclaration(semanticModel);
+                var helperMethod = invocation.ResolveHelperMethodDeclaration(semanticModel, out var helperSemanticModel);
                 if (helperMethod == null)
                 {
                     continue;
                 }
 
-                var methodSymbol = semanticModel.GetDeclaredSymbol(helperMethod);
+                var methodSymbol = helperSemanticModel.GetDeclaredSymbol(helperMethod);
                 if (methodSymbol == null || !visitedMethods.Add(methodSymbol))
                 {
                     continue;
                 }
 
-                if (HasAssertion(helperMethod, semanticModel, visitedMethods))
+                if (HasAssertion(helperMethod, helperSemanticModel, visitedMethods))
                 {
                     return true;
                 }
