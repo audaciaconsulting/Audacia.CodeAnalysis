@@ -47,6 +47,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason
             AnalyzeMethodInvocations(
                 methodDeclaration,
                 nodeAnalysisContext,
+                nodeAnalysisContext.SemanticModel,
                 new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default),
                 ref assertionFramework);
         }
@@ -54,6 +55,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason
         private static void AnalyzeMethodInvocations(
             MethodDeclarationSyntax methodDeclaration,
             SyntaxNodeAnalysisContext nodeAnalysisContext,
+            SemanticModel semanticModel,
             HashSet<IMethodSymbol> visitedMethods,
             ref IAssertionFramework assertionFramework)
         {
@@ -68,7 +70,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason
 
             foreach (var invocation in allInvocations)
             {
-                if (invocation.IsValidAssertion(ref assertionFramework) && !assertionFramework.HasReasonArgument(invocation, nodeAnalysisContext.SemanticModel))
+                if (invocation.IsValidAssertion(ref assertionFramework) && !assertionFramework.HasReasonArgument(invocation, semanticModel))
                 {
                     var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
                     nodeAnalysisContext.ReportDiagnostic(diagnostic);
@@ -76,19 +78,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason
                 }
 
                 // Not a known assertion call — check whether it is a helper method call that contains assertions.
-                var helperMethod = invocation.ResolveHelperMethodDeclaration(nodeAnalysisContext.SemanticModel);
+                var helperMethod = invocation.ResolveHelperMethodDeclaration(semanticModel, out var helperSemanticModel);
                 if (helperMethod == null)
                 {
                     continue;
                 }
 
-                var methodSymbol = nodeAnalysisContext.SemanticModel.GetDeclaredSymbol(helperMethod);
+                var methodSymbol = helperSemanticModel.GetDeclaredSymbol(helperMethod);
                 if (methodSymbol == null || !visitedMethods.Add(methodSymbol))
                 {
                     continue;
                 }
 
-                AnalyzeMethodInvocations(helperMethod, nodeAnalysisContext, visitedMethods, ref assertionFramework);
+                AnalyzeMethodInvocations(helperMethod, nodeAnalysisContext, helperSemanticModel, visitedMethods, ref assertionFramework);
             }
         }
     }
