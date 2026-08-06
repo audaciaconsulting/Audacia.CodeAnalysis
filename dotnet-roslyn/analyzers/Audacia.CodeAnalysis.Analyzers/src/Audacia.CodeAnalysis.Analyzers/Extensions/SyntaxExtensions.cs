@@ -379,19 +379,30 @@ namespace Audacia.CodeAnalysis.Analyzers.Extensions
         /// <summary>
         /// Uses the semantic model to resolve <paramref name="invocation"/> to the <see cref="MethodDeclarationSyntax"/>
         /// declared in the same compilation, or returns <see langword="null"/> if not found.
+        /// When a helper is found, the matching semantic model for its syntax tree is also returned.
         /// </summary>
-        internal static MethodDeclarationSyntax ResolveHelperMethodDeclaration(this InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+        internal static (MethodDeclarationSyntax methodDeclarationSyntax, SemanticModel helperSemanticModel) ResolveHelperMethodDeclarationWithSemanticModel(
+            this InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel)
         {
+            SemanticModel helperSemanticModel = null;
+
             var symbolInfo = semanticModel.GetSymbolInfo(invocation);
             var symbol = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
 
             if (symbol == null)
             {
-                return null;
+                return (null, null);
             }
 
             var methodDeclaration = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
-            return methodDeclaration;
+            if (methodDeclaration == null)
+            {
+                return (null, null);
+            }
+
+            helperSemanticModel = semanticModel.Compilation.GetSemanticModel(methodDeclaration.SyntaxTree);
+            return (methodDeclaration, helperSemanticModel);
         }
 
         /// <summary>

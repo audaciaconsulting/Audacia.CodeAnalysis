@@ -103,19 +103,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
                     continue;
                 }
 
-                var helperMethod = invocation.ResolveHelperMethodDeclaration(semanticModel);
+                var (helperMethod, helperSemanticModel) = invocation.ResolveHelperMethodDeclarationWithSemanticModel(semanticModel);
                 if (helperMethod == null)
                 {
                     continue;
                 }
 
-                var methodSymbol = semanticModel.GetDeclaredSymbol(helperMethod);
+                var methodSymbol = helperSemanticModel.GetDeclaredSymbol(helperMethod);
                 if (methodSymbol == null || !visitedMethods.Add(methodSymbol))
                 {
                     continue;
                 }
 
-                count += CountAssertionsOutsideAssertionScopes(helperMethod, semanticModel, visitedMethods, ref assertionFramework);
+                count += CountAssertionsOutsideAssertionScopes(helperMethod, helperSemanticModel, visitedMethods, ref assertionFramework);
             }
 
             return count;

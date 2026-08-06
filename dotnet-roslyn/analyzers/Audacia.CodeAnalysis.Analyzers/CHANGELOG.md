@@ -1,5 +1,12 @@
 ﻿# CHANGELOG
 
+# 1.14.1 - 2026-07-31
+### Added
+- No new functionality added
+
+### Changed
+- Updated "ResolveHelperMethodDeclaration" with SemanticModel to fix exceptions thrown in Analyzers.
+
 # 1.14.0 - 2026-07-30
 ### Added
 - No new functionality added
