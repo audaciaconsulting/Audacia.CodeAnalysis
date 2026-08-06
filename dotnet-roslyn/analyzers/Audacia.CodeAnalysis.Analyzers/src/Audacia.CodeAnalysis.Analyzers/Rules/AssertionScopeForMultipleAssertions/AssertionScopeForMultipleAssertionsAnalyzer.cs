@@ -103,7 +103,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertio
                     continue;
                 }
 
-                var helperMethod = invocation.ResolveHelperMethodDeclaration(semanticModel, out var helperSemanticModel);
+                var (helperMethod, helperSemanticModel) = invocation.ResolveHelperMethodDeclarationWithSemanticModel(semanticModel);
                 if (helperMethod == null)
                 {
                     continue;

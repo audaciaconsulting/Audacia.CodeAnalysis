@@ -78,7 +78,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason
                 }
 
                 // Not a known assertion call — check whether it is a helper method call that contains assertions.
-                var helperMethod = invocation.ResolveHelperMethodDeclaration(semanticModel, out var helperSemanticModel);
+                var (helperMethod, helperSemanticModel) = invocation.ResolveHelperMethodDeclarationWithSemanticModel(semanticModel);
                 if (helperMethod == null)
                 {
                     continue;
