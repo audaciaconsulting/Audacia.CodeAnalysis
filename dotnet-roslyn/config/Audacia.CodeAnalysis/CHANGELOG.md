@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## 2.1.0 - 2026-08-07
+
+### Added
+
+- No new functionality added
+
+### Changed
+
+- Updated Audacia.CodeAnalysis.Analyzers to 1.14.1
+
 ## 2.0.1 - 2026-07-16
 
 ### Added
