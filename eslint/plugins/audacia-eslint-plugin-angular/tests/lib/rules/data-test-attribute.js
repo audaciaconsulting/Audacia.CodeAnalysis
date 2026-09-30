@@ -5,14 +5,8 @@ const idsMocker = require('../../utils/ids-mocker');
 const rule = idsMocker.getRuleWithMock('data-test-attribute');
 
 const ruleTester = new RuleTester({
-    parser: require.resolve('@angular-eslint/template-parser'),
-    parserOptions: {
-        ecmaVersion: 2020,
-        sourceType: 'module',
-    },
-    env: {
-        browser: true,
-        es6: true,
+    languageOptions: {
+        parser: require('@angular-eslint/template-parser'),
     },
 });
 
@@ -228,28 +222,7 @@ ruleTester.run("data-test-attribute", rule, {
             output: '<template><input (click)="foobar()" data-test="test-id" /></template>',
             options: [{ enableFixer: true }],
         },
-        // self closing elements
-        {
-            name: 'self-closing input element without test attribute',
-            code: '<template><input (click)="foobar()"/></template>',
-            errors: ["input elements should include a 'data-test' attribute"],
-            output: '<template><input data-test="test-id" (click)="foobar()"/></template>',
-            options: [{ enableFixer: true }]
-        },
-        {
-            name: 'self-closing input element with no value in test attribute',
-            code: '<template><input (click)="foobar()" data-test /></template>',
-            errors: ["input elements should include a 'data-test' attribute"],
-            output: '<template><input (click)="foobar()" data-test="test-id" /></template>',
-            options: [{ enableFixer: true }],
-        },
-        {
-            name: 'self-closing input element with empty value in test attribute',
-            code: '<template><input (click)="foobar()" data-test="" /></template>',
-            errors: ["input elements should include a 'data-test' attribute"],
-            output: '<template><input (click)="foobar()" data-test="test-id" /></template>',
-            options: [{ enableFixer: true }],
-        },
+        // (self-closing input cases are covered above; ESLint 9 rejects duplicate test cases)
         // multiple events configured
         {
             name: '(click) without test attribute when multiple events configured',

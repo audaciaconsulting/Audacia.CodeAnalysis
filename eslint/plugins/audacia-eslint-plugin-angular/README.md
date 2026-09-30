@@ -4,61 +4,82 @@ An ESLint plugin which provides lint rules for angular projects.
 
 ## Installation
 
-You'll first need to install [@angular-eslint/eslint-plugin](https://www.npmjs.com/package/@angular-eslint/template-parser).
-
-If the plugin is going to be used with HTML files, you'll also need [@angular-eslint](https://eslint.org/docs/latest/use/getting-started) and [eslint-plugin-html](https://www.npmjs.com/package/eslint-plugin-html). This is because Angular ESLint doesn't parse HTML files by default.
-
-</br>
+Requires ESLint 9 (flat config) and `@angular-eslint` 20, 21 or 22.
 
 Before continuing, make sure you have the [AudaciaPublic](https://dev.azure.com/audacia/Audacia.Public/_artifacts/feed/AudaciaPublic) feed configured.
  You can find more information on how to set this up in the [Audacia wiki](https://dev.azure.com/audacia/Audacia/_wiki/wikis/Audacia.wiki/259/Configuring-a-project-to-access-the-Audacia-NPM-registry).
 
-Next, you can install `@audacia/eslint-plugin-angular`:
+Install the plugin and its peers:
 
 ```sh
-npm install @audacia/eslint-plugin-angular --save-dev
+npm install @audacia/eslint-plugin-angular @angular-eslint/eslint-plugin @angular-eslint/template-parser --save-dev
 ```
 
+This package does not install or configure a TypeScript parser. You must supply one, for example [typescript-eslint](https://typescript-eslint.io/) (including `@typescript-eslint/utils`, which `@angular-eslint/eslint-plugin` needs), or get it from a shared base config.
 
 ## Usage
 
-It is recommended that you install the plugin using the provided config, ensuring all of the rules are enabled. To do so, add `plugin:@audacia/angular/recommended` to the `extends` section of your ESLint configuration.
+Add the `flat/typescript` preset to your `eslint.config.js`. It applies to `**/*.ts` files.
 
-```json
-{
-    "extends": [
-        // ... other configs
-        "plugin:@audacia/angular/recommended"
-    ]
-}
+```js
+const audaciaAngular = require('@audacia/eslint-plugin-angular');
+
+module.exports = [
+    // ... your TypeScript parser and other configs
+    ...audaciaAngular.configs['flat/typescript'],
+];
 ```
 
-Or, if you wish to manually configure the rules, add `@audacia/angular` to the `plugins` section of your ESLint configuration.
+The preset uses `app` as the selector prefix. To change it, or to override any other rule, add a later config object:
 
-```json
-{
-    "plugins": [ "@audacia/angular" ]
-}
+```js
+module.exports = [
+    ...audaciaAngular.configs['flat/typescript'],
+    {
+        files: ['**/*.ts'],
+        rules: {
+            '@angular-eslint/component-selector': ['error', { type: 'element', prefix: 'xyz', style: 'kebab-case' }],
+            '@angular-eslint/directive-selector': ['error', { type: 'attribute', prefix: 'xyz', style: 'camelCase' }],
+            '@angular-eslint/prefer-standalone': 'off', // e.g. NgModule projects
+        },
+    },
+];
 ```
 
-You can configure and override rules from this plugin by using `@audacia/angular/<rule_name>` in the `rules` section of your ESLint configuration.
+### `flat/typescript` rules
 
-```json
-{
-    "rules": {
-        "@audacia/angular/example-rule": [ "off" ]
-    }
-}
+| Rule | Severity |
+|------|----------|
+| `@angular-eslint/component-selector` (element, kebab-case, prefix `app`) | error |
+| `@angular-eslint/directive-selector` (attribute, camelCase, prefix `app`) | error |
+| `@angular-eslint/prefer-standalone` | error |
+| `@angular-eslint/component-class-suffix` | warn |
+| `@angular-eslint/directive-class-suffix` | warn |
+
+### Custom rules
+
+To use the custom rules in this plugin, register it under the `@audacia/angular` name:
+
+```js
+module.exports = [
+    {
+        files: ['**/*.html'],
+        languageOptions: { parser: require('@angular-eslint/template-parser') },
+        plugins: { '@audacia/angular': require('@audacia/eslint-plugin-angular') },
+        rules: { '@audacia/angular/data-test-attribute': 'error' },
+    },
+];
 ```
+
+The legacy eslintrc `recommended` config is still exported but will be removed in 2.0.0.
 
 ## Supported Rules
 
-- :white_check_mark: Included in the `recommended` config provided with the plugin
 - :wrench: Auto-fix is available with the `--fix` command line option
 
-| Rule | Description |   |   |
-|------|-------------|---|---|
-| [`@audacia/angular/data-test-attribute`](/docs/rules/data-test-attribute.md) | Use data-test attributes for test automation | :white_check_mark: | :wrench: |
+| Rule | Description |   |
+|------|-------------|---|
+| [`@audacia/angular/data-test-attribute`](/docs/rules/data-test-attribute.md) | Use data-test attributes for test automation | :wrench: |
 
 ## Development
 

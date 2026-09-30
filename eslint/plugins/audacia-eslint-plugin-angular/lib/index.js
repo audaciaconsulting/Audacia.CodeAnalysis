@@ -4,5 +4,6 @@ module.exports = {
     },
     configs: {
       recommended: require('./configs/recommended'),
+      'flat/typescript': require('./configs/flat/typescript'),
     }
   };

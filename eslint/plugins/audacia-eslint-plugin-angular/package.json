@@ -1,6 +1,6 @@
 {
   "name": "@audacia/eslint-plugin-angular",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Custom ESLinting rules for Angular.",
   "main": "lib/index.js",
   "repository": {
@@ -13,14 +13,17 @@
     "test": "mocha \"tests/lib/rules/**/*.js\""
   },
   "peerDependencies": {
-    "eslint": "^9.0.0"
+    "eslint": "^9.0.0",
+    "@angular-eslint/eslint-plugin": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "@angular-eslint/template-parser": "^20.0.0 || ^21.0.0 || ^22.0.0"
   },
   "dependencies": {
-    "@angular-eslint/eslint-plugin": "^22.5.0",
-    "@angular-eslint/template-parser": "^22.5.0",
     "nanoid": "3.3.4"
   },
   "devDependencies": {
+    "@angular-eslint/eslint-plugin": "^20.7.0",
+    "@angular-eslint/template-parser": "^20.7.0",
+    "@typescript-eslint/utils": "^8.0.0",
     "eslint": "^9.39.0",
     "mocha": "10.2.0",
     "proxyquire": "2.1.3",
