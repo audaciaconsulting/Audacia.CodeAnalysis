@@ -10,6 +10,10 @@ describe('flat/typescript config', () => {
         assert.ok(Array.isArray(config));
     });
 
+    it('no longer exports the legacy eslintrc recommended config', () => {
+        assert.strictEqual(plugin.configs.recommended, undefined);
+    });
+
     it('applies to .ts files only', () => {
         config.forEach((c) => assert.deepStrictEqual(c.files, ['**/*.ts']));
     });

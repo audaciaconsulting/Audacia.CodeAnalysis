@@ -4,22 +4,30 @@
 
 ### Added
 
-- Added `flat/typescript` flat config with selector, `prefer-standalone` and class suffix rules
+- Added `flat/typescript` flat config: `angular-eslint` `tsRecommended`, the inline-template processor, and selector, `prefer-standalone` and class suffix rules
+- Added `flat/templates` flat config: `angular-eslint` template parser, `templateRecommended` and `templateAccessibility`
+- Added `flat/recommended` flat config combining `flat/typescript` and `flat/templates`
+- Added fixture tests that lint compliant and non-compliant components, external templates and inline templates through ESLint
 - Added `docs/compiler-options.md` with recommended Angular compiler options
 
 ### Changed
 
-- **Breaking:** Requires ESLint `^9.0.0`
-- **Breaking:** `@angular-eslint` `^20.0.0 || ^21.0.0 || ^22.0.0` as peer dependencies
-- Updated `data-test-attribute` rule and tests for ESLint 9 and the latest template parser
+- **Breaking:** Requires ESLint `^10.0.0` and Node `^20.19.0 || ^22.13.0 || >=24`
+- **Breaking:** `angular-eslint`, `@angular-eslint/eslint-plugin` and `@angular-eslint/template-parser` `^21.3.0 || ^22.0.0` as peer dependencies. Angular 20 is no longer supported
+- **Breaking:** `typescript-eslint` and `@typescript-eslint/utils` `^8.56.0` as peer dependencies
+- Updated `data-test-attribute` rule and tests for ESLint 10 and the latest template parser
+- Tests run with a 10 second mocha timeout
 - Rewrote README for flat config
 - Moved `proxyquire` to dev dependencies
 
+### Removed
+
+- **Breaking:** Legacy eslintrc `recommended` config (`lib/configs/base.js`, `lib/configs/recommended.js`)
+
 ### Fixed
 
+- Corrected `docs/compiler-options.md`: `tsc --noEmit` does not check templates or `angularCompilerOptions`; `ng build` or `ngc` is required
 - Removed duplicate `data-test-attribute` test cases rejected by ESLint 9
-
-## 2.0.0 - 2026-09-30
 
 ## 1.2.0 - 2024-09-10
 

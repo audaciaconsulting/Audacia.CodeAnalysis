@@ -2,7 +2,7 @@
 
 Strict TypeScript and strict template checking are enforced by the TypeScript and Angular compilers, not by ESLint. This page lists the recommended settings. It contains no lint configuration.
 
-Run `ng build`, `ngc` or `tsc --noEmit` (in CI as well as locally) to enforce these options. ESLint does not report compiler diagnostics.
+`tsc --noEmit` checks only the `compilerOptions` below, in `.ts` files. It ignores `angularCompilerOptions` and does not type-check templates, external or inline. Template type checking (`strictTemplates`, `strictInputAccessModifiers`, `extendedDiagnostics` and so on) runs only in the Angular compiler, through `ng build` or `ngc -p tsconfig.app.json`. Run one of these in CI as well as locally; ESLint does not report compiler diagnostics.
 
 ## `tsconfig.json`
 
@@ -27,6 +27,8 @@ Run `ng build`, `ngc` or `tsc --noEmit` (in CI as well as locally) to enforce th
 | `noFallthroughCasesInSwitch` | Reports `switch` cases that fall through. |
 
 ## `angularCompilerOptions`
+
+These options are read only by the Angular compiler, so `ng build` or `ngc` is required to enforce them. `tsc --noEmit` ignores them.
 
 ```json
 {

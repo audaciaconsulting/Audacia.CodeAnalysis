@@ -3,7 +3,8 @@ module.exports = {
       'data-test-attribute': require('./rules/data-test-attribute'),
     },
     configs: {
-      recommended: require('./configs/recommended'),
       'flat/typescript': require('./configs/flat/typescript'),
+      'flat/templates': require('./configs/flat/templates'),
+      'flat/recommended': require('./configs/flat/recommended'),
     }
   };

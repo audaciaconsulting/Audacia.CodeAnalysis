@@ -1,11 +1,15 @@
-const angular = require('@angular-eslint/eslint-plugin');
+const angular = require('angular-eslint');
+
+const files = ['**/*.ts'];
 
 module.exports = [
+    // angular-eslint's TypeScript parser, plugin and recommended rules, scoped to .ts files
+    ...angular.configs.tsRecommended.map((config) => ({ ...config, files })),
     {
-        files: ['**/*.ts'],
-        plugins: {
-            '@angular-eslint': angular,
-        },
+        files,
+        // Extracts inline component templates so the template rules lint them
+        processor: angular.processInlineTemplates,
+        // Placed after the spread above so these severities win
         rules: {
             '@angular-eslint/component-selector': [
                 'error',
