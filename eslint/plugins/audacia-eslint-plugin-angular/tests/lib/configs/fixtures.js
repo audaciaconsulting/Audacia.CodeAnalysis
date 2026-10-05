@@ -26,6 +26,7 @@ const nonCompliant = [
     ['external template accessibility', 'flat/templates', 'non-compliant/no-alt.component.html', '@angular-eslint/template/alt-text', 2],
     ['banana in box', 'flat/templates', 'non-compliant/banana.component.html', '@angular-eslint/template/banana-in-box', 2],
     ['structural directive instead of control flow', 'flat/templates', 'non-compliant/ngif.component.html', '@angular-eslint/template/prefer-control-flow', 2],
+    ['click handler without data-test attribute', 'flat/templates', 'non-compliant/click.component.html', '@audacia/angular/data-test-attribute', 2],
     ['external template accessibility via recommended', 'flat/recommended', 'non-compliant/no-alt.component.html', '@angular-eslint/template/alt-text', 2],
     ['inline template accessibility', 'flat/recommended', 'non-compliant/inline.component.ts', '@angular-eslint/template/alt-text', 2],
 ];

@@ -5,7 +5,7 @@
 ### Added
 
 - Added `flat/typescript` flat config: `angular-eslint` `tsRecommended`, the inline-template processor, and selector, `prefer-standalone` and class suffix rules
-- Added `flat/templates` flat config: `angular-eslint` template parser, `templateRecommended` and `templateAccessibility`
+- Added `flat/templates` flat config: `angular-eslint` template parser, `templateRecommended`, `templateAccessibility` and `data-test-attribute`
 - Added `flat/recommended` flat config combining `flat/typescript` and `flat/templates`
 - Added fixture tests that lint compliant and non-compliant components, external templates and inline templates through ESLint
 - Added `docs/compiler-options.md` with recommended Angular compiler options

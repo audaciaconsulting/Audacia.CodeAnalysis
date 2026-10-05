@@ -33,7 +33,7 @@ module.exports = [
 | Preset | Applies to | Contents |
 |--------|------------|----------|
 | `flat/typescript` | `**/*.ts` | `angular-eslint` `tsRecommended` (TypeScript parser, `@angular-eslint` plugin, recommended rules), the inline-template processor, then the Audacia rules below |
-| `flat/templates` | `**/*.html` | `angular-eslint` template parser, `templateRecommended` and `templateAccessibility` |
+| `flat/templates` | `**/*.html` | `angular-eslint` template parser, `templateRecommended`, `templateAccessibility` and the `@audacia/angular/data-test-attribute` rule (`error`) |
 | `flat/recommended` | both | `flat/typescript` and `flat/templates` |
 
 Inline templates (`template: \`...\``) are extracted by the processor in `flat/typescript` and linted with the `flat/templates` rules, so use `flat/recommended` (or both presets) to lint them.
@@ -68,7 +68,7 @@ These are set after the `angular-eslint` recommended rules, so these severities 
 
 ### Custom rules
 
-To use the custom rules in this plugin, register it under the `@audacia/angular` name:
+`flat/templates` already enables `data-test-attribute`. To use the custom rules without the presets, register the plugin under the `@audacia/angular` name:
 
 ```js
 module.exports = [
@@ -89,7 +89,7 @@ module.exports = [
 - ESLint `^10.0.0` is required, with Node `^20.19.0 || ^22.13.0 || >=24`.
 - `@angular-eslint/eslint-plugin` and `@angular-eslint/template-parser` must be `^21.3.0 || ^22.0.0`. Angular 20 is no longer supported; stay on 1.x or upgrade Angular first.
 - `@typescript-eslint/utils` `>=8.56.0` is required.
-- `data-test-attribute` was enabled as `error` by the old `recommended` config. It is no longer enabled for you, so register it by hand as shown in [Custom rules](#custom-rules).
+- `data-test-attribute` is still enabled as `error` by `flat/templates` (and so `flat/recommended`), until it is replaced by PBI 214236. Turn it off with `'@audacia/angular/data-test-attribute': 'off'` in a later config object.
 
 ## Supported Rules
 
