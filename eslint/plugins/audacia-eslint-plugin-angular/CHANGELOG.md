@@ -4,20 +4,18 @@
 
 ### Added
 
-- Added `flat/typescript` flat config: `angular-eslint` `tsRecommended`, the inline-template processor, and selector, `prefer-standalone` and class suffix rules
-- Added `flat/templates` flat config: `angular-eslint` template parser, `templateRecommended`, `templateAccessibility` and `data-test-attribute`
-- Added `flat/recommended` flat config combining `flat/typescript` and `flat/templates`
-- Added fixture tests that lint compliant and non-compliant components, external templates and inline templates through ESLint
+- Added `flat/recommended` flat config: the `angular-eslint` template parser and `data-test-attribute` on `**/*.html`, the same scope as the legacy `recommended` config
+- Added fixture tests that lint compliant and non-compliant templates through ESLint
 - Added `docs/compiler-options.md` with recommended Angular compiler options
 
 ### Changed
 
 - **Breaking:** Requires ESLint `^10.0.0` and Node `^20.19.0 || ^22.13.0 || >=24`
-- **Breaking:** `angular-eslint`, `@angular-eslint/eslint-plugin` and `@angular-eslint/template-parser` `^21.3.0 || ^22.0.0` as peer dependencies. Angular 20 is no longer supported
-- **Breaking:** `typescript-eslint` and `@typescript-eslint/utils` `^8.56.0` as peer dependencies
+- **Breaking:** `@angular-eslint/template-parser` `^21.3.0 || ^22.0.0` is a peer dependency instead of a dependency. Angular 20 is no longer supported
+- **Breaking:** `@angular-eslint/eslint-plugin` is no longer a dependency; install `angular-eslint` yourself to use its rules
 - Updated `data-test-attribute` rule and tests for ESLint 10 and the latest template parser
 - Tests run with a 10 second mocha timeout
-- Rewrote README for flat config
+- Rewrote README for flat config, showing the plugin combined with your own Angular configuration
 - Moved `proxyquire` to dev dependencies
 
 ### Removed

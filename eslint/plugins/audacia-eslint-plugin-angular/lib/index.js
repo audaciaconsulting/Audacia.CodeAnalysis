@@ -1,10 +1,11 @@
-module.exports = {
+const plugin = {
     rules: {
       'data-test-attribute': require('./rules/data-test-attribute'),
     },
-    configs: {
-      'flat/typescript': require('./configs/flat/typescript'),
-      'flat/templates': require('./configs/flat/templates'),
-      'flat/recommended': require('./configs/flat/recommended'),
-    }
+    configs: {},
   };
+
+// The config registers this same plugin object, so consumers can also register the plugin themselves without a conflict
+plugin.configs['flat/recommended'] = require('./configs/flat/recommended')(plugin);
+
+module.exports = plugin;
