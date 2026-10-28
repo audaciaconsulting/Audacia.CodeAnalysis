@@ -1,12 +1,14 @@
-const { RuleTester } = require('eslint');
-const idsMocker = require('../../utils/ids-mocker');
+import { RuleTester } from 'eslint';
+import templateParser from '@angular-eslint/template-parser';
+import ids from '../../../lib/utils/ids.js';
+import rule from '../../../lib/rules/data-test-attribute.js';
 
-// use the ids mocker util to import this rule so we can mock the ids require in the rule
-const rule = idsMocker.getRuleWithMock('data-test-attribute');
+// Stub the id generator so fixes produce a constant id rather than a random one from nanoid
+ids.create = () => 'test-id';
 
 const ruleTester = new RuleTester({
     languageOptions: {
-        parser: require('@angular-eslint/template-parser'),
+        parser: templateParser,
     },
 });
 

@@ -1,10 +1,12 @@
+import templateParser from '@angular-eslint/template-parser';
+
 // The Audacia custom rules for Angular templates. Inline templates reach these rules when the consumer's
 // config includes the angular-eslint inline-template processor.
-module.exports = (plugin) => [
+export default (plugin) => [
     {
         files: ['**/*.html'],
         languageOptions: {
-            parser: require('@angular-eslint/template-parser'),
+            parser: templateParser,
         },
         plugins: {
             '@audacia/angular': plugin,

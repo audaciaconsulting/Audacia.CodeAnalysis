@@ -1,9 +1,9 @@
-const assert = require('assert');
-const path = require('path');
-const { ESLint } = require('eslint');
-const plugin = require('../../../lib');
+import assert from 'assert';
+import path from 'path';
+import { ESLint } from 'eslint';
+import plugin from '../../../lib/index.js';
 
-const fixtures = path.join(__dirname, '..', '..', 'fixtures');
+const fixtures = path.join(import.meta.dirname, '..', '..', 'fixtures');
 const config = plugin.configs['flat/recommended'];
 
 const lint = async (file) => {

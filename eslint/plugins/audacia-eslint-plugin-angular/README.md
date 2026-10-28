@@ -19,16 +19,18 @@ npm install @audacia/eslint-plugin-angular @angular-eslint/template-parser --sav
 
 The plugin provides the Audacia custom rules only. Combine its `flat/recommended` config with your own Angular configuration in `eslint.config.js`.
 
+The plugin is an ES module. Use `import` in an ES module config (`eslint.config.mjs`, or `eslint.config.js` with `"type": "module"`). From a CommonJS config, use `require('@audacia/eslint-plugin-angular').default`.
+
 `flat/recommended` applies to `**/*.html`. It sets the `angular-eslint` template parser, registers the plugin as `@audacia/angular` and enables `@audacia/angular/data-test-attribute` (`error`).
 
 For example, with the [`angular-eslint`](https://github.com/angular-eslint/angular-eslint) presets (`ng add angular-eslint` installs them):
 
 ```js
-const angular = require('angular-eslint');
-const tseslint = require('typescript-eslint');
-const audaciaAngular = require('@audacia/eslint-plugin-angular');
+import angular from 'angular-eslint';
+import tseslint from 'typescript-eslint';
+import audaciaAngular from '@audacia/eslint-plugin-angular';
 
-module.exports = tseslint.config(
+export default tseslint.config(
     {
         files: ['**/*.ts'],
         extends: [...tseslint.configs.recommended, ...angular.configs.tsRecommended],
@@ -48,7 +50,7 @@ Inline templates (`template: \`...\``) are only linted when your config includes
 To change a rule's severity or options, add a later config object:
 
 ```js
-module.exports = [
+export default [
     ...audaciaAngular.configs['flat/recommended'],
     {
         files: ['**/*.html'],
@@ -62,11 +64,14 @@ module.exports = [
 To use the rules without `flat/recommended`, register the plugin under the `@audacia/angular` name:
 
 ```js
-module.exports = [
+import templateParser from '@angular-eslint/template-parser';
+import audaciaAngular from '@audacia/eslint-plugin-angular';
+
+export default [
     {
         files: ['**/*.html'],
-        languageOptions: { parser: require('@angular-eslint/template-parser') },
-        plugins: { '@audacia/angular': require('@audacia/eslint-plugin-angular') },
+        languageOptions: { parser: templateParser },
+        plugins: { '@audacia/angular': audaciaAngular },
         rules: { '@audacia/angular/data-test-attribute': 'error' },
     },
 ];
@@ -78,6 +83,7 @@ module.exports = [
 
 - The legacy eslintrc config is removed (`plugin:@audacia/angular/recommended`, `lib/configs/base.js` and `lib/configs/recommended.js`). ESLint 10 cannot load eslintrc, so use `eslint.config.js` with `flat/recommended`, which has the same scope: the template parser and `data-test-attribute` on `.html` files.
 - ESLint `^10.0.0` is required, with Node `^20.19.0 || ^22.13.0 || >=24`.
+- The plugin is now an ES module. Import it with `import`, or use `require('@audacia/eslint-plugin-angular').default` from CommonJS.
 - `@angular-eslint/template-parser` must be `^21.3.0 || ^22.0.0` and is now a peer dependency. Angular 20 is no longer supported; stay on 1.x or upgrade Angular first.
 - `@angular-eslint/eslint-plugin` is no longer installed by the plugin. Add `angular-eslint` yourself if you use its rules.
 - `data-test-attribute` is still enabled as `error` by `flat/recommended`, until it is replaced by PBI 214236.

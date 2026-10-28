@@ -1,7 +1,7 @@
 
-const ids = require('../utils/ids');
+import ids from '../utils/ids.js';
 
-module.exports = {
+export default {
     meta: {
         type: 'suggestion',
         docs: {

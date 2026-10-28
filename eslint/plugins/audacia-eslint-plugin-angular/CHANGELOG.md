@@ -9,6 +9,7 @@
 ### Changed
 
 - **Breaking:** Requires ESLint `^10.0.0` and Node `^20.19.0 || ^22.13.0 || >=24`
+- **Breaking:** Converted to an ES module (`"type": "module"`, `"exports"`). CommonJS consumers use `require('@audacia/eslint-plugin-angular').default`
 - **Breaking:** `@angular-eslint/template-parser` `^21.3.0 || ^22.0.0` is a peer dependency instead of a dependency. Angular 20 is no longer supported
 - **Breaking:** `@angular-eslint/eslint-plugin` is no longer a dependency; install `angular-eslint` yourself to use its rules
 
