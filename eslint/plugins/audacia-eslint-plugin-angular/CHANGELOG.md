@@ -4,19 +4,13 @@
 
 ### Added
 
-- Added `flat/recommended` flat config: the `angular-eslint` template parser and `data-test-attribute` on `**/*.html`, the same scope as the legacy `recommended` config
-- Added fixture tests that lint compliant and non-compliant templates through ESLint
-- Added `docs/compiler-options.md` with recommended Angular compiler options
+- `flat/recommended` flat config
 
 ### Changed
 
 - **Breaking:** Requires ESLint `^10.0.0` and Node `^20.19.0 || ^22.13.0 || >=24`
 - **Breaking:** `@angular-eslint/template-parser` `^21.3.0 || ^22.0.0` is a peer dependency instead of a dependency. Angular 20 is no longer supported
 - **Breaking:** `@angular-eslint/eslint-plugin` is no longer a dependency; install `angular-eslint` yourself to use its rules
-- Updated `data-test-attribute` rule and tests for ESLint 10 and the latest template parser
-- Tests run with a 10 second mocha timeout
-- Rewrote README for flat config, showing the plugin combined with your own Angular configuration
-- Moved `proxyquire` to dev dependencies
 
 ### Removed
 
@@ -25,7 +19,6 @@
 ### Fixed
 
 - Corrected `docs/compiler-options.md`: `tsc --noEmit` does not check templates or `angularCompilerOptions`; `ng build` or `ngc` is required
-- Removed duplicate `data-test-attribute` test cases rejected by ESLint 9
 
 ## 1.2.0 - 2024-09-10
 
