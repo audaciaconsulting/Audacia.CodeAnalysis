@@ -1,6 +1,6 @@
 ﻿# CHANGELOG
 
-TBC - TBC
+# 2.0.1 - 2026-10-29
 ### Added
 - No new functionality added
 
