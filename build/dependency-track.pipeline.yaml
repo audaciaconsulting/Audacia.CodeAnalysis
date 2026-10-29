@@ -51,7 +51,10 @@ variables:
   # Project paths and settings
   - name: audaciaCodeAnalysisProjectPaths
     value: |
-      $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers/Audacia.CodeAnalysis.Analyzers.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers.Core/Audacia.CodeAnalysis.Analyzers.Core.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers.AspNetCore/Audacia.CodeAnalysis.Analyzers.AspNetCore.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers.TestProjects/Audacia.CodeAnalysis.Analyzers.TestProjects.csproj
+      $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers.Shared/Audacia.CodeAnalysis.Analyzers.Shared.csproj
       $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/tests/Audacia.CodeAnalysis.Analyzers.Test/Audacia.CodeAnalysis.Analyzers.Test.csproj
       $(System.DefaultWorkingDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers.Helpers/src/Audacia.CodeAnalysis.Analyzers.Helpers/Audacia.CodeAnalysis.Analyzers.Helpers.csproj
       $(System.DefaultWorkingDirectory)/dotnet-roslyn/config/Audacia.CodeAnalysis/Audacia.CodeAnalysis.csproj

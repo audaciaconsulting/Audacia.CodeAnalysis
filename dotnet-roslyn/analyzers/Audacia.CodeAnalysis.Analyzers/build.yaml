@@ -34,9 +34,12 @@ stages:
         trustedSigningAccount: $(TrustedSigningAccount)
         trustedSigningCertificateProfile: $(TrustedSigningCertificateProfile)
         directory: $(Build.SourcesDirectory)/dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers
-        fileToSignPattern: 'Audacia.CodeAnalysis.Analyzers.dll'
+        fileToSignPattern: 'Audacia.CodeAnalysis.Analyzers.*.dll'
         serviceConnection: 'Audacia Code Signing'
-        projects: 'dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers/Audacia.CodeAnalysis.Analyzers.csproj'
+        projects: |
+          dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers.Core/Audacia.CodeAnalysis.Analyzers.Core.csproj
+          dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers.AspNetCore/Audacia.CodeAnalysis.Analyzers.AspNetCore.csproj
+          dotnet-roslyn/analyzers/Audacia.CodeAnalysis.Analyzers/src/Audacia.CodeAnalysis.Analyzers.TestProjects/Audacia.CodeAnalysis.Analyzers.TestProjects.csproj
         workingDirectory: '$(Build.SourcesDirectory)\dotnet-roslyn\analyzers\Audacia.CodeAnalysis.Analyzers'
         excludePaths: '*.Test.csproj'
 
