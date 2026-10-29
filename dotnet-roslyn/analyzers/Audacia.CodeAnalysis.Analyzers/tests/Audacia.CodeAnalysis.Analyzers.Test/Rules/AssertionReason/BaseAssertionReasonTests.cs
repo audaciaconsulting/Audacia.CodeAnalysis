@@ -1,4 +1,4 @@
-using Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionReason;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;

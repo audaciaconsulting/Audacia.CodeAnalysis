@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.AspNetCore\Audacia.CodeAnalysis.Analyzers.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.Core\Audacia.CodeAnalysis.Analyzers.Core.csproj" />
     <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.Shared\Audacia.CodeAnalysis.Analyzers.Shared.csproj" />
+    <ProjectReference Include="..\..\src\Audacia.CodeAnalysis.Analyzers.TestProjects\Audacia.CodeAnalysis.Analyzers.TestProjects.csproj" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

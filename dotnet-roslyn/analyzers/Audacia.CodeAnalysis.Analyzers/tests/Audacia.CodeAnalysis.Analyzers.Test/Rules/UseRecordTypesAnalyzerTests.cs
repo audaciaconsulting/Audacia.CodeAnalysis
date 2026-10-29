@@ -1,4 +1,4 @@
-using Audacia.CodeAnalysis.Analyzers.Rules.UseRecordTypes;
+using Audacia.CodeAnalysis.Analyzers.Core.Rules.UseRecordTypes;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;

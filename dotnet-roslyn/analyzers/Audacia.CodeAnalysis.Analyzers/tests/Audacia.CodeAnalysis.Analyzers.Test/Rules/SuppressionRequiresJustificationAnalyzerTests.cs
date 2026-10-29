@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification;
+﻿using Audacia.CodeAnalysis.Analyzers.Core.Rules.SuppressionRequiresJustification;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;

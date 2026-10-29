@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionReturnTypedResults;
+﻿using Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.ControllerActionReturnTypedResults;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis.Diagnostics;
