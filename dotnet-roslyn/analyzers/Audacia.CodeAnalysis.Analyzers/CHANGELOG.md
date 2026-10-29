@@ -1,5 +1,12 @@
 ﻿# CHANGELOG
 
+TBC - TBC
+### Added
+- No new functionality added
+
+### Changed
+- Updated "ControllerActionProducesResponseTypeAnalyzer" to allow 'ProducesResponseType<T>'
+
 # 1.14.1 - 2026-07-31
 ### Added
 - No new functionality added
