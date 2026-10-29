@@ -371,4 +371,33 @@ public class TestController
 
         VerifyDiagnostic(testCode, expectedDiagnostic);
     }
+
+    [TestMethod]
+    public void No_Diagnostics_For_Controller_With_Endpoint_Using_ProducesResponseType_StatusCode()
+    {
+        const string testCode = @"
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ConsoleApplication1;
+
+public class TestController
+{
+    static void Main(string[] args)
+    {
+    }
+
+    [HttpGet]
+    [ProducesResponseType<string>(statusCode: StatusCodes.Status200OK)]
+    [ProducesResponseType<IEnumerable<string>>(statusCode: StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Get()
+    {
+        return new OkObjectResult(""hello"");
+    }
+}";
+
+        VerifyNoDiagnostic(testCode);
+    }
 }

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Linq;
-using System.Xml.Linq;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Microsoft.CodeAnalysis;
@@ -93,7 +91,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
                 var hasProducesResponseType = methodAttributes
                 .Any(
                     name =>
-                        name.Equals("ProducesResponseType")
+                        name.Equals("ProducesResponseType") || name.StartsWith("ProducesResponseType<")
                 );
 
                 if (!hasProducesResponseType && 
