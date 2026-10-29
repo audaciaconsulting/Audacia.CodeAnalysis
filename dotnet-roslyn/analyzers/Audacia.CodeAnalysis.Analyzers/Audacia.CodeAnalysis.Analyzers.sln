@@ -22,6 +22,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Analyzers.TestProjects", "src\Audacia.CodeAnalysis.Analyzers.TestProjects\Audacia.CodeAnalysis.Analyzers.TestProjects.csproj", "{1A82E218-2C9D-4642-B067-3816D1222795}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED3A5A2D-B36E-49E0-92CB-00C05A452C7C}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5DE1B761-E4A7-4E88-8B2B-B411676FBB26}"
 EndProject

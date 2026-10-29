@@ -1,0 +1,18 @@
+<Project>
+
+	<PropertyGroup>
+		<Version>2.0.0</Version>
+		<Authors>Audacia</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+		<Copyright>Copyright © Audacia $([System.DateTime]::Now.Year)</Copyright>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<PackageIcon>package-icon.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)../../../../package-icon.png" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+</Project>

@@ -1,9 +1,6 @@
 ﻿# CHANGELOG
 
 # 2.0.0 - 2026-10-29
-### Added
-- No new functionality added
-
 ### Changed
 - Split the Audacia.CodeAnalysis.Analyzers into multiple packages (`.Core`, `.AspNetCore`, `.TestProjects`) to allow for more granular control over which analyzers are included in a project.
 
