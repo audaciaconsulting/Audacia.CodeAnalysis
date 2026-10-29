@@ -506,6 +506,7 @@ var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 
 ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute when the return type is not TypedResults and will produce a warning if not.
 This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
+`ProducesResponseType<T>` is also supported, and will not produce a warning.
 
 Code with diagnostic:
 
