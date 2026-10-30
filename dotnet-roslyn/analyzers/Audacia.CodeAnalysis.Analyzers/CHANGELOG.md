@@ -1,6 +1,6 @@
 ﻿# CHANGELOG
 
-# 2.0.1 - 2026-10-29
+# TBC - TBC
 ### Changed
 - Updated "ControllerActionProducesResponseTypeAnalyzer" to allow 'ProducesResponseType<T>'
 
