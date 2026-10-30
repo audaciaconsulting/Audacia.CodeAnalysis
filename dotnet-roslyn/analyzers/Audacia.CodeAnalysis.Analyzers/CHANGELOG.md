@@ -1,5 +1,9 @@
 ﻿# CHANGELOG
 
+# 2.0.0 - 2026-10-29
+### Changed
+- Split the Audacia.CodeAnalysis.Analyzers into multiple packages (`Audacia.CodeAnalysis.Analyzers` for general-purpose analyzers, plus `.AspNetCore` and `.TestProjects`)
+
 # 1.14.1 - 2026-07-31
 ### Added
 - No new functionality added

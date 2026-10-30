@@ -1,6 +1,16 @@
-# Overview
+﻿# Overview
 
-The `Audacia.CodeAnalysis.Analyzers` library contains custom Roslyn analyzers. These analyzers are provided to enforce coding standards where no existing analyzer exists for the rule in question.
+The `Audacia.CodeAnalysis.Analyzers` libraries contain custom Roslyn analyzers. These analyzers are provided to enforce coding standards where no existing analyzer exists for the rule in question.
+
+The analyzers are split into the following packages:
+
+| Package | Purpose |
+| --- | --- |
+| [Audacia.CodeAnalysis.Analyzers.Core](#audaciacodeanalysisanalyzers) | General-purpose analyzers applicable to any C# project |
+| [Audacia.CodeAnalysis.Analyzers.AspNetCore](#audaciacodeanalysisanalyzersaspnetcore) | Analyzers specific to ASP.NET Core projects (e.g. controllers) |
+| [Audacia.CodeAnalysis.Analyzers.TestProjects](#audaciacodeanalysisanalyzerstestprojects) | Analyzers specific to test projects |
+
+Shared helpers (diagnostic IDs, settings readers, help link URLs etc.) live in `Audacia.CodeAnalysis.Analyzers.Shared`.
 
 # Contributing
 
@@ -8,10 +18,12 @@ In order to add a new analyzer you can follow existing analyzers as a guide. The
 
 Once the analyzer is finished, you should:
 
-1. Ensure its use and purpose is documented in this README file
+1. Add it to the appropriate project (`Core`, `AspNetCore` or `TestProjects`)
+1. Ensure its use and purpose is documented in this README file, under the section for that package
 1. Submit a PR to merge the changes into `master`
    - when the PR completes a build will be triggered that publishes a new version of the `Audacia.CodeAnalysis.Analyzers` NuGet package
-1. Update the `Audacia.CodeAnalysis.Analyzers` package in the main `Audacia.CodeAnalysis` project
+1. Update the appropriate `Audacia.CodeAnalysis.Analyzers.<Package>` package whichever of the main `Audacia.CodeAnalysis.<Package>` projects consume it.
+   - Also update the .globalconfig file in the main `Audacia.CodeAnalysis.<Package>` project to include the new analyzer's ID and any default settings
 1. Submit a second PR to merge the `Audacia.CodeAnalysis` change into `master`
    - when the PR completes a build will be triggered that publishes a new version of the `Audacia.CodeAnalysis` NuGet package
 
@@ -44,7 +56,9 @@ e.g
 
 # Analyzers
 
-## ACL1000 - Private fields should be prefixed with an underscore
+## Audacia.CodeAnalysis.Analyzers
+
+### ACL1000 - Private fields should be prefixed with an underscore
 
 <table>
 <tr>
@@ -77,7 +91,7 @@ public class MyClass
 }
 ```
 
-## ACL1001 - Variable declarations should not use a magic number
+### ACL1001 - Variable declarations should not use a magic number
 
 <table>
 <tr>
@@ -198,7 +212,7 @@ An exception to this rule is where the 'magic number' is 1. This is because it i
 var next = previous + 1;
 ```
 
-## ACL1002 - Methods should not exceed a predefined number of statements
+### ACL1002 - Methods should not exceed a predefined number of statements
 
 <table>
 <tr>
@@ -279,7 +293,7 @@ public void MyMethod(string arg)
 }
 ```
 
-## ACL1003 - Don't declare signatures with more than a predefined number of parameters
+### ACL1003 - Don't declare signatures with more than a predefined number of parameters
 
 <table>
 <tr>
@@ -349,7 +363,7 @@ public static string ExampleExtension(this Person person, int a, int b, int c, i
 public static string ExampleExtension(this Person person, int a, int b, int c, int d, int e);
 ```
 
-## ACL1004 - Don't use abbreviations
+### ACL1004 - Don't use abbreviations
 
 <table>
 <tr>
@@ -391,7 +405,7 @@ There are two additional pieces of configuration that can be applied:
 - Exclude lambda expression parameters from the check
 - Allow certain characters/abbreviations as a for loop variable
 
-### Lambda expressions
+#### Lambda expressions
 
 Single characters are often used as lambda expression parameter names, therefore this can be allowed by using the following setting (which is set in the default configuration):
 
@@ -405,7 +419,7 @@ With the above setting in place, the following code will not result in a diagnos
 var match = list.First(a => a.Name == "Bob");
 ```
 
-### Loop variables
+#### Loop variables
 
 Some single characters (such as `i`) are widely used in for loops, therefore specific values can be specified as allowed as for loop variables. These values are provided as a comma-separated list as follows:
 
@@ -419,24 +433,7 @@ With the above setting in place, the following code will not result in a diagnos
 for (var i = 0; i < 10; i++)
 ```
 
-## ACL1005 - Asynchronous method name is not suffixed with 'Async'
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Naming</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>CS-05.15</td>
-</tr>
-</table>
-
-ACL1005 is based on the Roslynator rule [RCS1046](https://josefpihrt.github.io/docs/roslynator/analyzers/RCS1046), which checks if asynchronous methods are suffixed with 'Async'.
-
-ACL1005 adds an exclusion for controller actions, as they are often asynchronous but should generally not be suffixed.
-
-## ACL1006 - Code block does not have braces
+### ACL1006 - Code block does not have braces
 
 <table>
 <tr>
@@ -462,7 +459,7 @@ public void SomeMethod(string arg)
 
 The justification for this exclusion is that argument null checks, while advised, add noise to a codebase, and minimising this noise is useful.
 
-## ACL1007 - ThenByDescending instead of OrderByDescending if follows OrderBy or OrderByDescending statement
+### ACL1007 - ThenByDescending instead of OrderByDescending if follows OrderBy or OrderByDescending statement
 
 <table>
 <tr>
@@ -491,171 +488,7 @@ Code without diagnostic:
 var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 ```
 
-## ACL1008 - Controller actions have ProducesResponseType attribute when return type is not TypedResults
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Maintainability</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>N/A</td>
-</tr>
-</table>
-
-ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute when the return type is not TypedResults and will produce a warning if not.
-This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
-
-Code with diagnostic:
-
-```csharp
-[HttpGet]
-public string Get()
-{
-    return 'hello';
-}
-```
-
-Code without diagnostic:
-
-```csharp
-[HttpGet]
-[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-public string Get()
-{
-    return 'hello';
-}
-```
-
-## ACL1009 - Method overload should call another overload
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Maintainability</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>CS-01.20</td>
-</tr>
-</table>
-
-ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1551.md), which ensures the more overloaded method is called from other overloads.
-
-ACL1009 reports warnings on the three rules below:
-
-### That an overloaded method does not call another overload (unless it is the longest in the group)
-
-Code with diagnostic:
-
-```csharp
-public void TestMethod(int i, string s)
-{
-   var line = string.Format(s, i, 0);
-}
-
-public virtual void TestMethod(int i, string s, int j)
-{
-   var line = string.Format(s, i, j);
-}
-```
-
-Code without diagnostic:
-
-```csharp
-public void TestMethod(int i, string s)
-{
-    TestMethod(i, s, 0);
-}
-
-public virtual void TestMethod(int i, string s, int j)
-{
-    var line = string.Format(s, i, j);
-}
-```
-
-### That the longest overloaded method (the one with the most parameters) is not virtual.
-
-Code with diagnostic:
-
-```csharp
-public void TestMethod(int i, string s)
-{
-    TestMethod(i, s, 0);
-}
-
-public void TestMethod(int i, string s, int j)
-{
-    var line = string.Format(s, i, j);
-}
-```
-
-Code without diagnostic:
-
-```csharp
-public void TestMethod(int i, string s)
-{
-    TestMethod(i, s, 0);
-}
-
-public virtual void TestMethod(int i, string s, int j)
-{
-    var line = string.Format(s, i, j);
-}
-```
-### The order of parameters in an overloaded method does not match with the parameter order of the longest overload.
-
-Code with diagnostic:
-
-```csharp
-public void TestMethod(string s, int i)
-{
-    TestMethod(i, s, 0);
-}
-
-public virtual void TestMethod(int i, string s, int j)
-{
-    var line = string.Format(s, i, j);
-}
-```
-
-Code without diagnostic:
-
-```csharp
-public void TestMethod(int i, string s)
-{
-    TestMethod(i, s, 0);
-}
-
-public virtual void TestMethod(int i, string s, int j)
-{
-    var line = string.Format(s, i, j);
-}
-```
-
-There is one exception for these rules and that is if the class or method is from a `MVC` `Controller` as shown below. If a class inherits from a `Controller` or `ControllerBase` or if the method has Http Atrributes e.g. `HttpGet`.
-
-The code below will **NOT** trigger a warning since the methods are controller actions and therefore will be excluded.
-
-```csharp
-public class TestClassController : Controller
-{
-	[HttpGet]
-	public string Get(int i)
-	{
-		return string.Format(""Test"", i);
-	}
-
-	[HttpGet(""Test"")]
-	public string Get(int i, string s)
-	{
-		return string.Format(s, i);
-	}
-}
-```
-
-## ACL1010 - Nullable reference types enabled
+### ACL1010 - Nullable reference types enabled
 
 <table>
 <tr>
@@ -679,8 +512,7 @@ All other values are permitted.
 
 ACL1010 also provides a code fix, which inserts or updates the <Nullable> node in a .csproj file with a default value of `enable`.
 
-
-## ACL1011 - Don't nest too many control statements
+### ACL1011 - Don't nest too many control statements
 
 <table>
 <tr>
@@ -733,7 +565,7 @@ This analyzer considers the following to be "control statements":
 
 Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1011.max_control_statement_depth`.
 
-## ACL1012 - Don't pass predicates into 'Where' methods with too many clauses
+### ACL1012 - Don't pass predicates into 'Where' methods with too many clauses
 
 <table>
 <tr>
@@ -774,7 +606,7 @@ var filtered = myCollection
 
 Maximum allowed clauses can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1012.max_where_clauses`.
 
-## ACL1013 - Use record types
+### ACL1013 - Use record types
 
 <table>
 <tr>
@@ -811,7 +643,7 @@ public record PersonDto
 
 By default, types suffixed with `Dto` will raise a warning. This can be configured in `.editorconfig` as below.
 
-### Included suffixes
+#### Included suffixes
 
 To override the default behaviour of only checking for `Dto` suffixes, you can specify what types are checked in your `.editorconfig` as follows:
 
@@ -823,7 +655,7 @@ Note the following:
 - The diagnostic `Dto`s is removed unless explicitly included above.
 - The suffixes are case-sensitive, in case another word happens to end with the same letters.
 
-## ACL1014 - Do not include numbers in identifier name
+### ACL1014 - Do not include numbers in identifier name
 
 
 <table>
@@ -865,7 +697,7 @@ public class Class
 }
 ```
 
-### Allowed words
+#### Allowed words
 To override the default behaviour of prohibiting all numbers, you can specify what words are allowed as follows:
 
 ```
@@ -875,83 +707,7 @@ Note the following:
 - These overrides are case-insensitive. For example. an identifier with 'b2c' in its name would not violate this rule.
 - These overrides can contain letters. For example, an identifier with '2' in its name would violate this rule.
 
-## ACL1015 - Controller action has ProducesResponseType attribute when return type is TypedResults
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Maintainability</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>N/A</td>
-</tr>
-</table>
-
-ACL1015 checks if a controller action has `ProducesResponseType` attribute when the return type is TypedResults and will produce a warning if that is the case.
-This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
-
-Code with diagnostic:
-
-```csharp
-[HttpGet]
-[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-public Results<NotFound, Ok<string>> Get()
-{
-    var result = GetResult();
-    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
-}
-```
-
-Code without diagnostic:
-
-```csharp
-[HttpGet]
-public Results<NotFound, Ok<string>> Get()
-{
-    var result = GetResult();
-    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
-}
-```
-
-## ACL1016 - Controller action should return TypedResults instead of IActionResults
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Maintainability</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>N/A</td>
-</tr>
-</table>
-
-ACL1016 checks if a controller action return type is TypedResults instead of IActionResult and will produce a warning if not.
-This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
-
-Code with diagnostic:
-
-```csharp
-[HttpGet]
-public IActionResult Get()
-{
-    return Ok('hello');
-}
-```
-
-Code without diagnostic:
-
-```csharp
-[HttpGet]
-public Results<NotFound, Ok<string>> Get()
-{
-    var result = GetResult();
-    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
-}
-```
-
-## ACL1017 - Avoid signatures that take a bool parameter but exclude positional syntax records
+### ACL1017 - Avoid signatures that take a bool parameter but exclude positional syntax records
 
 ACL1017 performs the same analysis as the 'avoid boolean parameter' analyzer rule (AV1564) but excludes positional syntax records, treating them as properties rather than parameters.
 
@@ -997,7 +753,7 @@ No diagnostic for primary constructor with bool parameters:
      }
 ```
 
-## ACL1018 - Code analysis suppression attribute requires Justification
+### ACL1018 - Code analysis suppression attribute requires Justification
 
 <table>
 <tr>
@@ -1044,7 +800,436 @@ public void MyMethod()
 }
 ```
 
-## ACL1019 - Use an assertion scope with more than two assertions in a test method
+### ACL1023 - Named properties within log messages should use PascalCase
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1023 checks if named properties within log messages are in PascalCase and will produce a warning if not.
+It also supports Serilog's destructuring operator (@), and will ignore this when checking the case of the property name.
+
+Positional properties will not trigger a diagnostic as ACL1026 handles these separately.
+
+All log methods from `Microsoft.Extensions.Logging` are supported.
+
+Code with diagnostic:
+```csharp
+    _logger.LogInformation("User {userId} logged in with IP {ip_address}", userId, ipAddress);
+    _logger.LogInformation("User {@user} performed an action", user);
+    _logger.LogInformation("{{UserId}}: {userId}", userId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{userId}}", userId);
+    _logger.LogInformation("UserId: {userId:N0}", userId);
+
+    // Variables storing the message template are also checked
+    var message = "User {userId} logged in";
+    _logger.LogInformation(message, userId);
+```
+
+Code without diagnostic:
+```csharp
+    _logger.LogInformation("User {UserId} logged in with IP {IpAddress}", userId, ipAddress);
+    _logger.LogInformation("User {0} logged in with IP {1}", userId, ipAddress);
+    _logger.LogInformation("User {@User} performed an action", user);
+    _logger.LogInformation("{{UserId}}: {UserId}", userId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}}", userId);
+    _logger.LogInformation("UserId: {UserId:N0}", userId);
+
+    // Variables storing the message template are also checked
+    var message = "User {UserId} logged in";
+    _logger.LogInformation(message, userId);
+```
+
+### ACL1024 - Named properties within log messages should not be duplicated
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1024 checks if named properties within a log message are duplicated and will produce a warning for each if so.
+
+All log methods from `Microsoft.Extensions.Logging` are supported.
+
+Code with diagnostic:
+```csharp
+    _logger.LogInformation("User {UserId} logged in with IP {UserId}", userId, ipAddress);
+    _logger.LogInformation("User {@User} performed an action for {@User}", user, targetUser);
+    _logger.LogInformation("{{UserId}}: {UserId} and {UserId}", userId, targetUserId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{UserId}}", userId, targetUserId);
+    _logger.LogInformation("UserId: {UserId:N0} and {UserId:c}", userId, targetUserId);
+
+    // Variables storing the message template are also checked
+    var message = "User {UserId} logged in with IP {UserId}";
+    _logger.LogInformation(message, userId, ipAddress);
+```
+
+Code without diagnostic:
+```csharp
+    _logger.LogInformation("User {UserId} logged in with IP {IpAddress}", userId, ipAddress);
+    _logger.LogInformation("User {@User} performed an action for {@TargetUser}", user, targetUser);
+    _logger.LogInformation("{{UserId}}: {UserId} and {TargetUserId}", userId, targetUserId);
+    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{TargetUserId}}", userId, targetUserId);
+    _logger.LogInformation("UserId: {UserId:N0} and {TargetUserId:c}", userId, targetUserId);
+
+    // Variables storing the message template are also checked
+    var message = "User {UserId} logged in with IP {IpAddress}";
+    _logger.LogInformation(message, userId, ipAddress);
+```
+
+### ACL1025 - Exceptions should not be used in log message templates
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1025 checks if exceptions are included in log message templates and will produce a warning if so.
+Exceptions should be passed as the 'exception' parameter to the log method rather than included in the message template.
+
+All log methods from `Microsoft.Extensions.Logging` are supported.
+
+Code with diagnostic:
+```csharp
+    var anError = new System.ArgumentException("This is an error");
+
+    _logger.LogInformation("Error: {Error}", anError);
+    _logger.LogInformation("Error occurred for user {UserId}: {Error}", userId, anError);
+    _logger.LogInformation("Error: {@Error}", anError);
+    _logger.LogInformation(args: [new System.Exception()], message: "Error: {Error}");
+```
+
+Code without diagnostic:
+```csharp
+    var anError = new System.ArgumentException("This is an error");
+
+    _logger.LogInformation(anError, "An error occurred");
+    _logger.LogInformation(anError, "An error occurred for user {UserId}", userId);
+    _logger.LogInformation(exception: [new System.Exception()], message: "An error occurred");
+```
+
+### ACL1026 - Named properties should be used in logging messages
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1026 checks whether positional properties are used within logging message templates and will produce a warning if so.
+
+All log methods from `Microsoft.Extensions.Logging` are supported.
+
+Code with diagnostic:
+```csharp
+    _logger.LogInformation("Message: {0}", message);
+    _logger.LogInformation("Message: {@0}", message);
+    _logger.LogInformation("Amount: {0:c}", amount);
+    _logger.LogInformation("Message: {0} Info: {1}", message, info);
+    _logger.LogInformation("Message: {Message} Info: {0}", message, info);
+
+    // Variables storing the message template are also checked
+    var template = "Message: {0}";
+    _logger.LogInformation(template, message);
+```
+
+Code without diagnostic:
+```csharp
+    _logger.LogInformation("Message: {Message}", message);
+    _logger.LogInformation("Amount: {Amount:c}", amount);
+    _logger.LogInformation("Message: {Message} Info: {Info}", message, info);
+
+    // Variables storing the message template are also checked
+    var template = "Message: {Message}";
+    _logger.LogInformation(template, message);
+```
+
+## Audacia.CodeAnalysis.Analyzers.AspNetCore
+
+### ACL1005 - Asynchronous method name is not suffixed with 'Async'
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Naming</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-05.15</td>
+</tr>
+</table>
+
+ACL1005 is based on the Roslynator rule [RCS1046](https://josefpihrt.github.io/docs/roslynator/analyzers/RCS1046), which checks if asynchronous methods are suffixed with 'Async'.
+
+ACL1005 adds an exclusion for controller actions, as they are often asynchronous but should generally not be suffixed.
+
+### ACL1008 - Controller actions have ProducesResponseType attribute when return type is not TypedResults
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute when the return type is not TypedResults and will produce a warning if not.
+This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
+
+Code with diagnostic:
+
+```csharp
+[HttpGet]
+public string Get()
+{
+    return 'hello';
+}
+```
+
+Code without diagnostic:
+
+```csharp
+[HttpGet]
+[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+public string Get()
+{
+    return 'hello';
+}
+```
+
+### ACL1009 - Method overload should call another overload
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>CS-01.20</td>
+</tr>
+</table>
+
+ACL1009 is based on CSharpGuidelinesAnalyzer [AV1551](https://github.com/dennisdoomen/CSharpGuidelines/blob/5.6.0/_rules/1551.md), which ensures the more overloaded method is called from other overloads.
+
+ACL1009 reports warnings on the three rules below:
+
+#### That an overloaded method does not call another overload (unless it is the longest in the group)
+
+Code with diagnostic:
+
+```csharp
+public void TestMethod(int i, string s)
+{
+   var line = string.Format(s, i, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j)
+{
+   var line = string.Format(s, i, j);
+}
+```
+
+Code without diagnostic:
+
+```csharp
+public void TestMethod(int i, string s)
+{
+    TestMethod(i, s, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j)
+{
+    var line = string.Format(s, i, j);
+}
+```
+
+#### That the longest overloaded method (the one with the most parameters) is not virtual.
+
+Code with diagnostic:
+
+```csharp
+public void TestMethod(int i, string s)
+{
+    TestMethod(i, s, 0);
+}
+
+public void TestMethod(int i, string s, int j)
+{
+    var line = string.Format(s, i, j);
+}
+```
+
+Code without diagnostic:
+
+```csharp
+public void TestMethod(int i, string s)
+{
+    TestMethod(i, s, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j)
+{
+    var line = string.Format(s, i, j);
+}
+```
+#### The order of parameters in an overloaded method does not match with the parameter order of the longest overload.
+
+Code with diagnostic:
+
+```csharp
+public void TestMethod(string s, int i)
+{
+    TestMethod(i, s, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j)
+{
+    var line = string.Format(s, i, j);
+}
+```
+
+Code without diagnostic:
+
+```csharp
+public void TestMethod(int i, string s)
+{
+    TestMethod(i, s, 0);
+}
+
+public virtual void TestMethod(int i, string s, int j)
+{
+    var line = string.Format(s, i, j);
+}
+```
+
+There is one exception for these rules and that is if the class or method is from a `MVC` `Controller` as shown below. If a class inherits from a `Controller` or `ControllerBase` or if the method has Http Atrributes e.g. `HttpGet`.
+
+The code below will **NOT** trigger a warning since the methods are controller actions and therefore will be excluded.
+
+```csharp
+public class TestClassController : Controller
+{
+	[HttpGet]
+	public string Get(int i)
+	{
+		return string.Format(""Test"", i);
+	}
+
+	[HttpGet(""Test"")]
+	public string Get(int i, string s)
+	{
+		return string.Format(s, i);
+	}
+}
+```
+
+### ACL1015 - Controller action has ProducesResponseType attribute when return type is TypedResults
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1015 checks if a controller action has `ProducesResponseType` attribute when the return type is TypedResults and will produce a warning if that is the case.
+This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
+
+Code with diagnostic:
+
+```csharp
+[HttpGet]
+[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+public Results<NotFound, Ok<string>> Get()
+{
+    var result = GetResult();
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
+
+Code without diagnostic:
+
+```csharp
+[HttpGet]
+public Results<NotFound, Ok<string>> Get()
+{
+    var result = GetResult();
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
+
+### ACL1016 - Controller action should return TypedResults instead of IActionResults
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+ACL1016 checks if a controller action return type is TypedResults instead of IActionResult and will produce a warning if not.
+This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
+
+Code with diagnostic:
+
+```csharp
+[HttpGet]
+public IActionResult Get()
+{
+    return Ok('hello');
+}
+```
+
+Code without diagnostic:
+
+```csharp
+[HttpGet]
+public Results<NotFound, Ok<string>> Get()
+{
+    var result = GetResult();
+    return result == null ? TypedResults.NotFound() : TypedResults.Ok(result);
+}
+```
+
+## Audacia.CodeAnalysis.Analyzers.TestProjects
+
+### ACL1019 - Use an assertion scope with more than two assertions in a test method
 
 <table>
 <tr>
@@ -1134,7 +1319,7 @@ public void FluentAssertionsTestMethod()
 }
 ```
 
-## ACL1020 - Test methods must contain at least one assertion
+### ACL1020 - Test methods must contain at least one assertion
 
 <table>
 <tr>
@@ -1178,7 +1363,8 @@ public void TestMethod()
     foo.Should().NotBeEmpty();
 }
 ```
-## ACL1021 - Assertions must contain a reason where supported
+
+### ACL1021 - Assertions must contain a reason where supported
 
 <table>
 <tr>
@@ -1228,7 +1414,7 @@ public void TestMethod()
 }
 ```
 
-## ACL1022 - Test method names must be consistent
+### ACL1022 - Test method names must be consistent
 
 <table>
 <tr>
@@ -1255,170 +1441,3 @@ Some examples of common conventions and their regex patterns are as follows:
 | `WhenAUserDoesXWithSomethingThenThisHappens123` | `^[A-Z][a-zA-Z0-9]*$` | PascalCase only. No underscores permitted anywhere. The first character must be an upper case letter. |
 | `when_a_user_does_x_with_something_then_this_happens_123` | `^[a-z][a-z0-9]*(_[a-z][a-z0-9]*)*$` | snake_case only. All characters must be lower case letters or digits. Each underscore-separated segment must start with a lower case letter. No leading or trailing underscores. |
 
-## ACL1023 - Named properties within log messages should use PascalCase
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Logging</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>N/A</td>
-</tr>
-</table>
-
-ACL1023 checks if named properties within log messages are in PascalCase and will produce a warning if not.
-It also supports Serilog's destructuring operator (@), and will ignore this when checking the case of the property name.
-
-Positional properties will not trigger a diagnostic as ACL1026 handles these separately.
-
-All log methods from `Microsoft.Extensions.Logging` are supported.
-
-Code with diagnostic:
-```csharp
-    _logger.LogInformation("User {userId} logged in with IP {ip_address}", userId, ipAddress);
-    _logger.LogInformation("User {@user} performed an action", user);
-    _logger.LogInformation("{{UserId}}: {userId}", userId);
-    _logger.LogInformation($"{{{{UserId}}}}: {{userId}}", userId);
-    _logger.LogInformation("UserId: {userId:N0}", userId);
-
-    // Variables storing the message template are also checked
-    var message = "User {userId} logged in";
-    _logger.LogInformation(message, userId);
-```
-
-Code without diagnostic:
-```csharp
-    _logger.LogInformation("User {UserId} logged in with IP {IpAddress}", userId, ipAddress);
-    _logger.LogInformation("User {0} logged in with IP {1}", userId, ipAddress);
-    _logger.LogInformation("User {@User} performed an action", user);
-    _logger.LogInformation("{{UserId}}: {UserId}", userId);
-    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}}", userId);
-    _logger.LogInformation("UserId: {UserId:N0}", userId);
-
-    // Variables storing the message template are also checked
-    var message = "User {UserId} logged in";
-    _logger.LogInformation(message, userId);
-```
-
-## ACL1024 - Named properties within log messages should not be duplicated
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Logging</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>N/A</td>
-</tr>
-</table>
-
-ACL1024 checks if named properties within a log message are duplicated and will produce a warning for each if so.
-
-All log methods from `Microsoft.Extensions.Logging` are supported.
-
-Code with diagnostic:
-```csharp
-    _logger.LogInformation("User {UserId} logged in with IP {UserId}", userId, ipAddress);
-    _logger.LogInformation("User {@User} performed an action for {@User}", user, targetUser);
-    _logger.LogInformation("{{UserId}}: {UserId} and {UserId}", userId, targetUserId);
-    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{UserId}}", userId, targetUserId);
-    _logger.LogInformation("UserId: {UserId:N0} and {UserId:c}", userId, targetUserId);
-
-    // Variables storing the message template are also checked
-    var message = "User {UserId} logged in with IP {UserId}";
-    _logger.LogInformation(message, userId, ipAddress);
-```
-
-Code without diagnostic:
-```csharp
-    _logger.LogInformation("User {UserId} logged in with IP {IpAddress}", userId, ipAddress);
-    _logger.LogInformation("User {@User} performed an action for {@TargetUser}", user, targetUser);
-    _logger.LogInformation("{{UserId}}: {UserId} and {TargetUserId}", userId, targetUserId);
-    _logger.LogInformation($"{{{{UserId}}}}: {{UserId}} and {{TargetUserId}}", userId, targetUserId);
-    _logger.LogInformation("UserId: {UserId:N0} and {TargetUserId:c}", userId, targetUserId);
-
-    // Variables storing the message template are also checked
-    var message = "User {UserId} logged in with IP {IpAddress}";
-    _logger.LogInformation(message, userId, ipAddress);
-```
-
-## ACL1025 - Exceptions should not be used in log message templates
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Logging</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>N/A</td>
-</tr>
-</table>
-
-ACL1025 checks if exceptions are included in log message templates and will produce a warning if so.
-Exceptions should be passed as the 'exception' parameter to the log method rather than included in the message template.
-
-All log methods from `Microsoft.Extensions.Logging` are supported.
-
-Code with diagnostic:
-```csharp
-    var anError = new System.ArgumentException("This is an error");
-
-    _logger.LogInformation("Error: {Error}", anError);
-    _logger.LogInformation("Error occurred for user {UserId}: {Error}", userId, anError);
-    _logger.LogInformation("Error: {@Error}", anError);
-    _logger.LogInformation(args: [new System.Exception()], message: "Error: {Error}");
-```
-
-Code without diagnostic:
-```csharp
-    var anError = new System.ArgumentException("This is an error");
-
-    _logger.LogInformation(anError, "An error occurred");
-    _logger.LogInformation(anError, "An error occurred for user {UserId}", userId);
-    _logger.LogInformation(exception: [new System.Exception()], message: "An error occurred");
-```
-
-## ACL1026 - Named properties should be used in logging messages
-
-<table>
-<tr>
-    <td>Category:</td>
-    <td>Logging</td>
-</tr>
-<tr>
-    <td>Audacia coding standard:</td>
-    <td>N/A</td>
-</tr>
-</table>
-
-ACL1026 checks whether positional properties are used within logging message templates and will produce a warning if so.
-
-All log methods from `Microsoft.Extensions.Logging` are supported.
-
-Code with diagnostic:
-```csharp
-    _logger.LogInformation("Message: {0}", message);
-    _logger.LogInformation("Message: {@0}", message);
-    _logger.LogInformation("Amount: {0:c}", amount);
-    _logger.LogInformation("Message: {0} Info: {1}", message, info);
-    _logger.LogInformation("Message: {Message} Info: {0}", message, info);
-
-    // Variables storing the message template are also checked
-    var template = "Message: {0}";
-    _logger.LogInformation(template, message);
-```
-
-Code without diagnostic:
-```csharp
-    _logger.LogInformation("Message: {Message}", message);
-    _logger.LogInformation("Amount: {Amount:c}", amount);
-    _logger.LogInformation("Message: {Message} Info: {Info}", message, info);
-
-    // Variables storing the message template are also checked
-    var template = "Message: {Message}";
-    _logger.LogInformation(template, message);
-```

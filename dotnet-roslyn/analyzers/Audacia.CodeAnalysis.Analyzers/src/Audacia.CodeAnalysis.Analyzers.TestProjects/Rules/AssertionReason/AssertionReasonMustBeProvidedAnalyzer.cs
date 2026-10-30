@@ -1,0 +1,96 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Audacia.CodeAnalysis.Analyzers.Shared.Common;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Common.AssertionFrameworks;
+using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Extensions;
+
+namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionReason
+{
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public sealed class AssertionReasonMustBeProvidedAnalyzer : DiagnosticAnalyzer
+    {
+        public const string Id = DiagnosticId.AssertionReasonMustBeProvided;
+
+        private const string Title = "Assertion has no reason provided";
+        private const string MessageFormat = "Assertions must contain a reason";
+        private const string Description = "Assertions must provide a reason for better clarity and maintainability.";
+
+        private static readonly DiagnosticDescriptor Rule
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Maintainability, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);
+        }
+
+        private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext)
+        {
+            if (!nodeAnalysisContext.IsXunitTestMethod())
+            {
+                return;
+            }
+
+            var methodDeclaration = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
+
+            IAssertionFramework assertionFramework = null;
+            AnalyzeMethodInvocations(
+                methodDeclaration,
+                nodeAnalysisContext,
+                nodeAnalysisContext.SemanticModel,
+                new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default),
+                ref assertionFramework);
+        }
+
+        private static void AnalyzeMethodInvocations(
+            MethodDeclarationSyntax methodDeclaration,
+            SyntaxNodeAnalysisContext nodeAnalysisContext,
+            SemanticModel semanticModel,
+            HashSet<IMethodSymbol> visitedMethods,
+            ref IAssertionFramework assertionFramework)
+        {
+            SyntaxNode body = (SyntaxNode)methodDeclaration.Body ?? methodDeclaration.ExpressionBody;
+
+            if (body == null)
+            {
+                return;
+            }
+
+            var allInvocations = body.DescendantNodes().OfType<InvocationExpressionSyntax>();
+
+            foreach (var invocation in allInvocations)
+            {
+                if (invocation.IsValidAssertion(ref assertionFramework) && !assertionFramework.HasReasonArgument(invocation, semanticModel))
+                {
+                    var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
+                    nodeAnalysisContext.ReportDiagnostic(diagnostic);
+                    continue;
+                }
+
+                // Not a known assertion call — check whether it is a helper method call that contains assertions.
+                var (helperMethod, helperSemanticModel) = invocation.ResolveHelperMethodDeclarationWithSemanticModel(semanticModel);
+                if (helperMethod == null)
+                {
+                    continue;
+                }
+
+                var methodSymbol = helperSemanticModel.GetDeclaredSymbol(helperMethod);
+                if (methodSymbol == null || !visitedMethods.Add(methodSymbol))
+                {
+                    continue;
+                }
+
+                AnalyzeMethodInvocations(helperMethod, nodeAnalysisContext, helperSemanticModel, visitedMethods, ref assertionFramework);
+            }
+        }
+    }
+}
