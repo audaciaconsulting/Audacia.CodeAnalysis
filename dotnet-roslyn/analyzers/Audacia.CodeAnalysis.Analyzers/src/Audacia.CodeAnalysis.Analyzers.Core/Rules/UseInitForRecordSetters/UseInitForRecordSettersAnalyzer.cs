@@ -40,11 +40,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseInitForRecordSetters
 
         private void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
         {
-            var settingsReader = new EditorConfigSettingsReader(startContext.Options);
-            startContext.RegisterSymbolAction(actionContext => AnalyzeSymbol(actionContext, settingsReader), SymbolKind.NamedType);
+            startContext.RegisterSymbolAction(actionContext => AnalyzeSymbol(actionContext), SymbolKind.NamedType);
         }
 
-        private void AnalyzeSymbol(SymbolAnalysisContext context, EditorConfigSettingsReader settingsReader)
+        private void AnalyzeSymbol(SymbolAnalysisContext context)
         {
             var type = (INamedTypeSymbol)context.Symbol;
 
