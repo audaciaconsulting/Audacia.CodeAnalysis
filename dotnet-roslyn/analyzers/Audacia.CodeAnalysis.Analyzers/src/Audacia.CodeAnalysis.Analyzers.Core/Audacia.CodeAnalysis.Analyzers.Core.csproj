@@ -1,15 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>This package supports projects operating a minimum version of C# 12 and .NET 8.</Description>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <RootNamespace>Audacia.CodeAnalysis.Analyzers</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup>
-        <PackageId>Audacia.CodeAnalysis.Analyzers.Core</PackageId>
+        <PackageId>Audacia.CodeAnalysis.Analyzers</PackageId>
         <Description>This is a set of custom Roslyn analyzers. It is a dependency of Audacia.CodeAnalysis and shouldn't need to be referenced directly.</Description>
         <PackageTags>Audacia.CodeAnalysis.Analyzers, analyzers</PackageTags>
     </PropertyGroup>

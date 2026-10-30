@@ -1,10 +1,12 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Shared.Common;
+using System.Collections.Immutable;
+using System.Linq;
+using Audacia.CodeAnalysis.Analyzers.AspNetCore.Extensions;
+using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Collections.Immutable;
 
 namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.ControllerActionReturnTypedResults
 {

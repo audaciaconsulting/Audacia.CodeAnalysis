@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using Audacia.CodeAnalysis.Analyzers.Shared.Common.AssertionFrameworks;
 
 namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
 {
@@ -14,14 +13,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
     /// </summary>
     public static class SyntaxExtensions
     {
-        private static readonly IAssertionFramework[] AssertionFrameworks =
-        {
-            new XunitAssertions(),
-            new FluentAssertions(),
-            new ShouldlyAssertions()
-        };
-
-        // The fully qualified name of the ILogger interface, used to identify logger method invocations.
+        // The fully
         private const string LoggerTypeName = "Microsoft.Extensions.Logging.ILogger";
 
         /// <summary>
@@ -340,43 +332,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         }
 
         /// <summary>
-        /// Returns the <see cref="IAssertionFramework"/> that recognises <paramref name="invocation"/> as one
-        /// of its assertion calls, or <see langword="null"/> if the invocation is not a known assertion.
-        /// </summary>
-        public static IAssertionFramework GetAssertionFramework(this InvocationExpressionSyntax invocation)
-        {
-
-            return AssertionFrameworks.FirstOrDefault(framework => framework.IsAssertionCall(invocation));
-        }
-
-        /// <summary>
-        /// Returns the <see cref="IAssertionFramework"/> that recognises <paramref name="invocation"/> as being
-        /// nested inside one of its assertion scopes, or <see langword="null"/> if the invocation is not nested inside any known assertion scope.
-        /// </summary>
-        public static IAssertionFramework GetAssertionScopeFramework(this InvocationExpressionSyntax invocation)
-        {
-            return AssertionFrameworks.FirstOrDefault(framework =>
-                invocation.Ancestors().Any(ancestor => framework.IsAssertionScopeExpression(ancestor, invocation)));
-        }
-
-        /// <summary>
-        /// Determines whether the <paramref name="invocation"/> is a valid test assertion call, using the <paramref name="assertionFramework"/> if set.
-        /// If it is found to be a valid assertion then <paramref name="assertionFramework"/> is set to the framework which it is valid for, if it wasn't
-        /// already set.
-        /// </summary>
-        public static bool IsValidAssertion(this InvocationExpressionSyntax invocation, ref IAssertionFramework assertionFramework)
-        {
-            var validAssertion = false;
-            if (assertionFramework == null)
-            {
-                assertionFramework = invocation.GetAssertionFramework();
-                validAssertion = assertionFramework != null;
-            }
-
-            return validAssertion || assertionFramework?.IsAssertionCall(invocation) == true;
-        }
-
-        /// <summary>
         /// Uses the semantic model to resolve <paramref name="invocation"/> to the <see cref="MethodDeclarationSyntax"/>
         /// declared in the same compilation, or returns <see langword="null"/> if not found.
         /// When a helper is found, the matching semantic model for its syntax tree is also returned.
@@ -403,15 +358,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
 
             helperSemanticModel = semanticModel.Compilation.GetSemanticModel(methodDeclaration.SyntaxTree);
             return (methodDeclaration, helperSemanticModel);
-        }
-
-        /// <summary>
-        /// Determines whether the given <paramref name="invocation"/> is nested inside an assertion scope of the given <paramref name="framework"/>.
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsInsideAssertionScope(this InvocationExpressionSyntax invocation, IAssertionFramework framework)
-        {
-            return invocation.Ancestors().Any(ancestor => framework.IsAssertionScopeExpression(ancestor, invocation));
         }
 
         /// <summary>

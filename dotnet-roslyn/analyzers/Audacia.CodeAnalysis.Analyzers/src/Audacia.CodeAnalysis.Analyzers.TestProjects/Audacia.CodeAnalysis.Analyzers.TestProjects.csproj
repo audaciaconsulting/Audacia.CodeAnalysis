@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<LangVersion>latest</LangVersion>
+		<Description>This package supports projects operating a minimum version of C# 12 and .NET 8.</Description>
+		<RootNamespace>Audacia.CodeAnalysis.Analyzers.TestProjects</RootNamespace>
 	</PropertyGroup>
 
 	<PropertyGroup>
