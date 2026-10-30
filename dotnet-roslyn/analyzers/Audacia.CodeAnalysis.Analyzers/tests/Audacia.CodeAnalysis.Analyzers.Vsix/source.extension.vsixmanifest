@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+	<Metadata>
+		<Identity Id="Audacia.CodeAnalysis.Analyzers.13c954e2" Version="1.0" Language="en-US" Publisher="Audacia" />
+		<DisplayName>Audacia.CodeAnalysis.Analyzers</DisplayName>
+		<Description xml:space="preserve">Local debugging extension for the Audacia Roslyn analyzers (Core, AspNetCore and TestProjects).</Description>
+	</Metadata>
+	<Installation>
+		<InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,)">
+			<ProductArchitecture>amd64</ProductArchitecture>
+		</InstallationTarget>
+		<InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[17.0,)">
+			<ProductArchitecture>amd64</ProductArchitecture>
+		</InstallationTarget>
+		<InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,)">
+			<ProductArchitecture>amd64</ProductArchitecture>
+		</InstallationTarget>
+	</Installation>
+	<Dependencies>
+		<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.8,)" />
+	</Dependencies>
+	<Assets>
+		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Audacia.CodeAnalysis.Analyzers.Shared" Path="|Audacia.CodeAnalysis.Analyzers.Shared|"/>
+		<Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Audacia.CodeAnalysis.Analyzers.Shared" Path="|Audacia.CodeAnalysis.Analyzers.Shared|"/>
+		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Audacia.CodeAnalysis.Analyzers.Core" Path="|Audacia.CodeAnalysis.Analyzers.Core|"/>
+		<Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Audacia.CodeAnalysis.Analyzers.Core" Path="|Audacia.CodeAnalysis.Analyzers.Core|"/>
+		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Audacia.CodeAnalysis.Analyzers.AspNetCore" Path="|Audacia.CodeAnalysis.Analyzers.AspNetCore|"/>
+		<Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Audacia.CodeAnalysis.Analyzers.AspNetCore" Path="|Audacia.CodeAnalysis.Analyzers.AspNetCore|"/>
+		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Audacia.CodeAnalysis.Analyzers.TestProjects" Path="|Audacia.CodeAnalysis.Analyzers.TestProjects|"/>
+		<Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Audacia.CodeAnalysis.Analyzers.TestProjects" Path="|Audacia.CodeAnalysis.Analyzers.TestProjects|"/>
+	</Assets>
+	<Prerequisites>
+		<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,)" DisplayName="Visual Studio core editor" />
+		<Prerequisite Id="Microsoft.VisualStudio.Component.Roslyn.LanguageServices" Version="[17.0,)" DisplayName="Roslyn Language Services" />
+	</Prerequisites>
+</PackageManifest>

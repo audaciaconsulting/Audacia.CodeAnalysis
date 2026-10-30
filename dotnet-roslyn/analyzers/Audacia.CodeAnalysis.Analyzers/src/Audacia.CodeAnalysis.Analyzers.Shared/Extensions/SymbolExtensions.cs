@@ -388,32 +388,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         }
 
         /// <summary>
-        /// Returns true if method is representing a http action (e.g. get/post/delete/put etc)
-        /// </summary>
-        public static bool IsControllerAction(this IMethodSymbol method)
-        {
-            var controllerActionAttributeNames
-                = new List<string>
-                {
-                    "HttpDelete",
-                    "HttpGet",
-                    "HttpHead",
-                    "HttpOptions",
-                    "HttpPatch",
-                    "HttpPost",
-                    "HttpPut"
-                };
-
-            var attributes = method.GetAttributes().Select(attribute => attribute.AttributeClass.Name.ToString());
-
-            var isControllerAction = attributes.Any(attribute =>
-                controllerActionAttributeNames.Any(name =>
-                    attribute.StartsWith(name, StringComparison.InvariantCultureIgnoreCase)));
-
-            return isControllerAction;
-        }
-
-        /// <summary>
         /// Checks whether the <paramref name="parameterSymbol"/> is the last parameter and returns true is so.
         /// </summary>
         /// <param name="parameterSymbol"></param>
