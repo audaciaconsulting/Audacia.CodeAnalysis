@@ -968,6 +968,40 @@ Code without diagnostic:
     _logger.LogInformation(template, message);
 ```
 
+### ACL1027 - Record properties should use init instead of set for the setter
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>N/A</td>
+</tr>
+</table>
+
+The ACL1027 rule checks whether record properties use 'init' instead of 'set' for the setter. It also provides a code fix, which replaces 'set' with 'init'.
+The rule applies to both record classes and record structs, but not static or overridden properties (where replacing 'set' with 'init' would be invalid).
+
+Code with violation:
+
+```csharp
+public record MyRecord
+{
+    public int Number { get; set; }
+}
+```
+
+Code with fix:
+
+```csharp
+public record MyRecord
+{
+    public int Number { get; init; }
+}
+```
+
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 
 ### ACL1005 - Asynchronous method name is not suffixed with 'Async'

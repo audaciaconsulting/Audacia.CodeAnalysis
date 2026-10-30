@@ -29,5 +29,6 @@
         public const string LogMessagesNoDuplicateParameters = "ACL1024";
         public const string LogMessagesNoExceptionsAsTemplateParameters = "ACL1025";
         public const string LogMessagesNamedPropertiesMustBeUsed = "ACL1026";
+        public const string UseInitForRecordSetters = "ACL1027";
     }
 }
