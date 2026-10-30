@@ -4,7 +4,7 @@ using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Audacia.CodeAnalysis.Analyzers.Shared.Common.AssertionFrameworks
+namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Common.AssertionFrameworks
 {
     /// <summary>
     /// Identifies Shouldly assertion calls and assertion scopes.

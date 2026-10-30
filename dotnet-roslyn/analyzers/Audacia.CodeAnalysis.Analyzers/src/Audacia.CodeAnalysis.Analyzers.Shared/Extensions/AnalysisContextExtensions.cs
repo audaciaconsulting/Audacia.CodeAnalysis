@@ -12,17 +12,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
 {
     public static class AnalysisContextExtensions
     {
-        private static readonly ImmutableArray<string> TestMethodAttributeNames = ImmutableArray.Create(
-            "Fact",
-            "Theory",
-            "Xunit.Fact",
-            "Xunit.Theory",
-            "FactAttribute",
-            "TheoryAttribute",
-            "Xunit.FactAttribute",
-            "Xunit.TheoryAttribute"
-        );
-
         public static void SkipEmptyName(this SymbolAnalysisContext context, Action<SymbolAnalysisContext> action)
         {
             if (!string.IsNullOrEmpty(context.Symbol.Name))
@@ -122,40 +111,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         }
 
         /// <summary>
-        /// Returns true if method is representing a http action (e.g. get/post/delete/put etc)
-        /// </summary>
-        public static bool IsControllerAction(this SyntaxNodeAnalysisContext nodeAnalysisContext)
-        {
-            var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
-
-            var methodAttributes = GetMethodAttributes(methodDeclarationSyntax);
-
-            var controllerActionAttributeNames
-                = new List<string>
-                {
-                    "HttpDelete",
-                    "HttpGet",
-                    "HttpHead",
-                    "HttpOptions",
-                    "HttpPatch",
-                    "HttpPost",
-                    "HttpPut"
-                };
-
-            var isControllerAction = methodAttributes
-                .Any(
-                    attribute =>
-                        controllerActionAttributeNames.Any(name => attribute.StartsWith(name))
-                );
-
-            var containingTypeIsControllerType = IsControllerBaseType(nodeAnalysisContext);
-
-            var isPublicMethod = IsPublic(methodDeclarationSyntax);
-
-            return (isControllerAction || containingTypeIsControllerType) && isPublicMethod;
-        }
-
-        /// <summary>
         /// Returns true if a method name is suffixed with 'Async'.
         /// </summary>
         public static bool IsAsyncSuffixed(this SyntaxNodeAnalysisContext nodeAnalysisContext)
@@ -226,76 +181,5 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         {
             return context.Compilation.SyntaxTrees.FirstOrDefault();
         }
-
-        /// <summary>
-        /// Checks whether the method is decorated with a [Fact] or [Theory] attribute, which are used to denote test methods in xUnit.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns><c>true</c> if the method is an xUnit test method; otherwise, <c>false</c>.</returns>
-        public static bool IsXunitTestMethod(this SyntaxNodeAnalysisContext context)
-        {
-            var methodDeclarationSyntax = (MethodDeclarationSyntax)context.Node;
-
-            var methodAttributes = GetMethodAttributes(methodDeclarationSyntax);
-
-            var isTestMethod = methodAttributes
-                .Any(
-                    attribute =>
-                        TestMethodAttributeNames.Any(name => attribute.Equals(name))
-                );
-
-            return isTestMethod;
         }
-
-        /// <summary>
-        /// Checks whether the method has a public modifier.
-        /// </summary>
-        private static bool IsPublic(this MethodDeclarationSyntax methodDeclarationSyntax)
-        {
-            var isPublic = methodDeclarationSyntax
-                .Modifiers
-                .Any(
-                    modifier =>
-                        modifier.ValueText.Equals("public", StringComparison.InvariantCultureIgnoreCase)
-                );
-
-            return isPublic;
-        }
-
-        /// <summary>
-        /// Determines whether a methods containing type is a controller base type
-        /// </summary>
-        private static bool IsControllerBaseType(this SyntaxNodeAnalysisContext nodeAnalysisContext)
-        {
-            var classBaseType = nodeAnalysisContext
-                .SemanticModel
-                .GetDeclaredSymbol(nodeAnalysisContext.Node)
-                .ContainingType
-                .BaseType;
-
-            if (classBaseType == null)
-            {
-                return false;
-            }
-
-            var controllerBaseTypeNames
-                = new List<string>
-                {
-                    "Controller",
-                    "ControllerBase"
-                };
-
-            var isControllerBaseType = controllerBaseTypeNames
-                .Any(
-                    controllerBaseTypeName => classBaseType
-                        .Name
-                        .Equals(
-                            controllerBaseTypeName,
-                            StringComparison.InvariantCultureIgnoreCase
-                        )
-                );
-
-            return isControllerBaseType;
-        }
-    }
 }

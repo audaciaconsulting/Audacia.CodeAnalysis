@@ -6,7 +6,7 @@ The analyzers are split into the following packages:
 
 | Package | Purpose |
 | --- | --- |
-| [Audacia.CodeAnalysis.Analyzers.Core](#audaciacodeanalysisanalyzerscore) | General-purpose analyzers applicable to any C# project |
+| [Audacia.CodeAnalysis.Analyzers.Core](#audaciacodeanalysisanalyzers) | General-purpose analyzers applicable to any C# project |
 | [Audacia.CodeAnalysis.Analyzers.AspNetCore](#audaciacodeanalysisanalyzersaspnetcore) | Analyzers specific to ASP.NET Core projects (e.g. controllers) |
 | [Audacia.CodeAnalysis.Analyzers.TestProjects](#audaciacodeanalysisanalyzerstestprojects) | Analyzers specific to test projects |
 
@@ -56,7 +56,7 @@ e.g
 
 # Analyzers
 
-## Audacia.CodeAnalysis.Analyzers.Core
+## Audacia.CodeAnalysis.Analyzers
 
 ### ACL1000 - Private fields should be prefixed with an underscore
 

@@ -1,11 +1,14 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
-using Audacia.CodeAnalysis.Analyzers.Shared.Common.AssertionFrameworks;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Common.AssertionFrameworks;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Extensions;
 
 namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionReason
 {
@@ -73,7 +76,7 @@ namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionReason
                     continue;
                 }
 
-                // Not a known assertion call — check whether it is a helper method call that contains assertions.
+                // Not a known assertion call � check whether it is a helper method call that contains assertions.
                 var (helperMethod, helperSemanticModel) = invocation.ResolveHelperMethodDeclarationWithSemanticModel(semanticModel);
                 if (helperMethod == null)
                 {

@@ -1,10 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
+	<PropertyGroup>
+		<Description>This package supports projects operating a minimum version of C# 12 and .NET 8.</Description>
+		<RootNamespace>Audacia.CodeAnalysis.Analyzers.AspNetCore</RootNamespace>
+	</PropertyGroup>
 
     <PropertyGroup>
 		<PackageId>Audacia.CodeAnalysis.Analyzers.AspNetCore</PackageId>
