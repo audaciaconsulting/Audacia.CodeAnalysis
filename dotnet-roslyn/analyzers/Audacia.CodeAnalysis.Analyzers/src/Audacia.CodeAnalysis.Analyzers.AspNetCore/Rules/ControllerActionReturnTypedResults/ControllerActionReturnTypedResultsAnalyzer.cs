@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+
 namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.ControllerActionReturnTypedResults
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
