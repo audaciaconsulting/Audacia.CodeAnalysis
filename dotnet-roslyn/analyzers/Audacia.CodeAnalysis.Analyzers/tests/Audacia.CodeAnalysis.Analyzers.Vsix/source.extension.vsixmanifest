@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 	<Metadata>
-		Id="Audacia.CodeAnalysis.Analyzers.13c954e2
+		<Identity Id="Audacia.CodeAnalysis.Analyzers.13c954e2" Version="1.0" Language="en-US" Publisher="Audacia" />
 		<DisplayName>Audacia.CodeAnalysis.Analyzers</DisplayName>
 		<Description xml:space="preserve">Local debugging extension for the Audacia Roslyn analyzers (Core, AspNetCore and TestProjects).</Description>
 	</Metadata>
