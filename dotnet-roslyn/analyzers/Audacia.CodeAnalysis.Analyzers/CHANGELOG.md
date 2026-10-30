@@ -1,5 +1,9 @@
 ﻿# CHANGELOG
 
+# TBC - TBC
+### Changed
+- Updated "ControllerActionProducesResponseTypeAnalyzer" to allow 'ProducesResponseType<T>'
+
 # 2.0.0 - 2026-10-29
 ### Changed
 - Split the Audacia.CodeAnalysis.Analyzers into multiple packages (`Audacia.CodeAnalysis.Analyzers` for general-purpose analyzers, plus `.AspNetCore` and `.TestProjects`)
