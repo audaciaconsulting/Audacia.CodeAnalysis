@@ -547,8 +547,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
 
         /// <summary>
         /// Gets the name of the collection queried by the invocation that contains the lambda expression for the specified parameter.
-        /// For extension methods (whether called in reduced or static form) this is the first argument; for instance methods it is the
-        /// instance the method is invoked on. Null-conditional invocations are resolved to the receiver of the conditional access.
+        /// For instance methods this is the instance the method is invoked on (including the receiver of a null-conditional call);
+        /// for static methods, including extension methods in either call form, it is the first collection-typed argument.
         /// </summary>
         /// <param name="parameterSyntax">The parameter syntax node declared in a lambda expression.</param>
         /// <param name="semanticModel">The semantic model used to resolve the invocation.</param>
@@ -569,29 +569,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
                 return null;
             }
 
-            var method = invocationOperation.TargetMethod;
-
-            IOperation source = method.IsExtensionMethod || method.ReducedFrom != null
-                ? invocationOperation.Arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == 0)?.Value
-                : invocationOperation.Instance;
+            var source = invocationOperation.Instance ??
+                invocationOperation.Arguments
+                    .Where(arg => arg.Parameter != null &&
+                                  arg.Parameter.Type.SpecialType != SpecialType.System_String &&
+                                  arg.Parameter.Type.IsOrImplementsInterface("System.Collections.IEnumerable"))
+                    .OrderBy(arg => arg.Parameter.Ordinal)
+                    .FirstOrDefault()?.Value;
 
             while (source is IConversionOperation conversion)
             {
                 source = conversion.Operand;
             }
 
-            if (source == null)
-            {
-                return null;
-            }
-
-            var sourceSyntax = source.Syntax;
-            if (source is IConditionalAccessInstanceOperation)
-            {
-                sourceSyntax = invocation.FirstAncestorOrSelf<ConditionalAccessExpressionSyntax>()?.Expression;
-            }
-
-            return GetSimpleName(sourceSyntax);
+            return GetSimpleName(source?.Syntax);
         }
     }
 }

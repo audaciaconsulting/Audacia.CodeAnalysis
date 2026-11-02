@@ -343,6 +343,26 @@ class TypeName
         }
 
         [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Non_Extension_Call_Collection_Name()
+        {
+            var test = @"
+using System;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = Array.Find(arguments, a => a.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
         public void No_Diagnostic_If_A_Longer_Lambda_Parameter_Name_Is_Used()
         {
             var test = @"
