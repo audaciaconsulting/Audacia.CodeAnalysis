@@ -86,9 +86,6 @@ dotnet_diagnostic.ACL1025.severity = warning
 # Positional properties should be avoided in log message parameters
 dotnet_diagnostic.ACL1026.severity = warning
 
-# Record properties should be init-only
-dotnet_diagnostic.ACL1027.severity = warning
-
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
