@@ -1,11 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
-using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.UseInitForRecordSetters
+namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UseInitForRecordSettersAnalyzer : DiagnosticAnalyzer
@@ -26,8 +27,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseInitForRecordSetters
             Severity,
             isEnabledByDefault: true,
             Description,
-            HelpLinkUrl); 
-        
+            HelpLinkUrl);
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
@@ -35,15 +36,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseInitForRecordSetters
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-            context.RegisterCompilationStartAction(RegisterCompilationStart);
+            context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
         }
 
-        private void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
-        {
-            startContext.RegisterSymbolAction(actionContext => AnalyzeSymbol(actionContext), SymbolKind.NamedType);
-        }
-
-        private void AnalyzeSymbol(SymbolAnalysisContext context)
+        private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {
             var type = (INamedTypeSymbol)context.Symbol;
 
@@ -54,13 +50,45 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.UseInitForRecordSetters
 
             var properties = type.GetMembers()
                 .OfType<IPropertySymbol>()
-                .Where(p => !p.IsReadOnly && p.SetMethod != null && !p.SetMethod.IsInitOnly)
-                .Where(p => !p.IsStatic && !p.IsOverride);
+                .Where(HasSetAccessor)
+                .Where(p => !p.IsStatic && !p.IsOverride && !p.IsIndexer)
+                .Where(p => HasExplicitSetAccessor(p, context.CancellationToken))
+                .Where(p => !ImplementsInterfaceSetter(type, p));
 
             foreach (var property in properties)
             {
                 ReportDiagnostic(context, type, property);
             }
+        }
+
+        /// <summary>
+        /// Excludes properties synthesized from positional parameters (e.g. on a positional record struct), which have no accessor syntax to fix.
+        /// </summary>
+        private static bool HasExplicitSetAccessor(IPropertySymbol property, CancellationToken cancellationToken)
+        {
+            return property.SetMethod.DeclaringSyntaxReferences
+                .Any(reference => reference.GetSyntax(cancellationToken) is AccessorDeclarationSyntax);
+        }
+
+        /// <summary>
+        /// Excludes properties implementing an interface property with a 'set' accessor, where replacing 'set' with 'init' would no longer satisfy the interface.
+        /// </summary>
+        private static bool ImplementsInterfaceSetter(INamedTypeSymbol type, IPropertySymbol property)
+        {
+            if (property.ExplicitInterfaceImplementations.Any(HasSetAccessor))
+            {
+                return true;
+            }
+
+            return type.AllInterfaces
+                .SelectMany(i => i.GetMembers(property.Name).OfType<IPropertySymbol>())
+                .Where(HasSetAccessor)
+                .Any(member => SymbolEqualityComparer.Default.Equals(type.FindImplementationForInterfaceMember(member), property));
+        }
+
+        private static bool HasSetAccessor(IPropertySymbol property)
+        {
+            return property.SetMethod != null && !property.SetMethod.IsInitOnly;
         }
 
         private static void ReportDiagnostic(SymbolAnalysisContext context, INamedTypeSymbol type, IPropertySymbol property)

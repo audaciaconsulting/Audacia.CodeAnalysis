@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Audacia.CodeAnalysis.Analyzers.Rules.UseInitForRecordSetters;
+using Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -45,7 +45,6 @@ class Program
 
         return diagnosticResult;
     }
-
 
     [TestMethod]
     public void Diagnostic_And_Code_Fix_If_Set_Used_For_Record_Setter()
@@ -414,13 +413,86 @@ record struct TypeName1
     }
 
     [TestMethod]
-    public void Diagnostic_For_Positional_Record_Struct_Property()
+    public void No_Diagnostic_For_Positional_Record_Struct_Property()
     {
         var testCode = @"
 record struct TypeName1(string Name);" + EntryPoint;
 
+        VerifyNoDiagnostic(testCode);
+    }
+
+    [TestMethod]
+    public void Diagnostic_For_Body_Property_In_Positional_Record()
+    {
+        var testCode = @"
+record TypeName1(string First)
+{
+    public string Second { get; set; }
+}" + EntryPoint;
+
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only", 2, 32));
+            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only", 4, 33));
+    }
+
+    [TestMethod]
+    public void No_Diagnostic_For_Implicit_Interface_Property_Implementation()
+    {
+        var testCode = @"
+interface INamed
+{
+    string Name { get; set; }
+}
+record TypeName1 : INamed
+{
+    public string Name { get; set; }
+}" + EntryPoint;
+
+        VerifyNoDiagnostic(testCode);
+    }
+
+    [TestMethod]
+    public void No_Diagnostic_For_Explicit_Interface_Property_Implementation()
+    {
+        var testCode = @"
+interface INamed
+{
+    string Name { get; set; }
+}
+record TypeName1 : INamed
+{
+    string INamed.Name { get; set; }
+}" + EntryPoint;
+
+        VerifyNoDiagnostic(testCode);
+    }
+
+    [TestMethod]
+    public void Diagnostic_For_Property_Not_Implementing_Interface_Setter()
+    {
+        var testCode = @"
+interface INamed
+{
+    string Name { get; }
+}
+record TypeName1 : INamed
+{
+    public string Name { get; set; }
+}" + EntryPoint;
+
+        VerifyDiagnostic(testCode,
+            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only", 8, 31));
+    }
+
+    [TestMethod]
+    public void No_Diagnostic_For_Record_Indexer()
+    {
+        var testCode = @"
+record TypeName1
+{
+    public int this[int index] { get => index; set { } }
+}" + EntryPoint;
+
+        VerifyNoDiagnostic(testCode);
     }
 
     [TestMethod]
@@ -447,7 +519,7 @@ RECORD_DECLARATION TypeName1
     }
 
     [TestMethod]
-    public void No_Diagnostic_For_Overridden_Record_Property()
+    public void Diagnostic_Only_For_Base_Property_When_Overridden_In_Derived_Record()
     {
         var testCode = @"
 abstract record BaseRecord
