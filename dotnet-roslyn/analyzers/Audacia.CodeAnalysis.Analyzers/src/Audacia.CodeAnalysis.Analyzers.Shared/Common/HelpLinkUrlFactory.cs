@@ -58,6 +58,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Common
                     return $"{helpLinkUrlPrefix}controller-action-should-return-typedresults-instead-of-iactionresults";                
                 case DiagnosticId.SuppressionRequiresJustification:
                     return $"{helpLinkUrlPrefix}code-analysis-suppression-attribute-requires-justification";
+                case DiagnosticId.UseInitForRecordSetters:
+                    return $"{helpLinkUrlPrefix}record-properties-should-be-init-only";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),
