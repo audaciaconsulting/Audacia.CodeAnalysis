@@ -6,6 +6,9 @@
     - This rule checks that record properties use `init` instead of `set` accessors, so the records are immutable and follow best practices for data encapsulation.
     - This rule ignores properties with no setters (e.g. positional syntax) and those on which 'init' would produce invalid code.
 
+### Changed
+- Updated "ControllerActionProducesResponseTypeAnalyzer" to allow 'ProducesResponseType<T>'
+
 # 2.0.0 - 2026-10-29
 ### Changed
 - Split the Audacia.CodeAnalysis.Analyzers into multiple packages (`Audacia.CodeAnalysis.Analyzers` for general-purpose analyzers, plus `.AspNetCore` and `.TestProjects`)
