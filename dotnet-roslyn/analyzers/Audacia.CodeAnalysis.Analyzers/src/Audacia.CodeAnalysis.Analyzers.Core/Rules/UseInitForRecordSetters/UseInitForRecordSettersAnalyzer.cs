@@ -51,7 +51,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters
             var properties = type.GetMembers()
                 .OfType<IPropertySymbol>()
                 .Where(HasSetAccessor)
-                .Where(p => !p.IsStatic && !p.IsOverride && !p.IsIndexer)
+                .Where(p => !p.IsStatic && !p.IsOverride && !p.IsIndexer && !p.SetMethod.IsReadOnly)
                 .Where(p => HasExplicitSetAccessor(p, context.CancellationToken))
                 .Where(p => !ImplementsInterfaceSetter(type, p));
 
