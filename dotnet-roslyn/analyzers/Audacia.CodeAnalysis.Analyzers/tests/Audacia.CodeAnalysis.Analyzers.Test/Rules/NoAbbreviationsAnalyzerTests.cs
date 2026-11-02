@@ -255,6 +255,94 @@ class TypeName
         }
 
         [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Anonymous_Method_Parameter_Matches_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments.Where(delegate(string a) { return a.Length == 0; });
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Anonymous_Method_Parameter_Only_Matches_Outer_Collection_Name()
+        {
+            var test = @"
+using System;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments.Select(argument => (Func<int, bool>)delegate(int a) { return a == 0; });
+    }
+}";
+
+            var expected = BuildExpectedResult(12, 81, "Parameter", "a");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Wrapped_Lambda_Parameter_Matches_Collection_Name()
+        {
+            var test = @"
+using System;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var parenthesized = arguments.Where((a => a.Length == 0));
+        var cast = arguments.Where((Func<string, bool>)(a => a.Length == 0));
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Wrapped_Lambda_Parameter_Does_Not_Match_Collection_Name()
+        {
+            var test = @"
+using System;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var cast = arguments.Where((Func<string, bool>)(x => x.Length == 0));
+    }
+}";
+
+            var expected = BuildExpectedResult(12, 57, "Parameter", "x");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
         public void No_Diagnostic_If_A_Longer_Lambda_Parameter_Name_Is_Used()
         {
             var test = @"

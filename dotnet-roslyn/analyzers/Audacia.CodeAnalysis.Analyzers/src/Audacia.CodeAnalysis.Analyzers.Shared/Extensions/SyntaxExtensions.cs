@@ -555,9 +555,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         /// <returns>The collection identifier text when it can be resolved; otherwise <see langword="null"/>.</returns>
         public static string LambdaReceiverName(this ParameterSyntax parameterSyntax, SemanticModel semanticModel)
         {
-            var lambda = parameterSyntax.FirstAncestorOrSelf<LambdaExpressionSyntax>();
+            SyntaxNode function = parameterSyntax.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
 
-            if (lambda?.Parent is not ArgumentSyntax argument ||
+            while (function?.Parent is ParenthesizedExpressionSyntax || function?.Parent is CastExpressionSyntax)
+            {
+                function = function.Parent;
+            }
+
+            if (function?.Parent is not ArgumentSyntax argument ||
                 argument.Parent?.Parent is not InvocationExpressionSyntax invocation ||
                 semanticModel.GetOperation(invocation) is not IInvocationOperation invocationOperation)
             {
