@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
@@ -306,27 +307,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         /// <param name="invocation">The invocation whose method name should be resolved.</param>
         public static string GetSimpleMethodName(this InvocationExpressionSyntax invocation)
         {
-            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
-            {
-                return memberAccess.Name.Identifier.ValueText;
-            }
+            return invocation.Expression.GetSimpleName();
+        }
 
-            if (invocation.Expression is IdentifierNameSyntax identifier)
+        private static string GetSimpleName(this SyntaxNode expression)
+        {
+            switch (expression)
             {
-                return identifier.Identifier.ValueText;
+                case MemberAccessExpressionSyntax memberAccess:
+                    return memberAccess.Name.Identifier.ValueText;
+                case SimpleNameSyntax simpleName:
+                    return simpleName.Identifier.ValueText;
+                case MemberBindingExpressionSyntax memberBinding:
+                    return memberBinding.Name.Identifier.ValueText;
+                case ConditionalAccessExpressionSyntax conditionalAccess:
+                    return GetSimpleName(conditionalAccess.WhenNotNull);
+                case ParenthesizedExpressionSyntax parenthesized:
+                    return GetSimpleName(parenthesized.Expression);
+                default:
+                    return null;
             }
-
-            if (invocation.Expression is GenericNameSyntax generic)
-            {
-                return generic.Identifier.ValueText;
-            }
-
-            if (invocation.Expression is MemberBindingExpressionSyntax memberBinding)
-            {
-                return memberBinding.Name.Identifier.ValueText;
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -546,28 +546,47 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         }
 
         /// <summary>
-        /// Gets the receiver name of the invocation that contains the lambda expression for the specified parameter.
+        /// Gets the name of the collection queried by the invocation that contains the lambda expression for the specified parameter.
+        /// For extension methods (whether called in reduced or static form) this is the first argument; for instance methods it is the
+        /// instance the method is invoked on. Null-conditional invocations are resolved to the receiver of the conditional access.
         /// </summary>
         /// <param name="parameterSyntax">The parameter syntax node declared in a lambda expression.</param>
-        /// <returns>The receiver identifier text when the lambda is passed as an argument to a member invocation; otherwise <see
-        /// langword="null"/>.</returns>
-        public static string LambdaReceiverName(this ParameterSyntax parameterSyntax)
+        /// <param name="semanticModel">The semantic model used to resolve the invocation.</param>
+        /// <returns>The collection identifier text when it can be resolved; otherwise <see langword="null"/>.</returns>
+        public static string LambdaReceiverName(this ParameterSyntax parameterSyntax, SemanticModel semanticModel)
         {
             var lambda = parameterSyntax.FirstAncestorOrSelf<LambdaExpressionSyntax>();
-            if (lambda?.Parent is ArgumentSyntax argument &&
-                argument.Parent?.Parent is InvocationExpressionSyntax invocation &&
-                invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+
+            if (lambda?.Parent is not ArgumentSyntax argument ||
+                argument.Parent?.Parent is not InvocationExpressionSyntax invocation ||
+                semanticModel.GetOperation(invocation) is not IInvocationOperation invocationOperation)
             {
-                switch (memberAccess.Expression)
-                {
-                    case IdentifierNameSyntax identifier:
-                        return identifier.Identifier.ValueText;
-                    case MemberAccessExpressionSyntax innerMemberAccess:
-                        return innerMemberAccess.Name.Identifier.ValueText;
-                }
+                return null;
             }
 
-            return null;
+            var method = invocationOperation.TargetMethod;
+
+            IOperation source = method.IsExtensionMethod || method.ReducedFrom != null
+                ? invocationOperation.Arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == 0)?.Value
+                : invocationOperation.Instance;
+
+            while (source is IConversionOperation conversion)
+            {
+                source = conversion.Operand;
+            }
+
+            if (source == null)
+            {
+                return null;
+            }
+
+            var sourceSyntax = source.Syntax;
+            if (source is IConditionalAccessInstanceOperation)
+            {
+                sourceSyntax = invocation.FirstAncestorOrSelf<ConditionalAccessExpressionSyntax>()?.Expression;
+            }
+
+            return GetSimpleName(sourceSyntax);
         }
     }
 }

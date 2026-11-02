@@ -171,6 +171,90 @@ class TypeName
         }
 
         [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Null_Conditional_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments?.Where(a => a.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Does_Not_Match_Null_Conditional_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments?.Where(x => x.Length == 0);
+    }
+}";
+
+            var expected = BuildExpectedResult(11, 39, "Parameter", "x");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Extension_Call_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = Enumerable.Where(arguments, a => a.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Class_Name_Instead_Of_Collection()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = Enumerable.Where(arguments, e => e.Length == 0);
+    }
+}";
+
+            var expected = BuildExpectedResult(11, 50, "Parameter", "e");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
         public void No_Diagnostic_If_A_Longer_Lambda_Parameter_Name_Is_Used()
         {
             var test = @"

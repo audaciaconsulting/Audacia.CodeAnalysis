@@ -177,7 +177,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
 
             if (IsDisallowedOrSingleLetter(parameter.Name) &&
                 !parameter.IsInterfaceImplementation() &&
-                !IsAllowedLambdaParameterName(parameter, (ParameterSyntax)context.Node))
+                !IsAllowedLambdaParameterName(parameter, (ParameterSyntax)context.Node, context.SemanticModel))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, parameter.Locations[0], parameter.Kind, parameter.Name));
             }
@@ -330,7 +330,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
         /// (e.g. <c>people.Where(p =&gt; ...)</c> where the element type is <c>Person</c>) or the first letter of
         /// the name of the collection being queried (e.g. <c>_context.Customers.Where(c =&gt; ...)</c>).
         /// </summary>
-        private static bool IsAllowedLambdaParameterName(IParameterSymbol parameter, ParameterSyntax parameterSyntax)
+        private static bool IsAllowedLambdaParameterName(IParameterSymbol parameter, ParameterSyntax parameterSyntax, SemanticModel semanticModel)
         {
             if (!parameter.IsLambdaExpressionParameter() || !IsSingleLetter(parameter.Name))
             {
@@ -344,7 +344,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
                 return true;
             }
 
-            var receiverName = parameterSyntax.LambdaReceiverName();
+            var receiverName = parameterSyntax.LambdaReceiverName(semanticModel);
             return receiverName != null && StartsWithLetter(receiverName, letter);
         }
 
