@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Xml.Linq;
+using Audacia.CodeAnalysis.Analyzers.AspNetCore.Extensions;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
-using Audacia.CodeAnalysis.Analyzers.AspNetCore.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -94,7 +94,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
                 var hasProducesResponseType = methodAttributes
                 .Any(
                     name =>
-                        name.Equals("ProducesResponseType")
+                        name.Equals("ProducesResponseType") || name.StartsWith("ProducesResponseType<")
                 );
 
                 if (!hasProducesResponseType && 
