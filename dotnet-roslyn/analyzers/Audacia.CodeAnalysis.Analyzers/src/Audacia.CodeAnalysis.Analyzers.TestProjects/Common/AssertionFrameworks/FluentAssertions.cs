@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

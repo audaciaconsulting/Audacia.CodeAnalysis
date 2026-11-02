@@ -1,5 +1,3 @@
-using System;
-
 namespace Audacia.CodeAnalysis.Analyzers.Shared.Common
 {
     /// <summary>

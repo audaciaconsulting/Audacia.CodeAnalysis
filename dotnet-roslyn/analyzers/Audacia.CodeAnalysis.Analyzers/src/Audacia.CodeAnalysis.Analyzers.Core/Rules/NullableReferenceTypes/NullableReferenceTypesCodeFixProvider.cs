@@ -4,8 +4,6 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Immutable;
 using System.Composition;
-using System.Linq;
-using System.Threading.Tasks;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.NullableReferenceTypes
