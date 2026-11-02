@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;

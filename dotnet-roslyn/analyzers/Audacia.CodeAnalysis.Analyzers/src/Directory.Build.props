@@ -5,6 +5,8 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup>

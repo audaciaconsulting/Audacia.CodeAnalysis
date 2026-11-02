@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Linq;
 using System.Linq.Expressions;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Microsoft.CodeAnalysis;

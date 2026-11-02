@@ -1,4 +1,3 @@
-using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.TestProjects.Common.AssertionFrameworks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
