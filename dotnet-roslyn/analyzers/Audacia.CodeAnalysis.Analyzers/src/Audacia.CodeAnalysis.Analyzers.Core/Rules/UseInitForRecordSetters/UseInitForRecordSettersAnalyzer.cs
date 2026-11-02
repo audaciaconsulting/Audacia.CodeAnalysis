@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
@@ -36,10 +38,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-            context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
+            context.RegisterCompilationStartAction(RegisterCompilationStart);
         }
 
-        private static void AnalyzeSymbol(SymbolAnalysisContext context)
+        private static void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
+        {
+            // Built once per compilation, and only when a record has a property that could be reported.
+            var interfaceSetterImplementations = new Lazy<ImmutableHashSet<IPropertySymbol>>(
+                () => FindInterfaceSetterImplementations(startContext.Compilation, startContext.CancellationToken));
+
+            startContext.RegisterSymbolAction(actionContext => AnalyzeSymbol(actionContext, interfaceSetterImplementations), SymbolKind.NamedType);
+        }
+
+        private static void AnalyzeSymbol(SymbolAnalysisContext context, Lazy<ImmutableHashSet<IPropertySymbol>> interfaceSetterImplementations)
         {
             var type = (INamedTypeSymbol)context.Symbol;
 
@@ -53,7 +64,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters
                 .Where(HasSetAccessor)
                 .Where(p => !p.IsStatic && !p.IsOverride && !p.IsIndexer && !p.SetMethod.IsReadOnly)
                 .Where(p => HasExplicitSetAccessor(p, context.CancellationToken))
-                .Where(p => !ImplementsInterfaceSetter(type, p));
+                .Where(p => !interfaceSetterImplementations.Value.Contains(p));
 
             foreach (var property in properties)
             {
@@ -71,19 +82,43 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters
         }
 
         /// <summary>
-        /// Excludes properties implementing an interface property with a 'set' accessor, where replacing 'set' with 'init' would no longer satisfy the interface.
+        /// Finds the record properties (and the properties they override) that implement an interface property with a 'set' accessor, in any record in the compilation.
+        /// Replacing 'set' with 'init' on these would no longer satisfy the interface, including where a derived record implements the interface through an inherited property.
         /// </summary>
-        private static bool ImplementsInterfaceSetter(INamedTypeSymbol type, IPropertySymbol property)
+        private static ImmutableHashSet<IPropertySymbol> FindInterfaceSetterImplementations(Compilation compilation, CancellationToken cancellationToken)
         {
-            if (property.ExplicitInterfaceImplementations.Any(HasSetAccessor))
+            var implementations = ImmutableHashSet.CreateBuilder<IPropertySymbol>(SymbolEqualityComparer.Default);
+
+            var records = compilation.GetSymbolsWithName(_ => true, SymbolFilter.Type, cancellationToken)
+                .OfType<INamedTypeSymbol>()
+                .Where(t => t.IsRecord);
+
+            foreach (var record in records)
             {
-                return true;
+                implementations.UnionWith(GetInterfaceSetterImplementations(record));
             }
 
-            return type.AllInterfaces
-                .SelectMany(i => i.GetMembers(property.Name).OfType<IPropertySymbol>())
-                .Where(HasSetAccessor)
-                .Any(member => SymbolEqualityComparer.Default.Equals(type.FindImplementationForInterfaceMember(member), property));
+            return implementations.ToImmutable();
+        }
+
+        /// <summary>
+        /// Gets the properties of the type that implement an interface property with a 'set' accessor, along with every property they override.
+        /// </summary>
+        internal static IEnumerable<IPropertySymbol> GetInterfaceSetterImplementations(INamedTypeSymbol type)
+        {
+            var interfaceSetters = type.AllInterfaces
+                .SelectMany(i => i.GetMembers().OfType<IPropertySymbol>())
+                .Where(HasSetAccessor);
+
+            foreach (var interfaceSetter in interfaceSetters)
+            {
+                for (var implementation = type.FindImplementationForInterfaceMember(interfaceSetter) as IPropertySymbol;
+                     implementation != null;
+                     implementation = implementation.OverriddenProperty)
+                {
+                    yield return implementation.OriginalDefinition;
+                }
+            }
         }
 
         private static bool HasSetAccessor(IPropertySymbol property)

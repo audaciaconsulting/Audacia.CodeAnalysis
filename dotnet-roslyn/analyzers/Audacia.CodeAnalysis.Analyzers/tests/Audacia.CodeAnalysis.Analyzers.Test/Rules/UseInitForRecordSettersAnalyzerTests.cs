@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -484,6 +485,117 @@ record TypeName1 : INamed
     }
 
     [TestMethod]
+    public void No_Diagnostic_For_Base_Property_Implementing_Interface_Setter_In_Derived_Record()
+    {
+        var testCode = @"
+interface INamed
+{
+    string Name { get; set; }
+}
+record BaseRecord
+{
+    public string Name { get; set; }
+}
+record DerivedRecord : BaseRecord, INamed
+{
+}" + EntryPoint;
+
+        VerifyNoDiagnostic(testCode);
+    }
+
+    [TestMethod]
+    public void No_Diagnostic_For_Base_Property_When_Override_Implements_Interface_Setter()
+    {
+        var testCode = @"
+interface INamed
+{
+    string Name { get; set; }
+}
+abstract record BaseRecord
+{
+    public abstract string Name { get; set; }
+}
+record DerivedRecord : BaseRecord, INamed
+{
+    public override string Name { get; set; }
+}" + EntryPoint;
+
+        VerifyNoDiagnostic(testCode);
+    }
+
+    [TestMethod]
+    public void Diagnostic_For_Base_Property_Implementing_Getter_Only_Interface_In_Derived_Record()
+    {
+        var testCode = @"
+interface INamed
+{
+    string Name { get; }
+}
+record BaseRecord
+{
+    public string Name { get; set; }
+}
+record DerivedRecord : BaseRecord, INamed
+{
+}" + EntryPoint;
+
+        var fixedCode = @"
+interface INamed
+{
+    string Name { get; }
+}
+record BaseRecord
+{
+    public string Name { get; init; }
+}
+record DerivedRecord : BaseRecord, INamed
+{
+}" + EntryPoint;
+
+        VerifyDiagnostic(testCode,
+            BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only", 8, 31));
+        VerifyCodeFix(testCode, fixedCode);
+    }
+
+    [TestMethod]
+    public async Task No_Code_Fix_When_Derived_Record_In_Other_Project_Implements_Interface_Setter()
+    {
+        var baseProject = CreateProject([@"
+public interface INamed
+{
+    string Name { get; set; }
+}
+public record BaseRecord
+{
+    public string Name { get; set; }
+}" + EntryPoint]);
+
+        var derivedRecord = @"
+public record DerivedRecord : BaseRecord, INamed
+{
+}";
+
+        var derivedProjectId = ProjectId.CreateNewId();
+        var solution = baseProject.Solution
+            .AddProject(derivedProjectId, "DerivedProject", "DerivedProject", LanguageNames.CSharp)
+            .WithProjectCompilationOptions(derivedProjectId, baseProject.CompilationOptions.WithOutputKind(OutputKind.DynamicallyLinkedLibrary))
+            .WithProjectParseOptions(derivedProjectId, baseProject.ParseOptions)
+            .AddMetadataReferences(derivedProjectId, baseProject.MetadataReferences)
+            .AddProjectReference(derivedProjectId, new ProjectReference(baseProject.Id))
+            .AddDocument(DocumentId.CreateNewId(derivedProjectId), "Derived.cs", derivedRecord);
+
+        var baseDocument = solution.GetProject(baseProject.Id).Documents.Single();
+        var diagnostics = GetSortedDiagnosticsFromDocuments(GetCSharpDiagnosticAnalyzer(), [baseDocument]);
+        Assert.HasCount(1, diagnostics);
+
+        var actions = new List<CodeAction>();
+        var context = new CodeFixContext(baseDocument, diagnostics[0], (action, _) => actions.Add(action), CancellationToken.None);
+        await GetCSharpCodeFixProvider().RegisterCodeFixesAsync(context);
+
+        Assert.IsEmpty(actions);
+    }
+
+    [TestMethod]
     public void No_Diagnostic_For_Record_Indexer()
     {
         var testCode = @"
@@ -531,7 +643,118 @@ record DerivedRecord : BaseRecord
     public override string Name { get; set; }
 }" + EntryPoint;
 
+        var fixedCode = @"
+abstract record BaseRecord
+{
+    public abstract string Name { get; init; }
+}
+record DerivedRecord : BaseRecord
+{
+    public override string Name { get; init; }
+}" + EntryPoint;
+
         VerifyDiagnostic(testCode,
             BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only", 4, 40));
+        VerifyCodeFix(testCode, fixedCode);
+    }
+
+    [TestMethod]
+    public void Code_Fix_Updates_Every_Override_In_Chain()
+    {
+        var testCode = @"
+record BaseRecord
+{
+    public virtual string Name { get; set; }
+}
+record MiddleRecord : BaseRecord
+{
+    private string name;
+    public override string Name
+    {
+        get => name;
+        set
+        {
+            name = value.Trim();
+        }
+    }
+}
+record GetterOnlyRecord : MiddleRecord
+{
+    public override string Name => ""Fixed"";
+}
+record DerivedRecord : GetterOnlyRecord
+{
+    public override string Name { get; set; }
+}" + EntryPoint;
+
+        var fixedCode = @"
+record BaseRecord
+{
+    public virtual string Name { get; init; }
+}
+record MiddleRecord : BaseRecord
+{
+    private string name;
+    public override string Name
+    {
+        get => name;
+        init
+        {
+            name = value.Trim();
+        }
+    }
+}
+record GetterOnlyRecord : MiddleRecord
+{
+    public override string Name => ""Fixed"";
+}
+record DerivedRecord : GetterOnlyRecord
+{
+    public override string Name { get; init; }
+}" + EntryPoint;
+
+        VerifyDiagnostic(testCode,
+            BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only", 4, 39));
+        VerifyCodeFix(testCode, fixedCode);
+    }
+
+    [TestMethod]
+    public async Task Code_Fix_Updates_Overrides_In_Other_Files_And_Compiles()
+    {
+        var baseFile = @"
+abstract record BaseRecord
+{
+    public abstract string Name { get; set; }
+}" + EntryPoint;
+
+        var derivedFile = @"
+record DerivedRecord : BaseRecord
+{
+    public override string Name { get; set; }
+}";
+
+        var expectedDerivedFile = @"
+record DerivedRecord : BaseRecord
+{
+    public override string Name { get; init; }
+}";
+
+        var project = CreateProject([baseFile, derivedFile]);
+        var baseDocument = project.Documents.First();
+        var diagnostics = GetSortedDiagnosticsFromDocuments(GetCSharpDiagnosticAnalyzer(), project.Documents.ToArray());
+        Assert.HasCount(1, diagnostics);
+
+        var actions = new List<CodeAction>();
+        var context = new CodeFixContext(baseDocument, diagnostics[0], (action, _) => actions.Add(action), CancellationToken.None);
+        await GetCSharpCodeFixProvider().RegisterCodeFixesAsync(context);
+        Assert.HasCount(1, actions);
+
+        var operations = await actions[0].GetOperationsAsync(CancellationToken.None);
+        var changedProject = operations.OfType<ApplyChangesOperation>().Single().ChangedSolution.GetProject(project.Id);
+        var changedDerivedDocument = changedProject.Documents.Single(d => d.Id != baseDocument.Id);
+        var compilation = await changedProject.GetCompilationAsync(CancellationToken.None);
+
+        Assert.AreEqual(expectedDerivedFile, (await changedDerivedDocument.GetTextAsync(CancellationToken.None)).ToString());
+        Assert.IsEmpty(compilation.GetDiagnostics().Where(d => d.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error));
     }
 }
