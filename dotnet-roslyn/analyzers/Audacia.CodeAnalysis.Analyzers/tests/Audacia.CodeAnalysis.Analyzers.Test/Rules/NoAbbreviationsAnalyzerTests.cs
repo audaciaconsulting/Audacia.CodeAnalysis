@@ -122,23 +122,18 @@ class TypeName
 {
     static void Main(string[] args)
     {
-        var result = args.Where(s => s.Length == 0);
+        var result = args.Where(x => x.Length == 0);
     }
 }";
 
-            var expected = BuildExpectedResult(10, 33, "Parameter", "s");
+            var expected = BuildExpectedResult(10, 33, "Parameter", "x");
 
             VerifyDiagnostic(test, expected);
         }
 
         [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Lambda_Expression_Variable_Name_Is_Used()
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Type_Name()
         {
-            _mockSettingsReader.Setup(settings => settings.TryGetBool(
-                    It.IsAny<SyntaxTree>(),
-                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.ExcludeLambdasSetting)))
-                .Returns(true);
-
             var test = @"
 using System.Linq;
 
@@ -149,6 +144,45 @@ class TypeName
     static void Main(string[] args)
     {
         var result = args.Where(s => s.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Queried_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments.Where(a => a.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Longer_Lambda_Parameter_Name_Is_Used()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var result = args.Where(arg => arg.Length == 0);
     }
 }";
 

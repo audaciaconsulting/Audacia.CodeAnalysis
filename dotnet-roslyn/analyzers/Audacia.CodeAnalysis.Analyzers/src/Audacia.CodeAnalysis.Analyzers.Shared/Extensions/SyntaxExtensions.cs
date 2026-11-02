@@ -544,5 +544,30 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
 
             return false;
         }
+
+        /// <summary>
+        /// Gets the receiver name of the invocation that contains the lambda expression for the specified parameter.
+        /// </summary>
+        /// <param name="parameterSyntax">The parameter syntax node declared in a lambda expression.</param>
+        /// <returns>The receiver identifier text when the lambda is passed as an argument to a member invocation; otherwise <see
+        /// langword="null"/>.</returns>
+        public static string LambdaReceiverName(this ParameterSyntax parameterSyntax)
+        {
+            var lambda = parameterSyntax.FirstAncestorOrSelf<LambdaExpressionSyntax>();
+            if (lambda?.Parent is ArgumentSyntax argument &&
+                argument.Parent?.Parent is InvocationExpressionSyntax invocation &&
+                invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+            {
+                switch (memberAccess.Expression)
+                {
+                    case IdentifierNameSyntax identifier:
+                        return identifier.Identifier.ValueText;
+                    case MemberAccessExpressionSyntax innerMemberAccess:
+                        return innerMemberAccess.Name.Identifier.ValueText;
+                }
+            }
+
+            return null;
+        }
     }
 }

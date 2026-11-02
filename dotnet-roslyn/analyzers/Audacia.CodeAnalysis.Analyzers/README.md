@@ -400,23 +400,14 @@ The following is a full list of the abbreviations that are checked for:
 "Ctl", "Tm", "Mgr", "Flt", "Len", "Idx", "Str"
 ```
 
-There are two additional pieces of configuration that can be applied:
-
-- Exclude lambda expression parameters from the check
-- Allow certain characters/abbreviations as a for loop variable
-
 #### Lambda expressions
 
-Single characters are often used as lambda expression parameter names, therefore this can be allowed by using the following setting (which is set in the default configuration):
-
-```
-dotnet_diagnostic.ACL1004.exclude_lambdas = true
-```
-
-With the above setting in place, the following code will not result in a diagnostic.
+Single character lambda expression parameter names are allowed only when the character matches the first letter of the parameter's type, or the first letter of the collection being queried. For example, given `_context.People` is a collection of `Person`:
 
 ```csharp
-var match = list.First(a => a.Name == "Bob");
+_context.People.Where(x => x.Name == "Bob");      // Diagnostic
+_context.People.Where(p => p.Name == "Bob");      // No diagnostic
+_context.People.Where(person => person.Name == "Bob"); // No diagnostic
 ```
 
 #### Loop variables

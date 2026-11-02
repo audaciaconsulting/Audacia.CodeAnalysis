@@ -14,7 +14,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
     public class NoAbbreviationsAnalyzer : DiagnosticAnalyzer
     {
         public const string Id = DiagnosticId.NoAbbreviations;
-        public const string ExcludeLambdasSetting = "exclude_lambdas";
         public const string AllowedLoopVariablesSetting = "allowed_loop_variables";
 
         private const string Title = "Identifier contains an abbreviation or is too short";
@@ -176,18 +175,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
                 return;
             }
 
-            var syntaxTree = context.Compilation.SyntaxTrees.FirstOrDefault();
-            if (syntaxTree != null)
-            {
-                var excludeLambdasSetting = _settingsReader.TryGetBool(syntaxTree, new SettingsKey(Id, ExcludeLambdasSetting));
-                if (excludeLambdasSetting == true &&
-                    parameter.IsLambdaExpressionParameter())
-                {
-                    return;
-                }
-            }
-
-            if (IsDisallowedOrSingleLetter(parameter.Name) && !parameter.IsInterfaceImplementation())
+            if (IsDisallowedOrSingleLetter(parameter.Name) &&
+                !parameter.IsInterfaceImplementation() &&
+                !IsAllowedLambdaParameterName(parameter, (ParameterSyntax)context.Node))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, parameter.Locations[0], parameter.Kind, parameter.Name));
             }
@@ -333,6 +323,35 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
                 context.ReportDiagnostic(Diagnostic.Create(Rule, identifierToken.GetLocation(), "Range variable",
                     rangeVariableName));
             }
+        }
+
+        /// <summary>
+        /// A single letter lambda parameter is allowed if it matches the first letter of the parameter's type
+        /// (e.g. <c>people.Where(p =&gt; ...)</c> where the element type is <c>Person</c>) or the first letter of
+        /// the name of the collection being queried (e.g. <c>_context.Customers.Where(c =&gt; ...)</c>).
+        /// </summary>
+        private static bool IsAllowedLambdaParameterName(IParameterSymbol parameter, ParameterSyntax parameterSyntax)
+        {
+            if (!parameter.IsLambdaExpressionParameter() || !IsSingleLetter(parameter.Name))
+            {
+                return false;
+            }
+
+            var letter = parameter.Name[0];
+
+            if (parameter.Type != null && StartsWithLetter(parameter.Type.Name, letter))
+            {
+                return true;
+            }
+
+            var receiverName = parameterSyntax.LambdaReceiverName();
+            return receiverName != null && StartsWithLetter(receiverName, letter);
+        }
+
+        private static bool StartsWithLetter(string name, char letter)
+        {
+            var trimmed = name?.TrimStart('_');
+            return !string.IsNullOrEmpty(trimmed) && char.ToUpperInvariant(trimmed[0]) == char.ToUpperInvariant(letter);
         }
 
         private static bool IsDisallowedOrSingleLetter(string name)
