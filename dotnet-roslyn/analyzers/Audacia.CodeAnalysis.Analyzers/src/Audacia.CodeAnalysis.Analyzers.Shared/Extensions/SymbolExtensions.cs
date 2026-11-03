@@ -452,6 +452,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         /// <summary>
         /// Determines whether the specified type symbol is, or implements, an interface with the given name.
         /// </summary>
+        public static bool IsOrImplementsInterface(this ITypeSymbol typeSymbol, INamedTypeSymbol interfaceName)
+        {
+            return interfaceName != null && typeSymbol.IsOrImplementsInterface(interfaceName.ToDisplayString());
+        }
+
+        /// <summary>
+        /// Determines whether the specified type symbol is, or implements, an interface with the given name.
+        /// </summary>
         public static bool IsOrImplementsInterface(this ITypeSymbol typeSymbol, string interfaceName)
         {
             if (typeSymbol == null)
