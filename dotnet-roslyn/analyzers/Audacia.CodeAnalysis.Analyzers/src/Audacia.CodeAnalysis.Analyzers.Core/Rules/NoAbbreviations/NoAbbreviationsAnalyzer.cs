@@ -14,7 +14,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
     public class NoAbbreviationsAnalyzer : DiagnosticAnalyzer
     {
         public const string Id = DiagnosticId.NoAbbreviations;
-        public const string ExcludeLambdasSetting = "exclude_lambdas";
         public const string AllowedLoopVariablesSetting = "allowed_loop_variables";
 
         private const string Title = "Identifier contains an abbreviation or is too short";
@@ -176,18 +175,9 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
                 return;
             }
 
-            var syntaxTree = context.Compilation.SyntaxTrees.FirstOrDefault();
-            if (syntaxTree != null)
-            {
-                var excludeLambdasSetting = _settingsReader.TryGetBool(syntaxTree, new SettingsKey(Id, ExcludeLambdasSetting));
-                if (excludeLambdasSetting == true &&
-                    parameter.IsLambdaExpressionParameter())
-                {
-                    return;
-                }
-            }
-
-            if (IsDisallowedOrSingleLetter(parameter.Name) && !parameter.IsInterfaceImplementation())
+            if (IsDisallowedOrSingleLetter(parameter.Name) &&
+                !parameter.IsInterfaceImplementation() &&
+                !IsAllowedLambdaParameterName(parameter, (ParameterSyntax)context.Node, context.SemanticModel))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, parameter.Locations[0], parameter.Kind, parameter.Name));
             }
@@ -333,6 +323,90 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
                 context.ReportDiagnostic(Diagnostic.Create(Rule, identifierToken.GetLocation(), "Range variable",
                     rangeVariableName));
             }
+        }
+
+        /// <summary>
+        /// A single letter lambda parameter is allowed if it matches the first letter of the parameter's type
+        /// (e.g. <c>people.Where(p =&gt; ...)</c> where the element type is <c>Person</c>) or the first letter of
+        /// the name of the collection being queried (e.g. <c>_context.Customers.Where(c =&gt; ...)</c>).
+        /// </summary>
+        private static bool IsAllowedLambdaParameterName(IParameterSymbol parameter, ParameterSyntax parameterSyntax, SemanticModel semanticModel)
+        {
+            if (!parameter.IsLambdaExpressionParameter() || !IsSingleLetter(parameter.Name))
+            {
+                return false;
+            }
+
+            var letter = parameter.Name[0];
+
+            if (StartsWithLetter(GetTypeNameWithoutInterfacePrefix(parameter.Type), letter))
+            {
+                return true;
+            }
+
+            if (IsEventHandlerParameterMatchingName(parameter, parameterSyntax, semanticModel, letter))
+            {
+                return true;
+            }
+
+            return StartsWithLetter(parameterSyntax.LambdaReceiverName(semanticModel), letter);
+        }
+
+        private static string GetTypeNameWithoutInterfacePrefix(ITypeSymbol type)
+        {
+            var name = type.Name;
+            if (type.TypeKind == TypeKind.Interface &&
+                name.Length > 1 &&
+                name[0] == 'I' &&
+                char.IsUpper(name[1]))
+            {
+                return name.Substring(1);
+            }
+
+            return name;
+        }
+
+        /// <summary>
+        /// Allows single letter parameters in event handler lambdas (e.g. <c>(s, e) =&gt; { }</c>) when they match
+        /// the first letter of the corresponding delegate parameter name (e.g. <c>sender</c>).
+        /// </summary>
+        private static bool IsEventHandlerParameterMatchingName(IParameterSymbol parameter, ParameterSyntax parameterSyntax, SemanticModel semanticModel, char letter)
+        {
+            var function = parameterSyntax.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
+            if (!(semanticModel.GetTypeInfo(function).ConvertedType is INamedTypeSymbol delegateType) ||
+                delegateType.DelegateInvokeMethod == null)
+            {
+                return false;
+            }
+
+            var delegateParameters = delegateType.DelegateInvokeMethod.Parameters;
+            if (delegateParameters.Length != 2 ||
+                delegateParameters[0].Type.SpecialType != SpecialType.System_Object ||
+                !InheritsFromEventArgs(delegateParameters[1].Type))
+            {
+                return false;
+            }
+
+            return StartsWithLetter(delegateParameters[parameter.Ordinal].Name, letter);
+        }
+
+        private static bool InheritsFromEventArgs(ITypeSymbol type)
+        {
+            for (var current = type; current != null; current = current.BaseType)
+            {
+                if (current.Name == "EventArgs" && current.ContainingNamespace?.ToDisplayString() == "System")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool StartsWithLetter(string name, char letter)
+        {
+            var trimmed = name?.TrimStart('_');
+            return !string.IsNullOrEmpty(trimmed) && char.ToUpperInvariant(trimmed[0]) == char.ToUpperInvariant(letter);
         }
 
         private static bool IsDisallowedOrSingleLetter(string name)

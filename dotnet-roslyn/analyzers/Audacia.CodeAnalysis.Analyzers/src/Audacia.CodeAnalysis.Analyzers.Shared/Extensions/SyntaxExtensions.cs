@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
@@ -306,27 +307,26 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         /// <param name="invocation">The invocation whose method name should be resolved.</param>
         public static string GetSimpleMethodName(this InvocationExpressionSyntax invocation)
         {
-            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
-            {
-                return memberAccess.Name.Identifier.ValueText;
-            }
+            return invocation.Expression.GetSimpleName();
+        }
 
-            if (invocation.Expression is IdentifierNameSyntax identifier)
+        private static string GetSimpleName(this SyntaxNode expression)
+        {
+            switch (expression)
             {
-                return identifier.Identifier.ValueText;
+                case MemberAccessExpressionSyntax memberAccess:
+                    return memberAccess.Name.Identifier.ValueText;
+                case SimpleNameSyntax simpleName:
+                    return simpleName.Identifier.ValueText;
+                case MemberBindingExpressionSyntax memberBinding:
+                    return memberBinding.Name.Identifier.ValueText;
+                case ConditionalAccessExpressionSyntax conditionalAccess:
+                    return GetSimpleName(conditionalAccess.WhenNotNull);
+                case ParenthesizedExpressionSyntax parenthesized:
+                    return GetSimpleName(parenthesized.Expression);
+                default:
+                    return null;
             }
-
-            if (invocation.Expression is GenericNameSyntax generic)
-            {
-                return generic.Identifier.ValueText;
-            }
-
-            if (invocation.Expression is MemberBindingExpressionSyntax memberBinding)
-            {
-                return memberBinding.Name.Identifier.ValueText;
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -543,6 +543,53 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Gets the name of the collection queried by the invocation that contains the lambda expression for the specified parameter.
+        /// For instance methods this is the instance the method is invoked on when it is a collection (including the receiver of a null-conditional call);
+        /// for static methods, including extension methods in either call form, it is the first collection-typed argument.
+        /// </summary>
+        /// <param name="parameterSyntax">The parameter syntax node declared in a lambda expression.</param>
+        /// <param name="semanticModel">The semantic model used to resolve the invocation.</param>
+        /// <returns>The collection identifier text when it can be resolved; otherwise <see langword="null"/>.</returns>
+        public static string LambdaReceiverName(this ParameterSyntax parameterSyntax, SemanticModel semanticModel)
+        {
+            SyntaxNode function = parameterSyntax.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
+
+            while (function?.Parent is ParenthesizedExpressionSyntax || function?.Parent is CastExpressionSyntax)
+            {
+                function = function.Parent;
+            }
+
+            if (function?.Parent is not ArgumentSyntax argument ||
+                argument.Parent?.Parent is not InvocationExpressionSyntax invocation ||
+                semanticModel.GetOperation(invocation) is not IInvocationOperation invocationOperation)
+            {
+                return null;
+            }
+
+            var instance = invocationOperation.Instance;
+            var source = instance != null && IsCollectionType(instance.Type)
+                ? instance
+                : invocationOperation.Arguments
+                    .Where(arg => arg.Parameter != null && IsCollectionType(arg.Parameter.Type))
+                    .OrderBy(arg => arg.Parameter.Ordinal)
+                    .FirstOrDefault()?.Value;
+
+            while (source is IConversionOperation conversion)
+            {
+                source = conversion.Operand;
+            }
+
+            return GetSimpleName(source?.Syntax);
+        }
+
+        private static bool IsCollectionType(ITypeSymbol type)
+        {
+            return type != null &&
+                   type.SpecialType != SpecialType.System_String &&
+                   type.IsOrImplementsInterface("System.Collections.IEnumerable");
         }
     }
 }
