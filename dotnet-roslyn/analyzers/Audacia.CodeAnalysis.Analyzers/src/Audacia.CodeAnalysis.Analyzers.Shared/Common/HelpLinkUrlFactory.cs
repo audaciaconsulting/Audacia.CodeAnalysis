@@ -58,6 +58,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Common
                     return $"{helpLinkUrlPrefix}code-analysis-suppression-attribute-requires-justification";
                 case DiagnosticId.UseInitForRecordSetters:
                     return $"{helpLinkUrlPrefix}record-properties-should-be-init-only";
+                case DiagnosticId.LogMessageMinimumLength:
+                    return $"{helpLinkUrlPrefix}log-messages-should-be-long-enough-to-be-meaningful";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),

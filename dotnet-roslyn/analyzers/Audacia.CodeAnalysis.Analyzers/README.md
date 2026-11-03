@@ -1020,6 +1020,27 @@ By default, classes with the suffix of `Handler` are analysed under this rule. T
 dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
 ```
 
+### ACL1029 - Log messages should be long enough to be meaningful
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>LOG-01.4</td>
+</tr>
+</table>
+
+ACL1029 checks whether log messages are long enough to be meaningful, and will produce a warning if not. 
+
+The minimum length of a log message can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.min_log_message_length`. The default value is 10.
+An exception is thrown if the min_log_message_length is not an integer, less than 1 (as this would be meaningless) or greater than 50 (as that would be inappropriate).
+
+If a log message is stored in a variable, the length of the variable's value will be checked where possible, otherwise it is assumed to be one character long,
+on the basis that empty variables are very rare in logging.
+
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 
 ### ACL1005 - Asynchronous method name is not suffixed with 'Async'
