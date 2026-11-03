@@ -339,13 +339,71 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
 
             var letter = parameter.Name[0];
 
-            if (parameter.Type != null && StartsWithLetter(parameter.Type.Name, letter))
+            if (parameter.Type != null && StartsWithLetter(GetTypeNameWithoutInterfacePrefix(parameter.Type), letter))
+            {
+                return true;
+            }
+
+            if (IsEventHandlerParameterMatchingName(parameter, parameterSyntax, semanticModel, letter))
             {
                 return true;
             }
 
             var receiverName = parameterSyntax.LambdaReceiverName(semanticModel);
             return receiverName != null && StartsWithLetter(receiverName, letter);
+        }
+
+        private static string GetTypeNameWithoutInterfacePrefix(ITypeSymbol type)
+        {
+            var name = type.Name;
+            if (type.TypeKind == TypeKind.Interface &&
+                name.Length > 1 &&
+                name[0] == 'I' &&
+                char.IsUpper(name[1]))
+            {
+                return name.Substring(1);
+            }
+
+            return name;
+        }
+
+        /// <summary>
+        /// Allows single letter parameters in event handler lambdas (e.g. <c>(s, e) =&gt; { }</c>) when they match
+        /// the first letter of the corresponding delegate parameter name (e.g. <c>sender</c>).
+        /// </summary>
+        private static bool IsEventHandlerParameterMatchingName(IParameterSymbol parameter, ParameterSyntax parameterSyntax, SemanticModel semanticModel, char letter)
+        {
+            var function = parameterSyntax.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
+            if (function == null ||
+                !(semanticModel.GetTypeInfo(function).ConvertedType is INamedTypeSymbol delegateType) ||
+                delegateType.DelegateInvokeMethod == null)
+            {
+                return false;
+            }
+
+            var delegateParameters = delegateType.DelegateInvokeMethod.Parameters;
+            if (delegateParameters.Length != 2 ||
+                delegateParameters[0].Type.SpecialType != SpecialType.System_Object ||
+                !InheritsFromEventArgs(delegateParameters[1].Type) ||
+                parameter.Ordinal >= delegateParameters.Length)
+            {
+                return false;
+            }
+
+            return StartsWithLetter(delegateParameters[parameter.Ordinal].Name, letter);
+        }
+
+        private static bool InheritsFromEventArgs(ITypeSymbol type)
+        {
+            for (var current = type; current != null; current = current.BaseType)
+            {
+                if (current.Name == "EventArgs" && current.ContainingNamespace?.ToDisplayString() == "System")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool StartsWithLetter(string name, char letter)

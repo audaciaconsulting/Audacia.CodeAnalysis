@@ -452,5 +452,105 @@ class TypeName
 
             VerifyNoDiagnostic(test);
         }
+
+        [TestMethod]
+        public void No_Diagnostic_If_Event_Handler_Lambda_Uses_Sender_And_EventArgs_Letters()
+        {
+            var test = @"
+using System;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    public event EventHandler Changed;
+
+    void Subscribe()
+    {
+        Changed += (s, e) => { };
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_Lambda_Parameter_Matches_Interface_Type_Name_Without_Prefix_In_Chained_Call()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] words)
+    {
+        var result = words.GroupBy(word => word.Length).Select(g => g.Key);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_Lambda_Parameter_Matches_Interface_Element_Type_Name_Without_Prefix()
+        {
+            var test = @"
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+interface ICustomer
+{
+    string Name { get; }
+}
+
+class TypeName
+{
+    static IEnumerable<ICustomer> GetCustomers() => new List<ICustomer>();
+
+    static void Main(string[] args)
+    {
+        var result = GetCustomers().Where(c => c.Name == null);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_Lambda_Parameter_Matches_Only_Interface_Prefix()
+        {
+            var test = @"
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+interface ICustomer
+{
+    string Name { get; }
+}
+
+class TypeName
+{
+    static IEnumerable<ICustomer> GetCustomers() => new List<ICustomer>();
+
+    static void Main(string[] args)
+    {
+        var result = GetCustomers().Where(i => i.Name == null);
+    }
+}";
+
+            var expected = BuildExpectedResult(18, 43, "Parameter", "i");
+
+            VerifyDiagnostic(test, expected);
+        }
     }
 }
