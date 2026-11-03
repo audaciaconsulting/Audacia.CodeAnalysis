@@ -191,6 +191,28 @@ class TypeName
         }
 
         [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Non_Collection_Instance_Receiver_Name()
+        {
+            var test = @"
+namespace ConsoleApplication1;
+
+class Worker
+{
+    public void Execute(System.Func<int, bool> predicate) { }
+
+    static void Main(string[] args)
+    {
+        var processor = new Worker();
+        processor.Execute(p => p > 0);
+    }
+}";
+
+            var expected = BuildExpectedResult(11, 27, "Parameter", "p");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
         public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Does_Not_Match_Null_Conditional_Collection_Name()
         {
             var test = @"

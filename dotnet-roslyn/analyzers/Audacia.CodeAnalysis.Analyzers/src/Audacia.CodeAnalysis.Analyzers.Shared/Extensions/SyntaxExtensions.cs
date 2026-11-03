@@ -547,7 +547,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
 
         /// <summary>
         /// Gets the name of the collection queried by the invocation that contains the lambda expression for the specified parameter.
-        /// For instance methods this is the instance the method is invoked on (including the receiver of a null-conditional call);
+        /// For instance methods this is the instance the method is invoked on when it is a collection (including the receiver of a null-conditional call);
         /// for static methods, including extension methods in either call form, it is the first collection-typed argument.
         /// </summary>
         /// <param name="parameterSyntax">The parameter syntax node declared in a lambda expression.</param>
@@ -569,11 +569,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
                 return null;
             }
 
-            var source = invocationOperation.Instance ??
-                invocationOperation.Arguments
-                    .Where(arg => arg.Parameter != null &&
-                                  arg.Parameter.Type.SpecialType != SpecialType.System_String &&
-                                  arg.Parameter.Type.IsOrImplementsInterface("System.Collections.IEnumerable"))
+            var instance = invocationOperation.Instance;
+            var source = instance != null && IsCollectionType(instance.Type)
+                ? instance
+                : invocationOperation.Arguments
+                    .Where(arg => arg.Parameter != null && IsCollectionType(arg.Parameter.Type))
                     .OrderBy(arg => arg.Parameter.Ordinal)
                     .FirstOrDefault()?.Value;
 
@@ -583,6 +583,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
             }
 
             return GetSimpleName(source?.Syntax);
+        }
+
+        private static bool IsCollectionType(ITypeSymbol type)
+        {
+            return type != null &&
+                   type.SpecialType != SpecialType.System_String &&
+                   type.IsOrImplementsInterface("System.Collections.IEnumerable");
         }
     }
 }
