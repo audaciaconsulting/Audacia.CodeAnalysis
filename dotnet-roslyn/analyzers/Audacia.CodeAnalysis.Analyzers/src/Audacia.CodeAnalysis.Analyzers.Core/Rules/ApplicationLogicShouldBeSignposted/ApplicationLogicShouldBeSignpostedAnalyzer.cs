@@ -19,7 +19,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ApplicationLogicShouldBeSignposte
         private const string Description = "Application logic handler should inject a logger to enable signposting of significant application events.";
 
         private const string LoggerMetadataName = "Microsoft.Extensions.Logging.ILogger";
-        private const string GenericLoggerMetadataName = "Microsoft.Extensions.Logging.ILogger`1";
         private const string LoggerFactoryMetadataName = "Microsoft.Extensions.Logging.ILoggerFactory";
         private const string LoggerProviderMetadataName = "Microsoft.Extensions.Logging.ILoggerProvider";
 
@@ -54,7 +53,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ApplicationLogicShouldBeSignposte
         private void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
         {
             var loggerType = startContext.Compilation.GetTypeByMetadataName(LoggerMetadataName);
-            var genericLoggerType = startContext.Compilation.GetTypeByMetadataName(GenericLoggerMetadataName);
             var loggerFactoryType = startContext.Compilation.GetTypeByMetadataName(LoggerFactoryMetadataName);
             var loggerProviderType = startContext.Compilation.GetTypeByMetadataName(LoggerProviderMetadataName);
 
@@ -64,7 +62,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ApplicationLogicShouldBeSignposte
                 : new EditorConfigSettingsReader(startContext.Options);
 
             startContext.RegisterSymbolAction(
-                symbolContext => AnalyzeNamedType(symbolContext, settingsReader, loggerType, genericLoggerType, loggerFactoryType, loggerProviderType),
+                symbolContext => AnalyzeNamedType(symbolContext, settingsReader, loggerType, loggerFactoryType, loggerProviderType),
                 SymbolKind.NamedType);
         }
 
