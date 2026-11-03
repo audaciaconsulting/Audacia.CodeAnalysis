@@ -1016,7 +1016,8 @@ While this rule does not enforce that logging methods are actually used, it will
 By default, classes with the suffix of `Handler` are analysed under this rule. This can be configured with the following setting:
 
 ```
-dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator # Comma-separated list of suffixes
+# Comma-separated list of suffixes
+dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
 ```
 
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore

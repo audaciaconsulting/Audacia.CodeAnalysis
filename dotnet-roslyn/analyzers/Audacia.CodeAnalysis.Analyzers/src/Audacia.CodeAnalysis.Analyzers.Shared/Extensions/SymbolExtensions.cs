@@ -454,7 +454,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
         /// </summary>
         public static bool IsOrImplementsInterface(this ITypeSymbol typeSymbol, INamedTypeSymbol interfaceName)
         {
-            return typeSymbol.IsOrImplementsInterface(interfaceName.ToDisplayString());
+            return interfaceName != null && typeSymbol.IsOrImplementsInterface(interfaceName.ToDisplayString());
         }
 
         /// <summary>
