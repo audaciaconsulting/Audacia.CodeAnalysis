@@ -339,7 +339,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
 
             var letter = parameter.Name[0];
 
-            if (parameter.Type != null && StartsWithLetter(GetTypeNameWithoutInterfacePrefix(parameter.Type), letter))
+            if (StartsWithLetter(GetTypeNameWithoutInterfacePrefix(parameter.Type), letter))
             {
                 return true;
             }
@@ -349,8 +349,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
                 return true;
             }
 
-            var receiverName = parameterSyntax.LambdaReceiverName(semanticModel);
-            return receiverName != null && StartsWithLetter(receiverName, letter);
+            return StartsWithLetter(parameterSyntax.LambdaReceiverName(semanticModel), letter);
         }
 
         private static string GetTypeNameWithoutInterfacePrefix(ITypeSymbol type)
@@ -374,8 +373,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
         private static bool IsEventHandlerParameterMatchingName(IParameterSymbol parameter, ParameterSyntax parameterSyntax, SemanticModel semanticModel, char letter)
         {
             var function = parameterSyntax.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
-            if (function == null ||
-                !(semanticModel.GetTypeInfo(function).ConvertedType is INamedTypeSymbol delegateType) ||
+            if (!(semanticModel.GetTypeInfo(function).ConvertedType is INamedTypeSymbol delegateType) ||
                 delegateType.DelegateInvokeMethod == null)
             {
                 return false;
@@ -384,8 +382,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
             var delegateParameters = delegateType.DelegateInvokeMethod.Parameters;
             if (delegateParameters.Length != 2 ||
                 delegateParameters[0].Type.SpecialType != SpecialType.System_Object ||
-                !InheritsFromEventArgs(delegateParameters[1].Type) ||
-                parameter.Ordinal >= delegateParameters.Length)
+                !InheritsFromEventArgs(delegateParameters[1].Type))
             {
                 return false;
             }
