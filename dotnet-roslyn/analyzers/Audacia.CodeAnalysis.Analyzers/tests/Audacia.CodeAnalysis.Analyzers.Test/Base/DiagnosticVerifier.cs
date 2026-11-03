@@ -118,6 +118,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         }
 
         /// <summary>
+        /// Called to test a C# DiagnosticAnalyzer produces no diagnostics when applied on the inputted strings as a source
+        /// </summary>
+        /// <param name="sources">An array of strings to create source documents from to run the analyzers on</param>
+        protected void VerifyNoDiagnostic(string[] sources)
+        {
+            VerifyDiagnostics(sources, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer());
+        }
+
+        /// <summary>
         /// Called to test a C# DiagnosticAnalyzer when applied on the single inputted string as a source
         /// Note: input a DiagnosticResult for each Diagnostic expected
         /// </summary>

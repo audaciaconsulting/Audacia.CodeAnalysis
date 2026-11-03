@@ -996,6 +996,29 @@ public record MyRecord
 }
 ```
 
+### ACL1028 - Application logic should be signposted
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td>LOG-04.6</td>
+</tr>
+</table>
+
+ACL1028 is designed to nudge developers to signpost application logic with logging so that it is easier to understand what is happening in the application when reading logs. The Audacia logging standard LOG-04.6 states this.
+
+While this rule does not enforce that logging methods are actually used, it will produce a warning if an application logic handler does not have injected `ILogger`, `ILogger<T>`, `ILoggerFactory`, or `ILoggerProvider` instances.
+
+By default, classes with the suffix of `Handler` are analysed under this rule. This can be configured with the following setting:
+
+```
+dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator # Comma-separated list of suffixes
+```
+
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 
 ### ACL1005 - Asynchronous method name is not suffixed with 'Async'
