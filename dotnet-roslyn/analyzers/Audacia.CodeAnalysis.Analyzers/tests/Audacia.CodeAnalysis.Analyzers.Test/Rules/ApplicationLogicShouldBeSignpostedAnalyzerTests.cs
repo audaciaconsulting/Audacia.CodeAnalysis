@@ -32,7 +32,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = ApplicationLogicShouldBeSignpostedAnalyzer.Id,
-                Message = $"Application logic handler '{handlerName}' does not inject a logger",
+                Message = $"Application logic handler '{handlerName}' does not inject a logger. See Audacia standard LOG-04.6.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [
