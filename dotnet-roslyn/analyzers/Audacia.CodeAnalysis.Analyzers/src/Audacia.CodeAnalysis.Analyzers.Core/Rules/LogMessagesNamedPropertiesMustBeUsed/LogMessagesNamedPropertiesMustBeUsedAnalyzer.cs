@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNamedPropertiesMu
         public const string Id = DiagnosticId.LogMessagesNamedPropertiesMustBeUsed;
 
         private const string Title = "Log message template format uses positional parameters";
-        private const string MessageFormat = "Log message property '{0}' is a positional parameter";
+        private const string MessageFormat = "Log message property '{0}' is a positional parameter. LOG-01.3.";
         private const string Description = "Do not use positional parameters in log message templates. Use named properties instead.";
 
         private const string InvalidPositionalPropertyPattern = @"(?<!\{)\{(?!\{)(?'propertyName'@?\d+(?=[}:,])[^{}]*)\}(?!\})";
@@ -24,8 +24,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNamedPropertiesMu
 
         private const string LoggerMessageParameterName = "message";
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Logging, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

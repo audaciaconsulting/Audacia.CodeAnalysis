@@ -19,7 +19,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MethodLength
         private const string Title = "Member or local function contains too many statements";
 
         private const string MessageFormat =
-            "{0} '{1}' contains {2} statements, which exceeds the maximum of {3} statements";
+            "{0} '{1}' contains {2} statements, which exceeds the maximum of {3} statements. CS-01.1.";
 
         private const string Description =
             "Methods should not exceed a predefined number of statements. You can configure the maximum number of allowed statements globally in the .editorconfig file, or locally using the [MaxMethodLength] attribute.";

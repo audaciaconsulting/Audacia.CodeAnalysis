@@ -18,7 +18,7 @@
             /// <summary>
             /// The nullable reference type analyzer message format.
             /// </summary>
-            public const string MessageFormat = "Nullable reference types should be enabled";
+            public const string MessageFormat = "Nullable reference types should be enabled. CS-01.28.";
 
             /// <summary>
             /// The nullable reference type analyzer description.

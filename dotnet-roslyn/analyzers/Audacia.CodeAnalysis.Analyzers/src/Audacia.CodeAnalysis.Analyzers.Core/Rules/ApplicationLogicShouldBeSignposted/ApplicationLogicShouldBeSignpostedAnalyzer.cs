@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ApplicationLogicShouldBeSignposte
         public const string HandlerSuffixConfigKey = "handler_suffix";
 
         private const string Title = "Application logic handler does not inject a logger";
-        private const string MessageFormat = "Application logic handler '{0}' does not inject a logger. See Audacia standard LOG-04.6.";
+        private const string MessageFormat = "Application logic handler '{0}' does not inject a logger. LOG-04.6.";
         private const string Description = "Application logic handler should inject a logger to enable signposting of significant application events.";
 
         private const string LoggerMetadataName = "Microsoft.Extensions.Logging.ILogger";
@@ -27,8 +27,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ApplicationLogicShouldBeSignposte
         private readonly bool _isSettingsReaderInjected;
         private ISettingsReader _settingsReader;
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Logging, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

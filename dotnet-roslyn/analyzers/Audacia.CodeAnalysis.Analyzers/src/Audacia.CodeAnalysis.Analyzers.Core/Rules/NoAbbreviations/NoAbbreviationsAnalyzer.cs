@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations
         public const string AllowedLoopVariablesSetting = "allowed_loop_variables";
 
         private const string Title = "Identifier contains an abbreviation or is too short";
-        private const string MessageFormat = "{0} '{1}' should have a more descriptive name";
+        private const string MessageFormat = "{0} '{1}' should have a more descriptive name. CS-05.1.";
         private const string Description = "Don't use abbreviations.";
 
         private const string Category = DiagnosticCategory.Naming;

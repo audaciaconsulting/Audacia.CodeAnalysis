@@ -56,7 +56,7 @@ record TypeName1
     public string Name { get; set; }
 }" + EntryPoint;
 
-        var expectedDiagnostic = BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only", 4, 31);
+        var expectedDiagnostic = BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 31);
 
         VerifyDiagnostic(testCode, expectedDiagnostic);
 
@@ -93,9 +93,9 @@ record TypeName1
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only", 4, 32),
-            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only", 5, 33),
-            BuildExpectedResult("Record property 'Third' in record type 'TypeName1' should be init-only", 6, 32));
+            BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 32),
+            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 5, 33),
+            BuildExpectedResult("Record property 'Third' in record type 'TypeName1' should be init-only. CS-03.10.", 6, 32));
     }
 
     [TestMethod]
@@ -133,8 +133,8 @@ record TypeName1
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only", 5, 33),
-            BuildExpectedResult("Record property 'Fourth' in record type 'TypeName1' should be init-only", 7, 33));
+            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 5, 33),
+            BuildExpectedResult("Record property 'Fourth' in record type 'TypeName1' should be init-only. CS-03.10.", 7, 33));
     }
 
     [TestMethod]
@@ -192,8 +192,8 @@ record TypeName1
         Assert.AreEqual(fixedCode, formattedRoot.ToFullString());
 
         VerifyDiagnostic(formattedRoot.ToFullString(),
-            BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only", 4, 32),
-            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only", 5, 33));
+            BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 32),
+            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 5, 33));
     }
 
     [TestMethod]
@@ -230,7 +230,7 @@ record Asset
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'AssetName' in record type 'Asset' should be init-only", 9, 9));
+            BuildExpectedResult("Record property 'AssetName' in record type 'Asset' should be init-only. CS-03.10.", 9, 9));
         VerifyCodeFix(testCode, fixedCode);
     }
 
@@ -252,7 +252,7 @@ record TypeName1
 }".Replace("ACCESSIBILITY", accessibility) + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only", 4, column));
+            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 4, column));
         VerifyCodeFix(testCode, fixedCode);
     }
 
@@ -292,7 +292,7 @@ record TypeName1
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only", 9, 9));
+            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 9, 9));
         VerifyCodeFix(testCode, fixedCode);
     }
 
@@ -322,7 +322,7 @@ record TypeName1
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only", 8, 9));
+            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 8, 9));
 
         VerifyCodeFix(testCode, fixedCode);
     }
@@ -351,11 +351,11 @@ record SecondRecord
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'FirstRecord' should be init-only", 4, 31),
-            BuildExpectedResult("Record property 'Name' in record type 'SecondRecord' should be init-only", 8, 31));
+            BuildExpectedResult("Record property 'Name' in record type 'FirstRecord' should be init-only. CS-03.10.", 4, 31),
+            BuildExpectedResult("Record property 'Name' in record type 'SecondRecord' should be init-only. CS-03.10.", 8, 31));
         VerifyCodeFix(testCode, fixedCode, codeFixIndex: 0);
         VerifyDiagnostic(fixedCode,
-            BuildExpectedResult("Record property 'Name' in record type 'SecondRecord' should be init-only", 8, 31));
+            BuildExpectedResult("Record property 'Name' in record type 'SecondRecord' should be init-only. CS-03.10.", 8, 31));
     }
 
     [TestMethod]
@@ -389,8 +389,8 @@ partial record TypeName1
 }";
 
         VerifyDiagnostic([firstPart, secondPart],
-            BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only", 4, 32),
-            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only", 4, 33, "Test1.cs"));
+            BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 32),
+            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 33, "Test1.cs"));
     }
 
     [TestMethod]
@@ -409,7 +409,7 @@ record struct TypeName1
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only", 4, 31));
+            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 31));
         VerifyCodeFix(testCode, fixedCode);
     }
 
@@ -432,7 +432,7 @@ record TypeName1(string First)
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only", 4, 33));
+            BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 33));
     }
 
     [TestMethod]
@@ -481,7 +481,7 @@ record TypeName1 : INamed
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only", 8, 31));
+            BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 8, 31));
     }
 
     [TestMethod]
@@ -553,7 +553,7 @@ record DerivedRecord : BaseRecord, INamed
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only", 8, 31));
+            BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only. CS-03.10.", 8, 31));
         VerifyCodeFix(testCode, fixedCode);
     }
 
@@ -654,7 +654,7 @@ record DerivedRecord : BaseRecord
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only", 4, 40));
+            BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only. CS-03.10.", 4, 40));
         VerifyCodeFix(testCode, fixedCode);
     }
 
@@ -714,7 +714,7 @@ record DerivedRecord : GetterOnlyRecord
 }" + EntryPoint;
 
         VerifyDiagnostic(testCode,
-            BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only", 4, 39));
+            BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only. CS-03.10.", 4, 39));
         VerifyCodeFix(testCode, fixedCode);
     }
 

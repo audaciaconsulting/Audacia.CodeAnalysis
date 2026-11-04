@@ -32,7 +32,7 @@ Note the second PR is needed as `Audacia.CodeAnalysis.Analyzers` should be consu
 **Important:** The unit test project in this solution will fail to build if the path length of items in the bin folder exceeds 260 characters. (You will see errors similar to `Could not copy Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll`). Therefore, it is recommended to clone this repo into a high-level directory (e.g. C:\Projects).
 
 ## Help link URLs
-If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](./src/Audacia.CodeAnalysis.Analyzers/Common/HelpLinkUrlFactory.cs) is updated to reflect the new titles.
+If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](./src/Audacia.CodeAnalysis.Analyzers.Shared/Common/HelpLinkUrlFactory.cs) is updated to reflect the new titles.
 
 ## Testing changes locally
 
@@ -67,7 +67,7 @@ e.g
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-05.2</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-naming#CS-05.2">CS-05.2</a></td>
 </tr>
 </table>
 
@@ -96,11 +96,11 @@ public class MyClass
 <table>
 <tr>
     <td>Category:</td>
-    <td>Usage</td>
+    <td>Maintainability</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.8</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.8">CS-01.8</a></td>
 </tr>
 </table>
 
@@ -217,11 +217,11 @@ var next = previous + 1;
 <table>
 <tr>
     <td>Category:</td>
-    <td>Maintanability</td>
+    <td>Maintainability</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.1</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.1">CS-01.1</a></td>
 </tr>
 </table>
 
@@ -298,11 +298,11 @@ public void MyMethod(string arg)
 <table>
 <tr>
     <td>Category:</td>
-    <td>Maintanability</td>
+    <td>Maintainability</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.21</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.21">CS-01.21</a></td>
 </tr>
 </table>
 
@@ -372,7 +372,7 @@ public static string ExampleExtension(this Person person, int a, int b, int c, i
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-05.1</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-naming#CS-05.1">CS-05.1</a></td>
 </tr>
 </table>
 
@@ -429,11 +429,11 @@ for (var i = 0; i < 10; i++)
 <table>
 <tr>
     <td>Category:</td>
-    <td>Style</td>
+    <td>Maintainability</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-06.1</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.15">CS-01.15</a></td>
 </tr>
 </table>
 
@@ -488,7 +488,7 @@ var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.28</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.28">CS-01.28</a></td>
 </tr>
 </table>
 
@@ -512,7 +512,7 @@ ACL1010 also provides a code fix, which inserts or updates the <Nullable> node i
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.14</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.14">CS-01.14</a></td>
 </tr>
 </table>
 
@@ -565,7 +565,7 @@ Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.19">CS-01.19</a></td>
 </tr>
 </table>
 
@@ -606,7 +606,7 @@ Maximum allowed clauses can be configured in `.editorconfig` by setting `dotnet_
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-02.9</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-class-design#CS-02.10">CS-02.10</a></td>
 </tr>
 </table>
 
@@ -656,7 +656,7 @@ Note the following:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-naming#CS-05.3">CS-05.3</a></td>
 </tr>
 </table>
 
@@ -699,6 +699,17 @@ Note the following:
 - These overrides can contain letters. For example, an identifier with '2' in its name would violate this rule.
 
 ### ACL1017 - Avoid signatures that take a bool parameter but exclude positional syntax records
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.23">CS-01.23</a></td>
+</tr>
+</table>
 
 ACL1017 performs the same analysis as the 'avoid boolean parameter' analyzer rule (AV1564) but excludes positional syntax records, treating them as properties rather than parameters.
 
@@ -800,7 +811,7 @@ public void MyMethod()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.1">LOG-01.1</a></td>
 </tr>
 </table>
 
@@ -847,7 +858,7 @@ Code without diagnostic:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.3">LOG-01.3</a></td>
 </tr>
 </table>
 
@@ -890,7 +901,7 @@ Code without diagnostic:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.3">LOG-01.3</a></td>
 </tr>
 </table>
 
@@ -927,7 +938,7 @@ Code without diagnostic:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.3">LOG-01.3</a></td>
 </tr>
 </table>
 
@@ -968,7 +979,7 @@ Code without diagnostic:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-member-design#CS-03.10">CS-03.10</a></td>
 </tr>
 </table>
 
@@ -1001,11 +1012,11 @@ public record MyRecord
 <table>
 <tr>
     <td>Category:</td>
-    <td>Usage</td>
+    <td>Logging</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>LOG-04.6</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-04.6">LOG-04.6</a></td>
 </tr>
 </table>
 
@@ -1031,7 +1042,7 @@ dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-05.15</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-naming#CS-05.16">CS-05.16</a></td>
 </tr>
 </table>
 
@@ -1086,7 +1097,7 @@ public string Get()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.20</td>
+    <td><a href="https://audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.20">CS-01.20</a></td>
 </tr>
 </table>
 
@@ -1291,7 +1302,7 @@ public Results<NotFound, Ok<string>> Get()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/5-automated-testing/unit-testing#UT-01.5">UT-01.5</a></td>
 </tr>
 </table>
 
@@ -1381,7 +1392,7 @@ public void FluentAssertionsTestMethod()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>UT-01.1</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/5-automated-testing/unit-testing#UT-01.1">UT-01.1</a></td>
 </tr>
 </table>
 
@@ -1426,7 +1437,7 @@ public void TestMethod()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>UT-01.1</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/5-automated-testing/unit-testing#UT-01.1">UT-01.1</a></td>
 </tr>
 </table>
 
@@ -1476,7 +1487,7 @@ public void TestMethod()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>UT-01.2</td>
+    <td><a href="https://audacia.tech/standards/engineering/engineering-principles/5-automated-testing/unit-testing#UT-01.2">UT-01.2</a></td>
 </tr>
 </table>
 

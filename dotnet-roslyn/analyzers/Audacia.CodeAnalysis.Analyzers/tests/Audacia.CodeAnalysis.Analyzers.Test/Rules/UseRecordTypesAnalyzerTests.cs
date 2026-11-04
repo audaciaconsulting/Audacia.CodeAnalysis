@@ -38,7 +38,7 @@ public class UseRecordTypesAnalyzerTests : CodeFixVerifier
         return new DiagnosticResult
         {
             Id = UseRecordTypesAnalyzer.Id,
-            Message = $"Type '{typeName}' has suffix '{suffix}', which should be a record type",
+            Message = $"Type '{typeName}' has suffix '{suffix}', which should be a record type. CS-02.10.",
             Severity = DiagnosticSeverity.Warning,
             Locations =
             [

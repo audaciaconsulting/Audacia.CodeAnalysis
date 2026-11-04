@@ -11,10 +11,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.FieldWithUnderscore
         public const string Id = DiagnosticId.FieldWithUnderscore;
 
         private const string Title = "Private field not prefixed with an underscore";
-        private const string MessageFormat = "Field '{0}' is not prefixed with an underscore";
+        private const string MessageFormat = "Field '{0}' is not prefixed with an underscore. CS-05.2.";
         private const string Description = "Private fields should be prefixed with an underscore.";
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

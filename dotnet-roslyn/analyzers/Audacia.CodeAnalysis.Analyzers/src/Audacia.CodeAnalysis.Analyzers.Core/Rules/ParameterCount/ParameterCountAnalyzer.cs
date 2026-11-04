@@ -14,7 +14,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
         private const string Title = "Signature contains too many parameters";
 
         private const string MessageFormat =
-            "{0} contains {1} parameters, which exceeds the maximum of {2} parameters";
+            "{0} contains {1} parameters, which exceeds the maximum of {2} parameters. CS-01.21.";
 
         private const string Description = "Don't declare signatures with more than a predefined number of parameters.";
 

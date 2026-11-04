@@ -6,5 +6,7 @@
         public const string Naming = "Naming";
         public const string Usage = "Usage";
         public const string Style = "Style";
+        public const string Logging = "Logging";
+        public const string UnitTesting = "UnitTesting";
     }
 }

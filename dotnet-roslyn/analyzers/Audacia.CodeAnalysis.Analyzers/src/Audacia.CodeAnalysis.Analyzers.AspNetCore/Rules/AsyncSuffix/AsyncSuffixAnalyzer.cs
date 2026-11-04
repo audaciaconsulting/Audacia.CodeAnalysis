@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.AsyncSuffix
 
         public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
-        private const string MessageFormat = "Asynchronous method name '{0}' is not suffixed with 'Async'";
+        private const string MessageFormat = "Asynchronous method name '{0}' is not suffixed with 'Async'. CS-05.16.";
 
         private const string Title = "Asynchronous method name is not suffixed with 'Async'";
 
