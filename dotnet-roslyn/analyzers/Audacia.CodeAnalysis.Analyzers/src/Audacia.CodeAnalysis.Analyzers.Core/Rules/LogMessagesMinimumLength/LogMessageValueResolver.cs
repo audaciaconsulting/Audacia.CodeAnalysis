@@ -462,7 +462,8 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             }
         }
 
-        return argumentIndex == values.Length && TryFormatting(format.ToString(), values, out value);
+        return argumentIndex == values.Length
+            && TryFormatting(format.ToString(), values.Select(item => item ?? "(null)").ToArray(), out value);
     }
 
     private static bool TryAppendingPlaceholder(string template, StringBuilder format, int argumentIndex, ref int index)
