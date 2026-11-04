@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
@@ -18,7 +17,7 @@ public class LogMessagesMinimumLengthAnalyzerTests : CodeFixVerifier
 {
     private ISettingsReader _settingsReader;
 
-    private DiagnosticResult BuildExpectedResult(int lineNumber, int column, int minLength)
+    private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, int minLength)
     {
         return new DiagnosticResult
         {
@@ -297,6 +296,62 @@ class ClassName
     }
 
     [TestMethod]
+    [DataRow("var value = \"123456789\";", "string.Format(\"{0}\", value)", true)]
+    [DataRow("var value = \"1234567890\";", "string.Format(\"{0}\", value)", false)]
+    [DataRow("const string value = \"123456789\";", "string.Format(\"{0}\", value)", true)]
+    [DataRow("const string value = \"1234567890\";", "string.Format(\"{0}\", value)", false)]
+    [DataRow("const string value = \"123456789\";", "$\"{value}\"", true)]
+    [DataRow("const string value = \"123456789\";", "\"{Value}\", value", true)]
+    [DataRow("const string value = \"12345\";", "value + \"6789\"", true)]
+    [DataRow("var value = \"12345\";", "string.Concat(value, \"6789\")", true)]
+    [DataRow("var value = \"12345\";", "string.Concat(value, \"67890\")", false)]
+    [DataRow("var format = \"{0}\"; var value = \"123456789\";", "string.Format(format, value)", true)]
+    [DataRow("var original = \"123456789\"; var value = original;", "value", true)]
+    [DataRow("var value = string.Format(\"{0}\", \"123456789\");", "value", true)]
+    public void String_Construction_Resolves_Constants_And_Unchanged_Locals(
+        string declaration, string expression, bool diagnosticExpected)
+    {
+        VerifyMessage(expression, diagnosticExpected, declaration);
+    }
+
+    [TestMethod]
+    [DataRow("value")]
+    [DataRow("$\"{value}\"")]
+    [DataRow("\"{Value}\", value")]
+    [DataRow("\"1\" + value")]
+    [DataRow("string.Format(\"{0}\", value)")]
+    [DataRow("string.Concat(\"1\", value)")]
+    public void No_Diagnostic_For_Reassigned_Local(string arguments)
+    {
+        VerifyMessage(arguments, diagnosticExpected: false,
+            declaration: "var value = \"1\"; value = input;");
+    }
+
+    [TestMethod]
+    [DataRow("var value = \"1\"; if (input != null) value = input;")]
+    [DataRow("var value = \"1\"; System.Action change = () => value = input; change();")]
+    [DataRow("var value = \"1\"; ref var alias = ref value; alias = input;")]
+    [DataRow("var value = \"1\"; void Change(ref string text) { text = input; } Change(ref value);")]
+    [DataRow("var original = \"1\"; var value = original; original = input;")]
+    [DataRow("string value = \"1\", other = (value = input);")]
+    [DataRow("string GetValue() => input; var value = GetValue();")]
+    public void No_Diagnostic_For_Local_With_Uncertain_Value(string declaration)
+    {
+        VerifyMessage("value", diagnosticExpected: false, declaration);
+    }
+
+    [TestMethod]
+    [DataRow("$\"{value,9}\"", true)]
+    [DataRow("$\"{value,10}\"", false)]
+    [DataRow("\"{Value,9}\", value", true)]
+    [DataRow("\"{Value,10}\", value", false)]
+    [DataRow("\"{{{Value}}}\", value", true)]
+    public void Known_Local_Uses_Formatted_Length(string arguments, bool diagnosticExpected)
+    {
+        VerifyMessage(arguments, diagnosticExpected, "var value = \"1\";");
+    }
+
+    [TestMethod]
     public void No_Diagnostic_For_Message_In_Unresolved_Method_Parameter()
     {
         VerifyMessage("input", diagnosticExpected: false);
@@ -366,6 +421,7 @@ class ClassName
     /// <summary>
     /// Settings are read when the analyzer runs, and Roslyn reports any exception thrown by an analyzer as an AD0001 diagnostic.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MSTEST0046:Use 'Assert' instead of 'StringAssert'", Justification = "Assert gives a different result, and the test fails")]
     private void AssertAnalyzerThrowsInvalidConfig(string expectedMessage)
     {
         const string testCode = @"
@@ -402,7 +458,7 @@ class ClassName
         provider.GetOptions(Arg.Any<SyntaxTree>()).Returns(options);
 
         _settingsReader = new EditorConfigSettingsReader(
-            new AnalyzerOptions(ImmutableArray<AdditionalText>.Empty, provider));
+            new AnalyzerOptions([], provider));
     }
 
     private void VerifyMessage(string arguments, bool diagnosticExpected, string declaration = "", int minLength = 10)
