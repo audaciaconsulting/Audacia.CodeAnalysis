@@ -8,6 +8,9 @@
 - Added new rule "ApplicationLogicShouldBeSignposted" (ACL1028).
     - This rule checks that application logic classes (e.g. Handlers, Processors, Services) have a logger injected into their constructor, so that they can log important information and errors.
     - This rule ignores classes which are not application logic classes, and classes which have a logger injected into their constructor.
+- Added new rule "LogMessagesMinimumLength" (ACL1029).
+    - This rule checks that log messages are at least a minimum length, so that they are meaningful and provide enough information to be useful.
+    - The minimum length defaults to 10, but can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.min_log_message_length`.
 
 ### Changed
 - Updated "ControllerActionProducesResponseTypeAnalyzer" to allow 'ProducesResponseType<T>'
