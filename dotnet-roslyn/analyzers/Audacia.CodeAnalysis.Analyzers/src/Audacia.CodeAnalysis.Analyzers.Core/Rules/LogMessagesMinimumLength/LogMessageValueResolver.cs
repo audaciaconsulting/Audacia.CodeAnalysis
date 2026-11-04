@@ -224,7 +224,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     }
 
     /// <summary>
-    /// Resolves literal text or a known interpolation value, applying any alignment and format specifier.
+    /// Resolves literal text or a known interpolation value with supported formatting.
     /// </summary>
     private bool TryResolvingInterpolationPart(IInterpolatedStringContentOperation part, out string text)
     {
@@ -332,7 +332,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
     /// <summary>
     /// Converts named logging placeholders to positional format items and substitutes known values.
-    /// Preserves escaped braces, alignment, and format specifiers when calculating the resulting message.
+    /// Preserves escaped braces and alignment, skipping format specifiers that cannot be evaluated reliably.
     /// </summary>
     private static bool TryResolvingTemplate(string template, object[] values, out string value)
     {
@@ -398,6 +398,11 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     {
         value = null;
 
+        if (!IsSupportedFormat(format))
+        {
+            return false;
+        }
+
         try
         {
             value = string.Format(format, values);
@@ -407,5 +412,36 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         {
             return false;
         }
+    }
+
+    private static bool IsSupportedFormat(string format)
+    {
+        for (var index = 0; index < format.Length; index++)
+        {
+            var character = format[index];
+
+            if (character != '{' && character != '}')
+            {
+                continue;
+            }
+
+            if (index + 1 < format.Length && format[index + 1] == character)
+            {
+                index++;
+                continue;
+            }
+
+            var end = format.IndexOf('}', index + 1);
+
+            if (character == '}' || end < 0 || format.IndexOf(':', index + 1, end - index - 1) >= 0)
+            {
+                // Values may already be strings, so type-specific formatting cannot be evaluated reliably.
+                return false;
+            }
+
+            index = end;
+        }
+
+        return true;
     }
 }

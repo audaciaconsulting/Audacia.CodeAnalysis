@@ -455,6 +455,8 @@ class ClassName
     [DataRow("\"{Id,-10}\", \"1\"", false)]
     [DataRow("\"{{Id}} {Id}\", \"1234\"", true)]
     [DataRow("\"{{Id}} {Id}\", \"12345\"", false)]
+    [DataRow("\"{{OK}} {Id}\", 1", true)]
+    [DataRow("\"{Value}\", \"{Id:D10}\"", true)]
     public void Structured_Logging_Uses_Rendered_Values_In_Argument_Order(string arguments, bool diagnosticExpected)
     {
         VerifyMessage(arguments, diagnosticExpected);
@@ -463,20 +465,35 @@ class ClassName
     [TestMethod]
     [DataRow("\"Order {Id}\", 123", true)]
     [DataRow("\"Order {Id}\", 1234", false)]
-    [DataRow("\"{Id:D9}\", 42", false)] // Doesn't have to work, just not throw an exception. The analyzer doesn't know the format at compile time.
-    [DataRow("\"{Id:D10}\", 42", false)]
     [DataRow("\"Ok {Success}\", true", true)]
     [DataRow("\"Done {Success}\", false", false)]
     [DataRow("$\"Order {123}\"", true)]
     [DataRow("$\"Order {1234}\"", false)]
-    [DataRow("$\"{42:D9}\"", false)] // Doesn't have to work, just not throw an exception. The analyzer doesn't know the format at compile time.
-    [DataRow("$\"{42:D10}\"", false)]
     [DataRow("string.Format(\"Order {0}\", 123)", true)]
     [DataRow("string.Format(\"Order {0}\", 1234)", false)]
     public void Constant_Numeric_And_Boolean_Values_Use_Their_Formatted_Length(
             string arguments, bool diagnosticExpected)
     {
         VerifyMessage(arguments, diagnosticExpected);
+    }
+
+    [TestMethod]
+    [DataRow("\"{Id:D9}\", 42")]
+    [DataRow("\"{Id:D10}\", 42")]
+    [DataRow("\"{Id:X}\", 42")]
+    [DataRow("\"{Id,10:D9}\", 42")]
+    [DataRow("$\"{42:D9}\"")]
+    [DataRow("$\"{42:D10}\"")]
+    [DataRow("$\"{42:X}\"")]
+    [DataRow("string.Format(\"{0:D9}\", 42)")]
+    [DataRow("string.Format(\"{0:D10}\", 42)")]
+    [DataRow("string.Format(\"{0:X}\", 42)")]
+    [DataRow("\"{{literal}} {Id:D9}\", 42")]
+    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0:D9}\", 42)")]
+    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0:D10}\", 42)")]
+    public void No_Diagnostic_When_Format_Specifiers_Cannot_Be_Evaluated_Reliably(string arguments)
+    {
+        VerifyMessage(arguments, diagnosticExpected: false);
     }
 
     [TestMethod]
@@ -487,8 +504,8 @@ class ClassName
     [DataRow("string.Concat(str1: \"12345\", str0: \"Got \" )", true)]
     [DataRow("string.Format(\"{{{0}}}\", \"1234567\")", true)]
     [DataRow("string.Format(\"{{{0}}}\", \"12345678\")", false)]
-    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0:D9}\", 42)", false)] // Doesn't have to work, just not throw an exception. The analyzer doesn't know the culture at compile time.
-    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0:D10}\", 42)", false)]
+    [DataRow("string.Format(\"{{X:D9}}{0}\", \"1\")", true)]
+    [DataRow("string.Format(\"Id:{0}\", 42)", true)]
     public void Common_Formatting_Overloads_Use_Their_Result_Length(string expression, bool diagnosticExpected)
     {
         VerifyMessage(expression, diagnosticExpected);
