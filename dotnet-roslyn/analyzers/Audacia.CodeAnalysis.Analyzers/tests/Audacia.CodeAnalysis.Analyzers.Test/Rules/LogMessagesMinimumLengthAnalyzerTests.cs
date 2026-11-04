@@ -119,6 +119,22 @@ class ClassName
     }
 
     [TestMethod]
+    [DataRow("string.Format(\"{0}\", \"123456789\")", true)]
+    [DataRow("string.Format(\"{0}{1}\", \"1234\", \"56789\")", true)]
+    [DataRow("string.Format(\"{0}{1}{2}\", \"123\", \"456\", \"789\")", true)]
+    [DataRow("string.Format(\"{0}{1}{2}{3}\", \"12\", \"34\", \"56\", \"789\")", true)]
+    [DataRow("string.Format(\"{0}{1}{2}{3}\", \"12\", \"34\", \"56\", \"7890\")", false)]
+    [DataRow("string.Format(arg1: \"\", format: \"{0}{0}{1}\", arg0: \"12345\")", false)]
+    [DataRow("string.Format(\"{0}{1}\", new object[] { \"1234\", \"56789\" })", true)]
+    [DataRow("string.Format(\"{0}{1}{2}{3}\", \"123\", null, \"456\", \"789\")", true)]
+    [DataRow("string.Format(\"{0}\", input)", false)]
+    [DataRow("string.Format(\"{1}\", \"123456789\")", false)]
+    public void String_Format_Uses_Constant_String_Arguments(string expression, bool diagnosticExpected)
+    {
+        VerifyMessage(expression, diagnosticExpected);
+    }
+
+    [TestMethod]
     [DataRow("20", "1234567890123456789", true)]
     [DataRow("20", "12345678901234567890", false)]
     [DataRow("20", "123456789012345678901", false)]
@@ -181,12 +197,12 @@ class ClassName
     }
 
     [TestMethod]
-    [DataRow("$\"{input}\"", true)]
-    [DataRow("$\"12345678{input}\"", true)]
+    [DataRow("$\"{input}\"", false)]
+    [DataRow("$\"12345678{input}\"", false)]
     [DataRow("$\"123456789{input}\"", false)]
-    [DataRow("$\"1234567{input}{input}\"", true)]
+    [DataRow("$\"1234567{input}{input}\"", false)]
     [DataRow("$\"12345678{input}{input}\"", false)]
-    public void Interpolated_Method_Parameter_Counts_As_One_Character_Per_Occurrence(
+    public void No_Diagnostic_For_Interpolated_Unresolved_Method_Parameter(
         string expression, bool diagnosticExpected)
     {
         VerifyMessage(expression, diagnosticExpected);
@@ -205,12 +221,12 @@ class ClassName
     }
 
     [TestMethod]
-    [DataRow("\"{Value}\", input", true)]
-    [DataRow("\"12345678{Value}\", input", true)]
+    [DataRow("\"{Value}\", input", false)]
+    [DataRow("\"12345678{Value}\", input", false)]
     [DataRow("\"123456789{Value}\", input", false)]
-    [DataRow("\"1234567{First}{Second}\", input, input", true)]
+    [DataRow("\"1234567{First}{Second}\", input, input", false)]
     [DataRow("\"12345678{First}{Second}\", input, input", false)]
-    public void Message_Template_With_Method_Parameter_Counts_As_One_Character_Per_Placeholder(
+    public void No_Diagnostic_For_Message_Template_With_Unresolved_Method_Parameter(
         string arguments, bool diagnosticExpected)
     {
         VerifyMessage(arguments, diagnosticExpected);
@@ -229,13 +245,13 @@ class ClassName
     }
 
     [TestMethod]
-    [DataRow("\"12345678\" + input", true)]
+    [DataRow("\"12345678\" + input", false)]
     [DataRow("\"123456789\" + input", false)]
-    [DataRow("input + \"12345678\"", true)]
+    [DataRow("input + \"12345678\"", false)]
     [DataRow("input + \"123456789\"", false)]
-    [DataRow("\"1234567\" + input + input", true)]
+    [DataRow("\"1234567\" + input + input", false)]
     [DataRow("\"12345678\" + input + input", false)]
-    public void Concatenated_Method_Parameter_Counts_As_One_Character_Per_Occurrence(
+    public void No_Diagnostic_For_Concatenated_Unresolved_Method_Parameter(
         string expression, bool diagnosticExpected)
     {
         VerifyMessage(expression, diagnosticExpected);
@@ -244,11 +260,11 @@ class ClassName
     [TestMethod]
     [DataRow("\"1234\" + \"56789\"", true)]
     [DataRow("\"12345\" + \"67890\"", false)]
-    [DataRow("string.Format(\"12345678{0}\", input)", true)]
+    [DataRow("string.Format(\"12345678{0}\", input)", false)]
     [DataRow("string.Format(\"123456789{0}\", input)", false)]
     [DataRow("string.Format(\"{0}\", \"123456789\")", true)]
     [DataRow("string.Format(\"{0}\", \"1234567890\")", false)]
-    [DataRow("string.Concat(\"12345678\", input)", true)]
+    [DataRow("string.Concat(\"12345678\", input)", false)]
     [DataRow("string.Concat(\"123456789\", input)", false)]
     public void Common_String_Construction_Uses_Message_Length(string expression, bool diagnosticExpected)
     {
@@ -281,9 +297,24 @@ class ClassName
     }
 
     [TestMethod]
-    public void Message_In_Method_Parameter_Counts_As_One_Character()
+    public void No_Diagnostic_For_Message_In_Unresolved_Method_Parameter()
     {
-        VerifyMessage("input", diagnosticExpected: true);
+        VerifyMessage("input", diagnosticExpected: false);
+    }
+
+    [TestMethod]
+    [DataRow("value")]
+    [DataRow("$\"{value}\"")]
+    [DataRow("\"{Value}\", value")]
+    [DataRow("\"1\" + value")]
+    [DataRow("string.Format(\"{0}\", value)")]
+    [DataRow("string.Concat(\"1\", value)")]
+    [DataRow("$\"{known}{value}\"")]
+    [DataRow("\"{Known}{Value}\", known, value")]
+    [DataRow("known + value")]
+    public void No_Diagnostic_When_Local_Variable_Value_Cannot_Be_Resolved(string arguments)
+    {
+        VerifyMessage(arguments, diagnosticExpected: false, declaration: "var known = \"1\"; var value = input;");
     }
 
     [TestMethod]
@@ -299,21 +330,21 @@ class ClassName
     [DataRow("\"12345\" +\n    \"67890\"", false)]
     [DataRow("\"1234\" +\r\n\t\"56789\"", true)]
     [DataRow("\"12345\" +\r\n\t\"67890\"", false)]
-    [DataRow("\"12345678\" +\n    input", true)]
+    [DataRow("\"12345678\" +\n    input", false)]
     [DataRow("\"123456789\" +\n    input", false)]
-    [DataRow("\"12345678\" +\r\n\tinput", true)]
+    [DataRow("\"12345678\" +\r\n\tinput", false)]
     [DataRow("\"123456789\" +\r\n\tinput", false)]
-    [DataRow("$\"12345678{\n    input}\"", true)]
+    [DataRow("$\"12345678{\n    input}\"", false)]
     [DataRow("$\"123456789{\n    input}\"", false)]
-    [DataRow("$\"12345678{\r\n\tinput}\"", true)]
+    [DataRow("$\"12345678{\r\n\tinput}\"", false)]
     [DataRow("$\"123456789{\r\n\tinput}\"", false)]
-    [DataRow("\n    \"12345678{Value}\",\n    input", true)]
+    [DataRow("\n    \"12345678{Value}\",\n    input", false)]
     [DataRow("\n    \"123456789{Value}\",\n    input", false)]
-    [DataRow("\r\n\t\"12345678{Value}\",\r\n\tinput", true)]
+    [DataRow("\r\n\t\"12345678{Value}\",\r\n\tinput", false)]
     [DataRow("\r\n\t\"123456789{Value}\",\r\n\tinput", false)]
-    [DataRow("string.Format(\n    \"12345678{0}\",\n    input)", true)]
+    [DataRow("string.Format(\n    \"12345678{0}\",\n    input)", false)]
     [DataRow("string.Format(\n    \"123456789{0}\",\n    input)", false)]
-    [DataRow("string.Format(\r\n\t\"12345678{0}\",\r\n\tinput)", true)]
+    [DataRow("string.Format(\r\n\t\"12345678{0}\",\r\n\tinput)", false)]
     [DataRow("string.Format(\r\n\t\"123456789{0}\",\r\n\tinput)", false)]
     public void Source_Line_Breaks_And_Indentation_Do_Not_Count_Towards_Message_Length(
         string arguments, bool diagnosticExpected)
