@@ -101,7 +101,8 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (operation is IConversionOperation conversion && conversion.IsImplicit && conversion.OperatorMethod == null)
+        if (operation is IConversionOperation conversion && conversion.IsImplicit && conversion.OperatorMethod == null
+            && !conversion.Conversion.IsNumeric)
         {
             return TryResolvingValue(conversion.Operand, out value);
         }
