@@ -140,6 +140,10 @@ class ClassName
     [DataRow("5", "1234", true)]
     [DataRow("5", "12345", false)]
     [DataRow("5", "123456", false)]
+    [DataRow("1", "", true)]
+    [DataRow("1", "1", false)]
+    [DataRow("100", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
+    [DataRow("100", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false)]
     public void Configured_Minimum_Length_Is_Used(string setting, string message, bool diagnosticExpected)
     {
         ConfigureMinimumLength(setting);
@@ -173,14 +177,14 @@ class ClassName
     }
 
     [TestMethod]
-    public void Minimum_Length_Greater_Than_Fifty_Throws_When_Configuration_Is_Read()
+    public void Minimum_Length_Greater_Than_One_Hundred_Throws_When_Configuration_Is_Read()
     {
-        ConfigureMinimumLength("51");
+        ConfigureMinimumLength("101");
         var key = new SettingsKey(LogMessagesMinimumLengthAnalyzer.Id,
             LogMessagesMinimumLengthAnalyzer.LogMessageMinimumLengthSetting);
 
         AssertAnalyzerThrowsInvalidConfig(
-            $"Value for '{key.ToString().ToLowerInvariant()}' in '.editorconfig' must be at most 50.");
+            $"Value for '{key.ToString().ToLowerInvariant()}' in '.editorconfig' must be at most 100.");
     }
 
     [TestMethod]
@@ -341,11 +345,21 @@ class ClassName
     }
 
     [TestMethod]
+    // Outside padding should be trimmed
     [DataRow("$\"{value,9}\"", true)]
-    [DataRow("$\"{value,10}\"", false)]
+    [DataRow("$\"{value,10}\"", true)]
     [DataRow("\"{Value,9}\", value", true)]
-    [DataRow("\"{Value,10}\", value", false)]
+    [DataRow("\"{Value,10}\", value", true)]
     [DataRow("\"{{{Value}}}\", value", true)]
+    // Padding between other text is part of the message, so it counts towards the length.
+    [DataRow("$\"1234567{value,2}\"", true)]
+    [DataRow("$\"12345678{value,2}\"", false)]
+    [DataRow("$\"{value,-2}1234567\"", true)]
+    [DataRow("$\"{value,-2}12345678\"", false)]
+    [DataRow("\"1234567{Value,2}\", value", true)]
+    [DataRow("\"12345678{Value,2}\", value", false)]
+    [DataRow("\"{Value,-2}1234567\", value", true)]
+    [DataRow("\"{Value,-2}12345678\", value", false)]
     public void Known_Local_Uses_Formatted_Length(string arguments, bool diagnosticExpected)
     {
         VerifyMessage(arguments, diagnosticExpected, "var value = \"1\";");
@@ -452,7 +466,7 @@ class ClassName
     [DataRow("\"Got {Id}\", (object)null", true)]
     [DataRow("\"Got {Id}\", \"\"", true)]
     [DataRow("\"{Id,-9}\", \"1\"", true)]
-    [DataRow("\"{Id,-10}\", \"1\"", false)]
+    [DataRow("\"{Id,-10}\", \"1\"", true)]
     [DataRow("\"{{Id}} {Id}\", \"1234\"", true)]
     [DataRow("\"{{Id}} {Id}\", \"12345\"", false)]
     [DataRow("\"{{OK}} {Id}\", 1", true)]

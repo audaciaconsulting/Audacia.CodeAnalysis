@@ -18,7 +18,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
 
     public const string LogMessageMinimumLengthSetting = "log_message_minimum_length";
     private const int MinimumSettingValue = 1;
-    private const int MaximumSettingValue = 50;
+    private const int MaximumSettingValue = 100;
     public const int DefaultLogMessageMinimumLength = 10;
 
     private const string LoggerMessageParameterName = "message";
@@ -70,43 +70,32 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext nodeAnalysisContext, ISettingsReader settingsReader)
     {
-        try
+        var invocation = (InvocationExpressionSyntax)nodeAnalysisContext.Node;
+
+        if (!invocation.TryGetLoggerMethodSymbol(nodeAnalysisContext.SemanticModel, out IMethodSymbol methodSymbol))
         {
-            var invocation = (InvocationExpressionSyntax)nodeAnalysisContext.Node;
-
-            if (!invocation.TryGetLoggerMethodSymbol(nodeAnalysisContext.SemanticModel, out IMethodSymbol methodSymbol))
-            {
-                return;
-            }
-
-            if (!invocation.TryGetNamedParameterArgument(methodSymbol, LoggerMessageParameterName, out ArgumentSyntax messageArgument))
-            {
-                return;
-            }
-
-            var resolver = new LogMessageValueResolver(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
-            if (!resolver.TryResolvingMessage(invocation, messageArgument.Expression, out var messageParameterValue))
-            {
-                return;
-            }
-
-            // Settings are read per syntax tree, as .editorconfig sections can apply different values to different files
-            var minimumLength = GetMinimumLengthFromSettings(settingsReader, invocation.SyntaxTree)
-                ?? DefaultLogMessageMinimumLength;
-
-            if (messageParameterValue.Length < minimumLength)
-            {
-                var diagnostic = Diagnostic.Create(Rule, messageArgument.GetLocation(), minimumLength);
-                nodeAnalysisContext.ReportDiagnostic(diagnostic);
-            }
+            return;
         }
-        catch (InvalidConfigException)
+
+        if (!invocation.TryGetNamedParameterArgument(methodSymbol, LoggerMessageParameterName, out ArgumentSyntax messageArgument))
         {
-            throw;
+            return;
         }
-        catch
+
+        var resolver = new LogMessageValueResolver(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
+        if (!resolver.TryResolvingMessage(invocation, messageArgument.Expression, out var messageParameterValue))
         {
-            // Swallow any other exceptions to avoid crashing the analyzer
+            return;
+        }
+
+        // Settings are read per syntax tree, as .editorconfig sections can apply different values to different files
+        var minimumLength = GetMinimumLengthFromSettings(settingsReader, invocation.SyntaxTree)
+            ?? DefaultLogMessageMinimumLength;
+
+        if (messageParameterValue.Trim().Length < minimumLength)
+        {
+            var diagnostic = Diagnostic.Create(Rule, messageArgument.GetLocation(), minimumLength);
+            nodeAnalysisContext.ReportDiagnostic(diagnostic);
         }
     }
 

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
@@ -175,7 +175,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         foreach (var identifier in block.DescendantNodes().OfType<IdentifierNameSyntax>())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            SyntaxNode expression = SetExpression(identifier);
+            SyntaxNode expression = GetOutermostParenthesized(identifier);
 
             if (expression.Parent is not RefExpressionSyntax
                 && expression.Parent is not ArgumentSyntax { RefKindKeyword.RawKind: not 0 })
@@ -192,7 +192,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         return false;
     }
 
-    private static SyntaxNode SetExpression(IdentifierNameSyntax identifier)
+    private static SyntaxNode GetOutermostParenthesized(IdentifierNameSyntax identifier)
     {
         SyntaxNode expression = identifier;
 
