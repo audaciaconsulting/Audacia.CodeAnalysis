@@ -349,6 +349,15 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return true; // The call is a string.Concat call with constant string arguments, so we can resolve it.
         }
 
+        if (call.TargetMethod.Name == nameof(string.Join)
+            && call.TargetMethod.Parameters.Length == 2
+            && call.TargetMethod.Parameters[1].IsParams
+            && values.Count > 0)
+        {
+            value = string.Join(values[0] as string, values.Skip(1).Select(item => item as string));
+            return true;
+        }
+
         if (call.TargetMethod.Name != nameof(string.Format) || values.Count < 2
             || call.TargetMethod.Parameters[0].Type.SpecialType != SpecialType.System_String
             || values[0] is not string format)
