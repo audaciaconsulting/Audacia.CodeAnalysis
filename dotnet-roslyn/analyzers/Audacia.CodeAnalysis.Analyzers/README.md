@@ -1039,11 +1039,17 @@ The rule checks messages passed to `ILogger` methods (e.g. `LogInformation`), th
 
 For `[LoggerMessage]` and `LoggerMessage.Define`, the message template is measured as written (including any `{Placeholder}` names), as the values are only known at runtime. A `[LoggerMessage]` attribute without a message is not checked.
 
+The same applies to message templates passed to `ILogger` methods, unless all of the template's argument values are known at compile time (and have no format specifiers), in which case the values are substituted before the message is measured.
+For example, `_logger.LogError("Failed {Id}", id)` is measured as `Failed {Id}` (11 characters).
+
+Therefore, if a log message made up of template arguments gets a warning, adding descriptive wording around the arguments or using more descriptive argument names, will usually resolve the warning.
+
 The minimum length of a log message can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default value is 10.
 An exception is thrown if the log_message_minimum_length is not an integer, less than 1 (as this would be meaningless) or greater than 100 (as that would require too much resource).
 
-If a log message contains (or is stored in) a variable, the length of the variable's value is checked where possible, otherwise the rule is skipped. Similarly, if the
-syntax of the log message cannot be read by the analyzer, the rule is skipped to avoid potential false positives.
+If the message (or template) itself is stored in a variable, or built from variables (e.g. through concatenation, string interpolation or `string.Format`), the variable's value is used where it
+can be determined at compile time, otherwise the rule is skipped. Similarly, if the syntax of the log message cannot be read by the analyzer, the rule is skipped to avoid potential false positives.
+Template arguments are different: as described above, they never cause the rule to be skipped.
 
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 

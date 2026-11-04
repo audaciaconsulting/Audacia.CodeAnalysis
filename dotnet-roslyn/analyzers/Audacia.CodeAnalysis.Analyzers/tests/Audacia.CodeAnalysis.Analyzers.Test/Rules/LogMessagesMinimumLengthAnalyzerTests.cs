@@ -223,14 +223,44 @@ class ClassName
         VerifyMessage(arguments, diagnosticExpected, declaration);
     }
 
+    /// <summary>
+    /// Argument values that aren't known at compile time can't be substituted, so the template is measured as written
+    /// (including placeholder names), in the same way as <c>[LoggerMessage]</c> and <c>LoggerMessage.Define</c>.
+    /// </summary>
     [TestMethod]
-    [DataRow("\"{Value}\", input", false)]
-    [DataRow("\"12345678{Value}\", input", false)]
-    [DataRow("\"123456789{Value}\", input", false)]
-    [DataRow("\"1234567{First}{Second}\", input, input", false)]
-    [DataRow("\"12345678{First}{Second}\", input, input", false)]
-    public void No_Diagnostic_For_Message_Template_With_Unresolved_Method_Parameter(
-        string arguments, bool diagnosticExpected)
+    [DataRow("\"{Value}\", input", "", true)]
+    [DataRow("\"12{Value}\", input", "", true)]
+    [DataRow("\"123{Value}\", input", "", false)]
+    [DataRow("\"{A}{B}\", input, input", "", true)]
+    [DataRow("\"1{First}{Second}\", input, input", "", false)]
+    [DataRow("\"Got {Id}\", input", "", true)]
+    [DataRow("\"Got {Id}\", new object()", "", true)]
+    [DataRow("\"Got {Id}\", new object[] { input }", "", true)]
+    [DataRow("\"At {Time}\", System.DateTime.UtcNow", "", true)]
+    [DataRow("\"Id {Id}\", System.Guid.NewGuid()", "", true)]
+    [DataRow("\"Processed {OrderId}\", input", "", false)]
+    [DataRow("\"{Known} {Unknown}\", \"OK\", input", "", false)]
+    [DataRow("\"{Value}\", value", "var value = \"1\"; value = input;", true)]
+    [DataRow("\"{Value}\", value", "var value = input;", true)]
+    [DataRow("\"{Known}{Value}\", known, value", "var known = \"1\"; var value = input;", false)]
+    [DataRow("\"Got {Id}\", values", "var values = new object[] { \"123456\" };", true)]
+    [DataRow("\"Got {Id}\", values", "var values = new object[] { \"1\" }; values[0] = input;", true)]
+    public void Message_Template_With_Unknown_Values_Is_Measured_As_Written(
+        string arguments, string declaration, bool diagnosticExpected)
+    {
+        VerifyMessage(arguments, diagnosticExpected, declaration);
+    }
+
+    /// <summary>
+    /// Values with format specifiers can't be substituted reliably, so the template is measured as written.
+    /// </summary>
+    [TestMethod]
+    [DataRow("\"{Id:D9}\", 42", true)]
+    [DataRow("\"{Id:D10}\", 42", true)]
+    [DataRow("\"{Id:X}\", 42", true)]
+    [DataRow("\"{Id,10:D9}\", 42", false)]
+    [DataRow("\"{{literal}} {Id:D9}\", 42", false)]
+    public void Message_Template_With_Format_Specifiers_Is_Measured_As_Written(string arguments, bool diagnosticExpected)
     {
         VerifyMessage(arguments, diagnosticExpected);
     }
@@ -321,7 +351,6 @@ class ClassName
     [TestMethod]
     [DataRow("value")]
     [DataRow("$\"{value}\"")]
-    [DataRow("\"{Value}\", value")]
     [DataRow("\"1\" + value")]
     [DataRow("string.Format(\"{0}\", value)")]
     [DataRow("string.Concat(\"1\", value)")]
@@ -374,12 +403,10 @@ class ClassName
     [TestMethod]
     [DataRow("value")]
     [DataRow("$\"{value}\"")]
-    [DataRow("\"{Value}\", value")]
     [DataRow("\"1\" + value")]
     [DataRow("string.Format(\"{0}\", value)")]
     [DataRow("string.Concat(\"1\", value)")]
     [DataRow("$\"{known}{value}\"")]
-    [DataRow("\"{Known}{Value}\", known, value")]
     [DataRow("known + value")]
     public void No_Diagnostic_When_Local_Variable_Value_Cannot_Be_Resolved(string arguments)
     {
@@ -492,17 +519,12 @@ class ClassName
     }
 
     [TestMethod]
-    [DataRow("\"{Id:D9}\", 42")]
-    [DataRow("\"{Id:D10}\", 42")]
-    [DataRow("\"{Id:X}\", 42")]
-    [DataRow("\"{Id,10:D9}\", 42")]
     [DataRow("$\"{42:D9}\"")]
     [DataRow("$\"{42:D10}\"")]
     [DataRow("$\"{42:X}\"")]
     [DataRow("string.Format(\"{0:D9}\", 42)")]
     [DataRow("string.Format(\"{0:D10}\", 42)")]
     [DataRow("string.Format(\"{0:X}\", 42)")]
-    [DataRow("\"{{literal}} {Id:D9}\", 42")]
     [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0:D9}\", 42)")]
     [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0:D10}\", 42)")]
     public void No_Diagnostic_When_Format_Specifiers_Cannot_Be_Evaluated_Reliably(string arguments)
@@ -526,12 +548,6 @@ class ClassName
     }
 
     [TestMethod]
-    [DataRow("\"Got {Id}\", input")]
-    [DataRow("\"{Known} {Unknown}\", \"OK\", input")]
-    [DataRow("\"Got {Id}\", new object[] { input }")]
-    [DataRow("\"Got {Id}\", new object()")]
-    [DataRow("\"At {Time}\", System.DateTime.UtcNow")]
-    [DataRow("\"Id {Id}\", System.Guid.NewGuid()")]
     [DataRow("string.Concat(\"Got \", input, \"!\")")]
     [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0}\", input)")]
     public void No_Diagnostic_For_Structured_Or_Formatted_Runtime_Values(string arguments)
@@ -540,9 +556,6 @@ class ClassName
     }
 
     [TestMethod]
-    [DataRow("\"Got {Id}\", values", "var values = new object[] { \"12345\" };", false)] // Doesn't have to work, just not throw an exception. The analyzer doesn't know the length of the array at compile time.
-    [DataRow("\"Got {Id}\", values", "var values = new object[] { \"123456\" };", false)]
-    [DataRow("\"Got {Id}\", values", "var values = new object[] { \"1\" }; values[0] = input;", false)]
     [DataRow("value", "var value = input ?? \"Started\";", false)]
     [DataRow("value", "var value = input == null ? \"Started\" : input;", false)]
     public void Local_Message_And_Argument_Arrays_Respect_Runtime_Uncertainty(

@@ -9,6 +9,11 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 {
     private readonly HashSet<ILocalSymbol> _resolvingLocals = new(SymbolEqualityComparer.Default);
 
+    /// <summary>
+    /// Resolves a logger message template, substituting the template's argument values where they're all known.
+    /// If they aren't, the template is returned as written (including any <c>{Placeholder}</c> names), in the same
+    /// way as <c>[LoggerMessage]</c> and <c>LoggerMessage.Define</c> templates, as the values are only known at runtime.
+    /// </summary>
     public bool TryResolvingMessage(InvocationExpressionSyntax invocation, ExpressionSyntax message, out string value)
     {
         if (!TryResolving(message, out value)
@@ -23,11 +28,16 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         {
             if (!TryAddingArgument(argument, values))
             {
-                return false; // The params argument isn't a constant array, so we can't resolve the message.
+                return true; // The argument values aren't all known, so measure the template as written.
             }
         }
 
-        return values.Count == 0 || TryResolvingTemplate(value, [.. values], out value);
+        if (values.Count > 0 && TryResolvingTemplate(value, [.. values], out var renderedMessage))
+        {
+            value = renderedMessage;
+        }
+
+        return true; // If the values can't be substituted reliably (e.g. due to format specifiers), the template is measured as written.
     }
 
     public bool TryResolving(ExpressionSyntax expression, out string value)
