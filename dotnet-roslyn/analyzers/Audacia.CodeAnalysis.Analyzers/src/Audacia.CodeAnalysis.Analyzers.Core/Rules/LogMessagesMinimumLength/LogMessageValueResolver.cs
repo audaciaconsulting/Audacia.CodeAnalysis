@@ -101,6 +101,11 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (operation.Type?.TypeKind == TypeKind.Enum)
+        {
+            return false;
+        }
+
         if (operation is IConversionOperation conversion && conversion.IsImplicit && conversion.OperatorMethod == null
             && !conversion.Conversion.IsNumeric)
         {
