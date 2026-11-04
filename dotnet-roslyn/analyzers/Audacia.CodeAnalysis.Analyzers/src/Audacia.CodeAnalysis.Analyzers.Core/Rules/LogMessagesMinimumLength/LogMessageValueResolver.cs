@@ -11,13 +11,18 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
     /// <summary>
     /// Resolves a logger message template, substituting the template's argument values where they're all known.
-    /// If they aren't, the template is returned as written (including any <c>{Placeholder}</c> names), in the same
-    /// way as <c>[LoggerMessage]</c> and <c>LoggerMessage.Define</c> templates, as the values are only known at runtime.
+    /// Where values aren't known, the message is measured as written; see <see cref="LogMessageAsWrittenRenderer"/>.
     /// </summary>
     public bool TryResolvingMessage(InvocationExpressionSyntax invocation, ExpressionSyntax message, out string value)
     {
-        if (!TryResolving(message, out value)
-            || semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation call)
+        if (!TryResolving(message, out value))
+        {
+            // The template's own value isn't known, so measure 'as written' if built from strings.
+            // Its arguments aren't substituted, as the rendered text isn't the template's real value.
+            return TryRenderingAsWritten(message, out value);
+        }
+
+        if (semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation call)
         {
             return false;
         }
@@ -28,16 +33,37 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         {
             if (!TryAddingArgument(argument, values))
             {
-                return true; // The argument values aren't all known, so measure the template as written.
+                value = LogMessageAsWrittenRenderer.TemplateAsWritten(value); // The argument values aren't all known, so use the 'as written' form.
+                return true;
             }
         }
 
-        if (values.Count > 0 && TryResolvingTemplate(value, [.. values], out var renderedMessage))
+        if (values.Count == 0)
         {
-            value = renderedMessage;
+            return true;
         }
 
-        return true; // If the values can't be substituted reliably (e.g. due to format specifiers), the template is measured as written.
+        // If the values can't be substituted reliably (e.g. due to format specifiers), the template is measured as written.
+        value = TryResolvingTemplate(value, [.. values], out var renderedMessage)
+            ? renderedMessage
+            : LogMessageAsWrittenRenderer.TemplateAsWritten(value);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves a message template whose values are only supplied at runtime (e.g. a <c>LoggerMessage.Define</c> format string),
+    /// so it is always measured as written.
+    /// </summary>
+    public bool TryResolvingTemplateAsWritten(ExpressionSyntax template, out string value)
+    {
+        if (TryResolving(template, out value))
+        {
+            value = LogMessageAsWrittenRenderer.TemplateAsWritten(value);
+            return true;
+        }
+
+        return TryRenderingAsWritten(template, out value);
     }
 
     public bool TryResolving(ExpressionSyntax expression, out string value)
@@ -45,6 +71,23 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         var resolved = TryResolvingValue(semanticModel.GetOperation(expression, cancellationToken), out var result);
         value = result as string;
         return resolved && value != null;
+    }
+
+    /// <summary>
+    /// Resolves an operation's exact value as a string, for use by <see cref="LogMessageAsWrittenRenderer"/>.
+    /// A <see langword="null"/> constant resolves to an empty string, as it would in a concatenation.
+    /// </summary>
+    internal bool TryResolvingOperation(IOperation operation, out string value)
+    {
+        var resolved = TryResolvingValue(operation, out var result);
+        value = resolved ? result as string ?? string.Empty : null;
+        return resolved;
+    }
+
+    private bool TryRenderingAsWritten(ExpressionSyntax expression, out string value)
+    {
+        return new LogMessageAsWrittenRenderer(this)
+            .TryRendering(semanticModel.GetOperation(expression, cancellationToken), out value);
     }
 
     private bool TryResolvingValue(IOperation operation, out object value)
@@ -249,7 +292,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// <summary>
     /// Resolves literal text or a known interpolation value with supported formatting.
     /// </summary>
-    private bool TryResolvingInterpolationPart(IInterpolatedStringContentOperation part, out string text)
+    internal bool TryResolvingInterpolationPart(IInterpolatedStringContentOperation part, out string text)
     {
         text = null;
 
@@ -328,7 +371,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// <summary>
     /// Gets the elements passed to a params parameter, whether as an inline array or as a params collection.
     /// </summary>
-    private static bool TryGettingParamsElements(IOperation value, out IEnumerable<IOperation> elements)
+    internal static bool TryGettingParamsElements(IOperation value, out IEnumerable<IOperation> elements)
     {
         elements = null;
 

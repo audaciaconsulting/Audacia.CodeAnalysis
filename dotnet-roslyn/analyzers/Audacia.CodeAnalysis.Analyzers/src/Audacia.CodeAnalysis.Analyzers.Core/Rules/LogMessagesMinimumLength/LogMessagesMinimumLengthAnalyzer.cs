@@ -144,7 +144,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
         var resolver = new LogMessageValueResolver(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
 
         if (invocation.TryGetNamedParameterArgument(methodSymbol, LoggerMessageDefineParameterName, out var formatArgument)
-            && resolver.TryResolving(formatArgument.Expression, out var formatString))
+            && resolver.TryResolvingTemplateAsWritten(formatArgument.Expression, out var formatString))
         {
             ReportIfTooShort(nodeAnalysisContext.ReportDiagnostic, settingsReader, formatString, formatArgument.GetLocation());
         }
@@ -171,7 +171,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
             }
 
             var location = GetAttributeMessageLocation(attributeSyntax, constructorIndex);
-            ReportIfTooShort(symbolAnalysisContext.ReportDiagnostic, settingsReader, message, location);
+            ReportIfTooShort(symbolAnalysisContext.ReportDiagnostic, settingsReader, LogMessageAsWrittenRenderer.TemplateAsWritten(message), location);
         }
     }
 
@@ -218,10 +218,10 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
         for (var index = 0; index < arguments.Count; index++)
         {
             var argument = arguments[index];
+
             var isMessageArgument = constructorIndex < 0
                 ? argument.NameEquals?.Name.Identifier.ValueText == LoggerMessageAttributeMessageProperty
-                : argument.NameColon?.Name.Identifier.ValueText == LoggerMessageParameterName
-                    || (argument.NameColon == null && argument.NameEquals == null && index == constructorIndex);
+                : IsMessageArgument(constructorIndex, index, argument);
 
             if (isMessageArgument)
             {
@@ -232,10 +232,17 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
         return attributeSyntax.GetLocation();
     }
 
+    private static bool IsMessageArgument(int constructorIndex, int index, AttributeArgumentSyntax argument)
+    {
+        return argument.NameColon?.Name.Identifier.ValueText == LoggerMessageParameterName
+            || (argument.NameColon == null && argument.NameEquals == null && index == constructorIndex);
+    }
+
     private static void TryAnalyzingILoggerMessage(SyntaxNodeAnalysisContext nodeAnalysisContext, ISettingsReader settingsReader, 
         InvocationExpressionSyntax invocation, ArgumentSyntax messageArgument)
     {
         var resolver = new LogMessageValueResolver(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
+
         if (!resolver.TryResolvingMessage(invocation, messageArgument.Expression, out var messageParameterValue))
         {
             return;

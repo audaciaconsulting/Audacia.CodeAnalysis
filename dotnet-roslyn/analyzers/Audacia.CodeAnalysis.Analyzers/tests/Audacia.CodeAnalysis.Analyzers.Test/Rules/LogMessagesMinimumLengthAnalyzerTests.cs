@@ -351,9 +351,7 @@ class ClassName
     [TestMethod]
     [DataRow("value")]
     [DataRow("$\"{value}\"")]
-    [DataRow("\"1\" + value")]
     [DataRow("string.Format(\"{0}\", value)")]
-    [DataRow("string.Concat(\"1\", value)")]
     public void No_Diagnostic_For_Reassigned_Local(string arguments)
     {
         VerifyMessage(arguments, diagnosticExpected: false,
@@ -403,14 +401,64 @@ class ClassName
     [TestMethod]
     [DataRow("value")]
     [DataRow("$\"{value}\"")]
-    [DataRow("\"1\" + value")]
     [DataRow("string.Format(\"{0}\", value)")]
-    [DataRow("string.Concat(\"1\", value)")]
-    [DataRow("$\"{known}{value}\"")]
-    [DataRow("known + value")]
     public void No_Diagnostic_When_Local_Variable_Value_Cannot_Be_Resolved(string arguments)
     {
         VerifyMessage(arguments, diagnosticExpected: false, declaration: "var known = \"1\"; var value = input;");
+    }
+
+    /// <summary>
+    /// Messages built from strings with values that aren't known at compile time are measured as if written as an
+    /// interpolated string, with each unknown value shown as <c>{its source text}</c>, like a template placeholder.
+    /// </summary>
+    [TestMethod]
+    [DataRow("$\"12{input}\"", "", true)]
+    [DataRow("$\"123{input}\"", "", false)]
+    [DataRow("$\"12{\n    input}\"", "", true)]
+    [DataRow("$\"123{\n    input}\"", "", false)]
+    [DataRow("$\"1{i:N}\"", "var i = input;", true)]
+    [DataRow("$\"1{input,3}\"", "", false)]
+    [DataRow("\"12\" + input", "", true)]
+    [DataRow("\"123\" + input", "", false)]
+    [DataRow("input + \"12\"", "", true)]
+    [DataRow("input + \"123\"", "", false)]
+    [DataRow("string.Concat(\"12\", input)", "", true)]
+    [DataRow("string.Concat(\"123\", input)", "", false)]
+    [DataRow("string.Format(\"12{0}\", input)", "", true)]
+    [DataRow("string.Format(\"123{0}\", input)", "", false)]
+    [DataRow("string.Format(\"1{0:N}\", i)", "var i = input;", true)]
+    [DataRow("string.Format(\"1{0:N}\", input)", "", false)]
+    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"12{0}\", input)", "", true)]
+    [DataRow("string.Join(\"\", \"12\", input)", "", true)]
+    [DataRow("string.Join(\" \", \"12\", input)", "", false)]
+    [DataRow("\"1\" + value", "var value = \"1\"; value = input;", true)]
+    [DataRow("string.Concat(\"1\", value)", "var value = \"1\"; value = input;", true)]
+    [DataRow("$\"{known}{value}\"", "var known = \"1\"; var value = input;", true)]
+    [DataRow("known + value", "var known = \"1\"; var value = input;", true)]
+    [DataRow("$\"Failed {input}\"", "", false)]
+    public void Message_Built_From_Strings_With_Unknown_Values_Is_Measured_As_Written(
+        string arguments, string declaration, bool diagnosticExpected)
+    {
+        VerifyMessage(arguments, diagnosticExpected, declaration);
+    }
+
+    /// <summary>
+    /// A message that's only stored in a variable, or is made up entirely of unknown values, has nothing meaningful
+    /// to measure, so the rule is skipped.
+    /// </summary>
+    [TestMethod]
+    [DataRow("message", "var message = $\"1{input}\";")]
+    [DataRow("message", "var message = \"1\" + input;")]
+    [DataRow("input + input", "")]
+    [DataRow("$\"{input}{input}\"", "")]
+    [DataRow("string.Concat(input, input)", "")]
+    [DataRow("string.Format(\"{0}{1}\", input, input)", "")]
+    [DataRow("\" \" + input", "")]
+    [DataRow("string.Join(\", \", values)", "var values = new[] { input };")]
+    [DataRow("string.Format(format, input)", "var format = input;")]
+    public void No_Diagnostic_When_Message_Has_No_Known_Text(string arguments, string declaration)
+    {
+        VerifyMessage(arguments, diagnosticExpected: false, declaration);
     }
 
     [TestMethod]
@@ -655,6 +703,8 @@ class ClassName
     [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"Processed {Id}\")", null, false)]
     [DataRow("LoggerMessage.Define(formatString: \"123456789\", eventId: new EventId(1), logLevel: LogLevel.Information)", "formatString: \"123456789\"", true)]
     [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), input)", null, false)]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"12\" + input)", "\"12\" + input", true)]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"123\" + input)", null, false)]
     [DataRow("LoggerMessage.DefineScope(\"123456789\")", null, false)]
     public void LoggerMessage_Define_Format_String_Is_Checked(string expression, string flaggedArgument, bool diagnosticExpected)
     {

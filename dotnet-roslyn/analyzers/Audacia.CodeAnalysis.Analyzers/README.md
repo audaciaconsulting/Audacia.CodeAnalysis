@@ -1037,19 +1037,21 @@ ACL1029 checks whether log messages are long enough to be meaningful, and will p
 
 The rule checks messages passed to `ILogger` methods (e.g. `LogInformation`), the `Message` of `[LoggerMessage]` source-generated logging methods, and the format string passed to `LoggerMessage.Define`.
 
-For `[LoggerMessage]` and `LoggerMessage.Define`, the message template is measured as written (including any `{Placeholder}` names), as the values are only known at runtime. A `[LoggerMessage]` attribute without a message is not checked.
+For `[LoggerMessage]` and `LoggerMessage.Define`, the message template is measured as written (including any `{Placeholder}` names), as the values are only known at runtime.
 
-The same applies to message templates passed to `ILogger` methods, unless all of the template's argument values are known at compile time (and have no format specifiers), in which case the values are substituted before the message is measured.
-For example, `_logger.LogError("Failed {Id}", id)` is measured as `Failed {Id}` (11 characters).
+For `ILogger` templates, argument values are used if all are known at compile time (and have no format specifiers), otherwise the message is measured as written, e.g. `_logger.LogError("Failed {Id}", id)` 
+is treated as `Failed {Id}` (11 characters).
 
-Therefore, if a log message made up of template arguments gets a warning, adding descriptive wording around the arguments or using more descriptive argument names, will usually resolve the warning.
+Messages built from strings using interpolation, concatenation, join etc. are treated in the same way; any unknown value is measured as if written as an interpolated string or template placeholder. 
+So `"Failed: " + ex.Message` is treated as `Failed: {ex.Message}`, and `string.Format("Failed {0}", id)` as `Failed {id}`.
 
-The minimum length of a log message can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default value is 10.
-An exception is thrown if the log_message_minimum_length is not an integer, less than 1 (as this would be meaningless) or greater than 100 (as that would require too much resource).
+Therefore, if a message made up of variables/arguments gets a warning, adding descriptive wording around the arguments or using more descriptive argument names will usually resolve it.
 
-If the message (or template) itself is stored in a variable, or built from variables (e.g. through concatenation, string interpolation or `string.Format`), the variable's value is used where it
-can be determined at compile time, otherwise the rule is skipped. Similarly, if the syntax of the log message cannot be read by the analyzer, the rule is skipped to avoid potential false positives.
-Template arguments are different: as described above, they never cause the rule to be skipped.
+The minimum length of a log message can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default is 10.
+An exception is thrown if `log_message_minimum_length` is not an integer, less than 1, or greater than 100 (as that would be resource-intensive).
+
+If the message/template itself is stored in a variable, the value is used where it can be determined at compile time. 
+Otherwise, or if a message built from strings has no text that's known at compile time (e.g. `first + second`),  the rule is skipped to avoid false positives.
 
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 
