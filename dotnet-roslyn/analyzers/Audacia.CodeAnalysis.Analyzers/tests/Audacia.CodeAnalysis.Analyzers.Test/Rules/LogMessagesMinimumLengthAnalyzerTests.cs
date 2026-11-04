@@ -418,6 +418,108 @@ class ClassName
         VerifyMessage(arguments, diagnosticExpected, declaration);
     }
 
+    [TestMethod]
+    [DataRow("LogTrace", "\"Started\"", 0, true)]
+    [DataRow("LogDebug", "\"Started\"", 0, true)]
+    [DataRow("LogWarning", "\"Started\"", 0, true)]
+    [DataRow("LogError", "\"Started\"", 0, true)]
+    [DataRow("LogCritical", "\"Started\"", 0, true)]
+    [DataRow("LogInformation", "new EventId(42, \"OrderProcessing\"), \"Started\"", 1, true)]
+    [DataRow("LogError", "new System.Exception(\"A detailed exception message\"), \"Failed\"", 1, true)]
+    [DataRow("LogError", "new EventId(42), new System.Exception(), \"Failed\"", 2, true)]
+    [DataRow("LogError", "new System.Exception(), \"Order processing failed\"", 1, false)]
+    [DataRow("LogError", "new System.Exception(), \"Bad {Id}\", \"12345\"", 1, true)]
+    [DataRow("LogError", "new System.Exception(), \"Bad {Id}\", \"123456\"", 1, false)]
+    [DataRow("Log", "LogLevel.Warning, \"Started\"", 1, true)]
+    [DataRow("Log", "LogLevel.Error, new EventId(42), new System.Exception(), \"Failed\"", 3, true)]
+    [DataRow("LogInformation", "args: new object[] { \"12345\" }, message: \"Got {Id}\"", 1, true)]
+    [DataRow("LogError", "message: \"Failed\", exception: new System.Exception()", 0, true)]
+    public void Logging_Overloads_Use_Only_The_Rendered_Message_Length(
+        string methodName, string arguments, int messageArgumentIndex, bool diagnosticExpected)
+    {
+        VerifyMessage(arguments, diagnosticExpected, methodName: methodName, messageArgumentIndex: messageArgumentIndex);
+    }
+
+    [TestMethod]
+    [DataRow("\"Got {OrderIdentifier}\", \"12345\"", true)]
+    [DataRow("\"Got {OrderIdentifier}\", \"123456\"", false)]
+    [DataRow("\"{User} {Action}\", \"Sam\", \"login\"", true)]
+    [DataRow("\"{User} {Action}\", \"Sam\", \"logout\"", false)]
+    [DataRow("\"{Value}{Value}\", \"1234\", \"56789\"", true)]
+    [DataRow("\"{Second}{First}\", \"12345\", \"67890\"", false)]
+    [DataRow("\"Got {Id}\", new object[] { \"12345\" }", true)]
+    [DataRow("\"Got {Id}\", new object[] { \"123456\" }", false)]
+    [DataRow("\"Got {Id}\", (object)null", true)]
+    [DataRow("\"Got {Id}\", \"\"", true)]
+    [DataRow("\"{Id,-9}\", \"1\"", true)]
+    [DataRow("\"{Id,-10}\", \"1\"", false)]
+    [DataRow("\"{{Id}} {Id}\", \"1234\"", true)]
+    [DataRow("\"{{Id}} {Id}\", \"12345\"", false)]
+    public void Structured_Logging_Uses_Rendered_Values_In_Argument_Order(string arguments, bool diagnosticExpected)
+    {
+        VerifyMessage(arguments, diagnosticExpected);
+    }
+
+    [TestMethod]
+    [DataRow("\"Order {Id}\", 123", true)]
+    [DataRow("\"Order {Id}\", 1234", false)]
+    [DataRow("\"{Id:D9}\", 42", false)] // Doesn't have to work, just not throw an exception. The analyzer doesn't know the format at compile time.
+    [DataRow("\"{Id:D10}\", 42", false)]
+    [DataRow("\"Ok {Success}\", true", true)]
+    [DataRow("\"Done {Success}\", false", false)]
+    [DataRow("$\"Order {123}\"", true)]
+    [DataRow("$\"Order {1234}\"", false)]
+    [DataRow("$\"{42:D9}\"", false)] // Doesn't have to work, just not throw an exception. The analyzer doesn't know the format at compile time.
+    [DataRow("$\"{42:D10}\"", false)]
+    [DataRow("string.Format(\"Order {0}\", 123)", true)]
+    [DataRow("string.Format(\"Order {0}\", 1234)", false)]
+    public void Constant_Numeric_And_Boolean_Values_Use_Their_Formatted_Length(
+            string arguments, bool diagnosticExpected)
+    {
+        VerifyMessage(arguments, diagnosticExpected);
+    }
+
+    [TestMethod]
+    [DataRow("string.Concat(\"Got \", \"12\", \"345\")", true)]
+    [DataRow("string.Concat(\"Got \", \"12\", \"3456\")", false)]
+    [DataRow("string.Concat(new string[] { \"Got \", \"12345\" })", true)]
+    [DataRow("string.Concat(new string[] { \"Got \", \"123456\" })", false)]
+    [DataRow("string.Concat(str1: \"12345\", str0: \"Got \" )", true)]
+    [DataRow("string.Format(\"{{{0}}}\", \"1234567\")", true)]
+    [DataRow("string.Format(\"{{{0}}}\", \"12345678\")", false)]
+    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0:D9}\", 42)", false)] // Doesn't have to work, just not throw an exception. The analyzer doesn't know the culture at compile time.
+    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0:D10}\", 42)", false)]
+    public void Common_Formatting_Overloads_Use_Their_Result_Length(string expression, bool diagnosticExpected)
+    {
+        VerifyMessage(expression, diagnosticExpected);
+    }
+
+    [TestMethod]
+    [DataRow("\"Got {Id}\", input")]
+    [DataRow("\"{Known} {Unknown}\", \"OK\", input")]
+    [DataRow("\"Got {Id}\", new object[] { input }")]
+    [DataRow("\"Got {Id}\", new object()")]
+    [DataRow("\"At {Time}\", System.DateTime.UtcNow")]
+    [DataRow("\"Id {Id}\", System.Guid.NewGuid()")]
+    [DataRow("string.Concat(\"Got \", input, \"!\")")]
+    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"{0}\", input)")]
+    public void No_Diagnostic_For_Structured_Or_Formatted_Runtime_Values(string arguments)
+    {
+        VerifyMessage(arguments, diagnosticExpected: false);
+    }
+
+    [TestMethod]
+    [DataRow("\"Got {Id}\", values", "var values = new object[] { \"12345\" };", false)] // Doesn't have to work, just not throw an exception. The analyzer doesn't know the length of the array at compile time.
+    [DataRow("\"Got {Id}\", values", "var values = new object[] { \"123456\" };", false)]
+    [DataRow("\"Got {Id}\", values", "var values = new object[] { \"1\" }; values[0] = input;", false)]
+    [DataRow("value", "var value = input ?? \"Started\";", false)]
+    [DataRow("value", "var value = input == null ? \"Started\" : input;", false)]
+    public void Local_Message_And_Argument_Arrays_Respect_Runtime_Uncertainty(
+        string arguments, string declaration, bool diagnosticExpected)
+    {
+        VerifyMessage(arguments, diagnosticExpected, declaration);
+    }
+
     /// <summary>
     /// Settings are read when the analyzer runs, and Roslyn reports any exception thrown by an analyzer as an AD0001 diagnostic.
     /// </summary>
@@ -461,7 +563,8 @@ class ClassName
             new AnalyzerOptions([], provider));
     }
 
-    private void VerifyMessage(string arguments, bool diagnosticExpected, string declaration = "", int minLength = 10)
+    private void VerifyMessage(string arguments, bool diagnosticExpected, string declaration = "", int minLength = 10,
+        string methodName = "LogInformation", int messageArgumentIndex = 0)
     {
         var testCode = $$"""
             using Microsoft.Extensions.Logging;
@@ -471,7 +574,7 @@ class ClassName
                 private void Method(ILogger<ClassName> logger, string input)
                 {
                     {{declaration}}
-                    logger.LogInformation({{arguments}});
+                    logger.{{methodName}}({{arguments}});
                 }
 
                 static void Main(string[] args)
@@ -484,8 +587,8 @@ class ClassName
         {
             var messageArgument = CSharpSyntaxTree.ParseText(testCode).GetRoot()
                 .DescendantNodes().OfType<InvocationExpressionSyntax>()
-                .Single(invocation => invocation.Expression.ToString() == "logger.LogInformation")
-                .ArgumentList.Arguments[0];
+                .Single(invocation => invocation.Expression.ToString() == $"logger.{methodName}")
+                .ArgumentList.Arguments[messageArgumentIndex];
             var position = messageArgument.GetLocation().GetLineSpan().StartLinePosition;
 
             VerifyDiagnostic(testCode, BuildExpectedResult(position.Line + 1, position.Character + 1, minLength));

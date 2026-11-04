@@ -58,6 +58,12 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         if (operation.ConstantValue.HasValue)
         {
             value = operation.ConstantValue.Value;
+
+            if (value is bool or char or int or long or float or double)
+            {
+                value = value.ToString();
+            }
+
             return value == null || value is string;
         }
 
