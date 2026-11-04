@@ -292,7 +292,37 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     }
 
     /// <summary>
-    /// Adds a resolved argument value, expanding inline params arrays into their individual elements.
+    /// The operation kind used by C# 12+ collection expressions, including implicitly for C# 13 params collections.
+    /// It is looked up by name because this compiles against a Roslyn version that predates it; on older hosts it is unavailable.
+    /// </summary>
+    private static readonly OperationKind? CollectionExpressionKind =
+        Enum.TryParse<OperationKind>("CollectionExpression", out var kind) ? kind : null;
+
+    /// <summary>
+    /// Gets the elements passed to a params parameter, whether as an inline array or as a params collection.
+    /// </summary>
+    private static bool TryGettingParamsElements(IOperation value, out IEnumerable<IOperation> elements)
+    {
+        elements = null;
+
+        if (value is IArrayCreationOperation { Initializer: not null } array)
+        {
+            elements = array.Initializer.ElementValues;
+            return true;
+        }
+
+        if (CollectionExpressionKind.HasValue && value?.Kind == CollectionExpressionKind.Value)
+        {
+            // A collection expression's child operations are its elements; spread elements won't resolve to a value.
+            elements = value.ChildOperations;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Adds a resolved argument value, expanding inline params arrays and collections into their individual elements.
     /// </summary>
     private bool TryAddingArgument(IArgumentOperation argument, List<object> values)
     {
@@ -303,12 +333,12 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
         if (argument.Parameter.IsParams)
         {
-            if (argument.Value is not IArrayCreationOperation { Initializer: not null } array)
+            if (!TryGettingParamsElements(argument.Value, out var elements))
             {
-                return false; // The params argument isn't a constant array, so we can't resolve the message.
+                return false; // The params argument isn't an inline array or collection, so we can't resolve the message.
             }
 
-            foreach (var element in array.Initializer.ElementValues)
+            foreach (var element in elements)
             {
                 if (!TryResolvingValue(element, out var item))
                 {
