@@ -7,14 +7,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 
 internal sealed class LogMessageValueResolver(SemanticModel semanticModel, CancellationToken cancellationToken)
 {
-    private readonly SemanticModel _semanticModel = semanticModel;
-    private readonly CancellationToken _cancellationToken = cancellationToken;
     private readonly HashSet<ILocalSymbol> _resolvingLocals = new(SymbolEqualityComparer.Default);
 
     public bool TryResolvingMessage(InvocationExpressionSyntax invocation, ExpressionSyntax message, out string value)
     {
         if (!TryResolving(message, out value)
-            || _semanticModel.GetOperation(invocation, _cancellationToken) is not IInvocationOperation call)
+            || semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation call)
         {
             return false;
         }
@@ -34,7 +32,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
     public bool TryResolving(ExpressionSyntax expression, out string value)
     {
-        var resolved = TryResolvingValue(_semanticModel.GetOperation(expression, _cancellationToken), out var result);
+        var resolved = TryResolvingValue(semanticModel.GetOperation(expression, cancellationToken), out var result);
         value = result as string;
         return resolved && value != null;
     }
@@ -48,7 +46,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false;
         }
 
-        _cancellationToken.ThrowIfCancellationRequested();
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (operation is IConversionOperation conversion && conversion.IsImplicit && conversion.OperatorMethod == null)
         {
@@ -106,13 +104,22 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         try
         {
             if (local.DeclaringSyntaxReferences.Length != 1
-                || local.DeclaringSyntaxReferences[0].GetSyntax(_cancellationToken) is not VariableDeclaratorSyntax declaration
-                || declaration.Initializer == null || !IsUnchangedLocal(local, declaration, reference.Syntax))
+                || local.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken) is not VariableDeclaratorSyntax declaration
+                || declaration.Initializer == null)
             {
-                return false; // The local is either not initialized or modified after initialization, so we can't resolve its value.
+                return false; // The local isn't initialized in a single declaration, so we can't resolve its value.
             }
 
-            return TryResolvingValue(_semanticModel.GetOperation(declaration.Initializer.Value, _cancellationToken), out value);
+            // Resolve the initializer before the data-flow checks, as most initializers aren't constant
+            // and resolving them is far cheaper than analysing the enclosing block.
+            if (!TryResolvingValue(semanticModel.GetOperation(declaration.Initializer.Value, cancellationToken), out var initialValue)
+                || !IsUnchangedLocal(local, declaration, reference.Syntax))
+            {
+                return false; // The initializer isn't constant, or the local is modified after initialization, so we can't resolve its value.
+            }
+
+            value = initialValue;
+            return true;
         }
         finally
         {
@@ -134,9 +141,15 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false; // The local is either a ref, declared elsewhere, or referenced before its declaration, so we can't guarantee its value is unchanged.
         }
 
-        var flow = _semanticModel.AnalyzeDataFlow(block);
+        if (HasReferenceEscape(block, local))
+        {
+            return false; // The local is referenced by ref, so we can't guarantee its value is unchanged.
+        }
 
-        if (flow == null || !flow.Succeeded || flow.Captured.Contains(local, SymbolEqualityComparer.Default) || HasReferenceEscape(block, local))
+        // Data-flow analysis covers the whole enclosing block, so it runs only after the cheaper checks above have passed.
+        var flow = semanticModel.AnalyzeDataFlow(block);
+
+        if (flow == null || !flow.Succeeded || flow.Captured.Contains(local, SymbolEqualityComparer.Default))
         {
             return false; // The local is either captured by a lambda or referenced by ref, so we can't guarantee its value is unchanged.
         }
@@ -148,7 +161,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return true; // The local is declared in the last statement of the block, so it can't be modified after its declaration.
         }
 
-        var remainingFlow = _semanticModel.AnalyzeDataFlow(block.Statements[next], block.Statements.Last());
+        var remainingFlow = semanticModel.AnalyzeDataFlow(block.Statements[next], block.Statements.Last());
 
         return remainingFlow != null && remainingFlow.Succeeded
             && !remainingFlow.WrittenInside.Contains(local, SymbolEqualityComparer.Default);
@@ -161,7 +174,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     {
         foreach (var identifier in block.DescendantNodes().OfType<IdentifierNameSyntax>())
         {
-            _cancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
             SyntaxNode expression = SetExpression(identifier);
 
             if (expression.Parent is not RefExpressionSyntax
@@ -170,7 +183,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
                 continue; // The identifier isn't passed by reference, so it can't escape.
             }
 
-            if (SymbolEqualityComparer.Default.Equals(_semanticModel.GetSymbolInfo(identifier, _cancellationToken).Symbol, local))
+            if (SymbolEqualityComparer.Default.Equals(semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol, local))
             {
                 return true; // The identifier is passed by reference, so the local can escape.
             }
@@ -241,6 +254,11 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false; // The hole isn't a constant string, so we can't resolve the interpolation.
         }
 
+        if (hole.FormatString != null)
+        {
+            return false; // Values may already be strings, so type-specific formatting cannot be evaluated reliably.
+        }
+
         var format = "{0";
 
         if (hole.Alignment != null)
@@ -253,8 +271,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             format += "," + alignment;
         }
 
-        format += hole.FormatString == null ? "}" : ":" + hole.FormatString.ConstantValue.Value + "}";
-        return TryFormatting(format, [value], out text);
+        return TryFormatting(format + "}", [value], out text);
     }
 
     /// <summary>
@@ -405,23 +422,25 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         }
 
         var placeholder = template.Substring(index + 1, end - index - 1);
-        AppendToFormat(format, argumentIndex, placeholder);
 
-        index = end;
-        return true;
-    }
+        if (placeholder.IndexOf(':') >= 0)
+        {
+            return false; // Values may already be strings, so type-specific formatting cannot be evaluated reliably.
+        }
 
-    private static void AppendToFormat(StringBuilder format, int argumentIndex, string placeholder)
-    {
-        var suffix = placeholder.IndexOfAny([',', ':']);
+        // Keep any alignment (e.g. "{Value,10}"), replacing the name with the positional index.
+        var alignment = placeholder.IndexOf(',');
         format.Append('{').Append(argumentIndex);
 
-        if (suffix >= 0)
+        if (alignment >= 0)
         {
-            format.Append(placeholder.Substring(suffix));
+            format.Append(placeholder.Substring(alignment));
         }
 
         format.Append('}');
+
+        index = end;
+        return true;
     }
 
     private static bool TryFormatting(string format, object[] values, out string value)
