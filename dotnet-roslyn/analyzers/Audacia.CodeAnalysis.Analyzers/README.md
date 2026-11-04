@@ -1035,8 +1035,8 @@ dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
 
 ACL1029 checks whether log messages are long enough to be meaningful, and will produce a warning if not. 
 
-The minimum length of a log message can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.min_log_message_length`. The default value is 10.
-An exception is thrown if the min_log_message_length is not an integer, less than 1 (as this would be meaningless) or greater than 50 (as that would be inappropriate).
+The minimum length of a log message can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default value is 10.
+An exception is thrown if the log_message_minimum_length is not an integer, less than 1 (as this would be meaningless) or greater than 50 (as that would be inappropriate).
 
 If a log message contains (or is stored in) a variable, the length of the variable's value is checked where possible, otherwise the rule is skipped. Similarly, if the
 syntax of the log message cannot be read by the analyzer, the rule is skipped to avoid potential false positives.
