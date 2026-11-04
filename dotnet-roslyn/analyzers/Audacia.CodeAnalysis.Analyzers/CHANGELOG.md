@@ -10,6 +10,7 @@
     - This rule ignores classes which are not application logic classes, and classes which have a logger injected into their constructor.
 - Added new rule "LogMessagesMinimumLength" (ACL1029).
     - This rule checks that log messages are at least a minimum length, so that they are meaningful and provide enough information to be useful.
+    - It covers `ILogger` method calls, `[LoggerMessage]` source-generated logging methods, and `LoggerMessage.Define`.
     - The minimum length defaults to 10, but can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`.
 
 ### Changed

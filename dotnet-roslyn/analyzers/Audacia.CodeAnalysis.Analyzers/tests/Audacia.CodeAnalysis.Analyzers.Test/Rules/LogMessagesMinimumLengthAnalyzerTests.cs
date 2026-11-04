@@ -576,6 +576,114 @@ class ClassName
         StringAssert.Contains(analyzerException.GetMessage(), expectedMessage);
     }
 
+    [TestMethod]
+    [DataRow("EventId = 1, Level = LogLevel.Information, Message = \"123456789\"", "Message = \"123456789\"", true)]
+    [DataRow("EventId = 1, Level = LogLevel.Information, Message = \"1234567890\"", null, false)]
+    [DataRow("1, LogLevel.Information, \"123456789\"", "\"123456789\"", true)]
+    [DataRow("1, LogLevel.Information, \"1234567890\"", null, false)]
+    [DataRow("LogLevel.Information, \"123456789\"", "\"123456789\"", true)]
+    [DataRow("\"123456789\"", "\"123456789\"", true)]
+    [DataRow("message: \"123456789\", level: LogLevel.Information, eventId: 1", "message: \"123456789\"", true)]
+    [DataRow("Level = LogLevel.Information, Message = \"   12345678   \"", "Message = \"   12345678   \"", true)]
+    [DataRow("Level = LogLevel.Information, Message = ShortMessage", "Message = ShortMessage", true)]
+    [DataRow("Level = LogLevel.Information, Message = \"{OrderId}\"", "Message = \"{OrderId}\"", true)]
+    [DataRow("Level = LogLevel.Information, Message = \"Processed {OrderId}\"", null, false)]
+    [DataRow("EventId = 1, Level = LogLevel.Information", null, false)]
+    [DataRow("LogLevel.Information", null, false)]
+    public void LoggerMessage_Attribute_Message_Is_Checked(string attributeArguments, string flaggedArgument, bool diagnosticExpected)
+    {
+        var testCode = $$"""
+            using Microsoft.Extensions.Logging;
+            namespace ConsoleApplication;
+            static partial class Log
+            {
+                private const string ShortMessage = "12345678";
+
+                [LoggerMessage({{attributeArguments}})]
+                static partial void Processed(ILogger logger);
+
+                static void Main(string[] args)
+                {
+                }
+            }
+            """;
+
+        VerifyCodeAt(testCode, flaggedArgument, diagnosticExpected);
+    }
+
+    [TestMethod]
+    public void LoggerMessage_Attribute_Uses_Configured_Minimum_Length()
+    {
+        ConfigureMinimumLength("5");
+        const string testCode = """
+            using Microsoft.Extensions.Logging;
+            namespace ConsoleApplication;
+            static partial class Log
+            {
+                [LoggerMessage(Level = LogLevel.Information, Message = "1234")]
+                static partial void Short(ILogger logger);
+
+                [LoggerMessage(Level = LogLevel.Information, Message = "12345")]
+                static partial void LongEnough(ILogger logger);
+
+                static void Main(string[] args)
+                {
+                }
+            }
+            """;
+
+        VerifyCodeAt(testCode, "Message = \"1234\"", diagnosticExpected: true, minLength: 5);
+    }
+
+    [TestMethod]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"123456789\")", "\"123456789\"", true)]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"1234567890\")", null, false)]
+    [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"{Id}\")", "\"{Id}\"", true)]
+    [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"Processed {Id}\")", null, false)]
+    [DataRow("LoggerMessage.Define(formatString: \"123456789\", eventId: new EventId(1), logLevel: LogLevel.Information)", "formatString: \"123456789\"", true)]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), input)", null, false)]
+    [DataRow("LoggerMessage.DefineScope(\"123456789\")", null, false)]
+    public void LoggerMessage_Define_Format_String_Is_Checked(string expression, string flaggedArgument, bool diagnosticExpected)
+    {
+        var testCode = $$"""
+            using Microsoft.Extensions.Logging;
+            namespace ConsoleApplication;
+            class ClassName
+            {
+                private object Method(string input)
+                {
+                    return {{expression}};
+                }
+
+                static void Main(string[] args)
+                {
+                }
+            }
+            """;
+
+        VerifyCodeAt(testCode, flaggedArgument, diagnosticExpected);
+    }
+
+    /// <summary>
+    /// Verifies a diagnostic is reported at the first occurrence of <paramref name="flaggedArgument"/>, or that none is reported.
+    /// </summary>
+    private void VerifyCodeAt(string testCode, string flaggedArgument, bool diagnosticExpected, int minLength = 10)
+    {
+        if (!diagnosticExpected)
+        {
+            VerifyNoDiagnostic(testCode);
+            return;
+        }
+
+        var index = testCode.IndexOf(flaggedArgument, System.StringComparison.Ordinal);
+        Assert.IsTrue(index >= 0, $"'{flaggedArgument}' was not found in the test code.");
+
+        var line = testCode.Take(index).Count(character => character == '\n') + 1;
+        var column = index - testCode.LastIndexOf('\n', index) ;
+
+        VerifyDiagnostic(testCode, BuildExpectedResult(line, column, minLength));
+    }
+
     private void ConfigureMinimumLength(string setting)
     {
         var key = new SettingsKey(LogMessagesMinimumLengthAnalyzer.Id,
