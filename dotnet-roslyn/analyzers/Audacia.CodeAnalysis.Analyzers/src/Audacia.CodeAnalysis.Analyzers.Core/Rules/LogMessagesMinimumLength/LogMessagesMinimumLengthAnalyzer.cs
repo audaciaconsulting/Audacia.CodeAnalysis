@@ -118,8 +118,12 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
     /// </summary>
     private static bool IsLoggerMessageDefineCall(InvocationExpressionSyntax invocation)
     {
-        return invocation.Expression is MemberAccessExpressionSyntax memberAccess
-            && memberAccess.Name.Identifier.ValueText == LoggerMessageDefineMethodName;
+        return invocation.Expression switch
+        {
+            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.ValueText == LoggerMessageDefineMethodName,
+            SimpleNameSyntax name => name.Identifier.ValueText == LoggerMessageDefineMethodName,
+            _ => false,
+        };
     }
 
     /// <summary>
