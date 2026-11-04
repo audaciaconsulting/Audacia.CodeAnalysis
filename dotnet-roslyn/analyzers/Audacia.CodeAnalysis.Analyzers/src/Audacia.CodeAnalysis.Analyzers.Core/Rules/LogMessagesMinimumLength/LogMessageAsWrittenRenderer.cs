@@ -269,6 +269,7 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
 
             if ((character == '{' || character == '}') && index + 1 < format.Length && format[index + 1] == character)
             {
+                hasKnownText = true;
                 result.Append(character).Append(character); // Escaped braces are kept as written, as in a template
                 index++;
                 continue;
