@@ -22,7 +22,7 @@ public class LogMessagesMinimumLengthAnalyzerTests : CodeFixVerifier
         return new DiagnosticResult
         {
             Id = LogMessagesMinimumLengthAnalyzer.Id,
-            Message = $"Log messages should be at least {minLength} characters long",
+            Message = $"Log messages should be at least {minLength} characters long. LOG-01.4.",
             Severity = DiagnosticSeverity.Warning,
             Locations =
             [

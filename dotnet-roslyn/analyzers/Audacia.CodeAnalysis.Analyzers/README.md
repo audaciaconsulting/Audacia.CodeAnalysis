@@ -1040,7 +1040,7 @@ dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>LOG-01.4</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.4">LOG-01.4</a></td>
 </tr>
 </table>
 

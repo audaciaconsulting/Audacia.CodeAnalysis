@@ -31,7 +31,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
     private const string LoggerMessageAttributeMessageProperty = "Message";
 
     private const string Title = "Log message is too short";
-    private const string MessageFormat = "Log messages should be at least {0} characters long";
+    private const string MessageFormat = "Log messages should be at least {0} characters long. LOG-01.4.";
     private const string Description = "Log messages should be long enough to be meaningful.";
 
     private const string Category = DiagnosticCategory.Usage;
