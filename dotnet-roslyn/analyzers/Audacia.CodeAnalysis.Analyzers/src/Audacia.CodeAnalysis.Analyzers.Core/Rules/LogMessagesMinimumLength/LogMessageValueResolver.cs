@@ -13,13 +13,57 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// </summary>
     private const int FormatWidthLimit = 1_000_000;
 
+    /// <summary>
+    /// The most operations resolved for one message, so pathological code can't stall IDE or build analysis.
+    /// </summary>
+    internal const int MaximumResolutionSteps = 1_000;
+
+    /// <summary>
+    /// The longest value resolved, so values that grow exponentially (e.g. locals that each double the previous one) can't exhaust memory.
+    /// </summary>
+    internal const int MaximumValueLength = 1_000;
+
     private readonly HashSet<ILocalSymbol> _resolvingLocals = new(SymbolEqualityComparer.Default);
+
+    /// <summary>
+    /// Completed resolutions of locals' initializers, which don't depend on where the local is referenced.
+    /// A failure caused by a cycle between locals is cached too, as every local in (or depending on) a cycle fails whichever is resolved first.
+    /// </summary>
+    private readonly Dictionary<ILocalSymbol, (bool Resolved, object Value)> _localInitializers = new(SymbolEqualityComparer.Default);
+
+    /// <summary>
+    /// Completed checks that a local isn't changed after its declaration, excluding the per-reference position checks.
+    /// </summary>
+    private readonly Dictionary<ILocalSymbol, bool> _unchangedLocals = new(SymbolEqualityComparer.Default);
+
+    /// <summary>
+    /// The locals passed or aliased by reference within each block.
+    /// </summary>
+    private readonly Dictionary<BlockSyntax, HashSet<ISymbol>> _referenceEscapes = [];
+
+    /// <summary>
+    /// The data-flow analysis of each block.
+    /// </summary>
+    private readonly Dictionary<BlockSyntax, DataFlowAnalysis> _blockDataFlows = [];
+
+    private int _resolutionSteps;
+
+    /// <summary>
+    /// Once true, nothing else resolves and the message is skipped, as neither its value nor its 'as written' form can be trusted.
+    /// </summary>
+    private bool _workLimitExceeded;
 
     /// <summary>
     /// Resolves a logger message template, substituting the template's argument values where they're all known.
     /// Where values aren't known, the message is measured as written; see <see cref="LogMessageAsWrittenRenderer"/>.
     /// </summary>
     public bool TryResolvingMessage(InvocationExpressionSyntax invocation, ExpressionSyntax message, out string value)
+    {
+        var resolved = TryResolvingMessageWithinLimit(invocation, message, out value);
+        return resolved && !_workLimitExceeded;
+    }
+
+    private bool TryResolvingMessageWithinLimit(InvocationExpressionSyntax invocation, ExpressionSyntax message, out string value)
     {
         if (!TryResolving(message, out value))
         {
@@ -62,6 +106,12 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// so it is always measured as written.
     /// </summary>
     public bool TryResolvingTemplateAsWritten(ExpressionSyntax template, out string value)
+    {
+        var resolved = TryResolvingTemplateAsWrittenWithinLimit(template, out value);
+        return resolved && !_workLimitExceeded;
+    }
+
+    private bool TryResolvingTemplateAsWrittenWithinLimit(ExpressionSyntax template, out string value)
     {
         if (TryResolving(template, out value))
         {
@@ -107,6 +157,12 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (_workLimitExceeded || ++_resolutionSteps > MaximumResolutionSteps)
+        {
+            _workLimitExceeded = true;
+            return false;
+        }
+
         if (operation.Type?.TypeKind == TypeKind.Enum)
         {
             return false;
@@ -141,20 +197,35 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     {
         value = null;
 
-        return operation switch
+        var resolved = operation switch
         {
-            ILocalReferenceOperation local 
+            ILocalReferenceOperation local
                 => TryResolvingLocal(local, out value),
-            IParenthesizedOperation parentheses 
+            IParenthesizedOperation parentheses
                 => TryResolvingValue(parentheses.Operand, out value),
-            IBinaryOperation binary when binary.OperatorKind == BinaryOperatorKind.Add && binary.OperatorMethod == null && binary.Type?.SpecialType == SpecialType.System_String 
+            IBinaryOperation binary when binary.OperatorKind == BinaryOperatorKind.Add && binary.OperatorMethod == null && binary.Type?.SpecialType == SpecialType.System_String
                 => TryResolvingConcatenation(binary, out value),
-            IInterpolatedStringOperation interpolation 
+            IInterpolatedStringOperation interpolation
                 => TryResolvingInterpolation(interpolation, out value),
-            IInvocationOperation call when call.TargetMethod.ContainingType.SpecialType == SpecialType.System_String 
+            IInvocationOperation call when call.TargetMethod.ContainingType.SpecialType == SpecialType.System_String
                 => TryResolvingCall(call, out value),
             _ => false,
         };
+
+        return resolved && IsWithinLengthLimit((value as string)?.Length ?? 0);
+    }
+
+    /// <summary>
+    /// Checks a value's length against <see cref="MaximumValueLength"/>, marking the work limit as exceeded if it is too long.
+    /// </summary>
+    private bool IsWithinLengthLimit(long length)
+    {
+        if (length > MaximumValueLength)
+        {
+            _workLimitExceeded = true;
+        }
+
+        return !_workLimitExceeded;
     }
 
     /// <summary>
@@ -165,30 +236,53 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         value = null;
         var local = reference.Local;
 
+        if (local.DeclaringSyntaxReferences.Length != 1
+            || local.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken) is not VariableDeclaratorSyntax declaration
+            || declaration.Initializer == null)
+        {
+            return false; // The local isn't initialized in a single declaration, so we can't resolve its value.
+        }
+
+        // Resolve the initializer before the data-flow checks, as most initializers aren't constant
+        // and resolving them is far cheaper than analysing the enclosing block.
+        if (!TryResolvingInitializer(local, declaration, out var initialValue)
+            || !IsUnchangedLocal(local, declaration, reference.Syntax))
+        {
+            return false; // The initializer isn't constant, or the local is modified after initialization, so we can't resolve its value.
+        }
+
+        value = initialValue;
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves a local's initializer once, so locals referenced many times (e.g. <c>var b = a + a;</c>) aren't re-resolved.
+    /// </summary>
+    private bool TryResolvingInitializer(ILocalSymbol local, VariableDeclaratorSyntax declaration, out object value)
+    {
+        if (_localInitializers.TryGetValue(local, out var cached))
+        {
+            value = cached.Value;
+            return cached.Resolved;
+        }
+
         if (!_resolvingLocals.Add(local))
         {
+            value = null;
             return false; // Prevent infinite recursion when a local is initialized with itself, or another local that references it.
         }
 
         try
         {
-            if (local.DeclaringSyntaxReferences.Length != 1
-                || local.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken) is not VariableDeclaratorSyntax declaration
-                || declaration.Initializer == null)
+            var resolved = TryResolvingValue(semanticModel.GetOperation(declaration.Initializer.Value, cancellationToken), out value);
+
+            if (!_workLimitExceeded)
             {
-                return false; // The local isn't initialized in a single declaration, so we can't resolve its value.
+                // Results are only cached when complete; once the work limit is exceeded, nothing resolves anyway.
+                _localInitializers[local] = (resolved, value);
             }
 
-            // Resolve the initializer before the data-flow checks, as most initializers aren't constant
-            // and resolving them is far cheaper than analysing the enclosing block.
-            if (!TryResolvingValue(semanticModel.GetOperation(declaration.Initializer.Value, cancellationToken), out var initialValue)
-                || !IsUnchangedLocal(local, declaration, reference.Syntax))
-            {
-                return false; // The initializer isn't constant, or the local is modified after initialization, so we can't resolve its value.
-            }
-
-            value = initialValue;
-            return true;
+            return resolved;
         }
         finally
         {
@@ -210,13 +304,29 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false; // The local is either a ref, declared elsewhere, or referenced before its declaration, so we can't guarantee its value is unchanged.
         }
 
-        if (HasReferenceEscape(block, local))
+        // The remaining checks don't depend on where the local is referenced, so are only run once per local.
+        if (!_unchangedLocals.TryGetValue(local, out var unchanged))
+        {
+            unchanged = IsUnchangedAfterDeclaration(local, statement, block);
+            _unchangedLocals[local] = unchanged;
+        }
+
+        return unchanged;
+    }
+
+    private bool IsUnchangedAfterDeclaration(ILocalSymbol local, LocalDeclarationStatementSyntax statement, BlockSyntax block)
+    {
+        if (GetReferenceEscapes(block).Contains(local))
         {
             return false; // The local is referenced by ref, so we can't guarantee its value is unchanged.
         }
 
         // Data-flow analysis covers the whole enclosing block, so it runs only after the cheaper checks above have passed.
-        var flow = semanticModel.AnalyzeDataFlow(block);
+        if (!_blockDataFlows.TryGetValue(block, out var flow))
+        {
+            flow = semanticModel.AnalyzeDataFlow(block);
+            _blockDataFlows[block] = flow;
+        }
 
         if (flow == null || !flow.Succeeded || flow.Captured.Contains(local, SymbolEqualityComparer.Default))
         {
@@ -237,10 +347,18 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     }
 
     /// <summary>
-    /// Detects reference aliases and by-reference arguments that could allow a local's value to change indirectly.
+    /// Finds the symbols in a block that are aliased or passed by reference, and so could have their value changed indirectly.
+    /// The block is scanned once, however many of its locals are checked.
     /// </summary>
-    private bool HasReferenceEscape(BlockSyntax block, ILocalSymbol local)
+    private HashSet<ISymbol> GetReferenceEscapes(BlockSyntax block)
     {
+        if (_referenceEscapes.TryGetValue(block, out var escapes))
+        {
+            return escapes;
+        }
+
+        escapes = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+
         foreach (var identifier in block.DescendantNodes().OfType<IdentifierNameSyntax>())
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -252,13 +370,14 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
                 continue; // The identifier isn't passed by reference, so it can't escape.
             }
 
-            if (SymbolEqualityComparer.Default.Equals(semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol, local))
+            if (semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol is { } symbol)
             {
-                return true; // The identifier is passed by reference, so the local can escape.
+                escapes.Add(symbol); // The identifier is passed by reference, so the symbol can escape.
             }
         }
 
-        return false;
+        _referenceEscapes[block] = escapes;
+        return escapes;
     }
 
     private static SyntaxNode GetOutermostParenthesized(IdentifierNameSyntax identifier)
@@ -282,9 +401,16 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false; // One of the operands isn't a constant string, so we can't resolve the concatenation.
         }
 
+        if (!IsWithinLengthLimit(LengthOf(left) + LengthOf(right)))
+        {
+            return false; // Checked before concatenating, so the result is never allocated.
+        }
+
         value = string.Concat(left as string, right as string);
         return true;
     }
+
+    private static long LengthOf(object value) => (value as string)?.Length ?? 0;
 
     private bool TryResolvingInterpolation(IInterpolatedStringOperation interpolation, out object value)
     {
@@ -361,6 +487,11 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
         if (call.TargetMethod.Name == nameof(string.Concat))
         {
+            if (!IsWithinLengthLimit(values.Sum(LengthOf)))
+            {
+                return false; // Checked before concatenating, so the result is never allocated.
+            }
+
             value = string.Concat(values.Select(item => item as string));
             return true; // The call is a string.Concat call with constant string arguments, so we can resolve it.
         }
@@ -370,6 +501,11 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             && call.TargetMethod.Parameters[1].IsParams
             && values.Count > 0)
         {
+            if (!IsWithinLengthLimit(values.Skip(1).Sum(LengthOf) + (LengthOf(values[0]) * Math.Max(values.Count - 2, 0))))
+            {
+                return false; // Checked before joining, so the result is never allocated.
+            }
+
             value = string.Join(values[0] as string, values.Skip(1).Select(item => item as string));
             return true;
         }

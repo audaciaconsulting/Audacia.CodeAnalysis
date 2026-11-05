@@ -641,6 +641,42 @@ class ClassName
     }
 
     /// <summary>
+    /// Each local doubles the previous one, so re-resolving every reference would take 2^10 local resolutions.
+    /// </summary>
+    [TestMethod]
+    [Timeout(30_000)]
+    public void Chained_Locals_Referenced_Many_Times_Are_Resolved_Once()
+    {
+        VerifyMessage("value10", diagnosticExpected: true, DoublingLocals("\"\"", 10));
+    }
+
+    /// <summary>
+    /// Each local doubles the previous one, so the last would be 2^10 characters long. Resolution stops at the work limit
+    /// and the message is skipped, rather than measured as written (e.g. <c>Hi {value10}</c>, which would be too short).
+    /// </summary>
+    [TestMethod]
+    [Timeout(30_000)]
+    [DataRow("value10")]
+    [DataRow("\"Hi \" + value10")]
+    [DataRow("$\"Hi {value10}\"")]
+    public void No_Diagnostic_When_Resolved_Value_Exceeds_Work_Limit(string arguments)
+    {
+        VerifyMessage(arguments, diagnosticExpected: false, DoublingLocals("\"x\"", 10));
+    }
+
+    private static string DoublingLocals(string initialValue, int count)
+    {
+        var declarations = new System.Text.StringBuilder($"var value0 = {initialValue};");
+
+        for (var index = 1; index <= count; index++)
+        {
+            declarations.Append($" var value{index} = value{index - 1} + value{index - 1};");
+        }
+
+        return declarations.ToString();
+    }
+
+    /// <summary>
     /// Settings are read when the analyzer runs, and Roslyn reports any exception thrown by an analyzer as an AD0001 diagnostic.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MSTEST0046:Use 'Assert' instead of 'StringAssert'", Justification = "Assert gives a different result, and the test fails")]
