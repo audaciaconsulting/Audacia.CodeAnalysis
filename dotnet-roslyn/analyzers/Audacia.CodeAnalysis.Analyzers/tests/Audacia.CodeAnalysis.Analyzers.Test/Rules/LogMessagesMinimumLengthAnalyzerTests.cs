@@ -463,6 +463,18 @@ class ClassName
         VerifyMessage(arguments, diagnosticExpected, "var value = \"1\";");
     }
 
+    /// <summary>
+    /// Capping an alignment keeps padding inside the message, e.g. "A" + 99 spaces + "x" + 100 spaces is still long enough.
+    /// </summary>
+    [TestMethod]
+    [DataRow("$\"A{value,200}\"")]
+    [DataRow("\"A{Value,200}\", value")]
+    [DataRow("string.Format(\"A{0,200}\", value)")]
+    public void Known_Local_Formatting_Keeps_Interior_Padding_When_Capping_Alignments(string arguments)
+    {
+        VerifyMessage(arguments, diagnosticExpected: false, $"var value = \"x{new string(' ', 100)}\";");
+    }
+
     [TestMethod]
     public void No_Diagnostic_For_Message_In_Unresolved_Method_Parameter()
     {

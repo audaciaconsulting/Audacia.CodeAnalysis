@@ -808,7 +808,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     {
         value = null;
 
-        if (!TryLimitingFormat(format, out var limitedFormat))
+        if (!TryLimitingFormat(format, values, out var limitedFormat))
         {
             return false;
         }
@@ -825,11 +825,12 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     }
 
     /// <summary>
-    /// Checks the format only has items that can be evaluated reliably, capping each item's alignment at
+    /// Checks the format only has items that can be evaluated reliably, capping the padding each item's alignment adds at
     /// <see cref="LogMessagesMinimumLengthAnalyzer.MaximumSettingValue"/> so it can't allocate excessive padding.
-    /// Capping doesn't change whether a message is long enough: padding at either end is trimmed either way.
+    /// Capping doesn't change whether a message is long enough: padding at either end is trimmed either way, and
+    /// interior padding is still at least as long as the longest minimum length.
     /// </summary>
-    private static bool TryLimitingFormat(string format, out string limitedFormat)
+    private static bool TryLimitingFormat(string format, object[] values, out string limitedFormat)
     {
         limitedFormat = null;
         var result = new StringBuilder(format.Length);
@@ -859,7 +860,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
                 return false;
             }
 
-            result.Append('{').Append(LimitAlignment(format.Substring(index + 1, end - index - 1))).Append('}');
+            result.Append('{').Append(LimitAlignment(format.Substring(index + 1, end - index - 1), values)).Append('}');
             index = end;
         }
 
@@ -868,14 +869,16 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     }
 
     /// <summary>
-    /// Caps the alignment of a format item (e.g. "0,999999" becomes "0,100").
+    /// Caps the alignment of a format item at its value's length plus the padding limit (e.g. "0,999999" becomes "0,101" for a value of "1").
     /// Anything other than a plain integer alignment is left unchanged, so invalid items still fail to format.
     /// </summary>
-    private static string LimitAlignment(string item)
+    private static string LimitAlignment(string item, object[] values)
     {
         var comma = item.IndexOf(',');
 
-        if (comma < 0)
+        if (comma < 0
+            || !int.TryParse(item.Substring(0, comma).Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out var argumentIndex)
+            || argumentIndex >= values.Length)
         {
             return item;
         }
@@ -883,7 +886,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         var alignment = item.Substring(comma + 1).Trim();
         var negative = alignment.StartsWith("-", StringComparison.Ordinal);
         var digits = negative ? alignment.Substring(1) : alignment;
-        var limit = LogMessagesMinimumLengthAnalyzer.MaximumSettingValue;
+        var limit = LogMessagesMinimumLengthAnalyzer.MaximumSettingValue + (values[argumentIndex]?.ToString().Length ?? 0);
 
         if (digits.Length == 0
             || !digits.All(digit => digit >= '0' && digit <= '9')
