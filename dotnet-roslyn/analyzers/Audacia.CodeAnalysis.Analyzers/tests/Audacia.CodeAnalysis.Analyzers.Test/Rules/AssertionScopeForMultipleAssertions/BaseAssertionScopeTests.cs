@@ -41,7 +41,7 @@ public class TestClass
             {
                 Id = AssertionScopeForMultipleAssertionsAnalyzer.Id,
                 Severity = DiagnosticSeverity.Warning,
-                Message = "Use an assertion scope when a test method has more than two assertions",
+                Message = "Use an assertion scope when a test method has more than two assertions. UT-01.5.",
                 Locations =
                     new[] {
                     new DiagnosticResultLocation("Test0.cs", lineNumber, column)

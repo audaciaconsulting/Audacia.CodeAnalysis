@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = LogMessagesNamedPropertiesPascalCaseAnalyzer.Id,
-                Message = $"Log message property '{propertyName}' does not use PascalCase",
+                Message = $"Log message property '{propertyName}' does not use PascalCase. LOG-01.1.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

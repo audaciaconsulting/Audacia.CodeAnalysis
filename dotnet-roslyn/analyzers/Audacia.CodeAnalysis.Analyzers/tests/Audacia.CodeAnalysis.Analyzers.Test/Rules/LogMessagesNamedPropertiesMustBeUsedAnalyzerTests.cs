@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = LogMessagesNamedPropertiesMustBeUsedAnalyzer.Id,
-                Message = $"Log message property '{propertyName}' is a positional parameter",
+                Message = $"Log message property '{propertyName}' is a positional parameter. LOG-01.3.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

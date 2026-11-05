@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.DoNotUseNumberInIdentifierNa
         public const string AllowedWordsSetting = "allowed_words";
 
         private const string Title = "Identifier contains one or more digits in its name";
-        private const string MessageFormat = "{0} '{1}' contains one or more digits in its name";
+        private const string MessageFormat = "{0} '{1}' contains one or more digits in its name. CS-05.3.";
         private const string Description = "Don't include numbers in variables, parameters and type members.";
 
         private const string Category = DiagnosticCategory.Naming;

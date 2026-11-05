@@ -13,10 +13,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.IncludeBraces
     {
         public const string Id = DiagnosticId.IncludeBraces;
         private const string Title = "Code block does not have braces";
-        private const string MessageFormat = "Code block should have braces";
+        private const string MessageFormat = "Code block should have braces. CS-01.15.";
         private const string Description = "Add braces.";
 
-        private const string Category = DiagnosticCategory.Style;
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
+        private const string Category = DiagnosticCategory.Maintainability;
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             Id,
@@ -25,7 +27,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.IncludeBraces
             Category,
             DiagnosticSeverity.Warning,
             true,
-            Description);
+            Description,
+            HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
         {

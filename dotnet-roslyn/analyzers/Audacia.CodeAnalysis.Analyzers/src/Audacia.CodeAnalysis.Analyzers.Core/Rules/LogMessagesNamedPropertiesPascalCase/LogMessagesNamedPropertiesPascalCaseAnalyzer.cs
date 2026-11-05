@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNamedPropertiesPa
         public const string Id = DiagnosticId.LogMessagesNamedPropertiesPascalCase;
 
         private const string Title = "Log message property is not in PascalCase";
-        private const string MessageFormat = "Log message property '{0}' does not use PascalCase";
+        private const string MessageFormat = "Log message property '{0}' does not use PascalCase. LOG-01.1.";
         private const string Description = "When using log message named properties, ensure they are in PascalCase.";
 
         private const string InvalidNamedPropertyPattern = @"(?<!\{)\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])(?'propertyName'[^{}:]+)[^{}]*\}(?!\})";
@@ -25,8 +25,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNamedPropertiesPa
         private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])(?'propertyName'[^{}:]+)[^{}]*\}\}(?!\})";
         private const string LoggerMessageParameterName = "message";
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Logging, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

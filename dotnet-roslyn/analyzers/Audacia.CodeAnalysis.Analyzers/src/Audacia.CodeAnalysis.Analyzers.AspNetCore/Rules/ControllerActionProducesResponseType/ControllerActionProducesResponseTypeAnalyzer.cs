@@ -27,8 +27,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseT
 
         private const bool IsEnabled = true;
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, Severity, IsEnabled, Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, Severity, IsEnabled, Description, HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
             => ImmutableArray.Create(Rule);

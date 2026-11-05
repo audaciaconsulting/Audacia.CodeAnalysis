@@ -20,7 +20,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = MethodLengthAnalyzer.Id,
-                Message = $"Method '{memberName}' contains {statementCount} statements, which exceeds the maximum of {maxStatementCount} statements",
+                Message = $"Method '{memberName}' contains {statementCount} statements, which exceeds the maximum of {maxStatementCount} statements. CS-01.1.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNoDuplicateParame
         public const string Id = DiagnosticId.LogMessagesNoDuplicateParameters;
 
         private const string Title = "Log message property is duplicated";
-        private const string MessageFormat = "Log message property '{0}' is duplicated";
+        private const string MessageFormat = "Log message property '{0}' is duplicated. LOG-01.3.";
         private const string Description = "When using log message named properties ensure they are unique within a message template.";
 
         // Matches named (non-positional) log message properties in regular strings, capturing the property name in group 1.
@@ -28,8 +28,10 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNoDuplicateParame
 
         private const string LoggerMessageParameterName = "message";
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Logging, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

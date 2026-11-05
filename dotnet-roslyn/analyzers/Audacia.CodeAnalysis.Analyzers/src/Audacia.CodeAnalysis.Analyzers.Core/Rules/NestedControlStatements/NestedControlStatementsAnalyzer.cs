@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.NestedControlStatements
 
         private const string Title = "Signature contains too many nested control flow statements";
 
-        private const string MessageFormat = "{0} contains {1} nested control flow statements, which exceeds the maximum of {2} nested control flow statements";
+        private const string MessageFormat = "{0} contains {1} nested control flow statements, which exceeds the maximum of {2} nested control flow statements. CS-01.14.";
 
         private const string Description = "Don't nest too many control statements.";
         
