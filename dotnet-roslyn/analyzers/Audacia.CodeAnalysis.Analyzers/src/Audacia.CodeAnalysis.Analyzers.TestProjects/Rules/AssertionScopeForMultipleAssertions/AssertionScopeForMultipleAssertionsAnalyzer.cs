@@ -96,7 +96,7 @@ namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionScopeForMul
                     continue;
                 }
 
-                // Not a known assertion call � check whether it is a helper method call that contains assertions.
+                // Not a known assertion call - check whether it is a helper method call that contains assertions.
                 // If the call site itself is already inside a scope, we treat all assertions inside the helper as scoped.
                 var isCallSiteInsideScope = invocation.GetAssertionScopeFramework() != null;
                 if (isCallSiteInsideScope)
