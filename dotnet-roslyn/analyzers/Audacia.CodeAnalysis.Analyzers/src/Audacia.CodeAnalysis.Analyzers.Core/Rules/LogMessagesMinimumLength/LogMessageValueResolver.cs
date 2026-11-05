@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
@@ -7,6 +8,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 
 internal sealed class LogMessageValueResolver(SemanticModel semanticModel, CancellationToken cancellationToken)
 {
+    /// <summary>
+    /// string.Format throws a <see cref="FormatException"/> for alignments of this size or larger.
+    /// </summary>
+    private const int FormatWidthLimit = 1_000_000;
+
     private readonly HashSet<ILocalSymbol> _resolvingLocals = new(SymbolEqualityComparer.Default);
 
     /// <summary>
@@ -516,14 +522,14 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     {
         value = null;
 
-        if (!IsSupportedFormat(format))
+        if (!TryLimitingFormat(format, out var limitedFormat))
         {
             return false;
         }
 
         try
         {
-            value = string.Format(format, values);
+            value = string.Format(limitedFormat, values);
             return true;
         }
         catch (FormatException)
@@ -532,19 +538,29 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         }
     }
 
-    private static bool IsSupportedFormat(string format)
+    /// <summary>
+    /// Checks the format only has items that can be evaluated reliably, capping each item's alignment at
+    /// <see cref="LogMessagesMinimumLengthAnalyzer.MaximumSettingValue"/> so it can't allocate excessive padding.
+    /// Capping doesn't change whether a message is long enough: padding at either end is trimmed either way.
+    /// </summary>
+    private static bool TryLimitingFormat(string format, out string limitedFormat)
     {
+        limitedFormat = null;
+        var result = new StringBuilder(format.Length);
+
         for (var index = 0; index < format.Length; index++)
         {
             var character = format[index];
 
             if (character != '{' && character != '}')
             {
+                result.Append(character);
                 continue;
             }
 
             if (index + 1 < format.Length && format[index + 1] == character)
             {
+                result.Append(character).Append(character);
                 index++;
                 continue;
             }
@@ -557,9 +573,42 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
                 return false;
             }
 
+            result.Append('{').Append(LimitAlignment(format.Substring(index + 1, end - index - 1))).Append('}');
             index = end;
         }
 
+        limitedFormat = result.ToString();
         return true;
+    }
+
+    /// <summary>
+    /// Caps the alignment of a format item (e.g. "0,999999" becomes "0,100").
+    /// Anything other than a plain integer alignment is left unchanged, so invalid items still fail to format.
+    /// </summary>
+    private static string LimitAlignment(string item)
+    {
+        var comma = item.IndexOf(',');
+
+        if (comma < 0)
+        {
+            return item;
+        }
+
+        var alignment = item.Substring(comma + 1).Trim();
+        var negative = alignment.StartsWith("-", StringComparison.Ordinal);
+        var digits = negative ? alignment.Substring(1) : alignment;
+        var limit = LogMessagesMinimumLengthAnalyzer.MaximumSettingValue;
+
+        if (digits.Length == 0
+            || !digits.All(digit => digit >= '0' && digit <= '9')
+            || !int.TryParse(digits, NumberStyles.None, CultureInfo.InvariantCulture, out var width)
+            || width <= limit
+            || width >= FormatWidthLimit)
+        {
+            // Leave alignments that are small enough, or that string.Format rejects without allocating, unchanged.
+            return item;
+        }
+
+        return item.Substring(0, comma + 1) + (negative ? "-" : string.Empty) + limit.ToString(CultureInfo.InvariantCulture);
     }
 }

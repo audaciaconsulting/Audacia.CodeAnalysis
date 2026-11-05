@@ -18,7 +18,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
 
     public const string LogMessageMinimumLengthSetting = "log_message_minimum_length";
     private const int MinimumSettingValue = 1;
-    private const int MaximumSettingValue = 100;
+    internal const int MaximumSettingValue = 100;
     public const int DefaultLogMessageMinimumLength = 10;
 
     private const string LoggerMessageParameterName = "message";

@@ -372,22 +372,50 @@ class ClassName
     }
 
     [TestMethod]
-    // Outside padding should be trimmed
-    [DataRow("$\"{value,9}\"", true)]
-    [DataRow("$\"{value,10}\"", true)]
-    [DataRow("\"{Value,9}\", value", true)]
-    [DataRow("\"{Value,10}\", value", true)]
-    [DataRow("\"{{{Value}}}\", value", true)]
-    // Padding between other text is part of the message, so it counts towards the length.
+    [DataRow("$\"{value,9}\"")] // $"{text,n}" pads the string to a minimum length of n, so when 'value' = 1, this evaluates to "        1"
+    [DataRow("$\"{value,10}\"")]
+    [DataRow("\"{Value,9}\", value")]
+    [DataRow("\"{Value,10}\", value")]
+    [DataRow("\"{{{Value}}}\", value")]
+    /// <summary>
+    /// Outside padding should be trimmed, so these all evaluate as too short.
+    ///  </summary>
+    public void Known_Local_With_Only_Padding_Gets_Diagnostic(string arguments)
+    {
+        VerifyMessage(arguments, diagnosticExpected: true, "var value = \"1\";");
+    }
+
+    [TestMethod]
     [DataRow("$\"1234567{value,2}\"", true)]
     [DataRow("$\"12345678{value,2}\"", false)]
-    [DataRow("$\"{value,-2}1234567\"", true)]
+    [DataRow("$\"{value,-2}1234567\"", true)] // The negative pad value adds padding at position 2, so when 'value' = 1, this evaluates to "1 1234567"
     [DataRow("$\"{value,-2}12345678\"", false)]
     [DataRow("\"1234567{Value,2}\", value", true)]
     [DataRow("\"12345678{Value,2}\", value", false)]
     [DataRow("\"{Value,-2}1234567\", value", true)]
     [DataRow("\"{Value,-2}12345678\", value", false)]
+    /// <summary>
+    /// Padding outside the message is trimmed, but padding between other text is part of the message, so it counts towards the length.
+    /// </summary>
     public void Known_Local_Uses_Formatted_Length(string arguments, bool diagnosticExpected)
+    {
+        VerifyMessage(arguments, diagnosticExpected, "var value = \"1\";");
+    }
+
+    [TestMethod]    
+    [DataRow("$\"{value,999999}\"", true)] // Pads at the start
+    [DataRow("$\"{value,-999999}\"", true)] // The negative pad value effectively pads at the end
+    [DataRow("$\"1{value,999999}\"", false)]
+    [DataRow("$\"{value,-999999}1\"", false)]
+    [DataRow("\"{Value,999999}\", value", true)]
+    [DataRow("\"1{Value,999999}\", value", false)]
+    [DataRow("\"{Value,-999999}1\", value", false)]
+    [DataRow("string.Format(\"{0,999999}\", value)", true)]
+    [DataRow("string.Format(\"1{0,999999}\", value)", false)]
+    /// <summary>
+    /// Large alignments are capped while formatting, without changing whether the message is long enough.
+    /// </summary>
+    public void Known_Local_Formatting_Caps_Large_Alignments(string arguments, bool diagnosticExpected)
     {
         VerifyMessage(arguments, diagnosticExpected, "var value = \"1\";");
     }
