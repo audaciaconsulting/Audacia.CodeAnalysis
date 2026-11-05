@@ -464,15 +464,16 @@ class ClassName
     }
 
     /// <summary>
-    /// Capping an alignment keeps padding inside the message, e.g. "A" + 99 spaces + "x" + 100 spaces is still long enough.
+    /// Capping an alignment keeps padding inside the message, e.g. "A" + 51 spaces + "x" + 98 spaces is still long enough.
+    /// Capping the width at 100 would leave only one space, so "A x" would be too short.
     /// </summary>
     [TestMethod]
-    [DataRow("$\"A{value,200}\"")]
-    [DataRow("\"A{Value,200}\", value")]
-    [DataRow("string.Format(\"A{0,200}\", value)")]
+    [DataRow("$\"A{value,150}\"")]
+    [DataRow("\"A{Value,150}\", value")]
+    [DataRow("string.Format(\"A{0,150}\", value)")]
     public void Known_Local_Formatting_Keeps_Interior_Padding_When_Capping_Alignments(string arguments)
     {
-        VerifyMessage(arguments, diagnosticExpected: false, $"var value = \"x{new string(' ', 100)}\";");
+        VerifyMessage(arguments, diagnosticExpected: false, $"var value = \"x{new string(' ', 98)}\";");
     }
 
     [TestMethod]

@@ -10,7 +10,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 /// <summary>
 /// This tries to resolve a logger message template to its actual value, substituting the template's argument values where they're all known.
 /// Whenever a value isn't known or the logic gets too complex/expensive, the message is measured 'as written'; see <see cref="LogMessageAsWrittenRenderer"/>.
-/// A lot of the logic is to handle edge cases and avoid expensive operations, so that pathological code can't stall IDE or build analysis.
+/// A lot of the logic is to handle edge cases and avoid expensive operations, so this rule doesn't break the build analysis or take too long.
 /// </summary>
 internal sealed class LogMessageValueResolver(SemanticModel semanticModel, CancellationToken cancellationToken)
 {
@@ -22,12 +22,12 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// <summary>
     /// The most operations resolved for one message, so pathological code can't stall IDE or build analysis.
     /// </summary>
-    internal const int MaximumResolutionSteps = 1_000;
+    internal const int MaximumResolutionSteps = 100;
 
     /// <summary>
     /// The longest value resolved, so values that grow exponentially (e.g. locals that each double the previous one) can't exhaust memory.
     /// </summary>
-    internal const int MaximumValueLength = 1_000;
+    internal const int MaximumValueLength = 200;
 
     private readonly HashSet<ILocalSymbol> _resolvingLocals = new(SymbolEqualityComparer.Default);
 
