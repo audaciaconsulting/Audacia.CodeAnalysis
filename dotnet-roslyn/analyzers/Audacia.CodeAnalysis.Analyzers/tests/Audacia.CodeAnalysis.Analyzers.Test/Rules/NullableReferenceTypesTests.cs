@@ -51,7 +51,7 @@ public class TestClass
             return new DiagnosticResult
             {
                 Id = DiagnosticId.NullableReferenceTypesEnabled,
-                Message = "Nullable reference types should be enabled",
+                Message = "Nullable reference types should be enabled. CS-01.28.",
                 Severity = DiagnosticSeverity.Warning,
                 // No Locations specified as this is a project-level diagnostic.
             };

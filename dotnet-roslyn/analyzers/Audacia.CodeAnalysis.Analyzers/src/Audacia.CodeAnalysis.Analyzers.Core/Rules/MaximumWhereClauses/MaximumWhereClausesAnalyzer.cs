@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.MaximumWhereClauses
 
         private const string Title = "Expression contains too many clauses, consider separating out into separate chained expressions";
 
-        private const string MessageFormat = "Expression contains {0} clauses, which exceeds the maximum of {1} clauses per expression";
+        private const string MessageFormat = "Expression contains {0} clauses, which exceeds the maximum of {1} clauses per expression. CS-01.19.";
 
         private const string Description = "Don't pass predicates into expressions with too many clauses.";
 

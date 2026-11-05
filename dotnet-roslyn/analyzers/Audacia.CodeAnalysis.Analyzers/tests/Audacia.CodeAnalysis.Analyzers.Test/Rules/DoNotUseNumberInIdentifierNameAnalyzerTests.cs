@@ -19,7 +19,7 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
         return new DiagnosticResult
         {
             Id = DoNotUseNumberInIdentifierNameAnalyzer.Id,
-            Message = $"{kind} '{identifierName}' contains one or more digits in its name",
+            Message = $"{kind} '{identifierName}' contains one or more digits in its name. CS-05.3.",
             Severity = DiagnosticSeverity.Warning,
             Locations =
             [

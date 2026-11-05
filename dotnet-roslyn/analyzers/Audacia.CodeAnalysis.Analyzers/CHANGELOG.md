@@ -15,6 +15,7 @@
 ### Changed
 - Updated "ControllerActionProducesResponseTypeAnalyzer" to allow 'ProducesResponseType<T>'
 - Removed configuration setting `exclude_lambdas` from "NoAbbreviationsAnalyzer" and allowed single character lambda expression parameter names only when the character matches the first letter of the parameter's type, or the first letter of the collection being queried.
+- Updated several logging analyzers to include the Audacia standard ID in the message format, so that they can be more easily identified in reports.
 
 # 2.0.0 - 2026-10-29
 ### Changed

@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters
         public static DiagnosticSeverity Severity => DiagnosticSeverity.Warning;
 
         private const string Title = "Record property setter should be init-only";
-        private const string MessageFormat = "Record property '{0}' in record type '{1}' should be init-only";
+        private const string MessageFormat = "Record property '{0}' in record type '{1}' should be init-only. CS-03.10.";
         private const string Description = "Record properties should use 'init' instead of 'set', to ensure immutability.";
         private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
 

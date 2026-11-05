@@ -33,14 +33,14 @@ namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.OverloadShouldCallOthe
         private const string Title = "Method overload should call another overload";
 
         private const string MessageFormat =
-            "Parameter order in '{0}' does not match with the parameter order of the longest overload";
+            "Parameter order in '{0}' does not match with the parameter order of the longest overload. CS-01.20.";
 
-        private const string InvokeMessageFormat = "Overloaded method '{0}' should call another overload";
+        private const string InvokeMessageFormat = "Overloaded method '{0}' should call another overload. CS-01.20.";
 
-        private const string MakeVirtualMessageFormat = "Method overload with the most parameters should be virtual";
+        private const string MakeVirtualMessageFormat = "Method overload with the most parameters should be virtual. CS-01.20.";
 
         private const string OrderMessageFormat =
-            "Parameter order in '{0}' does not match with the parameter order of the longest overload";
+            "Parameter order in '{0}' does not match with the parameter order of the longest overload. CS-01.20.";
 
         private const string Description = "Call the more overloaded method from other overloads.";
         private const string Category = DiagnosticCategory.Maintainability;
@@ -62,13 +62,13 @@ namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.OverloadShouldCallOthe
             HelpLinkUrl);
 
         private static readonly DiagnosticDescriptor MakeVirtualRule = new DiagnosticDescriptor(Id, Title,
-            MakeVirtualMessageFormat, Category, DiagnosticSeverity.Warning, true, Description);
+            MakeVirtualMessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUrl);
 
         private static readonly DiagnosticDescriptor OrderRule = new DiagnosticDescriptor(Id, Title, OrderMessageFormat,
-            Category, DiagnosticSeverity.Warning, true, Description);
+            Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUrl);
 
         private static readonly DiagnosticDescriptor InvokeRule = new DiagnosticDescriptor(Id, Title,
-            InvokeMessageFormat, Category, DiagnosticSeverity.Warning, true, Description);
+            InvokeMessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule, MakeVirtualRule, OrderRule, InvokeRule);

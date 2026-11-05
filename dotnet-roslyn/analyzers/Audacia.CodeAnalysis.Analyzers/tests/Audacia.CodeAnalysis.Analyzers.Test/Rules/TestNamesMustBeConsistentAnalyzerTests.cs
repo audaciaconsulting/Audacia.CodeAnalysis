@@ -36,7 +36,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             {
                 Id = TestNamesMustBeConsistentAnalyzer.Id,
                 Severity = DiagnosticSeverity.Warning,
-                Message = $"Test method name '{methodName}' is not consistent with configured format '{configuredFormat}'",
+                Message = $"Test method name '{methodName}' is not consistent with configured format '{configuredFormat}'. UT-01.2.",
                 Locations =
                     new[] {
                     new DiagnosticResultLocation("Test0.cs", lineNumber, column)

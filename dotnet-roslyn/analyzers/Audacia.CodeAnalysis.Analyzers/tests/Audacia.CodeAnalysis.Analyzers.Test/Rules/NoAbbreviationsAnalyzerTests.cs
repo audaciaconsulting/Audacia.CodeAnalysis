@@ -19,7 +19,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = NoAbbreviationsAnalyzer.Id,
-                Message = $"{kind} '{abbreviationUsed}' should have a more descriptive name",
+                Message = $"{kind} '{abbreviationUsed}' should have a more descriptive name. CS-05.1.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [
