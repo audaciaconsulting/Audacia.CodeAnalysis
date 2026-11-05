@@ -366,26 +366,70 @@ class ClassName
     [DataRow("var original = \"1\"; var value = original; original = input;")]
     [DataRow("string value = \"1\", other = (value = input);")]
     [DataRow("string GetValue() => input; var value = GetValue();")]
+    [DataRow("var value = \"1\"; value += input;")]
+    [DataRow("var value = \"1\"; value ??= input;")]
+    [DataRow("var value = \"1\"; (value) = input;")]
+    [DataRow("var value = \"1\"; void Set(out string text) { text = input; } Set(out value);")]
+    [DataRow("var value = \"1\"; (value, var count) = (input, 1);")]
+    [DataRow("var value = \"1\"; (var count, (value, var other)) = (1, (input, 2));")]
+    [DataRow("var value = \"1\"; { value = input; }")]
+    [DataRow("var value = \"1\"; void Show() => System.Console.WriteLine(value);")]
     public void No_Diagnostic_For_Local_With_Uncertain_Value(string declaration)
     {
         VerifyMessage("value", diagnosticExpected: false, declaration);
     }
 
+    /// <summary>
+    /// "Value: {Value}" is long enough as written, but too short when a known value of "1" is substituted.
+    /// Known values must still be substituted where unknown values are detected without getting the invocation's operation.
+    /// </summary>
+    [TestMethod]
+    [DataRow("var value = \"1\";", true)]
+    [DataRow("var original = \"1\"; var value = original;", true)]
+    [DataRow("var value = string.Concat(\"1\", \"\");", true)]
+    [DataRow("var value = $\"{1}\";", true)]
+    [DataRow("var value = \"\" + 1;", true)]
+    [DataRow("var value = input.Length;", false)]
+    [DataRow("var value = System.Math.Abs(-1);", false)]
+    [DataRow("var value = 1 + 0 * input.Length;", false)]
+    [DataRow("var original = input; var value = original;", false)]
+    [DataRow("var value = input == null ? \"1\" : \"2\";", false)]
+    public void Template_Arguments_Are_Substituted_Only_When_Known(string declaration, bool diagnosticExpected)
+    {
+        VerifyMessage("\"Value: {Value}\", value", diagnosticExpected, declaration);
+    }
+
+    /// <summary>
+    /// As written, each message is long enough; if the changed local were resolved as "1", it would be too short.
+    /// </summary>
+    [TestMethod]
+    [DataRow("var value = 1; value++;")]
+    [DataRow("var value = 1; --value;")]
+    [DataRow("var value = 1; unsafe { var pointer = &value; *pointer = 123; }")]
+    public void No_Diagnostic_For_Changed_Numeric_Local(string declaration)
+    {
+        VerifyMessage("\"Count: \" + value", diagnosticExpected: false, declaration);
+    }
+
+
+    /// <summary>
+    /// Outside padding should be trimmed, so these all evaluate as too short.
+    ///  </summary>
     [TestMethod]
     [DataRow("$\"{value,9}\"")] // $"{text,n}" pads the string to a minimum length of n, so when 'value' = 1, this evaluates to "        1"
     [DataRow("$\"{value,10}\"")]
     [DataRow("\"{Value,9}\", value")]
     [DataRow("\"{Value,10}\", value")]
     [DataRow("\"{{{Value}}}\", value")]
-    /// <summary>
-    /// Outside padding should be trimmed, so these all evaluate as too short.
-    ///  </summary>
     public void Known_Local_With_Only_Padding_Gets_Diagnostic(string arguments)
     {
         VerifyMessage(arguments, diagnosticExpected: true, "var value = \"1\";");
     }
 
-    [TestMethod]
+
+    /// <summary>
+    /// Padding outside the message is trimmed, but padding between other text is part of the message, so it counts towards the length.
+    /// </summary>[TestMethod]
     [DataRow("$\"1234567{value,2}\"", true)]
     [DataRow("$\"12345678{value,2}\"", false)]
     [DataRow("$\"{value,-2}1234567\"", true)] // The negative pad value adds padding at position 2, so when 'value' = 1, this evaluates to "1 1234567"
@@ -394,15 +438,15 @@ class ClassName
     [DataRow("\"12345678{Value,2}\", value", false)]
     [DataRow("\"{Value,-2}1234567\", value", true)]
     [DataRow("\"{Value,-2}12345678\", value", false)]
-    /// <summary>
-    /// Padding outside the message is trimmed, but padding between other text is part of the message, so it counts towards the length.
-    /// </summary>
     public void Known_Local_Uses_Formatted_Length(string arguments, bool diagnosticExpected)
     {
         VerifyMessage(arguments, diagnosticExpected, "var value = \"1\";");
     }
 
-    [TestMethod]    
+
+    /// <summary>
+    /// Large alignments are capped while formatting, without changing whether the message is long enough.
+    /// </summary>[TestMethod]    
     [DataRow("$\"{value,999999}\"", true)] // Pads at the start
     [DataRow("$\"{value,-999999}\"", true)] // The negative pad value effectively pads at the end
     [DataRow("$\"1{value,999999}\"", false)]
@@ -412,9 +456,6 @@ class ClassName
     [DataRow("\"{Value,-999999}1\", value", false)]
     [DataRow("string.Format(\"{0,999999}\", value)", true)]
     [DataRow("string.Format(\"1{0,999999}\", value)", false)]
-    /// <summary>
-    /// Large alignments are capped while formatting, without changing whether the message is long enough.
-    /// </summary>
     public void Known_Local_Formatting_Caps_Large_Alignments(string arguments, bool diagnosticExpected)
     {
         VerifyMessage(arguments, diagnosticExpected, "var value = \"1\";");

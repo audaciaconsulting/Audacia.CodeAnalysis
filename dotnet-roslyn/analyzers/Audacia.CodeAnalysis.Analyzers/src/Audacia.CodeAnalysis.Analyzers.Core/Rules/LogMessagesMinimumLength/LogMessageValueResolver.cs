@@ -1,11 +1,17 @@
 ﻿using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 
 namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 
+/// <summary>
+/// This tries to resolve a logger message template to its actual value, substituting the template's argument values where they're all known.
+/// Whenever a value isn't known or the logic gets too complex/expensive, the message is measured 'as written'; see <see cref="LogMessageAsWrittenRenderer"/>.
+/// A lot of the logic is to handle edge cases and avoid expensive operations, so that pathological code can't stall IDE or build analysis.
+/// </summary>
 internal sealed class LogMessageValueResolver(SemanticModel semanticModel, CancellationToken cancellationToken)
 {
     /// <summary>
@@ -37,14 +43,9 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     private readonly Dictionary<ILocalSymbol, bool> _unchangedLocals = new(SymbolEqualityComparer.Default);
 
     /// <summary>
-    /// The locals passed or aliased by reference within each block.
+    /// The locals declared in each block that may change after their declaration.
     /// </summary>
-    private readonly Dictionary<BlockSyntax, HashSet<ISymbol>> _referenceEscapes = [];
-
-    /// <summary>
-    /// The data-flow analysis of each block.
-    /// </summary>
-    private readonly Dictionary<BlockSyntax, DataFlowAnalysis> _blockDataFlows = [];
+    private readonly Dictionary<BlockSyntax, HashSet<ISymbol>> _changeableLocals = [];
 
     private int _resolutionSteps;
 
@@ -70,6 +71,14 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             // The template's own value isn't known, so measure 'as written' if built from strings.
             // Its arguments aren't substituted, as the rendered text isn't the template's real value.
             return TryRenderingAsWritten(message, out value);
+        }
+
+        if (!MayHaveKnownArguments(invocation, value))
+        {
+            // The values can't be substituted, so the template is measured as written. This is checked without
+            // getting the invocation's operation, as the first operation requested in a method builds the whole method's operation tree.
+            value = LogMessageAsWrittenRenderer.TemplateAsWritten(value);
+            return true;
         }
 
         if (semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation call)
@@ -122,11 +131,123 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         return TryRenderingAsWritten(template, out value);
     }
 
-    public bool TryResolving(ExpressionSyntax expression, out string value)
+    private bool TryResolving(ExpressionSyntax expression, out string value)
     {
+        // Most messages are constants, which are resolved without getting the operation (see MayHaveKnownArguments).
+        // A null constant resolves to an empty string, as TryResolvingValue does.
+        var constant = semanticModel.GetConstantValue(expression, cancellationToken);
+
+        if (constant.HasValue && constant.Value is null or string)
+        {
+            value = constant.Value as string ?? string.Empty;
+            return true;
+        }
+
         var resolved = TryResolvingValue(semanticModel.GetOperation(expression, cancellationToken), out var result);
         value = result as string;
         return resolved && value != null;
+    }
+
+    /// <summary>
+    /// Checks whether a template's params argument values could be substituted, using only syntax and symbols.
+    /// Where it returns <see langword="false"/>, resolving the arguments would give the template as written anyway: either
+    /// the template has no placeholders, the method has no params parameter, or a params value is certainly unknown.
+    /// </summary>
+    private bool MayHaveKnownArguments(InvocationExpressionSyntax invocation, string template)
+    {
+        if (template.IndexOf('{') < 0)
+        {
+            return false; // Without placeholders, a template is always measured as written.
+        }
+
+        if (semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol is not IMethodSymbol method)
+        {
+            return true;
+        }
+
+        var parameters = method.Parameters;
+
+        if (parameters.Length == 0 || !parameters[parameters.Length - 1].IsParams)
+        {
+            return false; // There's no params parameter, so there are no values to substitute.
+        }
+
+        var arguments = invocation.ArgumentList.Arguments;
+
+        if (arguments.Any(argument => argument.NameColon != null))
+        {
+            return true; // Named arguments don't map to parameters by position, so leave them to the operation.
+        }
+
+        // Positional arguments from the params parameter's position onwards are its values (or the array itself).
+        for (var index = parameters.Length - 1; index < arguments.Count; index++)
+        {
+            if (IsCertainlyUnknown(arguments[index].Expression))
+            {
+                return false;
+            }
+        }
+
+        return arguments.Count >= parameters.Length;
+    }
+
+    /// <summary>
+    /// The most locals followed through their initializers by <see cref="IsCertainlyUnknown"/>, after which a value is
+    /// left to the operation, so long chains of locals can't make the check itself expensive.
+    /// </summary>
+    private const int MaximumUnknownCheckDepth = 8;
+
+    /// <summary>
+    /// Checks for runtime values that <see cref="TryResolvingValue"/> never resolves, e.g. parameters, fields, properties,
+    /// non-string arithmetic, calls to methods other than <see cref="string"/>'s, and locals initialized with any of these.
+    /// Anything else may be resolvable, so returns <see langword="false"/>.
+    /// </summary>
+    private bool IsCertainlyUnknown(ExpressionSyntax expression, int depth = 0)
+    {
+        while (expression is ParenthesizedExpressionSyntax parentheses)
+        {
+            expression = parentheses.Expression;
+        }
+
+        if (semanticModel.GetConstantValue(expression, cancellationToken).HasValue)
+        {
+            return false;
+        }
+
+        switch (expression)
+        {
+            case MemberAccessExpressionSyntax or ElementAccessExpressionSyntax or ConditionalAccessExpressionSyntax
+                or ThisExpressionSyntax or BaseObjectCreationExpressionSyntax or ConditionalExpressionSyntax
+                or CastExpressionSyntax or AwaitExpressionSyntax:
+                return true;
+            case BinaryExpressionSyntax binary:
+                // Only string concatenation is resolved.
+                return !binary.IsKind(SyntaxKind.AddExpression)
+                    || semanticModel.GetTypeInfo(binary, cancellationToken).Type?.SpecialType != SpecialType.System_String;
+            case InvocationExpressionSyntax invocation:
+                // Only string's own methods are resolved.
+                return semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol
+                    is not IMethodSymbol { ContainingType.SpecialType: SpecialType.System_String };
+            case IdentifierNameSyntax identifier:
+                return semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol is not ILocalSymbol local
+                    || IsCertainlyUnknownLocal(local, depth);
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Checks whether a local can't be resolved, as it isn't initialized in a single declaration or its initializer is certainly unknown.
+    /// </summary>
+    private bool IsCertainlyUnknownLocal(ILocalSymbol local, int depth)
+    {
+        if (local.DeclaringSyntaxReferences.Length != 1
+            || local.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken) is not VariableDeclaratorSyntax { Initializer: { } initializer })
+        {
+            return true; // e.g. a foreach variable, out variable or pattern variable.
+        }
+
+        return depth < MaximumUnknownCheckDepth && IsCertainlyUnknown(initializer.Value, depth + 1);
     }
 
     /// <summary>
@@ -304,86 +425,110 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false; // The local is either a ref, declared elsewhere, or referenced before its declaration, so we can't guarantee its value is unchanged.
         }
 
-        // The remaining checks don't depend on where the local is referenced, so are only run once per local.
+        // The remaining check doesn't depend on where the local is referenced, so is only run once per local.
         if (!_unchangedLocals.TryGetValue(local, out var unchanged))
         {
-            unchanged = IsUnchangedAfterDeclaration(local, statement, block);
+            unchanged = !GetChangeableLocals(block).Contains(local);
             _unchangedLocals[local] = unchanged;
         }
 
         return unchanged;
     }
 
-    private bool IsUnchangedAfterDeclaration(ILocalSymbol local, LocalDeclarationStatementSyntax statement, BlockSyntax block)
+    /// <summary>
+    /// Finds the locals declared directly in a block that could change after their declaration: those written to
+    /// (assigned, incremented, deconstructed into, or passed as <c>out</c>), aliased or passed by reference,
+    /// or captured by a lambda or local function. Writes before the declaration aren't possible,
+    /// so the whole block is checked; this is conservative, as writes after the reference are included too.
+    /// <para>
+    /// This is a single syntax walk per block, only binding identifiers that share a name with one of its locals.
+    /// It is far cheaper than data-flow analysis, which would need running once for the block and once per local.
+    /// </para>
+    /// </summary>
+    private HashSet<ISymbol> GetChangeableLocals(BlockSyntax block)
     {
-        if (GetReferenceEscapes(block).Contains(local))
+        if (_changeableLocals.TryGetValue(block, out var changeable))
         {
-            return false; // The local is referenced by ref, so we can't guarantee its value is unchanged.
+            return changeable;
         }
 
-        // Data-flow analysis covers the whole enclosing block, so it runs only after the cheaper checks above have passed.
-        if (!_blockDataFlows.TryGetValue(block, out var flow))
+        changeable = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+        _changeableLocals[block] = changeable;
+
+        var names = new HashSet<string>(block.Statements
+            .OfType<LocalDeclarationStatementSyntax>()
+            .SelectMany(statement => statement.Declaration.Variables)
+            .Select(variable => variable.Identifier.ValueText));
+
+        // An explicit stack, rather than recursion, so deeply nested expressions can't overflow the call stack.
+        var pending = new Stack<(SyntaxNode Node, bool InFunction)>();
+        pending.Push((block, false));
+
+        while (pending.Count > 0)
         {
-            flow = semanticModel.AnalyzeDataFlow(block);
-            _blockDataFlows[block] = flow;
+            cancellationToken.ThrowIfCancellationRequested();
+            var (node, inFunction) = pending.Pop();
+
+            foreach (var child in node.ChildNodes())
+            {
+                var childInFunction = inFunction || child is AnonymousFunctionExpressionSyntax or LocalFunctionStatementSyntax;
+
+                if (child is IdentifierNameSyntax identifier
+                    && names.Contains(identifier.Identifier.ValueText)
+                    && (childInFunction || IsChangedAt(identifier))
+                    && semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol is ILocalSymbol local)
+                {
+                    changeable.Add(local);
+                }
+
+                pending.Push((child, childInFunction));
+            }
         }
 
-        if (flow == null || !flow.Succeeded || flow.Captured.Contains(local, SymbolEqualityComparer.Default))
-        {
-            return false; // The local is either captured by a lambda or referenced by ref, so we can't guarantee its value is unchanged.
-        }
-
-        var next = block.Statements.IndexOf(statement) + 1;
-
-        if (next == block.Statements.Count)
-        {
-            return true; // The local is declared in the last statement of the block, so it can't be modified after its declaration.
-        }
-
-        var remainingFlow = semanticModel.AnalyzeDataFlow(block.Statements[next], block.Statements.Last());
-
-        return remainingFlow != null && remainingFlow.Succeeded
-            && !remainingFlow.WrittenInside.Contains(local, SymbolEqualityComparer.Default);
+        return changeable;
     }
 
     /// <summary>
-    /// Finds the symbols in a block that are aliased or passed by reference, and so could have their value changed indirectly.
-    /// The block is scanned once, however many of its locals are checked.
+    /// Checks whether an identifier is somewhere its variable could be written to or aliased.
     /// </summary>
-    private HashSet<ISymbol> GetReferenceEscapes(BlockSyntax block)
+    private static bool IsChangedAt(IdentifierNameSyntax identifier)
     {
-        if (_referenceEscapes.TryGetValue(block, out var escapes))
+        var expression = GetOutermost(identifier);
+
+        switch (expression.Parent)
         {
-            return escapes;
+            case RefExpressionSyntax or MakeRefExpressionSyntax:
+            case ArgumentSyntax { RefKindKeyword.RawKind: not 0 }:
+            case AssignmentExpressionSyntax assignment when assignment.Left == expression:
+            case PrefixUnaryExpressionSyntax prefix when prefix.Kind() is SyntaxKind.PreIncrementExpression
+                or SyntaxKind.PreDecrementExpression or SyntaxKind.AddressOfExpression:
+            case PostfixUnaryExpressionSyntax postfix when postfix.Kind() is SyntaxKind.PostIncrementExpression
+                or SyntaxKind.PostDecrementExpression:
+                return true;
+            case ArgumentSyntax { Parent: TupleExpressionSyntax tuple }:
+                return IsDeconstructionTarget(tuple);
+            default:
+                return false;
         }
-
-        escapes = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
-
-        foreach (var identifier in block.DescendantNodes().OfType<IdentifierNameSyntax>())
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            SyntaxNode expression = GetOutermostParenthesized(identifier);
-
-            if (expression.Parent is not RefExpressionSyntax
-                && expression.Parent is not ArgumentSyntax { RefKindKeyword.RawKind: not 0 })
-            {
-                continue; // The identifier isn't passed by reference, so it can't escape.
-            }
-
-            if (semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol is { } symbol)
-            {
-                escapes.Add(symbol); // The identifier is passed by reference, so the symbol can escape.
-            }
-        }
-
-        _referenceEscapes[block] = escapes;
-        return escapes;
     }
 
-    private static SyntaxNode GetOutermostParenthesized(IdentifierNameSyntax identifier)
+    /// <summary>
+    /// Checks whether a tuple is (part of) the target of a deconstruction, e.g. <c>(a, (b, c)) = ...</c>.
+    /// </summary>
+    private static bool IsDeconstructionTarget(TupleExpressionSyntax tuple)
     {
-        SyntaxNode expression = identifier;
+        var target = GetOutermost(tuple);
 
+        while (target.Parent is ArgumentSyntax { Parent: TupleExpressionSyntax outer })
+        {
+            target = GetOutermost(outer);
+        }
+
+        return target.Parent is AssignmentExpressionSyntax assignment && assignment.Left == target;
+    }
+
+    private static SyntaxNode GetOutermost(SyntaxNode expression)
+    {
         while (expression.Parent is ParenthesizedExpressionSyntax parentheses)
         {
             expression = parentheses;
