@@ -429,7 +429,8 @@ class ClassName
 
     /// <summary>
     /// Padding outside the message is trimmed, but padding between other text is part of the message, so it counts towards the length.
-    /// </summary>[TestMethod]
+    /// </summary>
+    [TestMethod]
     [DataRow("$\"1234567{value,2}\"", true)]
     [DataRow("$\"12345678{value,2}\"", false)]
     [DataRow("$\"{value,-2}1234567\"", true)] // The negative pad value adds padding at position 2, so when 'value' = 1, this evaluates to "1 1234567"
@@ -446,7 +447,8 @@ class ClassName
 
     /// <summary>
     /// Large alignments are capped while formatting, without changing whether the message is long enough.
-    /// </summary>[TestMethod]    
+    /// </summary>
+    [TestMethod]
     [DataRow("$\"{value,999999}\"", true)] // Pads at the start
     [DataRow("$\"{value,-999999}\"", true)] // The negative pad value effectively pads at the end
     [DataRow("$\"1{value,999999}\"", false)]
