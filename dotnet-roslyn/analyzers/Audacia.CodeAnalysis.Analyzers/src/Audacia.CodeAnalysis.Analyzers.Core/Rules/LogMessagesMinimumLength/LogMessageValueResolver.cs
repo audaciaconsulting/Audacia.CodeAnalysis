@@ -122,7 +122,11 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         {
             value = operation.ConstantValue.Value;
 
-            if (value is bool or char or int or long or float or double)
+            if (value == null)
+            {
+                value = string.Empty; // If this doesn't throw an exception, the null constant is used in a string context, so it is treated as an empty string.
+            }
+            else if (value is bool or char or int or long or float or double)
             {
                 value = value.ToString();
             }
