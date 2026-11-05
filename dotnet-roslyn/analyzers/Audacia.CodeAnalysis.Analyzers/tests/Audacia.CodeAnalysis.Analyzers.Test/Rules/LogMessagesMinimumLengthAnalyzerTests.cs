@@ -705,6 +705,19 @@ class ClassName
         VerifyMessage(arguments, diagnosticExpected: false, DoublingLocals("\"x\"", 10));
     }
 
+    /// <summary>
+    /// A long concatenation of unknown values exceeds the work limit, so rendering it as written stops rather than
+    /// recursing through every operand (which could overflow the stack), and the message is skipped.
+    /// </summary>
+    [TestMethod]
+    [Timeout(30_000)]
+    public void No_Diagnostic_When_Long_Concatenation_Exceeds_Work_Limit()
+    {
+        var arguments = "\"1\"" + string.Concat(Enumerable.Repeat(" + input", 10_000));
+
+        VerifyMessage(arguments, diagnosticExpected: false);
+    }
+
     private static string DoublingLocals(string initialValue, int count)
     {
         var declarations = new System.Text.StringBuilder($"var value0 = {initialValue};");

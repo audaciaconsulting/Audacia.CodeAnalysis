@@ -72,7 +72,7 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
         var hasKnownText = false;
         var rendered = Render(message, ref hasKnownText);
 
-        if (!hasKnownText)
+        if (!hasKnownText || resolver.WorkLimitExceeded)
         {
             return false; // The message is made up entirely of unknown values, so it's effectively just variables.
         }
@@ -133,6 +133,13 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
         {
             hasKnownText |= !string.IsNullOrWhiteSpace(known);
             return known;
+        }
+
+        if (resolver.WorkLimitExceeded)
+        {
+            // Stop rendering, as the message is skipped anyway. Each call uses at least one resolution step,
+            // so this also bounds the recursion, e.g. for a long concatenation such as "Failed" + a + b + ... + z.
+            return string.Empty;
         }
 
         if (operation is IInterpolatedStringOperation interpolation)

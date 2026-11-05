@@ -51,8 +51,9 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
     /// <summary>
     /// Once true, nothing else resolves and the message is skipped, as neither its value nor its 'as written' form can be trusted.
+    /// The <see cref="LogMessageAsWrittenRenderer"/> checks this too, so it stops rendering as soon as the limit is reached.
     /// </summary>
-    private bool _workLimitExceeded;
+    internal bool WorkLimitExceeded { get; private set; }
 
     /// <summary>
     /// Resolves a logger message template, substituting the template's argument values where they're all known.
@@ -61,7 +62,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     public bool TryResolvingMessage(InvocationExpressionSyntax invocation, ExpressionSyntax message, out string value)
     {
         var resolved = TryResolvingMessageWithinLimit(invocation, message, out value);
-        return resolved && !_workLimitExceeded;
+        return resolved && !WorkLimitExceeded;
     }
 
     private bool TryResolvingMessageWithinLimit(InvocationExpressionSyntax invocation, ExpressionSyntax message, out string value)
@@ -117,7 +118,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     public bool TryResolvingTemplateAsWritten(ExpressionSyntax template, out string value)
     {
         var resolved = TryResolvingTemplateAsWrittenWithinLimit(template, out value);
-        return resolved && !_workLimitExceeded;
+        return resolved && !WorkLimitExceeded;
     }
 
     private bool TryResolvingTemplateAsWrittenWithinLimit(ExpressionSyntax template, out string value)
@@ -278,9 +279,9 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (_workLimitExceeded || ++_resolutionSteps > MaximumResolutionSteps)
+        if (WorkLimitExceeded || ++_resolutionSteps > MaximumResolutionSteps)
         {
-            _workLimitExceeded = true;
+            WorkLimitExceeded = true;
             return false;
         }
 
@@ -343,10 +344,10 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     {
         if (length > MaximumValueLength)
         {
-            _workLimitExceeded = true;
+            WorkLimitExceeded = true;
         }
 
-        return !_workLimitExceeded;
+        return !WorkLimitExceeded;
     }
 
     /// <summary>
@@ -397,7 +398,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         {
             var resolved = TryResolvingValue(semanticModel.GetOperation(declaration.Initializer.Value, cancellationToken), out value);
 
-            if (!_workLimitExceeded)
+            if (!WorkLimitExceeded)
             {
                 // Results are only cached when complete; once the work limit is exceeded, nothing resolves anyway.
                 _localInitializers[local] = (resolved, value);
