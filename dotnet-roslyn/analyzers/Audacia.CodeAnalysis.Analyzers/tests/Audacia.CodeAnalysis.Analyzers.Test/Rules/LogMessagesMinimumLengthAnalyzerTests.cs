@@ -622,7 +622,8 @@ class ClassName
     [DataRow("\"{Second}{First}\", \"12345\", \"67890\"", false)]
     [DataRow("\"Got {Id}\", new object[] { \"12345\" }", true)]
     [DataRow("\"Got {Id}\", new object[] { \"123456\" }", false)]
-    [DataRow("\"Got {Id}\", (object)null", true)]
+    [DataRow("\"Got {Id}\", (object)null", false)] // Logging shows null values as "(null)", so this is "Got (null)"
+    [DataRow("\"{Id}\", (object)null", true)]
     [DataRow("\"Got {Id}\", \"\"", true)]
     [DataRow("\"{Id,-9}\", \"1\"", true)]
     [DataRow("\"{Id,-10}\", \"1\"", true)]

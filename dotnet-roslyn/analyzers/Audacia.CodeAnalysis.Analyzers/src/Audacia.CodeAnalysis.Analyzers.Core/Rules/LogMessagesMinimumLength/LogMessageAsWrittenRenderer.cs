@@ -84,23 +84,8 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
     private static bool IsBuiltFromStrings(IOperation operation)
     {
         return operation is IInterpolatedStringOperation
-            || IsStringConcatenation(operation)
-            || IsSupportedStringMethod(operation, out _);
-    }
-
-    private static bool IsStringConcatenation(IOperation operation)
-    {
-        return operation is IBinaryOperation { OperatorKind: BinaryOperatorKind.Add, OperatorMethod: null } binary
-            && binary.Type?.SpecialType == SpecialType.System_String;
-    }
-
-    private static bool IsSupportedStringMethod(IOperation operation, out IInvocationOperation call)
-    {
-        call = operation as IInvocationOperation;
-
-        return call?.TargetMethod.ContainingType.SpecialType == SpecialType.System_String
-            && call.TargetMethod.IsStatic
-            && call.TargetMethod.Name is nameof(string.Concat) or nameof(string.Format) or nameof(string.Join);
+            || LogMessageValueResolver.IsStringConcatenation(operation)
+            || LogMessageValueResolver.IsSupportedStringMethod(operation);
     }
 
     private static IOperation Unwrap(IOperation operation)
@@ -147,14 +132,14 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
             return RenderInterpolation(interpolation, ref hasKnownText);
         }
 
-        if (IsStringConcatenation(operation))
+        if (LogMessageValueResolver.IsStringConcatenation(operation))
         {
             var binary = (IBinaryOperation)operation;
             return Render(binary.LeftOperand, ref hasKnownText) + Render(binary.RightOperand, ref hasKnownText);
         }
 
-        if (IsSupportedStringMethod(operation, out var call)
-            && TryRenderingStringMethod(call, ref hasKnownText, out var rendered))
+        if (LogMessageValueResolver.IsSupportedStringMethod(operation)
+            && TryRenderingStringMethod((IInvocationOperation)operation, ref hasKnownText, out var rendered))
         {
             return rendered;
         }
@@ -207,7 +192,7 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
     {
         rendered = null;
 
-        if (!TryGettingInlineValues(call.Arguments, out var values))
+        if (!LogMessageValueResolver.TryGettingInlineValues(call.Arguments, out var values))
         {
             return false;
         }
@@ -230,7 +215,7 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
 
         // Only joins of values written inline can be rendered, e.g. string.Join(", ", "Failed", id), not joins of a collection
         if (arguments.Count != 2 || arguments[1].Parameter?.IsParams != true
-            || !TryGettingInlineValues(arguments.Skip(1), out var values))
+            || !LogMessageValueResolver.TryGettingInlineValues(arguments.Skip(1), out var values))
         {
             return false;
         }
@@ -263,7 +248,7 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
 
         if (formatIndex < 0
             || !resolver.TryResolvingOperation(arguments[formatIndex].Value, out var format)
-            || !TryGettingInlineValues(arguments.Skip(formatIndex + 1), out var values))
+            || !LogMessageValueResolver.TryGettingInlineValues(arguments.Skip(formatIndex + 1), out var values))
         {
             return false; // The format string or its arguments aren't written inline, so the call can't be rendered.
         }
@@ -325,33 +310,6 @@ internal sealed class LogMessageAsWrittenRenderer(LogMessageValueResolver resolv
 
         // Alignment and format specifiers can't be applied reliably, so keep them on the placeholder
         rendered = Placeholder(value.Syntax.ToString() + formatItem.Substring(suffixStart));
-        return true;
-    }
-
-    /// <summary>
-    /// Gets argument values, expanding params arguments written inline. Fails if a params argument is passed as a variable,
-    /// as the number of values isn't known.
-    /// </summary>
-    private static bool TryGettingInlineValues(IEnumerable<IArgumentOperation> arguments, out List<IOperation> values)
-    {
-        values = [];
-
-        foreach (var argument in arguments.OrderBy(argument => argument.Parameter?.Ordinal))
-        {
-            if (argument.Parameter?.IsParams != true)
-            {
-                values.Add(argument.Value);
-            }
-            else if (LogMessageValueResolver.TryGettingParamsElements(argument.Value, out var elements))
-            {
-                values.AddRange(elements);
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         return true;
     }
 }

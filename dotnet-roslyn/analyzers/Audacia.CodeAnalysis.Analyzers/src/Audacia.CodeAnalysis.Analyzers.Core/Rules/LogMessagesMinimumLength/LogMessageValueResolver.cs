@@ -9,7 +9,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 
 /// <summary>
 /// This tries to resolve a logger message template to its actual value, substituting the template's argument values where they're all known.
-/// Whenever a value isn't known or the logic gets too complex/expensive, the message is measured 'as written'; see <see cref="LogMessageAsWrittenRenderer"/>.
+/// Whenever a value isn't known or is too complex to evaluate, the message is measured 'as written'; see <see cref="LogMessageAsWrittenRenderer"/>.
 /// A lot of the logic is to handle edge cases and avoid expensive operations, so this rule doesn't break the build analysis or take too long.
 /// </summary>
 internal sealed class LogMessageValueResolver(SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// Completed resolutions of locals' initializers, which don't depend on where the local is referenced.
     /// A failure caused by a cycle between locals is cached too, as every local in (or depending on) a cycle fails whichever is resolved first.
     /// </summary>
-    private readonly Dictionary<ILocalSymbol, (bool Resolved, object Value)> _localInitializers = new(SymbolEqualityComparer.Default);
+    private readonly Dictionary<ILocalSymbol, (bool Resolved, string Value)> _localInitializers = new(SymbolEqualityComparer.Default);
 
     /// <summary>
     /// Completed checks that a local isn't changed after its declaration, excluding the per-reference position checks.
@@ -87,15 +87,10 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false;
         }
 
-        var values = new List<object>();
-
-        foreach (var argument in call.Arguments.Where(argument => argument.Parameter?.IsParams == true))
+        if (!TryResolvingArguments(call.Arguments.Where(argument => argument.Parameter?.IsParams == true), out var values))
         {
-            if (!TryAddingArgument(argument, values))
-            {
-                value = LogMessageAsWrittenRenderer.TemplateAsWritten(value); // The argument values aren't all known, so use the 'as written' form.
-                return true;
-            }
+            value = LogMessageAsWrittenRenderer.TemplateAsWritten(value); // The argument values aren't all known, so use the 'as written' form.
+            return true;
         }
 
         if (values.Count == 0)
@@ -135,7 +130,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     private bool TryResolving(ExpressionSyntax expression, out string value)
     {
         // Most messages are constants, which are resolved without getting the operation (see MayHaveKnownArguments).
-        // A null constant resolves to an empty string, as TryResolvingValue does.
+        // A null constant resolves to an empty string, as TryResolvingOperation does.
         var constant = semanticModel.GetConstantValue(expression, cancellationToken);
 
         if (constant.HasValue && constant.Value is null or string)
@@ -144,9 +139,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return true;
         }
 
-        var resolved = TryResolvingValue(semanticModel.GetOperation(expression, cancellationToken), out var result);
-        value = result as string;
-        return resolved && value != null;
+        return TryResolvingOperation(semanticModel.GetOperation(expression, cancellationToken), out value);
     }
 
     /// <summary>
@@ -242,13 +235,24 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// </summary>
     private bool IsCertainlyUnknownLocal(ILocalSymbol local, int depth)
     {
-        if (local.DeclaringSyntaxReferences.Length != 1
-            || local.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken) is not VariableDeclaratorSyntax { Initializer: { } initializer })
+        if (!TryGettingInitializedDeclaration(local, out var declaration))
         {
             return true; // e.g. a foreach variable, out variable or pattern variable.
         }
 
-        return depth < MaximumUnknownCheckDepth && IsCertainlyUnknown(initializer.Value, depth + 1);
+        return depth < MaximumUnknownCheckDepth && IsCertainlyUnknown(declaration.Initializer.Value, depth + 1);
+    }
+
+    /// <summary>
+    /// Gets a local's declaration if it's declared and initialized in a single declarator, e.g. not a foreach, out or pattern variable.
+    /// </summary>
+    private bool TryGettingInitializedDeclaration(ILocalSymbol local, out VariableDeclaratorSyntax declaration)
+    {
+        declaration = local.DeclaringSyntaxReferences.Length == 1
+            ? local.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken) as VariableDeclaratorSyntax
+            : null;
+
+        return declaration?.Initializer != null;
     }
 
     /// <summary>
@@ -257,8 +261,8 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// </summary>
     internal bool TryResolvingOperation(IOperation operation, out string value)
     {
-        var resolved = TryResolvingValue(operation, out var result);
-        value = resolved ? result as string ?? string.Empty : null;
+        var resolved = TryResolvingValue(operation, out value);
+        value = resolved ? value ?? string.Empty : null;
         return resolved;
     }
 
@@ -268,7 +272,11 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             .TryRendering(semanticModel.GetOperation(expression, cancellationToken), out value);
     }
 
-    private bool TryResolvingValue(IOperation operation, out object value)
+    /// <summary>
+    /// Resolves an operation's exact value. A <see langword="null"/> constant resolves to <see langword="null"/>, as how it's
+    /// shown depends on where it's used: an empty string in a concatenation, but "(null)" as a message template argument.
+    /// </summary>
+    private bool TryResolvingValue(IOperation operation, out string value)
     {
         value = null;
 
@@ -298,24 +306,35 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
 
         if (operation.ConstantValue.HasValue)
         {
-            value = operation.ConstantValue.Value;
-
-            if (value == null)
-            {
-                value = string.Empty; // If this doesn't throw an exception, the null constant is used in a string context, so it is treated as an empty string.
-            }
-            else if (value is bool or char or int or long or float or double)
-            {
-                value = value.ToString();
-            }
-
-            return value == null || value is string;
+            var constant = operation.ConstantValue.Value;
+            value = constant is string or bool or char or int or long or float or double ? constant.ToString() : null;
+            return constant == null || value != null;
         }
 
         return TryResolvingExpression(operation, out value);
     }
 
-    private bool TryResolvingExpression(IOperation operation, out object value)
+    /// <summary>
+    /// Checks for a built-in string concatenation, e.g. <c>"Failed: " + id</c>.
+    /// </summary>
+    internal static bool IsStringConcatenation(IOperation operation)
+    {
+        return operation is IBinaryOperation { OperatorKind: BinaryOperatorKind.Add, OperatorMethod: null } binary
+            && binary.Type?.SpecialType == SpecialType.System_String;
+    }
+
+    /// <summary>
+    /// Checks for a call to <c>string.Concat</c>, <c>string.Format</c> or <c>string.Join</c>, the methods messages are built with.
+    /// </summary>
+    internal static bool IsSupportedStringMethod(IOperation operation)
+    {
+        return operation is IInvocationOperation call
+            && call.TargetMethod.ContainingType.SpecialType == SpecialType.System_String
+            && call.TargetMethod.IsStatic
+            && call.TargetMethod.Name is nameof(string.Concat) or nameof(string.Format) or nameof(string.Join);
+    }
+
+    private bool TryResolvingExpression(IOperation operation, out string value)
     {
         value = null;
 
@@ -325,16 +344,16 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
                 => TryResolvingLocal(local, out value),
             IParenthesizedOperation parentheses
                 => TryResolvingValue(parentheses.Operand, out value),
-            IBinaryOperation binary when binary.OperatorKind == BinaryOperatorKind.Add && binary.OperatorMethod == null && binary.Type?.SpecialType == SpecialType.System_String
+            IBinaryOperation binary when IsStringConcatenation(binary)
                 => TryResolvingConcatenation(binary, out value),
             IInterpolatedStringOperation interpolation
                 => TryResolvingInterpolation(interpolation, out value),
-            IInvocationOperation call when call.TargetMethod.ContainingType.SpecialType == SpecialType.System_String
+            IInvocationOperation call when IsSupportedStringMethod(call)
                 => TryResolvingCall(call, out value),
             _ => false,
         };
 
-        return resolved && IsWithinLengthLimit((value as string)?.Length ?? 0);
+        return resolved && IsWithinLengthLimit(LengthOf(value));
     }
 
     /// <summary>
@@ -353,14 +372,12 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// <summary>
     /// Resolves a local's initializer if it is unchanged, guarding against recursive references between locals.
     /// </summary>
-    private bool TryResolvingLocal(ILocalReferenceOperation reference, out object value)
+    private bool TryResolvingLocal(ILocalReferenceOperation reference, out string value)
     {
         value = null;
         var local = reference.Local;
 
-        if (local.DeclaringSyntaxReferences.Length != 1
-            || local.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken) is not VariableDeclaratorSyntax declaration
-            || declaration.Initializer == null)
+        if (!TryGettingInitializedDeclaration(local, out var declaration))
         {
             return false; // The local isn't initialized in a single declaration, so we can't resolve its value.
         }
@@ -380,7 +397,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// <summary>
     /// Resolves a local's initializer once, so locals referenced many times (e.g. <c>var b = a + a;</c>) aren't re-resolved.
     /// </summary>
-    private bool TryResolvingInitializer(ILocalSymbol local, VariableDeclaratorSyntax declaration, out object value)
+    private bool TryResolvingInitializer(ILocalSymbol local, VariableDeclaratorSyntax declaration, out string value)
     {
         if (_localInitializers.TryGetValue(local, out var cached))
         {
@@ -538,7 +555,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         return expression;
     }
 
-    private bool TryResolvingConcatenation(IBinaryOperation binary, out object value)
+    private bool TryResolvingConcatenation(IBinaryOperation binary, out string value)
     {
         value = null;
 
@@ -552,13 +569,13 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false; // Checked before concatenating, so the result is never allocated.
         }
 
-        value = string.Concat(left as string, right as string);
+        value = string.Concat(left, right);
         return true;
     }
 
-    private static long LengthOf(object value) => (value as string)?.Length ?? 0;
+    private static long LengthOf(string value) => value?.Length ?? 0;
 
-    private bool TryResolvingInterpolation(IInterpolatedStringOperation interpolation, out object value)
+    private bool TryResolvingInterpolation(IInterpolatedStringOperation interpolation, out string value)
     {
         value = null;
         var result = new StringBuilder();
@@ -616,19 +633,15 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     }
 
     /// <summary>
-    /// Evaluates supported string.Concat and string.Format calls using known argument values in parameter order.
+    /// Evaluates supported string.Concat, string.Format and string.Join calls using known argument values in parameter order.
     /// </summary>
-    private bool TryResolvingCall(IInvocationOperation call, out object value)
+    private bool TryResolvingCall(IInvocationOperation call, out string value)
     {
         value = null;
-        var values = new List<object>();
 
-        foreach (var argument in call.Arguments.OrderBy(argument => argument.Parameter?.Ordinal))
+        if (!TryResolvingArguments(call.Arguments, out var values))
         {
-            if (!TryAddingArgument(argument, values))
-            {
-                return false; // One of the arguments isn't a constant string, so we can't resolve the call.
-            }
+            return false; // One of the arguments isn't a constant string, so we can't resolve the call.
         }
 
         if (call.TargetMethod.Name == nameof(string.Concat))
@@ -638,7 +651,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
                 return false; // Checked before concatenating, so the result is never allocated.
             }
 
-            value = string.Concat(values.Select(item => item as string));
+            value = string.Concat(values);
             return true; // The call is a string.Concat call with constant string arguments, so we can resolve it.
         }
 
@@ -652,7 +665,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
                 return false; // Checked before joining, so the result is never allocated.
             }
 
-            value = string.Join(values[0] as string, values.Skip(1).Select(item => item as string));
+            value = string.Join(values[0], values.Skip(1));
             return true;
         }
 
@@ -663,9 +676,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             return false; // The call isn't a string.Format call with a constant format string, so we can't resolve it.
         }
 
-        var success = TryFormatting(format, [.. values.Skip(1)], out var result);
-        value = result;
-        return success;
+        return TryFormatting(format, [.. values.Skip(1)], out value);
     }
 
     /// <summary>
@@ -699,41 +710,62 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     }
 
     /// <summary>
-    /// Adds a resolved argument value, expanding inline params arrays and collections into their individual elements.
+    /// Gets argument values in parameter order, expanding params arguments written inline (an array or collection expression).
+    /// Fails if a params argument is passed as a variable, as the number of values isn't known.
     /// </summary>
-    private bool TryAddingArgument(IArgumentOperation argument, List<object> values)
+    internal static bool TryGettingInlineValues(IEnumerable<IArgumentOperation> arguments, out List<IOperation> values)
     {
-        if (argument.Parameter == null)
-        {
-            return false;
-        }
+        values = [];
 
-        if (argument.Parameter.IsParams)
+        foreach (var argument in arguments.OrderBy(argument => argument.Parameter?.Ordinal))
         {
-            if (!TryGettingParamsElements(argument.Value, out var elements))
+            if (argument.Parameter == null)
             {
-                return false; // The params argument isn't an inline array or collection, so we can't resolve the message.
+                return false;
             }
 
-            foreach (var element in elements)
+            if (!argument.Parameter.IsParams)
             {
-                if (!TryResolvingValue(element, out var item))
-                {
-                    return false; // One of the elements isn't a constant string, so we can't resolve the message.
-                }
+                values.Add(argument.Value);
+            }
+            else if (TryGettingParamsElements(argument.Value, out var elements))
+            {
+                values.AddRange(elements);
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-                values.Add(item);
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves argument values in parameter order, expanding params arguments written inline into their individual elements.
+    /// </summary>
+    private bool TryResolvingArguments(IEnumerable<IArgumentOperation> arguments, out List<string> values)
+    {
+        values = null;
+
+        if (!TryGettingInlineValues(arguments, out var operations))
+        {
+            return false; // A params argument isn't an inline array or collection, so we can't resolve its values.
+        }
+
+        var resolved = new List<string>(operations.Count);
+
+        foreach (var operation in operations)
+        {
+            if (!TryResolvingValue(operation, out var value))
+            {
+                return false; // One of the values isn't a constant string, so we can't resolve them.
             }
 
-            return true;
+            resolved.Add(value);
         }
 
-        if (!TryResolvingValue(argument.Value, out var value))
-        {
-            return false; // The argument isn't a constant string, so we can't resolve the message.
-        }
-
-        values.Add(value);
+        values = resolved;
         return true;
     }
 
@@ -741,7 +773,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// Converts named logging placeholders to positional format items and substitutes known values.
     /// Preserves escaped braces and alignment, skipping format specifiers that cannot be evaluated reliably.
     /// </summary>
-    private static bool TryResolvingTemplate(string template, object[] values, out string value)
+    private static bool TryResolvingTemplate(string template, string[] values, out string value)
     {
         value = null;
         var format = new StringBuilder();
@@ -769,8 +801,9 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
             }
         }
 
+        // Logging shows null values as "(null)", whereas string.Format shows them as an empty string.
         return argumentIndex == values.Length
-            && TryFormatting(format.ToString(), values.Select(item => item ?? "(null)").ToArray(), out value);
+            && TryFormatting(format.ToString(), [.. values.Select(item => item ?? "(null)")], out value);
     }
 
     private static bool TryAppendingPlaceholder(string template, StringBuilder format, int argumentIndex, ref int index)
@@ -804,7 +837,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         return true;
     }
 
-    private static bool TryFormatting(string format, object[] values, out string value)
+    private static bool TryFormatting(string format, string[] values, out string value)
     {
         value = null;
 
@@ -830,7 +863,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// Capping doesn't change whether a message is long enough: padding at either end is trimmed either way, and
     /// interior padding is still at least as long as the longest minimum length.
     /// </summary>
-    private static bool TryLimitingFormat(string format, object[] values, out string limitedFormat)
+    private static bool TryLimitingFormat(string format, string[] values, out string limitedFormat)
     {
         limitedFormat = null;
         var result = new StringBuilder(format.Length);
@@ -872,7 +905,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
     /// Caps the alignment of a format item at its value's length plus the padding limit (e.g. "0,999999" becomes "0,101" for a value of "1").
     /// Anything other than a plain integer alignment is left unchanged, so invalid items still fail to format.
     /// </summary>
-    private static string LimitAlignment(string item, object[] values)
+    private static string LimitAlignment(string item, string[] values)
     {
         var comma = item.IndexOf(',');
 
@@ -886,7 +919,7 @@ internal sealed class LogMessageValueResolver(SemanticModel semanticModel, Cance
         var alignment = item.Substring(comma + 1).Trim();
         var negative = alignment.StartsWith("-", StringComparison.Ordinal);
         var digits = negative ? alignment.Substring(1) : alignment;
-        var limit = LogMessagesMinimumLengthAnalyzer.MaximumSettingValue + (values[argumentIndex]?.ToString().Length ?? 0);
+        var limit = LogMessagesMinimumLengthAnalyzer.MaximumSettingValue + (values[argumentIndex]?.Length ?? 0);
 
         if (digits.Length == 0
             || !digits.All(digit => digit >= '0' && digit <= '9')
