@@ -1031,6 +1031,39 @@ By default, classes with the suffix of `Handler` are analysed under this rule. T
 dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
 ```
 
+### ACL1029 - Log messages should be long enough to be meaningful
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.4">LOG-01.4</a></td>
+</tr>
+</table>
+
+ACL1029 checks whether log messages are long enough to be meaningful, and will produce a warning if not. Leading and trailing whitespace is not counted.
+
+The rule checks messages passed to `ILogger` methods (e.g. `LogInformation`), the `Message` of `[LoggerMessage]` source-generated logging methods, and the format string passed to `LoggerMessage.Define`.
+
+For `[LoggerMessage]` and `LoggerMessage.Define`, the message template is measured as written (including any `{Placeholder}` names), as the values are only known at runtime.
+
+For `ILogger` templates, argument values are used if all are known at compile time (and have no format specifiers), otherwise the message is measured as written, e.g. `_logger.LogError("Failed {Id}", id)` 
+is treated as `Failed {Id}` (11 characters).
+
+Messages built from strings using interpolation, concatenation, join etc. are treated in the same way; any unknown value is measured as if written as an interpolated string or template placeholder. 
+So `"Failed: " + ex.Message` is treated as `Failed: {ex.Message}`, and `string.Format("Failed {0}", id)` as `Failed {id}`.
+
+Therefore, if a message made up of variables/arguments gets a warning, adding descriptive wording around the arguments or using more descriptive argument names will usually resolve it.
+
+The minimum length of a log message can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default is 10.
+An exception is thrown if `log_message_minimum_length` is not an integer, less than 1, or greater than 100 (as that would be resource-intensive).
+
+If the message/template itself is stored in a variable, the value is used where it can be determined at compile time. 
+Otherwise, or if a message built from strings has no text that's known at compile time (e.g. `first + second`),  the rule is skipped to avoid false positives.
+
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 
 ### ACL1005 - Asynchronous method name is not suffixed with 'Async'

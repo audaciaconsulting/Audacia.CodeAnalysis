@@ -1,0 +1,151 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{8C1E4A52-3B7D-4F0A-9E6C-2D5B7A1F0C31}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+		..\.gitattributes = ..\.gitattributes
+		..\.gitignore = ..\.gitignore
+		..\LICENCE.txt = ..\LICENCE.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{4F2D9B17-6A3C-4E85-B1D0-7C9E2F5A8B64}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\dependency-track.pipeline.yaml = ..\build\dependency-track.pipeline.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{1AD244E0-696C-4A2A-31B1-1832C4FA60E4}"
+	ProjectSection(SolutionItems) = preProject
+		config\build-dotnet.yaml = config\build-dotnet.yaml
+		config\Directory.Build.props = config\Directory.Build.props
+		config\README.md = config\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{F883AD26-E2D9-0064-49F2-B333EF800629}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{A63B0E2C-91D4-4C7F-8E25-5B1F3D7C6A09}"
+	ProjectSection(SolutionItems) = preProject
+		analyzers\Audacia.CodeAnalysis.Analyzers\.editorconfig = analyzers\Audacia.CodeAnalysis.Analyzers\.editorconfig
+		analyzers\Audacia.CodeAnalysis.Analyzers\build.yaml = analyzers\Audacia.CodeAnalysis.Analyzers\build.yaml
+		analyzers\Audacia.CodeAnalysis.Analyzers\CHANGELOG.md = analyzers\Audacia.CodeAnalysis.Analyzers\CHANGELOG.md
+		analyzers\Audacia.CodeAnalysis.Analyzers\README.md = analyzers\Audacia.CodeAnalysis.Analyzers\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7188C2C0-F586-2E1C-E0B5-5DFC1FABF135}"
+	ProjectSection(SolutionItems) = preProject
+		analyzers\Audacia.CodeAnalysis.Analyzers\src\Directory.Build.props = analyzers\Audacia.CodeAnalysis.Analyzers\src\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D445CE80-8319-7C31-478D-62DF196D1262}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{1F7389E2-0121-8D74-D878-2337622B2A39}"
+	ProjectSection(SolutionItems) = preProject
+		analyzers\Audacia.CodeAnalysis.Analyzers.Helpers\build.yaml = analyzers\Audacia.CodeAnalysis.Analyzers.Helpers\build.yaml
+		analyzers\Audacia.CodeAnalysis.Analyzers.Helpers\CHANGELOG.md = analyzers\Audacia.CodeAnalysis.Analyzers.Helpers\CHANGELOG.md
+		analyzers\Audacia.CodeAnalysis.Analyzers.Helpers\README.md = analyzers\Audacia.CodeAnalysis.Analyzers.Helpers\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.AspNetCore", "config\Audacia.CodeAnalysis.AspNetCore\Audacia.CodeAnalysis.AspNetCore.csproj", "{7657CA38-D6FA-4E2C-9372-261FAD48B559}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis", "config\Audacia.CodeAnalysis\Audacia.CodeAnalysis.csproj", "{4F721B85-DD1F-401F-9FDC-F5C6BCF0C8FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.EntityFrameworkCore", "config\Audacia.CodeAnalysis.EntityFrameworkCore\Audacia.CodeAnalysis.EntityFrameworkCore.csproj", "{5F23C8D8-4815-4826-A1F6-0086B5320808}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Libraries", "config\Audacia.CodeAnalysis.Libraries\Audacia.CodeAnalysis.Libraries.csproj", "{F101B865-2026-4536-961E-4A29245C0AF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.TestProjects", "config\Audacia.CodeAnalysis.TestProjects\Audacia.CodeAnalysis.TestProjects.csproj", "{86E3E21F-E0E1-4BCD-9CA8-DCC9733E99AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Analyzers.AspNetCore", "analyzers\Audacia.CodeAnalysis.Analyzers\src\Audacia.CodeAnalysis.Analyzers.AspNetCore\Audacia.CodeAnalysis.Analyzers.AspNetCore.csproj", "{EC4CBD83-9FE8-4F71-A421-3F3765DEE1B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Analyzers.Shared", "analyzers\Audacia.CodeAnalysis.Analyzers\src\Audacia.CodeAnalysis.Analyzers.Shared\Audacia.CodeAnalysis.Analyzers.Shared.csproj", "{726FCFE5-6090-4DF7-A89E-0A4692E823C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Analyzers.Core", "analyzers\Audacia.CodeAnalysis.Analyzers\src\Audacia.CodeAnalysis.Analyzers.Core\Audacia.CodeAnalysis.Analyzers.Core.csproj", "{D396F349-3900-42BA-91B0-7EF957FD6116}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Analyzers.TestProjects", "analyzers\Audacia.CodeAnalysis.Analyzers\src\Audacia.CodeAnalysis.Analyzers.TestProjects\Audacia.CodeAnalysis.Analyzers.TestProjects.csproj", "{1A82E218-2C9D-4642-B067-3816D1222795}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Analyzers.Test", "analyzers\Audacia.CodeAnalysis.Analyzers\tests\Audacia.CodeAnalysis.Analyzers.Test\Audacia.CodeAnalysis.Analyzers.Test.csproj", "{7054BC8A-4F87-4989-B32E-94DF924BA974}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Analyzers.Vsix", "analyzers\Audacia.CodeAnalysis.Analyzers\tests\Audacia.CodeAnalysis.Analyzers.Vsix\Audacia.CodeAnalysis.Analyzers.Vsix.csproj", "{48B058B5-380B-4ABB-A010-C4E4D9FF2367}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.CodeAnalysis.Analyzers.Helpers", "analyzers\Audacia.CodeAnalysis.Analyzers.Helpers\src\Audacia.CodeAnalysis.Analyzers.Helpers\Audacia.CodeAnalysis.Analyzers.Helpers.csproj", "{EC3E70A0-1F77-4160-8E20-BCBA7B347D13}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7657CA38-D6FA-4E2C-9372-261FAD48B559}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7657CA38-D6FA-4E2C-9372-261FAD48B559}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7657CA38-D6FA-4E2C-9372-261FAD48B559}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7657CA38-D6FA-4E2C-9372-261FAD48B559}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F721B85-DD1F-401F-9FDC-F5C6BCF0C8FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F721B85-DD1F-401F-9FDC-F5C6BCF0C8FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F721B85-DD1F-401F-9FDC-F5C6BCF0C8FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F721B85-DD1F-401F-9FDC-F5C6BCF0C8FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F23C8D8-4815-4826-A1F6-0086B5320808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F23C8D8-4815-4826-A1F6-0086B5320808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F23C8D8-4815-4826-A1F6-0086B5320808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F23C8D8-4815-4826-A1F6-0086B5320808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F101B865-2026-4536-961E-4A29245C0AF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F101B865-2026-4536-961E-4A29245C0AF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F101B865-2026-4536-961E-4A29245C0AF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F101B865-2026-4536-961E-4A29245C0AF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86E3E21F-E0E1-4BCD-9CA8-DCC9733E99AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86E3E21F-E0E1-4BCD-9CA8-DCC9733E99AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86E3E21F-E0E1-4BCD-9CA8-DCC9733E99AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86E3E21F-E0E1-4BCD-9CA8-DCC9733E99AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC4CBD83-9FE8-4F71-A421-3F3765DEE1B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC4CBD83-9FE8-4F71-A421-3F3765DEE1B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC4CBD83-9FE8-4F71-A421-3F3765DEE1B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC4CBD83-9FE8-4F71-A421-3F3765DEE1B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{726FCFE5-6090-4DF7-A89E-0A4692E823C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{726FCFE5-6090-4DF7-A89E-0A4692E823C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{726FCFE5-6090-4DF7-A89E-0A4692E823C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{726FCFE5-6090-4DF7-A89E-0A4692E823C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D396F349-3900-42BA-91B0-7EF957FD6116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D396F349-3900-42BA-91B0-7EF957FD6116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D396F349-3900-42BA-91B0-7EF957FD6116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D396F349-3900-42BA-91B0-7EF957FD6116}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A82E218-2C9D-4642-B067-3816D1222795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A82E218-2C9D-4642-B067-3816D1222795}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A82E218-2C9D-4642-B067-3816D1222795}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A82E218-2C9D-4642-B067-3816D1222795}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7054BC8A-4F87-4989-B32E-94DF924BA974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7054BC8A-4F87-4989-B32E-94DF924BA974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7054BC8A-4F87-4989-B32E-94DF924BA974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7054BC8A-4F87-4989-B32E-94DF924BA974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48B058B5-380B-4ABB-A010-C4E4D9FF2367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48B058B5-380B-4ABB-A010-C4E4D9FF2367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48B058B5-380B-4ABB-A010-C4E4D9FF2367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48B058B5-380B-4ABB-A010-C4E4D9FF2367}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC3E70A0-1F77-4160-8E20-BCBA7B347D13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC3E70A0-1F77-4160-8E20-BCBA7B347D13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC3E70A0-1F77-4160-8E20-BCBA7B347D13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC3E70A0-1F77-4160-8E20-BCBA7B347D13}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4F2D9B17-6A3C-4E85-B1D0-7C9E2F5A8B64} = {8C1E4A52-3B7D-4F0A-9E6C-2D5B7A1F0C31}
+		{A63B0E2C-91D4-4C7F-8E25-5B1F3D7C6A09} = {F883AD26-E2D9-0064-49F2-B333EF800629}
+		{7188C2C0-F586-2E1C-E0B5-5DFC1FABF135} = {A63B0E2C-91D4-4C7F-8E25-5B1F3D7C6A09}
+		{D445CE80-8319-7C31-478D-62DF196D1262} = {A63B0E2C-91D4-4C7F-8E25-5B1F3D7C6A09}
+		{1F7389E2-0121-8D74-D878-2337622B2A39} = {F883AD26-E2D9-0064-49F2-B333EF800629}
+		{7657CA38-D6FA-4E2C-9372-261FAD48B559} = {1AD244E0-696C-4A2A-31B1-1832C4FA60E4}
+		{4F721B85-DD1F-401F-9FDC-F5C6BCF0C8FD} = {1AD244E0-696C-4A2A-31B1-1832C4FA60E4}
+		{5F23C8D8-4815-4826-A1F6-0086B5320808} = {1AD244E0-696C-4A2A-31B1-1832C4FA60E4}
+		{F101B865-2026-4536-961E-4A29245C0AF1} = {1AD244E0-696C-4A2A-31B1-1832C4FA60E4}
+		{86E3E21F-E0E1-4BCD-9CA8-DCC9733E99AD} = {1AD244E0-696C-4A2A-31B1-1832C4FA60E4}
+		{EC4CBD83-9FE8-4F71-A421-3F3765DEE1B5} = {7188C2C0-F586-2E1C-E0B5-5DFC1FABF135}
+		{726FCFE5-6090-4DF7-A89E-0A4692E823C0} = {7188C2C0-F586-2E1C-E0B5-5DFC1FABF135}
+		{D396F349-3900-42BA-91B0-7EF957FD6116} = {7188C2C0-F586-2E1C-E0B5-5DFC1FABF135}
+		{1A82E218-2C9D-4642-B067-3816D1222795} = {7188C2C0-F586-2E1C-E0B5-5DFC1FABF135}
+		{7054BC8A-4F87-4989-B32E-94DF924BA974} = {D445CE80-8319-7C31-478D-62DF196D1262}
+		{48B058B5-380B-4ABB-A010-C4E4D9FF2367} = {D445CE80-8319-7C31-478D-62DF196D1262}
+		{EC3E70A0-1F77-4160-8E20-BCBA7B347D13} = {1F7389E2-0121-8D74-D878-2337622B2A39}
+	EndGlobalSection
+EndGlobal

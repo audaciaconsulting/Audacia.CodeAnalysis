@@ -78,6 +78,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Common
                     return $"{helpLinkUrlPrefix}named-properties-should-be-used-in-logging-messages";
                 case DiagnosticId.ApplicationLogicShouldBeSignposted:
                     return $"{helpLinkUrlPrefix}application-logic-should-be-signposted";
+                case DiagnosticId.LogMessageMinimumLength:
+                    return $"{helpLinkUrlPrefix}log-messages-should-be-long-enough-to-be-meaningful";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),
