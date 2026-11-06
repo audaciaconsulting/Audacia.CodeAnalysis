@@ -77,7 +77,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference FluentAssertionsAssertionScopeReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Execution.AssertionScope).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsAssertionExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.AssertionExtensions).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsStringExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Primitives.StringAssertions).Assembly.Location);
-        private static readonly MetadataReference MoqReference = MetadataReference.CreateFromFile(typeof(Moq.Mock).Assembly.Location);
         private static readonly MetadataReference NSubstituteReference = MetadataReference.CreateFromFile(typeof(NSubstitute.Substitute).Assembly.Location);
 
         internal static readonly CompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(
@@ -549,7 +548,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddMetadataReference(projectId, FluentAssertionsAssertionScopeReference)
                 .AddMetadataReference(projectId, FluentAssertionsAssertionExtensionsReference)
                 .AddMetadataReference(projectId, FluentAssertionsStringExtensionsReference)
-                .AddMetadataReference(projectId, MoqReference)
                 .AddMetadataReference(projectId, NSubstituteReference);
 
             int count = 0;
