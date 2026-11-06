@@ -5,15 +5,13 @@ using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+using NSubstitute;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 {
     [TestClass]
     public class NoAbbreviationsAnalyzerTests : DiagnosticVerifier
     {
-        private readonly Mock<ISettingsReader> _mockSettingsReader = new();
-
         private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string kind, string abbreviationUsed)
         {
             return new DiagnosticResult
@@ -30,7 +28,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new NoAbbreviationsAnalyzer(_mockSettingsReader.Object);
+            return new NoAbbreviationsAnalyzer(SubstituteSettingsReader);
         }
 
         [TestMethod]
@@ -406,9 +404,9 @@ class TypeName
         [TestMethod]
         public void Diagnostic_If_A_Loop_Variable_Abbreviation_Not_In_The_Allowed_List_Is_Used()
         {
-            _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                    It.IsAny<SyntaxTree>(),
-                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting)))
+            SubstituteSettingsReader.TryGetValue(
+                    Arg.Any<SyntaxTree>(),
+                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting))
                 .Returns("i");
 
             var test = @"
@@ -432,9 +430,9 @@ class TypeName
         [TestMethod]
         public void No_Diagnostic_If_An_Allowed_Loop_Variable_Abbreviation_Is_Used()
         {
-            _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                    It.IsAny<SyntaxTree>(),
-                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting)))
+            SubstituteSettingsReader.TryGetValue(
+                    Arg.Any<SyntaxTree>(),
+                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting))
                 .Returns("i,j");
 
             var test = @"

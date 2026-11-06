@@ -5,29 +5,27 @@ using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+using NSubstitute;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 {
     [TestClass]
     public class ApplicationLogicShouldBeSignpostedAnalyzerTests : DiagnosticVerifier
     {
-        private readonly Mock<ISettingsReader> _mockSettingsReader = new();
-
         private void SetupHandlerSuffix(string handlerSuffix)
         {
-            _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                It.IsAny<SyntaxTree>(),
-                new SettingsKey(ApplicationLogicShouldBeSignpostedAnalyzer.Id, ApplicationLogicShouldBeSignpostedAnalyzer.HandlerSuffixConfigKey)))
+            SubstituteSettingsReader.TryGetValue(
+                Arg.Any<SyntaxTree>(),
+                new SettingsKey(ApplicationLogicShouldBeSignpostedAnalyzer.Id, ApplicationLogicShouldBeSignpostedAnalyzer.HandlerSuffixConfigKey))
             .Returns(handlerSuffix);
         }
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new ApplicationLogicShouldBeSignpostedAnalyzer(_mockSettingsReader.Object);
+            return new ApplicationLogicShouldBeSignpostedAnalyzer(SubstituteSettingsReader);
         }
 
-        private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string handlerName)
+        private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string handlerName)
         {
             return new DiagnosticResult
             {
