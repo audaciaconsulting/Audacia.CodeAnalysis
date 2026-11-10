@@ -21,6 +21,12 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
     internal const int MaximumSettingValue = 100;
     public const int DefaultLogMessageMinimumLength = 10;
 
+    /// <summary>
+    /// The assumed length assigned to any parameter or variable, e.g. in message ""Payment {paymentId} failed", where paymentId is unknown at compile time, does paymentId count as 0 or 1
+    /// Only compile-time constant strings are read; see <see cref="LogMessageRenderer"/>.
+    /// </summary>
+    public const byte NominalParameterLength = 0;
+
     private const string LoggerMessageParameterName = "message";
 
     private const string LoggerMessageTypeName = "Microsoft.Extensions.Logging.LoggerMessage";
@@ -109,7 +115,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        TryAnalyzingILoggerMessage(nodeAnalysisContext, settingsReader, invocation, messageArgument);
+        AnalyzeILoggerMessage(nodeAnalysisContext, settingsReader, invocation, methodSymbol, messageArgument);
     }
 
     /// <summary>
@@ -127,7 +133,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
     }
 
     /// <summary>
-    /// Checks the format string passed to <c>LoggerMessage.Define</c>. The template is measured as written,
+    /// Checks the format string passed to <c>LoggerMessage.Define</c>. Its placeholders are given a nominal length,
     /// as the values are only supplied when the delegate is invoked.
     /// </summary>
     /// <returns><see langword="false"/> if the call isn't to <c>LoggerMessage.Define</c>, so other checks can still run.</returns>
@@ -145,11 +151,10 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        var resolver = new LogMessageValueResolver(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
-
-        if (invocation.TryGetNamedParameterArgument(methodSymbol, LoggerMessageDefineParameterName, out var formatArgument)
-            && resolver.TryResolvingTemplateAsWritten(formatArgument.Expression, out var formatString))
+        if (invocation.TryGetNamedParameterArgument(methodSymbol, LoggerMessageDefineParameterName, out var formatArgument))
         {
+            var renderer = new LogMessageRenderer(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
+            var formatString = renderer.RenderTemplateWithoutValues(formatArgument.Expression);
             ReportIfTooShort(nodeAnalysisContext.ReportDiagnostic, settingsReader, formatString, formatArgument.GetLocation());
         }
 
@@ -158,7 +163,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
 
     /// <summary>
     /// Checks the message of a source-generated <c>[LoggerMessage]</c> method. Attribute arguments are always
-    /// compile-time constants, so the message template is measured as written. Attributes without a message are skipped.
+    /// compile-time constants, but the values aren't, so its placeholders are given a nominal length. Attributes without a message are skipped.
     /// </summary>
     private static void AnalyzeLoggerMessageAttribute(
         SymbolAnalysisContext symbolAnalysisContext,
@@ -175,7 +180,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
             }
 
             var location = GetAttributeMessageLocation(attributeSyntax, constructorIndex);
-            ReportIfTooShort(symbolAnalysisContext.ReportDiagnostic, settingsReader, LogMessageAsWrittenRenderer.TemplateAsWritten(message), location);
+            ReportIfTooShort(symbolAnalysisContext.ReportDiagnostic, settingsReader, LogMessageRenderer.TemplateWithNominalParameters(message), location);
         }
     }
 
@@ -242,17 +247,12 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
             || (argument.NameColon == null && argument.NameEquals == null && index == constructorIndex);
     }
 
-    private static void TryAnalyzingILoggerMessage(SyntaxNodeAnalysisContext nodeAnalysisContext, ISettingsReader settingsReader, 
-        InvocationExpressionSyntax invocation, ArgumentSyntax messageArgument)
+    private static void AnalyzeILoggerMessage(SyntaxNodeAnalysisContext nodeAnalysisContext, ISettingsReader settingsReader,
+        InvocationExpressionSyntax invocation, IMethodSymbol methodSymbol, ArgumentSyntax messageArgument)
     {
-        var resolver = new LogMessageValueResolver(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
-
-        if (!resolver.TryResolvingMessage(invocation, messageArgument.Expression, out var messageParameterValue))
-        {
-            return;
-        }
-
-        ReportIfTooShort(nodeAnalysisContext.ReportDiagnostic, settingsReader, messageParameterValue, messageArgument.GetLocation());
+        var renderer = new LogMessageRenderer(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
+        var message = renderer.RenderMessage(invocation, methodSymbol, messageArgument.Expression);
+        ReportIfTooShort(nodeAnalysisContext.ReportDiagnostic, settingsReader, message, messageArgument.GetLocation());
     }
 
     private static void ReportIfTooShort(Action<Diagnostic> reportDiagnostic, ISettingsReader settingsReader, string message, Location location)
