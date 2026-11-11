@@ -1031,6 +1031,36 @@ By default, classes with the suffix of `Handler` are analysed under this rule. T
 dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
 ```
 
+### ACL1029 - Log messages should be long enough to be meaningful
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.4">LOG-01.4</a></td>
+</tr>
+</table>
+
+ACL1029 checks whether log messages are long enough to be meaningful, and produces a warning if not, to encourage adding descriptive wording. Leading and trailing whitespace is not counted.
+
+The rule checks messages passed to `ILogger` methods (e.g. `LogInformation`), the `Message` of `[LoggerMessage]` source-generated logging methods, and the format string passed to `LoggerMessage.Define`.
+
+The minimum length can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default is 10.
+`log_message_minimum_length` must be an integer between 1 and 100.
+
+For `ILogger` templates, string constant argument values are included, e.g. for messages in dedicated files for ease of maintenance/translation.
+Only compile-time constant strings (literals, and `const` fields and locals) are 'read', not `static readonly` fields.
+
+All other arguments (including numeric, boolean and `null` constants) are treated as zero length, e.g. `_logger.LogError("Failed {Id}", id)` is read as `Failed`.
+For `[LoggerMessage]` and `LoggerMessage.Define`, each placeholder is ignored, as values are only known at runtime.
+
+Messages using interpolation, concatenation, join, `string.Format` etc. are treated in the same way: string constants are 'read', but `"Failed: " + ex.Message` is read as `Failed:` (7 characters), and `string.Format("Failed {0}", id)` as `Failed` (6 characters).
+
+If the message/template itself is a variable, but not a string constant, it will also generate a warning.
+
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 
 ### ACL1005 - Asynchronous method name is not suffixed with 'Async'
