@@ -158,7 +158,13 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
             return false;
         }
 
-        if (!TryGettingParamsElements(Unwrap(paramsArgument.Value), out var elements))
+        var paramsValue = Unwrap(paramsArgument.Value);
+        if (paramsValue?.ConstantValue is { HasValue: true, Value: null })
+        {
+            return false;
+        }
+
+        if (!TryGettingParamsElements(paramsValue, out var elements))
         {
             return true; // The values are passed as an array variable, so each placeholder is given the nominal length.
         }
