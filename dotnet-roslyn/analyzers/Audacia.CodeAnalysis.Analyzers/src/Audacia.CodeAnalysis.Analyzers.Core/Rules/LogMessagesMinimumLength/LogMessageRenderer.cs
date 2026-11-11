@@ -158,7 +158,13 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
             return false;
         }
 
-        if (!TryGettingParamsElements(Unwrap(paramsArgument.Value), out var elements))
+        var paramsValue = Unwrap(paramsArgument.Value);
+        if (paramsValue?.ConstantValue is { HasValue: true, Value: null })
+        {
+            return false;
+        }
+
+        if (!TryGettingParamsElements(paramsValue, out var elements))
         {
             return true; // The values are passed as an array variable, so each placeholder is given the nominal length.
         }
@@ -378,15 +384,27 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
         // The values aren't known if they're passed as an array variable, so each format item is given the nominal value.
         var values = TryGettingInlineValues(arguments.Skip(formatIndex + 1), out var inlineValues) ? inlineValues : [];
 
-        rendered = RenderTemplate(format, (_, name, formatSuffix) => Align(RenderFormatValue(name, values), formatSuffix));
+        var renderedValues = new Dictionary<int, string>();
+        rendered = RenderTemplate(format, (_, name, formatSuffix) =>
+            Align(RenderFormatValue(name, values, renderedValues), formatSuffix));
         return true;
     }
 
-    private string RenderFormatValue(string indexText, List<IOperation> values)
+    private string RenderFormatValue(string indexText, List<IOperation> values, Dictionary<int, string> renderedValues)
     {
-        return int.TryParse(indexText.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out var index) && index < values.Count
-            ? Render(values[index])
-            : Nominal;
+        if (!int.TryParse(indexText.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out var index)
+            || index >= values.Count)
+        {
+            return Nominal;
+        }
+
+        if (!renderedValues.TryGetValue(index, out var value))
+        {
+            value = Render(values[index]);
+            renderedValues.Add(index, value);
+        }
+
+        return value;
     }
 
     /// <summary>
