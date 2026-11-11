@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount;
@@ -16,6 +17,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Base
@@ -75,7 +77,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference FluentAssertionsAssertionScopeReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Execution.AssertionScope).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsAssertionExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.AssertionExtensions).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsStringExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Primitives.StringAssertions).Assembly.Location);
-        private static readonly MetadataReference MoqReference = MetadataReference.CreateFromFile(typeof(Moq.Mock).Assembly.Location);
         private static readonly MetadataReference NSubstituteReference = MetadataReference.CreateFromFile(typeof(NSubstitute.Substitute).Assembly.Location);
 
         internal static readonly CompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(
@@ -86,6 +87,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         internal static string CSharpDefaultFileExt = "cs";
         internal static string VisualBasicDefaultExt = "vb";
         internal static string TestProjectName = "TestProject";
+
+        /// <summary>
+        /// Settings reader substitute for analyzers that read settings.
+        /// </summary>
+        /// <remarks>
+        /// <para>Declared in the base so that all settings are defaulted to null (not configured) by the constructor running <see cref="DefaultToNoSettings"/>.</para>
+        /// <para>Otherwise, NSubstitute default everything to an empty string, which gives different results and can lead to unexpected behavior in tests.</para>
+        /// </remarks>
+        protected ISettingsReader SubstituteSettingsReader { get; } = Substitute.For<ISettingsReader>();
+
+        protected DiagnosticVerifier()
+        {
+            DefaultToNoSettings(SubstituteSettingsReader);
+        }
 
         #region To be implemented by Test classes
         /// <summary>
@@ -429,6 +444,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         #endregion
 
         #region Set up compilation and documents
+
+        /// <summary>
+        /// Default all settings to null (not configured), otherwise the substitute uses an empty string, which causes false positives.
+        /// </summary>
+        /// <param name="settingsReader">Settings reader substitute</param>
+        private static void DefaultToNoSettings(ISettingsReader settingsReader)
+        {
+            settingsReader.TryGetValue(
+                    Arg.Any<SyntaxTree>(),
+                    Arg.Any<SettingsKey>())
+                .Returns((string)null);
+        }
+
         /// <summary>
         /// Given an array of strings as sources and a language, turn them into a project and return the documents and spans of it.
         /// </summary>
@@ -520,7 +548,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddMetadataReference(projectId, FluentAssertionsAssertionScopeReference)
                 .AddMetadataReference(projectId, FluentAssertionsAssertionExtensionsReference)
                 .AddMetadataReference(projectId, FluentAssertionsStringExtensionsReference)
-                .AddMetadataReference(projectId, MoqReference)
                 .AddMetadataReference(projectId, NSubstituteReference);
 
             int count = 0;
@@ -533,6 +560,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
             }
             return solution.GetProject(projectId);
         }
+
         #endregion
     }
 }
