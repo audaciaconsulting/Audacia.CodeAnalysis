@@ -1044,25 +1044,22 @@ dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
 </tr>
 </table>
 
-ACL1029 checks whether log messages are long enough to be meaningful, and will produce a warning if not. Leading and trailing whitespace is not counted.
+ACL1029 checks whether log messages are long enough to be meaningful, and produces a warning if not, to encourage adding descriptive wording. Leading and trailing whitespace is not counted.
 
 The rule checks messages passed to `ILogger` methods (e.g. `LogInformation`), the `Message` of `[LoggerMessage]` source-generated logging methods, and the format string passed to `LoggerMessage.Define`.
 
-For `[LoggerMessage]` and `LoggerMessage.Define`, the message template is measured as written (including any `{Placeholder}` names), as the values are only known at runtime.
+The minimum length can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default is 10.
+`log_message_minimum_length` must be an integer between 1 and 100.
 
-For `ILogger` templates, argument values are used if all are known at compile time (and have no format specifiers), otherwise the message is measured as written, e.g. `_logger.LogError("Failed {Id}", id)` 
-is treated as `Failed {Id}` (11 characters).
+For `ILogger` templates, string constant argument values are included, e.g. for messages in dedicated files for ease of maintenance/translation.
+Only compile-time constant strings (literals, and `const` fields and locals) are 'read', not `static readonly` fields.
 
-Messages built from strings using interpolation, concatenation, join etc. are treated in the same way; any unknown value is measured as if written as an interpolated string or template placeholder. 
-So `"Failed: " + ex.Message` is treated as `Failed: {ex.Message}`, and `string.Format("Failed {0}", id)` as `Failed {id}`.
+All other arguments (including numeric, boolean and `null` constants) are treated as zero length, e.g. `_logger.LogError("Failed {Id}", id)` is read as `Failed`.
+For `[LoggerMessage]` and `LoggerMessage.Define`, each placeholder is ignored, as values are only known at runtime.
 
-Therefore, if a message made up of variables/arguments gets a warning, adding descriptive wording around the arguments or using more descriptive argument names will usually resolve it.
+Messages using interpolation, concatenation, join, `string.Format` etc. are treated in the same way: string constants are 'read', but `"Failed: " + ex.Message` is read as `Failed:` (7 characters), and `string.Format("Failed {0}", id)` as `Failed` (6 characters).
 
-The minimum length of a log message can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default is 10.
-An exception is thrown if `log_message_minimum_length` is not an integer, less than 1, or greater than 100 (as that would be resource-intensive).
-
-If the message/template itself is stored in a variable, the value is used where it can be determined at compile time. 
-Otherwise, or if a message built from strings has no text that's known at compile time (e.g. `first + second`),  the rule is skipped to avoid false positives.
+If the message/template itself is a variable, but not a string constant, it will also generate a warning.
 
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 

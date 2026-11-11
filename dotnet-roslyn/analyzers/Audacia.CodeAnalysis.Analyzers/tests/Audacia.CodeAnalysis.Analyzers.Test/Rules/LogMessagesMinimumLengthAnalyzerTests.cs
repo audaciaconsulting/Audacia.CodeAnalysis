@@ -209,7 +209,7 @@ class ClassName
     [DataRow("string.Format(\"{0}\", Messages.Long)", "", false)]
     [DataRow("string.Format(format, \"123456789\")", "const string format = \"{0}\";", true)]
     [DataRow("string.Format(format, \"1234567890\")", "const string format = \"{0}\";", false)]
-    [DataRow("Messages.Template, input", "", true)] // "Order {Id}" with a nominal value is "Order "
+    [DataRow("Messages.Template, input", "", true)] // "Order {Id}" with a nominal value is "Order"
     [DataRow("Messages.LongTemplate, input", "", false)]
     public void Constant_Strings_Are_Read(string arguments, string declaration, bool diagnosticExpected)
     {
@@ -279,7 +279,7 @@ class ClassName
 
     /// <summary>
     /// Only constant strings are read, so constants of other types are given the nominal length, e.g. "Order {Id}" with
-    /// a value of 1234567890 is measured as "Order ". Format specifiers have no effect, and null isn't shown as "(null)".
+    /// a value of 1234567890 is measured as "Order". Format specifiers have no effect, and null isn't shown as "(null)".
     /// </summary>
     [TestMethod]
     [DataRow("(string)null")]
