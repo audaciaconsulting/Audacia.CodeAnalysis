@@ -355,6 +355,27 @@ class ClassName
     }
 
     /// <summary>
+    /// A spread in a collection expression can supply any number of values. A spread of an inline array is expanded, but
+    /// any other spread's length isn't known, so the positions after it are given the nominal length, rather than being
+    /// matched to the values that follow it. Concatenated values aren't matched by position, so are still read.
+    /// </summary>
+    [TestMethod]
+    [DataRow("\"{First}{Second}\", [..values, \"1234567890\"]", "var values = new object[] { 1, 2 };", true, "")]
+    [DataRow("\"{First}{Second}\", [\"1234567890\", ..values]", "var values = new object[] { 1, 2 };", false, "1234567890")]
+    [DataRow("\"{First}{Second}\", [..new object[] { \"1234\" }, \"567890\"]", "", false, "1234567890")]
+    [DataRow("\"{First}{Second}\", [..new object[] { \"1234\" }, \"56789\"]", "", true, "123456789")]
+    [DataRow("\"{{1234567}}\", [..values]", "var values = new object[] { 1 };", true, "{1234567}")]
+    [DataRow("string.Format(\"{0}{1}\", [..values, \"1234567890\"])", "var values = new object[] { 1, 2 };", true, "")]
+    [DataRow("string.Format(\"{0}{1}\", [..new object[] { \"1234\" }, \"567890\"])", "", false, "1234567890")]
+    [DataRow("string.Concat([..values, \"123456789\"])", "var values = new string[] { input };", true, "123456789")]
+    [DataRow("string.Concat([..values, \"1234567890\"])", "var values = new string[] { input };", false, "1234567890")]
+    public void Values_After_A_Spread_Of_Unknown_Length_Are_Given_The_Nominal_Length(
+        string arguments, string declaration, bool diagnosticExpected, string expectedRead)
+    {
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
+    }
+
+    /// <summary>
     /// Only constant strings are read, so constants of other types are given the nominal length, e.g. "Order {Id}" with
     /// a value of 1234567890 is measured as "Order". Format specifiers have no effect, and null isn't shown as "(null)".
     /// </summary>

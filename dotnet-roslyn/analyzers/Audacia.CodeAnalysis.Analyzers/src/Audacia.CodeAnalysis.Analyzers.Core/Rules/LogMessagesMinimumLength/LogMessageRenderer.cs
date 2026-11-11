@@ -34,6 +34,12 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
         Enum.TryParse<OperationKind>("CollectionExpression", out var kind) ? kind : null;
 
     /// <summary>
+    /// The operation kind of a spread element (<c>..values</c>) in a collection expression, looked up by name for the same reason.
+    /// </summary>
+    private static readonly OperationKind? SpreadKind =
+        Enum.TryParse<OperationKind>("Spread", out var spreadKind) ? spreadKind : null;
+
+    /// <summary>
     /// Renders the message passed to an <c>ILogger</c> method, substituting its template values.
     /// </summary>
     public string RenderMessage(InvocationExpressionSyntax invocation, IMethodSymbol method, ExpressionSyntax message)
@@ -169,8 +175,8 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
             return true; // The values are passed as an array variable, so each placeholder is given the nominal length.
         }
 
-        values.AddRange(elements.Select(element => GetConstantString(Unwrap(element)?.ConstantValue ?? default)));
-        return values.Count > 0;
+        values.AddRange(KnownPositions(elements).Select(element => GetConstantString(Unwrap(element)?.ConstantValue ?? default)));
+        return elements.Count > 0; // A spread whose length isn't known may supply values, so the template is formatted.
     }
 
     /// <summary>
@@ -382,7 +388,7 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
         }
 
         // The values aren't known if they're passed as an array variable, so each format item is given the nominal value.
-        var values = TryGettingInlineValues(arguments.Skip(formatIndex + 1), out var inlineValues) ? inlineValues : [];
+        var values = TryGettingInlineValues(arguments.Skip(formatIndex + 1), out var inlineValues, positional: true) ? inlineValues : [];
 
         var renderedValues = new Dictionary<int, string>();
         rendered = RenderTemplate(format, (_, name, formatSuffix) =>
@@ -411,7 +417,12 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
     /// Gets argument values in parameter order, expanding params arguments written inline (an array or collection expression).
     /// Fails if a params argument is passed as a variable, as the number of values isn't known.
     /// </summary>
-    private static bool TryGettingInlineValues(IEnumerable<IArgumentOperation> arguments, out List<IOperation> values)
+    /// <param name="positional">
+    /// Whether the values are matched by position (as in <c>string.Format</c>), so none are given after a spread whose length
+    /// isn't known. Otherwise, such a spread is kept as a single value, which is rendered as the nominal value.
+    /// </param>
+    private static bool TryGettingInlineValues(
+        IEnumerable<IArgumentOperation> arguments, out List<IOperation> values, bool positional = false)
     {
         values = [];
 
@@ -426,9 +437,9 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
             {
                 values.Add(argument.Value);
             }
-            else if (TryGettingParamsElements(argument.Value, out var elements))
+            else if (TryGettingParamsElements(Unwrap(argument.Value), out var elements)) // A collection expression is converted, e.g. to a span.
             {
-                values.AddRange(elements);
+                values.AddRange(positional ? KnownPositions(elements) : elements);
             }
             else
             {
@@ -442,24 +453,51 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
     /// <summary>
     /// Gets the elements passed to a params parameter, whether as an inline array or as a params collection.
     /// </summary>
-    private static bool TryGettingParamsElements(IOperation value, out IEnumerable<IOperation> elements)
+    private static bool TryGettingParamsElements(IOperation value, out List<IOperation> elements)
     {
-        elements = null;
+        elements = [];
+        return TryAddingParamsElements(value, elements);
+    }
 
+    private static bool TryAddingParamsElements(IOperation value, List<IOperation> elements)
+    {
         if (value is IArrayCreationOperation { Initializer: not null } array)
         {
-            elements = array.Initializer.ElementValues;
+            elements.AddRange(array.Initializer.ElementValues);
             return true;
         }
 
-        if (CollectionExpressionKind.HasValue && value?.Kind == CollectionExpressionKind.Value)
+        if (IsKind(value, CollectionExpressionKind))
         {
-            // A collection expression's child operations are its elements; spread elements are given the nominal length.
-            elements = value.ChildOperations;
+            // A collection expression's child operations are its elements. A spread of an inline array or collection is
+            // expanded; any other spread's length isn't known, so it's kept as is (see KnownPositions).
+            foreach (var element in value.ChildOperations)
+            {
+                if (!IsKind(element, SpreadKind)
+                    || !TryAddingParamsElements(Unwrap(element.ChildOperations.FirstOrDefault()), elements))
+                {
+                    elements.Add(element);
+                }
+            }
+
             return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Gets the elements whose position is known: those before any spread whose length isn't known, as it can supply
+    /// any number of values, so the positions after it are left unresolved (and given the nominal length).
+    /// </summary>
+    private static IEnumerable<IOperation> KnownPositions(IEnumerable<IOperation> elements)
+    {
+        return elements.TakeWhile(element => !IsKind(element, SpreadKind));
+    }
+
+    private static bool IsKind(IOperation operation, OperationKind? kind)
+    {
+        return kind.HasValue && operation?.Kind == kind.Value;
     }
 
     /// <summary>
