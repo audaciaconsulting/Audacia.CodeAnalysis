@@ -21,8 +21,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 internal sealed class LogMessageRenderer(SemanticModel semanticModel, CancellationToken cancellationToken)
 {
     /// <summary>
-    /// Stands in for a value that isn't a constant string. It isn't whitespace, so it still counts when at either end of a
-    /// trimmed message, and it isn't a brace, so it can't be mistaken for part of a template placeholder.
+    /// Stands in for a value that isn't a constant string. It isn't whitespace (so it avoids being trimmed) or a brace
+    /// (so it can't be mistaken for part of a placeholder). If NominalParameterLength is zero, it is empty.
     /// </summary>
     private static readonly string Nominal = new('_', LogMessagesMinimumLengthAnalyzer.NominalParameterLength);
 
@@ -68,10 +68,11 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
 
     /// <summary>
     /// Renders a message template or format string as it's formatted: escaped braces become a single brace, and each
-    /// placeholder is replaced by <paramref name="renderPlaceholder"/>, given the placeholder's position, its name (or index),
-    /// and its alignment and/or format specifier (e.g. <c>",10:N2"</c>, or empty). An unmatched <c>{</c> or <c>}</c> is
-    /// measured as written.
+    /// placeholder is replaced by <paramref name="renderPlaceholder"/>, (e.g. <c>",10:N2"</c>, or empty).
     /// </summary>
+    /// <remarks>
+    /// <para> An unmatched <c>{</c> or <c>}</c> is measured as written.</para>
+    /// </remarks>
     private static string RenderTemplate(string template, Func<int, string, string, string> renderPlaceholder)
     {
         var result = new StringBuilder(template.Length);
@@ -98,6 +99,7 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
 
             var placeholder = template.Substring(index + 1, end - index - 1);
             var suffixStart = placeholder.IndexOfAny([',', ':']);
+
             result.Append(renderPlaceholder(
                 position++,
                 suffixStart < 0 ? placeholder : placeholder.Substring(0, suffixStart),
@@ -125,8 +127,8 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
         var paramsIndex = parameters.Length - 1;
         var arguments = invocation.ArgumentList.Arguments;
 
-        // Named arguments, or the params array passed itself, can't be matched by position, so are left to the operation.
-        // The converted type is used because a collection expression has no natural type, only the array type it converts to.
+        // Named arguments (or the params array passed itself) can't be matched by position, so are left to the operation.
+        // The converted type is used because a collection expression has no natural type.
         if (arguments.Any(argument => argument.NameColon != null)
             || (arguments.Count == paramsIndex + 1
                 && semanticModel.GetTypeInfo(arguments[paramsIndex].Expression, cancellationToken).ConvertedType is IArrayTypeSymbol))
@@ -356,10 +358,11 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
     /// <summary>
     /// Renders a <c>string.Format</c> call with a constant format string by replacing each format item with its argument,
     /// so <c>string.Format("Failed {0}", id)</c> is rendered as <c>Failed </c> plus the nominal value.
-    /// Any format item that can't be matched to an argument is given the nominal value, as with a message template's placeholders,
-    /// so the format string's text is always measured. This includes arguments passed as an array variable, and an index that's
-    /// out of range or isn't a number.
     /// </summary>
+    /// <remarks>
+    /// <para>Any format item that can't be matched to an argument is given the nominal value, as with a message template's placeholders.</para>
+    /// <para>This includes arguments passed as an array variable, and an index that's out of range or isn't a number.</para>
+    /// </remarks>
     private bool TryRenderingFormat(IInvocationOperation call, out string rendered)
     {
         rendered = null;
@@ -461,10 +464,12 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
     }
 
     /// <summary>
-    /// Pads a value to an alignment's width, on the left if positive or the right if negative. The padding is capped at
-    /// <see cref="LogMessagesMinimumLengthAnalyzer.MaximumSettingValue"/> so it can't allocate excessive padding; this doesn't
-    /// change whether a message is long enough, as padding at either end is trimmed either way.
+    /// Pads a value to an alignment's width, on the left if positive or the right if negative.
     /// </summary>
+    /// <remarks>
+    /// <para>The padding is capped at <see cref="LogMessagesMinimumLengthAnalyzer.MaximumSettingValue"/> so it can't allocate excessive padding 
+    /// (padding at either end is trimmed either way).</para>
+    /// </remarks>
     private static string Align(string value, int alignment)
     {
         var width = (int)Math.Min(Math.Abs((long)alignment), LogMessagesMinimumLengthAnalyzer.MaximumSettingValue + (long)value.Length);

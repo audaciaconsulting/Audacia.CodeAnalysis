@@ -23,9 +23,12 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
     public const int DefaultLogMessageMinimumLength = 10;
 
     /// <summary>
-    /// The assumed length assigned to any parameter or variable, e.g. in message ""Payment {paymentId} failed", where paymentId is unknown at compile time, does paymentId count as 0 or 1
-    /// Only compile-time constant strings are read; see <see cref="LogMessageRenderer"/>.
+    /// The assumed length assigned to any 'unread' parameter or variable, e.g. in message ""Payment {paymentId} failed"
+    /// , where paymentId is unknown at compile time, does paymentId count as 0 or 1?
     /// </summary>
+    /// <remarks>
+    /// <para>Only compile-time constant strings are 'read'; see <see cref="LogMessageRenderer"/>.</para>
+    /// </remarks>
     public const byte NominalParameterLength = 0;
 
     private const string LoggerMessageParameterName = "message";
