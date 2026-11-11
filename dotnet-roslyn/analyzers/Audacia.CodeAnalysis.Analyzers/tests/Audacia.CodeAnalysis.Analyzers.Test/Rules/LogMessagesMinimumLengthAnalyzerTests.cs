@@ -513,6 +513,8 @@ class ClassName
     [DataRow("\"{Second}{First}\", \"12345\", \"67890\"", false, "1234567890")]
     [DataRow("\"Got {Id}\", new object[] { \"12345\" }", true, "Got 12345")]
     [DataRow("\"Got {Id}\", new object[] { \"123456\" }", false, "Got 123456")]
+    [DataRow("\"Got {Id}\", [\"12345\"]", true, "Got 12345")]
+    [DataRow("\"Got {Id}\", [\"123456\"]", false, "Got 123456")]
     [DataRow("\"Got {Id}\", \"\"", true, "Got")]
     [DataRow("\"{Id,-9}\", \"1\"", true, "1")]
     [DataRow("\"{Id,-10}\", \"1\"", true, "1")]

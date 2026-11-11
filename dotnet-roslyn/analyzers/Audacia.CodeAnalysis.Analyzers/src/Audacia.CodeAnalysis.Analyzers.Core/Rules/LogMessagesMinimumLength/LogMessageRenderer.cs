@@ -126,9 +126,10 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
         var arguments = invocation.ArgumentList.Arguments;
 
         // Named arguments, or the params array passed itself, can't be matched by position, so are left to the operation.
+        // The converted type is used because a collection expression has no natural type, only the array type it converts to.
         if (arguments.Any(argument => argument.NameColon != null)
             || (arguments.Count == paramsIndex + 1
-                && semanticModel.GetTypeInfo(arguments[paramsIndex].Expression, cancellationToken).Type is IArrayTypeSymbol))
+                && semanticModel.GetTypeInfo(arguments[paramsIndex].Expression, cancellationToken).ConvertedType is IArrayTypeSymbol))
         {
             return TryGettingTemplateValuesFromOperation(invocation, values);
         }
@@ -155,7 +156,7 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
             return false;
         }
 
-        if (!TryGettingParamsElements(paramsArgument.Value, out var elements))
+        if (!TryGettingParamsElements(Unwrap(paramsArgument.Value), out var elements))
         {
             return true; // The values are passed as an array variable, so each placeholder is given the nominal length.
         }
