@@ -13,6 +13,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
 {
     private readonly ISettingsReader _settingsReader;
+    private readonly Action<string, Location> _onMessageRead;
 
     public const string Id = DiagnosticId.LogMessageMinimumLength;
 
@@ -64,6 +65,18 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
         _settingsReader = settingsReader;
     }
 
+    /// <summary>
+    /// For unit tests: <paramref name="onMessageRead"/> is given each message exactly as it's measured (i.e. rendered and
+    /// trimmed), whether or not it's too short, so tests can check the message was read as expected.
+    /// </summary>
+    /// <param name="settingsReader">The settings to use, or <see langword="null"/> to read them from <c>.editorconfig</c>.</param>
+    /// <param name="onMessageRead">Called with each message as it's measured, and the location a diagnostic would be reported at. It may be called concurrently.</param>
+    public LogMessagesMinimumLengthAnalyzer(ISettingsReader settingsReader, Action<string, Location> onMessageRead)
+        : this(settingsReader)
+    {
+        _onMessageRead = onMessageRead;
+    }
+
     public override void Initialize(AnalysisContext context)
     {
         context.EnableConcurrentExecution();
@@ -92,7 +105,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void AnalyzeInvocation(
+    private void AnalyzeInvocation(
         SyntaxNodeAnalysisContext nodeAnalysisContext,
         ISettingsReader settingsReader,
         INamedTypeSymbol loggerMessageType)
@@ -137,7 +150,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
     /// as the values are only supplied when the delegate is invoked.
     /// </summary>
     /// <returns><see langword="false"/> if the call isn't to <c>LoggerMessage.Define</c>, so other checks can still run.</returns>
-    private static bool TryAnalyzingLoggerMessageDefine(
+    private bool TryAnalyzingLoggerMessageDefine(
         SyntaxNodeAnalysisContext nodeAnalysisContext,
         ISettingsReader settingsReader,
         INamedTypeSymbol loggerMessageType)
@@ -165,7 +178,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
     /// Checks the message of a source-generated <c>[LoggerMessage]</c> method. Attribute arguments are always
     /// compile-time constants, but the values aren't, so its placeholders are given a nominal length. Attributes without a message are skipped.
     /// </summary>
-    private static void AnalyzeLoggerMessageAttribute(
+    private void AnalyzeLoggerMessageAttribute(
         SymbolAnalysisContext symbolAnalysisContext,
         ISettingsReader settingsReader,
         INamedTypeSymbol loggerMessageAttributeType)
@@ -247,7 +260,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
             || (argument.NameColon == null && argument.NameEquals == null && index == constructorIndex);
     }
 
-    private static void AnalyzeILoggerMessage(SyntaxNodeAnalysisContext nodeAnalysisContext, ISettingsReader settingsReader,
+    private void AnalyzeILoggerMessage(SyntaxNodeAnalysisContext nodeAnalysisContext, ISettingsReader settingsReader,
         InvocationExpressionSyntax invocation, IMethodSymbol methodSymbol, ArgumentSyntax messageArgument)
     {
         var renderer = new LogMessageRenderer(nodeAnalysisContext.SemanticModel, nodeAnalysisContext.CancellationToken);
@@ -255,13 +268,16 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
         ReportIfTooShort(nodeAnalysisContext.ReportDiagnostic, settingsReader, message, messageArgument.GetLocation());
     }
 
-    private static void ReportIfTooShort(Action<Diagnostic> reportDiagnostic, ISettingsReader settingsReader, string message, Location location)
+    private void ReportIfTooShort(Action<Diagnostic> reportDiagnostic, ISettingsReader settingsReader, string message, Location location)
     {
         // Settings are read per syntax tree, as .editorconfig sections can apply different values to different files
         var minimumLength = GetMinimumLengthFromSettings(settingsReader, location.SourceTree)
             ?? DefaultLogMessageMinimumLength;
 
-        if (message.Trim().Length < minimumLength)
+        string trimmedMessage = message?.Trim() ?? string.Empty;
+        _onMessageRead?.Invoke(trimmedMessage, location); // for unit tests to check the message was read as expected; ignored in production
+
+        if (trimmedMessage.Length < minimumLength)
         {
             reportDiagnostic(Diagnostic.Create(Rule, location, minimumLength));
         }

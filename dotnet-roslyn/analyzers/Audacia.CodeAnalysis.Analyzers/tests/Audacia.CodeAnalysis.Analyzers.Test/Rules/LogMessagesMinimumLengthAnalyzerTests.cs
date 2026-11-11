@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Concurrent;
+using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
@@ -12,10 +13,32 @@ using NSubstitute;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 
+/// <summary>
+/// Most tests give whether a diagnostic is expected, and the message the analyzer is expected to read, i.e. the message as
+/// it's measured (rendered and trimmed). The test checks both, so a test can't pass or fail for the wrong reason (e.g. a
+/// message of the right length, but read differently than intended). A diagnostic should be expected if, and only if, the
+/// message is shorter than the minimum length, which is also checked, so the test data can't contradict itself.
+/// </summary>
 [TestClass]
 public class LogMessagesMinimumLengthAnalyzerTests : CodeFixVerifier
 {
+    private const int DefaultMinLength = LogMessagesMinimumLengthAnalyzer.DefaultLogMessageMinimumLength;
+
+    private const string TenSpaces = "          ";
+
+    /// <summary>
+    /// Alignment padding is capped at <see cref="LogMessagesMinimumLengthAnalyzer.MaximumSettingValue"/> (100) characters.
+    /// </summary>
+    private const string CappedPadding =
+        TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces;
+
     private ISettingsReader _settingsReader;
+
+    /// <summary>
+    /// The messages read by the most recently created analyzer, by location. The test base runs the analyzer more than once
+    /// on the same compilation, so a message read again at the same location is only recorded once.
+    /// </summary>
+    private ConcurrentDictionary<Location, string> _messagesRead = new();
 
     private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, int minLength)
     {
@@ -33,9 +56,14 @@ public class LogMessagesMinimumLengthAnalyzerTests : CodeFixVerifier
 
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        return _settingsReader == null
-            ? new LogMessagesMinimumLengthAnalyzer()
-            : new LogMessagesMinimumLengthAnalyzer(_settingsReader);
+        var messagesRead = new ConcurrentDictionary<Location, string>();
+        _messagesRead = messagesRead;
+
+        return new LogMessagesMinimumLengthAnalyzer(_settingsReader, (message, location) =>
+        {
+            var recorded = messagesRead.GetOrAdd(location, message);
+            Assert.AreEqual(recorded, message, "The same message was read differently when the analyzer ran again.");
+        });
     }
 
     [TestMethod]
@@ -51,6 +79,7 @@ class ClassName
 }";
 
         VerifyNoDiagnostic(test);
+        AssertMessagesRead();
     }
 
     [TestMethod]
@@ -70,6 +99,7 @@ class ClassName
 }";
 
         VerifyNoDiagnostic(test);
+        AssertMessagesRead();
     }
 
     [TestMethod]
@@ -83,7 +113,7 @@ class ClassName
     static void Main(string[] args)
     {
     }
-    
+
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
@@ -92,6 +122,7 @@ class ClassName
     }
 }";
         VerifyNoDiagnostic(testCode);
+        AssertMessagesRead("1234567890");
     }
 
     [TestMethod]
@@ -105,7 +136,7 @@ class ClassName
     static void Main(string[] args)
     {
     }
-    
+
     private void Method()
     {
         var logger = (new LoggerFactory()).CreateLogger<ClassName>();
@@ -115,37 +146,38 @@ class ClassName
 }";
         var expected = BuildExpectedResult(14, 31, 10);
         VerifyDiagnostic(testCode, expected);
+        AssertMessagesRead("123456789");
     }
 
     [TestMethod]
-    [DataRow("string.Format(\"{0}\", \"123456789\")", true)]
-    [DataRow("string.Format(\"{0}{1}\", \"1234\", \"56789\")", true)]
-    [DataRow("string.Format(\"{0}{1}{2}\", \"123\", \"456\", \"789\")", true)]
-    [DataRow("string.Format(\"{0}{1}{2}{3}\", \"12\", \"34\", \"56\", \"789\")", true)]
-    [DataRow("string.Format(\"{0}{1}{2}{3}\", \"12\", \"34\", \"56\", \"7890\")", false)]
-    [DataRow("string.Format(arg1: \"\", format: \"{0}{0}{1}\", arg0: \"12345\")", false)]
-    [DataRow("string.Format(\"{0}{1}\", new object[] { \"1234\", \"56789\" })", true)]
-    public void String_Format_Uses_Constant_String_Arguments(string expression, bool diagnosticExpected)
+    [DataRow("string.Format(\"{0}\", \"123456789\")", true, "123456789")]
+    [DataRow("string.Format(\"{0}{1}\", \"1234\", \"56789\")", true, "123456789")]
+    [DataRow("string.Format(\"{0}{1}{2}\", \"123\", \"456\", \"789\")", true, "123456789")]
+    [DataRow("string.Format(\"{0}{1}{2}{3}\", \"12\", \"34\", \"56\", \"789\")", true, "123456789")]
+    [DataRow("string.Format(\"{0}{1}{2}{3}\", \"12\", \"34\", \"56\", \"7890\")", false, "1234567890")]
+    [DataRow("string.Format(arg1: \"\", format: \"{0}{0}{1}\", arg0: \"12345\")", false, "1234512345")]
+    [DataRow("string.Format(\"{0}{1}\", new object[] { \"1234\", \"56789\" })", true, "123456789")]
+    public void String_Format_Uses_Constant_String_Arguments(string expression, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(expression, diagnosticExpected);
+        VerifyMessage(expression, diagnosticExpected, expectedRead);
     }
 
     [TestMethod]
-    [DataRow("20", "1234567890123456789", true)]
-    [DataRow("20", "12345678901234567890", false)]
-    [DataRow("20", "123456789012345678901", false)]
-    [DataRow("5", "1234", true)]
-    [DataRow("5", "12345", false)]
-    [DataRow("5", "123456", false)]
-    [DataRow("1", "", true)]
-    [DataRow("1", "1", false)]
-    [DataRow("100", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
-    [DataRow("100", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false)]
-    public void Configured_Minimum_Length_Is_Used(string setting, string message, bool diagnosticExpected)
+    [DataRow("20", true, "1234567890123456789")] // 19 characters, below the overridden minimum of 20
+    [DataRow("20", false, "12345678901234567890")]
+    [DataRow("20", false, "123456789012345678901")]
+    [DataRow("5", true, "1234")]
+    [DataRow("5", false, "12345")]
+    [DataRow("5", false, "123456")]
+    [DataRow("1", true, "")]
+    [DataRow("1", false, "1")]
+    [DataRow("100", true, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+    [DataRow("100", false, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+    public void Configured_Minimum_Length_Is_Used(string setting, bool diagnosticExpected, string message)
     {
         ConfigureMinimumLength(setting);
 
-        VerifyMessage($"\"{message}\"", diagnosticExpected, minLength: int.Parse(setting));
+        VerifyMessage($"\"{message}\"", diagnosticExpected, expectedRead: message, minLength: int.Parse(setting));
     }
 
     [TestMethod]
@@ -189,92 +221,137 @@ class ClassName
     /// <c>Messages</c> is a class of constants in the test code, like a centralised set of messages (e.g. for translation).
     /// </summary>
     [TestMethod]
-    [DataRow("Messages.Short", "", true)]
-    [DataRow("Messages.Long", "", false)]
-    [DataRow("value", "const string value = \"123456789\";", true)]
-    [DataRow("value", "const string value = \"1234567890\";", false)]
-    [DataRow("\n    value", "const string value =\n    \"1234567890\";", false)]
-    [DataRow("\r\n\tvalue", "const string value =\r\n\t\"1234567890\";", false)]
-    [DataRow("$\"{Messages.Short}\"", "", true)]
-    [DataRow("$\"{Messages.Long}\"", "", false)]
-    [DataRow("$\"12345678{value}\"", "const string value = \"1\";", true)]
-    [DataRow("$\"123456789{value}\"", "const string value = \"1\";", false)]
-    [DataRow("\"{Value}\", Messages.Short", "", true)]
-    [DataRow("\"{Value}\", Messages.Long", "", false)]
-    [DataRow("value + \"6789\"", "const string value = \"12345\";", true)]
-    [DataRow("value + \"67890\"", "const string value = \"12345\";", false)]
-    [DataRow("string.Concat(Messages.Short, \"\")", "", true)]
-    [DataRow("string.Concat(Messages.Short, \"0\")", "", false)]
-    [DataRow("string.Format(\"{0}\", Messages.Short)", "", true)]
-    [DataRow("string.Format(\"{0}\", Messages.Long)", "", false)]
-    [DataRow("string.Format(format, \"123456789\")", "const string format = \"{0}\";", true)]
-    [DataRow("string.Format(format, \"1234567890\")", "const string format = \"{0}\";", false)]
-    [DataRow("Messages.Template, input", "", true)] // "Order {Id}" with a nominal value is "Order"
-    [DataRow("Messages.LongTemplate, input", "", false)]
-    public void Constant_Strings_Are_Read(string arguments, string declaration, bool diagnosticExpected)
+    [DataRow("Messages.Short", "", true, "123456789")]
+    [DataRow("Messages.Long", "", false, "1234567890")]
+    [DataRow("value", "const string value = \"123456789\";", true, "123456789")]
+    [DataRow("value", "const string value = \"1234567890\";", false, "1234567890")]
+    [DataRow("\n    value", "const string value =\n    \"1234567890\";", false, "1234567890")]
+    [DataRow("\r\n\tvalue", "const string value =\r\n\t\"1234567890\";", false, "1234567890")]
+    [DataRow("$\"{Messages.Short}\"", "", true, "123456789")]
+    [DataRow("$\"{Messages.Long}\"", "", false, "1234567890")]
+    [DataRow("$\"12345678{value}\"", "const string value = \"1\";", true, "123456781")]
+    [DataRow("$\"123456789{value}\"", "const string value = \"1\";", false, "1234567891")]
+    [DataRow("\"{Value}\", Messages.Short", "", true, "123456789")]
+    [DataRow("\"{Value}\", Messages.Long", "", false, "1234567890")]
+    [DataRow("value + \"6789\"", "const string value = \"12345\";", true, "123456789")]
+    [DataRow("value + \"67890\"", "const string value = \"12345\";", false, "1234567890")]
+    [DataRow("string.Concat(Messages.Short, \"\")", "", true, "123456789")]
+    [DataRow("string.Concat(Messages.Short, \"0\")", "", false, "1234567890")]
+    [DataRow("string.Format(\"{0}\", Messages.Short)", "", true, "123456789")]
+    [DataRow("string.Format(\"{0}\", Messages.Long)", "", false, "1234567890")]
+    [DataRow("string.Format(format, \"123456789\")", "const string format = \"{0}\";", true, "123456789")]
+    [DataRow("string.Format(format, \"1234567890\")", "const string format = \"{0}\";", false, "1234567890")]
+    [DataRow("Messages.Template, input", "", true, "Order")] // "Order {Id}" with a nominal value
+    [DataRow("Messages.LongTemplate, input", "", false, "Order processed")] // "Order processed {Id}" with a nominal value
+    public void Constant_Strings_Are_Read(string arguments, string declaration, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected, declaration);
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
     }
 
     /// <summary>
     /// Anything that isn't a compile-time constant string is given the nominal length of zero
-    /// (<see cref="LogMessagesMinimumLengthAnalyzer.NominalParameterLength"/>), whether it's the whole message or only
-    /// part of it, as the length of its name or source text says nothing about the length of the value that will be logged.
+    /// (<see cref="LogMessagesMinimumLengthAnalyzer.NominalParameterLength"/>), as the length of its name or source text says
+    /// nothing about the length of the value that will be logged. The tests below cover this for the whole message, and for
+    /// each way a value can be only part of it.
     /// </summary>
     [TestMethod]
-    // The whole message
-    [DataRow("input", "", true)]
-    [DataRow("input.Trim()", "", true)]
-    [DataRow("value", "var value = \"1234567890\";", true)]
-    // Interpolated strings
-    [DataRow("$\"{input}\"", "", true)]
-    [DataRow("$\"123456789{input}\"", "", true)]
-    [DataRow("$\"1234567890{input}\"", "", false)]
-    [DataRow("$\"123456789{input:N}\"", "", true)]
-    [DataRow("$\"{value}\"", "var value = \"1234567890\";", true)]
-    // Concatenation
-    [DataRow("\"123456789\" + input", "", true)]
-    [DataRow("\"1234567890\" + input", "", false)]
-    [DataRow("input + \"123456789\"", "", true)]
-    [DataRow("input + \"1234567890\"", "", false)]
-    [DataRow("input + input", "", true)]
-    [DataRow("\"12345\" + value", "var value = \"67890\";", true)]
-    // string.Concat, string.Join and string.Format
-    [DataRow("string.Concat(\"123456789\", input)", "", true)]
-    [DataRow("string.Concat(\"1234567890\", input)", "", false)]
-    [DataRow("string.Join(\", \", \"12345678\", input)", "", true)]
-    [DataRow("string.Join(\", \", \"123456789\", input)", "", false)]
-    [DataRow("string.Join(\", \", values)", "var values = new[] { \"1234567890\" };", true)]
-    [DataRow("string.Format(\"123456789{0}\", input)", "", true)]
-    [DataRow("string.Format(\"1234567890{0}\", input)", "", false)]
-    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"123456789{0}\", input)", "", true)]
-    [DataRow("string.Format(format, \"1234567890\")", "var format = \"{0}\";", true)]
-    // Format items that can't be matched to an argument are given the nominal length, but the format string is still read
-    [DataRow("string.Format(\"{1}\", \"1234567890\")", "", true)]
-    [DataRow("string.Format(\"123456789{1}\", \"1234567890\")", "", true)]
-    [DataRow("string.Format(\"1234567890{1}\", input)", "", false)]
-    [DataRow("string.Format(\"Order processing failed: {1}\", input)", "", false)]
-    [DataRow("string.Format(\"123456789{x}\", input)", "", true)]
-    [DataRow("string.Format(\"1234567890{x}\", input)", "", false)]
-    [DataRow("string.Format(\"1{x,8}1\", input)", "", false)]
-    [DataRow("string.Format(\"12345678{\", input)", "", true)] // An unmatched brace is measured as written
-    [DataRow("string.Format(\"123456789{\", input)", "", false)]
-    [DataRow("string.Format(\"123456789{0}\", values)", "var values = new object[] { \"1234567890\" };", true)]
-    [DataRow("string.Format(\"1234567890{0}\", values)", "var values = new object[] { input };", false)]
-    [DataRow("string.Format(\"Order processing failed: {0}\", values)", "var values = new object[] { input };", false)]
-    [DataRow("string.Format(\"123456789{1}\", values)", "var values = new object[] { input };", true)]
-    [DataRow("string.Format(\"1{0,8}1\", values)", "var values = new object[] { input };", false)]
-    // Message template values
-    [DataRow("\"123456789{Value}\", input", "", true)]
-    [DataRow("\"1234567890{Value}\", input", "", false)]
-    [DataRow("\"{Value}\", value", "var value = \"1234567890\";", true)]
-    [DataRow("\"{Known} {Unknown}\", \"12345678\", input", "", true)]
-    [DataRow("\"{Known} {Unknown}\", \"1234567890\", input", "", false)]
-    [DataRow("\"123456789{Id}\", values", "var values = new object[] { \"1\" };", true)]
-    public void Values_That_Are_Not_Constant_Strings_Are_Given_The_Nominal_Length(
-        string arguments, string declaration, bool diagnosticExpected)
+    [DataRow("input", "", true, "")]
+    [DataRow("input.Trim()", "", true, "")]
+    [DataRow("value", "var value = \"1234567890\";", true, "")]
+    public void Non_Constant_Message_Is_Given_The_Nominal_Length(
+        string arguments, string declaration, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected, declaration);
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
+    }
+
+    [TestMethod]
+    [DataRow("$\"{input}\"", "", true, "")]
+    [DataRow("$\"123456789{input}\"", "", true, "123456789")]
+    [DataRow("$\"1234567890{input}\"", "", false, "1234567890")]
+    [DataRow("$\"123456789{input:N}\"", "", true, "123456789")]
+    [DataRow("$\"{value}\"", "var value = \"1234567890\";", true, "")]
+    public void Non_Constant_Interpolated_Values_Are_Given_The_Nominal_Length(
+        string arguments, string declaration, bool diagnosticExpected, string expectedRead)
+    {
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
+    }
+
+    [TestMethod]
+    [DataRow("\"123456789\" + input", "", true, "123456789")]
+    [DataRow("\"1234567890\" + input", "", false, "1234567890")]
+    [DataRow("input + \"123456789\"", "", true, "123456789")]
+    [DataRow("input + \"1234567890\"", "", false, "1234567890")]
+    [DataRow("input + input", "", true, "")]
+    [DataRow("\"12345\" + value", "var value = \"67890\";", true, "12345")]
+    public void Non_Constant_Concatenated_Values_Are_Given_The_Nominal_Length(
+        string arguments, string declaration, bool diagnosticExpected, string expectedRead)
+    {
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
+    }
+
+    [TestMethod]
+    [DataRow("string.Concat(\"123456789\", input)", "", true, "123456789")]
+    [DataRow("string.Concat(\"1234567890\", input)", "", false, "1234567890")]
+    [DataRow("string.Join(\", \", \"12345678\", input)", "", true, "12345678,")]
+    [DataRow("string.Join(\", \", \"123456789\", input)", "", false, "123456789,")]
+    [DataRow("string.Join(\", \", values)", "var values = new[] { \"1234567890\" };", true, "")]
+    public void Non_Constant_String_Concat_And_Join_Values_Are_Given_The_Nominal_Length(
+        string arguments, string declaration, bool diagnosticExpected, string expectedRead)
+    {
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
+    }
+
+    /// <summary>
+    /// A non-constant format string, or non-constant values (whether passed individually or in an array), are given the
+    /// nominal length.
+    /// </summary>
+    [TestMethod]
+    [DataRow("string.Format(\"123456789{0}\", input)", "", true, "123456789")]
+    [DataRow("string.Format(\"1234567890{0}\", input)", "", false, "1234567890")]
+    [DataRow("string.Format(System.Globalization.CultureInfo.InvariantCulture, \"123456789{0}\", input)", "", true, "123456789")]
+    [DataRow("string.Format(format, \"1234567890\")", "var format = \"{0}\";", true, "")]
+    [DataRow("string.Format(\"123456789{0}\", values)", "var values = new object[] { \"1234567890\" };", true, "123456789")]
+    [DataRow("string.Format(\"1234567890{0}\", values)", "var values = new object[] { input };", false, "1234567890")]
+    [DataRow("string.Format(\"Order processing failed: {0}\", values)", "var values = new object[] { input };", false, "Order processing failed:")]
+    [DataRow("string.Format(\"1{0,8}1\", values)", "var values = new object[] { input };", false, "1        1")]
+    public void Non_Constant_String_Format_Values_Are_Given_The_Nominal_Length(
+        string arguments, string declaration, bool diagnosticExpected, string expectedRead)
+    {
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
+    }
+
+    /// <summary>
+    /// Format items that can't be matched to an argument are given the nominal length, but the format string is still read.
+    /// An unmatched brace is measured as written.
+    /// </summary>
+    [TestMethod]
+    [DataRow("string.Format(\"{1}\", \"1234567890\")", "", true, "")]
+    [DataRow("string.Format(\"123456789{1}\", \"1234567890\")", "", true, "123456789")]
+    [DataRow("string.Format(\"1234567890{1}\", input)", "", false, "1234567890")]
+    [DataRow("string.Format(\"Order processing failed: {1}\", input)", "", false, "Order processing failed:")]
+    [DataRow("string.Format(\"123456789{x}\", input)", "", true, "123456789")]
+    [DataRow("string.Format(\"1234567890{x}\", input)", "", false, "1234567890")]
+    [DataRow("string.Format(\"1{x,8}1\", input)", "", false, "1        1")]
+    [DataRow("string.Format(\"123456789{1}\", values)", "var values = new object[] { input };", true, "123456789")]
+    [DataRow("string.Format(\"12345678{\", input)", "", true, "12345678{")]
+    [DataRow("string.Format(\"123456789{\", input)", "", false, "123456789{")]
+    public void Unmatched_String_Format_Items_Are_Given_The_Nominal_Length(
+        string arguments, string declaration, bool diagnosticExpected, string expectedRead)
+    {
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
+    }
+
+    [TestMethod]
+    [DataRow("\"123456789{Value}\", input", "", true, "123456789")]
+    [DataRow("\"1234567890{Value}\", input", "", false, "1234567890")]
+    [DataRow("\"{Value}\", value", "var value = \"1234567890\";", true, "")]
+    [DataRow("\"{Known} {Unknown}\", \"12345678\", input", "", true, "12345678")]
+    [DataRow("\"{Known} {Unknown}\", \"1234567890\", input", "", false, "1234567890")]
+    [DataRow("\"123456789{Id}\", values", "var values = new object[] { \"1\" };", true, "123456789")]
+    public void Non_Constant_Message_Template_Values_Are_Given_The_Nominal_Length(
+        string arguments, string declaration, bool diagnosticExpected, string expectedRead)
+    {
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, declaration);
     }
 
     /// <summary>
@@ -282,33 +359,33 @@ class ClassName
     /// a value of 1234567890 is measured as "Order". Format specifiers have no effect, and null isn't shown as "(null)".
     /// </summary>
     [TestMethod]
-    [DataRow("(string)null")]
-    [DataRow("\"Got {Id}\", (object)null")]
-    [DataRow("\"Got {Id}\", new object[] { null }")]
-    [DataRow("$\"Got {(object)null}\"")]
-    [DataRow("string.Format(\"Got {0}\", (object)null)")]
-    [DataRow("\"Order {Id}\", 1234567890")]
-    [DataRow("\"Done {Success}\", false")]
-    [DataRow("$\"Order {1234567890}\"")]
-    [DataRow("string.Format(\"Order {0}\", 1234567890)")]
-    [DataRow("\"Order {Id:D10}\", 42")]
-    [DataRow("$\"Order {42:D10}\"")]
-    [DataRow("string.Format(\"Order {0:D10}\", 42)")]
-    [DataRow("\"{{literal}} {Id:D9}\", 42")]
-    public void Constants_That_Are_Not_Strings_Are_Given_The_Nominal_Length(string arguments)
+    [DataRow("(string)null", true, "")]
+    [DataRow("\"Got {Id}\", (object)null", true, "Got")]
+    [DataRow("\"Got {Id}\", new object[] { null }", true, "Got")]
+    [DataRow("$\"Got {(object)null}\"", true, "Got")]
+    [DataRow("string.Format(\"Got {0}\", (object)null)", true, "Got")]
+    [DataRow("\"Order {Id}\", 1234567890", true, "Order")]
+    [DataRow("\"Done {Success}\", false", true, "Done")]
+    [DataRow("$\"Order {1234567890}\"", true, "Order")]
+    [DataRow("string.Format(\"Order {0}\", 1234567890)", true, "Order")]
+    [DataRow("\"Order {Id:D10}\", 42", true, "Order")]
+    [DataRow("$\"Order {42:D10}\"", true, "Order")]
+    [DataRow("string.Format(\"Order {0:D10}\", 42)", true, "Order")]
+    [DataRow("\"{{literal}} {Id:D9}\", 42", true, "{literal}")]
+    public void Constants_That_Are_Not_Strings_Are_Given_The_Nominal_Length(string arguments, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected: true);
+        VerifyMessage(arguments, diagnosticExpected, expectedRead);
     }
 
     /// <summary>
     /// Without values, the logger doesn't format a template, so its placeholders are logged as written.
     /// </summary>
     [TestMethod]
-    [DataRow("\"{UserId}\"", true)]
-    [DataRow("\"Id {UserId}\"", false)]
-    public void Template_Without_Values_Is_Measured_As_Written(string arguments, bool diagnosticExpected)
+    [DataRow("\"{UserId}\"", true, "{UserId}")]
+    [DataRow("\"Id {UserId}\"", false, "Id {UserId}")]
+    public void Template_Without_Values_Is_Measured_As_Written(string arguments, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected);
+        VerifyMessage(arguments, diagnosticExpected, expectedRead);
     }
 
     /// <summary>
@@ -316,153 +393,153 @@ class ClassName
     /// Padding outside the message is trimmed, but padding between other text counts towards its length.
     /// </summary>
     [TestMethod]
-    [DataRow("$\"{value,9}\"", true)] // "        1"
-    [DataRow("$\"{value,-10}\"", true)]
-    [DataRow("\"{Value,9}\", value", true)]
-    [DataRow("\"{{{Value}}}\", value", true)]
-    [DataRow("$\"1234567{value,2}\"", true)]
-    [DataRow("$\"12345678{value,2}\"", false)]
-    [DataRow("$\"{value,-2}1234567\"", true)] // "1 1234567"
-    [DataRow("$\"{value,-2}12345678\"", false)]
-    [DataRow("\"12345678{Value,2}\", value", false)]
-    [DataRow("\"{Value,-2}12345678\", value", false)]
-    [DataRow("string.Format(\"12345678{0,2}\", value)", false)]
-    [DataRow("$\"1{input,8}\"", true)]
-    [DataRow("$\"1{input,7}1\"", true)]
-    [DataRow("$\"1{input,8}1\"", false)]
-    [DataRow("$\"1{input,-8}1\"", false)]
-    [DataRow("\"1{Value,8}1\", input", false)]
-    [DataRow("\"1{Value,8:D2}1\", input", false)]
-    [DataRow("string.Format(\"1{0,8}1\", input)", false)]
-    public void Alignment_Pads_Values(string arguments, bool diagnosticExpected)
+    [DataRow("$\"{value,9}\"", true, "1")] // "        1" before trimming
+    [DataRow("$\"{value,-10}\"", true, "1")]
+    [DataRow("\"{Value,9}\", value", true, "1")]
+    [DataRow("\"{{{Value}}}\", value", true, "{1}")]
+    [DataRow("$\"1234567{value,2}\"", true, "1234567 1")]
+    [DataRow("$\"12345678{value,2}\"", false, "12345678 1")]
+    [DataRow("$\"{value,-2}1234567\"", true, "1 1234567")]
+    [DataRow("$\"{value,-2}12345678\"", false, "1 12345678")]
+    [DataRow("\"12345678{Value,2}\", value", false, "12345678 1")]
+    [DataRow("\"{Value,-2}12345678\", value", false, "1 12345678")]
+    [DataRow("string.Format(\"12345678{0,2}\", value)", false, "12345678 1")]
+    [DataRow("$\"1{input,8}\"", true, "1")]
+    [DataRow("$\"1{input,7}1\"", true, "1       1")]
+    [DataRow("$\"1{input,8}1\"", false, "1        1")]
+    [DataRow("$\"1{input,-8}1\"", false, "1        1")]
+    [DataRow("\"1{Value,8}1\", input", false, "1        1")]
+    [DataRow("\"1{Value,8:D2}1\", input", false, "1        1")]
+    [DataRow("string.Format(\"1{0,8}1\", input)", false, "1        1")]
+    public void Alignment_Pads_Values(string arguments, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected, "const string value = \"1\";");
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, "const string value = \"1\";");
     }
 
     /// <summary>
     /// Large alignments are capped, without changing whether the message is long enough.
     /// </summary>
     [TestMethod]
-    [DataRow("$\"{input,999999}\"", true)]
-    [DataRow("$\"{input,-999999}\"", true)]
-    [DataRow("$\"1{input,999999}1\"", false)]
-    [DataRow("\"1{Value,999999}1\", input", false)]
-    [DataRow("string.Format(\"1{0,999999}1\", input)", false)]
-    [DataRow("$\"1{value,999999}\"", false)]
-    [DataRow("$\"{value,-999999}1\"", false)]
-    public void Large_Alignments_Are_Capped(string arguments, bool diagnosticExpected)
+    [DataRow("$\"{input,999999}\"", true, "")]
+    [DataRow("$\"{input,-999999}\"", true, "")]
+    [DataRow("$\"1{input,999999}1\"", false, "1" + CappedPadding + "1")]
+    [DataRow("\"1{Value,999999}1\", input", false, "1" + CappedPadding + "1")]
+    [DataRow("string.Format(\"1{0,999999}1\", input)", false, "1" + CappedPadding + "1")]
+    [DataRow("$\"1{value,999999}\"", false, "1" + CappedPadding + "1")]
+    [DataRow("$\"{value,-999999}1\"", false, "1" + CappedPadding + "1")]
+    public void Large_Alignments_Are_Capped(string arguments, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected, "const string value = \"1\";");
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, "const string value = \"1\";");
     }
 
     [TestMethod]
-    [DataRow("\"\"", true)]
-    [DataRow("@\"123456789\"", true)]
-    [DataRow("@\"1234567890\"", false)]
-    [DataRow("\"1234\\t5678\"", true)]
-    [DataRow("\"1234\\t56789\"", false)]
-    [DataRow("\"\\u003123456789\"", true)]
-    [DataRow("\"\\u0031234567890\"", false)]
-    [DataRow("\"\"\"123456789\"\"\"", true)]
-    [DataRow("\"\"\"1234567890\"\"\"", false)]
-    public void String_Literals_Use_Content_Length(string expression, bool diagnosticExpected)
+    [DataRow("\"\"", true, "")]
+    [DataRow("@\"123456789\"", true, "123456789")]
+    [DataRow("@\"1234567890\"", false, "1234567890")]
+    [DataRow("\"1234\\t5678\"", true, "1234\t5678")]
+    [DataRow("\"1234\\t56789\"", false, "1234\t56789")]
+    [DataRow("\"\\u003123456789\"", true, "123456789")]
+    [DataRow("\"\\u0031234567890\"", false, "1234567890")]
+    [DataRow("\"\"\"123456789\"\"\"", true, "123456789")]
+    [DataRow("\"\"\"1234567890\"\"\"", false, "1234567890")]
+    public void String_Literals_Use_Content_Length(string expression, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(expression, diagnosticExpected);
+        VerifyMessage(expression, diagnosticExpected, expectedRead);
     }
 
     [TestMethod]
-    [DataRow("\n    \"123456789\"", true)]
-    [DataRow("\n    \"1234567890\"", false)]
-    [DataRow("\n\t\"123456789\"", true)]
-    [DataRow("\n\t\"1234567890\"", false)]
-    [DataRow("\r\n    \"123456789\"", true)]
-    [DataRow("\r\n    \"1234567890\"", false)]
-    [DataRow("\r\n\t\"123456789\"", true)]
-    [DataRow("\r\n\t\"1234567890\"", false)]
-    [DataRow("\"1234\" +\n    \"56789\"", true)]
-    [DataRow("\"12345\" +\n    \"67890\"", false)]
-    [DataRow("\"1234\" +\r\n\t\"56789\"", true)]
-    [DataRow("\"12345\" +\r\n\t\"67890\"", false)]
-    [DataRow("\"123456789\" +\n    input", true)]
-    [DataRow("\"1234567890\" +\n    input", false)]
-    [DataRow("\"123456789\" +\r\n\tinput", true)]
-    [DataRow("\"1234567890\" +\r\n\tinput", false)]
-    [DataRow("$\"123456789{\n    input}\"", true)]
-    [DataRow("$\"1234567890{\n    input}\"", false)]
-    [DataRow("$\"123456789{\r\n\tinput}\"", true)]
-    [DataRow("$\"1234567890{\r\n\tinput}\"", false)]
-    [DataRow("\n    \"123456789{Value}\",\n    input", true)]
-    [DataRow("\n    \"1234567890{Value}\",\n    input", false)]
-    [DataRow("\r\n\t\"123456789{Value}\",\r\n\tinput", true)]
-    [DataRow("\r\n\t\"1234567890{Value}\",\r\n\tinput", false)]
-    [DataRow("string.Format(\n    \"123456789{0}\",\n    input)", true)]
-    [DataRow("string.Format(\n    \"1234567890{0}\",\n    input)", false)]
-    [DataRow("string.Format(\r\n\t\"123456789{0}\",\r\n\tinput)", true)]
-    [DataRow("string.Format(\r\n\t\"1234567890{0}\",\r\n\tinput)", false)]
+    [DataRow("\n    \"123456789\"", true, "123456789")]
+    [DataRow("\n    \"1234567890\"", false, "1234567890")]
+    [DataRow("\n\t\"123456789\"", true, "123456789")]
+    [DataRow("\n\t\"1234567890\"", false, "1234567890")]
+    [DataRow("\r\n    \"123456789\"", true, "123456789")]
+    [DataRow("\r\n    \"1234567890\"", false, "1234567890")]
+    [DataRow("\r\n\t\"123456789\"", true, "123456789")]
+    [DataRow("\r\n\t\"1234567890\"", false, "1234567890")]
+    [DataRow("\"1234\" +\n    \"56789\"", true, "123456789")]
+    [DataRow("\"12345\" +\n    \"67890\"", false, "1234567890")]
+    [DataRow("\"1234\" +\r\n\t\"56789\"", true, "123456789")]
+    [DataRow("\"12345\" +\r\n\t\"67890\"", false, "1234567890")]
+    [DataRow("\"123456789\" +\n    input", true, "123456789")]
+    [DataRow("\"1234567890\" +\n    input", false, "1234567890")]
+    [DataRow("\"123456789\" +\r\n\tinput", true, "123456789")]
+    [DataRow("\"1234567890\" +\r\n\tinput", false, "1234567890")]
+    [DataRow("$\"123456789{\n    input}\"", true, "123456789")]
+    [DataRow("$\"1234567890{\n    input}\"", false, "1234567890")]
+    [DataRow("$\"123456789{\r\n\tinput}\"", true, "123456789")]
+    [DataRow("$\"1234567890{\r\n\tinput}\"", false, "1234567890")]
+    [DataRow("\n    \"123456789{Value}\",\n    input", true, "123456789")]
+    [DataRow("\n    \"1234567890{Value}\",\n    input", false, "1234567890")]
+    [DataRow("\r\n\t\"123456789{Value}\",\r\n\tinput", true, "123456789")]
+    [DataRow("\r\n\t\"1234567890{Value}\",\r\n\tinput", false, "1234567890")]
+    [DataRow("string.Format(\n    \"123456789{0}\",\n    input)", true, "123456789")]
+    [DataRow("string.Format(\n    \"1234567890{0}\",\n    input)", false, "1234567890")]
+    [DataRow("string.Format(\r\n\t\"123456789{0}\",\r\n\tinput)", true, "123456789")]
+    [DataRow("string.Format(\r\n\t\"1234567890{0}\",\r\n\tinput)", false, "1234567890")]
     public void Source_Line_Breaks_And_Indentation_Do_Not_Count_Towards_Message_Length(
-        string arguments, bool diagnosticExpected)
+        string arguments, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected);
+        VerifyMessage(arguments, diagnosticExpected, expectedRead);
     }
 
     [TestMethod]
-    [DataRow("LogTrace", "\"Started\"", 0, true)]
-    [DataRow("LogDebug", "\"Started\"", 0, true)]
-    [DataRow("LogWarning", "\"Started\"", 0, true)]
-    [DataRow("LogError", "\"Started\"", 0, true)]
-    [DataRow("LogCritical", "\"Started\"", 0, true)]
-    [DataRow("LogInformation", "new EventId(42, \"OrderProcessing\"), \"Started\"", 1, true)]
-    [DataRow("LogError", "new System.Exception(\"A detailed exception message\"), \"Failed\"", 1, true)]
-    [DataRow("LogError", "new EventId(42), new System.Exception(), \"Failed\"", 2, true)]
-    [DataRow("LogError", "new System.Exception(), \"Order processing failed\"", 1, false)]
-    [DataRow("LogError", "new System.Exception(), \"Bad {Id}\", \"12345\"", 1, true)]
-    [DataRow("LogError", "new System.Exception(), \"Bad {Id}\", \"123456\"", 1, false)]
-    [DataRow("Log", "LogLevel.Warning, \"Started\"", 1, true)]
-    [DataRow("Log", "LogLevel.Error, new EventId(42), new System.Exception(), \"Failed\"", 3, true)]
-    [DataRow("LogInformation", "args: new object[] { \"12345\" }, message: \"Got {Id}\"", 1, true)]
-    [DataRow("LogError", "message: \"Failed\", exception: new System.Exception()", 0, true)]
+    [DataRow("LogTrace", "\"Started\"", 0, true, "Started")]
+    [DataRow("LogDebug", "\"Started\"", 0, true, "Started")]
+    [DataRow("LogWarning", "\"Started\"", 0, true, "Started")]
+    [DataRow("LogError", "\"Started\"", 0, true, "Started")]
+    [DataRow("LogCritical", "\"Started\"", 0, true, "Started")]
+    [DataRow("LogInformation", "new EventId(42, \"OrderProcessing\"), \"Started\"", 1, true, "Started")]
+    [DataRow("LogError", "new System.Exception(\"A detailed exception message\"), \"Failed\"", 1, true, "Failed")]
+    [DataRow("LogError", "new EventId(42), new System.Exception(), \"Failed\"", 2, true, "Failed")]
+    [DataRow("LogError", "new System.Exception(), \"Order processing failed\"", 1, false, "Order processing failed")]
+    [DataRow("LogError", "new System.Exception(), \"Bad {Id}\", \"12345\"", 1, true, "Bad 12345")]
+    [DataRow("LogError", "new System.Exception(), \"Bad {Id}\", \"123456\"", 1, false, "Bad 123456")]
+    [DataRow("Log", "LogLevel.Warning, \"Started\"", 1, true, "Started")]
+    [DataRow("Log", "LogLevel.Error, new EventId(42), new System.Exception(), \"Failed\"", 3, true, "Failed")]
+    [DataRow("LogInformation", "args: new object[] { \"12345\" }, message: \"Got {Id}\"", 1, true, "Got 12345")]
+    [DataRow("LogError", "message: \"Failed\", exception: new System.Exception()", 0, true, "Failed")]
     public void Logging_Overloads_Use_Only_The_Rendered_Message_Length(
-        string methodName, string arguments, int messageArgumentIndex, bool diagnosticExpected)
+        string methodName, string arguments, int messageArgumentIndex, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected, methodName: methodName, messageArgumentIndex: messageArgumentIndex);
+        VerifyMessage(arguments, diagnosticExpected, expectedRead, methodName: methodName, messageArgumentIndex: messageArgumentIndex);
     }
 
     [TestMethod]
-    [DataRow("\"Got {OrderIdentifier}\", \"12345\"", true)]
-    [DataRow("\"Got {OrderIdentifier}\", \"123456\"", false)]
-    [DataRow("\"{User} {Action}\", \"Sam\", \"login\"", true)]
-    [DataRow("\"{User} {Action}\", \"Sam\", \"logout\"", false)]
-    [DataRow("\"{Value}{Value}\", \"1234\", \"56789\"", true)]
-    [DataRow("\"{Second}{First}\", \"12345\", \"67890\"", false)]
-    [DataRow("\"Got {Id}\", new object[] { \"12345\" }", true)]
-    [DataRow("\"Got {Id}\", new object[] { \"123456\" }", false)]
-    [DataRow("\"Got {Id}\", \"\"", true)]
-    [DataRow("\"{Id,-9}\", \"1\"", true)]
-    [DataRow("\"{Id,-10}\", \"1\"", true)]
-    [DataRow("\"{{Id}} {Id}\", \"1234\"", true)]
-    [DataRow("\"{{Id}} {Id}\", \"12345\"", false)]
-    [DataRow("\"{{OK}} {Id}\", 1", true)]
-    [DataRow("\"{Value}\", \"{Id:D10}\"", true)]
-    public void Structured_Logging_Uses_Rendered_Values_In_Argument_Order(string arguments, bool diagnosticExpected)
+    [DataRow("\"Got {OrderIdentifier}\", \"12345\"", true, "Got 12345")]
+    [DataRow("\"Got {OrderIdentifier}\", \"123456\"", false, "Got 123456")]
+    [DataRow("\"{User} {Action}\", \"Sam\", \"login\"", true, "Sam login")]
+    [DataRow("\"{User} {Action}\", \"Sam\", \"logout\"", false, "Sam logout")]
+    [DataRow("\"{Value}{Value}\", \"1234\", \"56789\"", true, "123456789")]
+    [DataRow("\"{Second}{First}\", \"12345\", \"67890\"", false, "1234567890")]
+    [DataRow("\"Got {Id}\", new object[] { \"12345\" }", true, "Got 12345")]
+    [DataRow("\"Got {Id}\", new object[] { \"123456\" }", false, "Got 123456")]
+    [DataRow("\"Got {Id}\", \"\"", true, "Got")]
+    [DataRow("\"{Id,-9}\", \"1\"", true, "1")]
+    [DataRow("\"{Id,-10}\", \"1\"", true, "1")]
+    [DataRow("\"{{Id}} {Id}\", \"1234\"", true, "{Id} 1234")]
+    [DataRow("\"{{Id}} {Id}\", \"12345\"", false, "{Id} 12345")]
+    [DataRow("\"{{OK}} {Id}\", 1", true, "{OK}")]
+    [DataRow("\"{Value}\", \"{Id:D10}\"", true, "{Id:D10}")]
+    public void Structured_Logging_Uses_Rendered_Values_In_Argument_Order(string arguments, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(arguments, diagnosticExpected);
+        VerifyMessage(arguments, diagnosticExpected, expectedRead);
     }
 
     [TestMethod]
-    [DataRow("\"1234\" + \"56789\"", true)]
-    [DataRow("\"12345\" + \"67890\"", false)]
-    [DataRow("string.Concat(\"Got \", \"12\", \"345\")", true)]
-    [DataRow("string.Concat(\"Got \", \"12\", \"3456\")", false)]
-    [DataRow("string.Concat(new string[] { \"Got \", \"12345\" })", true)]
-    [DataRow("string.Concat(new string[] { \"Got \", \"123456\" })", false)]
-    [DataRow("string.Concat(str1: \"12345\", str0: \"Got \" )", true)]
-    [DataRow("string.Format(\"{{{0}}}\", \"1234567\")", true)]
-    [DataRow("string.Format(\"{{{0}}}\", \"12345678\")", false)]
-    [DataRow("string.Format(\"{{X:D9}}{0}\", \"1\")", true)]
-    [DataRow("string.Format(\"Id:{0}\", 42)", true)]
-    public void Common_Formatting_Overloads_Use_Their_Result_Length(string expression, bool diagnosticExpected)
+    [DataRow("\"1234\" + \"56789\"", true, "123456789")]
+    [DataRow("\"12345\" + \"67890\"", false, "1234567890")]
+    [DataRow("string.Concat(\"Got \", \"12\", \"345\")", true, "Got 12345")]
+    [DataRow("string.Concat(\"Got \", \"12\", \"3456\")", false, "Got 123456")]
+    [DataRow("string.Concat(new string[] { \"Got \", \"12345\" })", true, "Got 12345")]
+    [DataRow("string.Concat(new string[] { \"Got \", \"123456\" })", false, "Got 123456")]
+    [DataRow("string.Concat(str1: \"12345\", str0: \"Got \" )", true, "Got 12345")]
+    [DataRow("string.Format(\"{{{0}}}\", \"1234567\")", true, "{1234567}")]
+    [DataRow("string.Format(\"{{{0}}}\", \"12345678\")", false, "{12345678}")]
+    [DataRow("string.Format(\"{{X:D9}}{0}\", \"1\")", true, "{X:D9}1")]
+    [DataRow("string.Format(\"Id:{0}\", 42)", true, "Id:")]
+    public void Common_Formatting_Overloads_Use_Their_Result_Length(string expression, bool diagnosticExpected, string expectedRead)
     {
-        VerifyMessage(expression, diagnosticExpected);
+        VerifyMessage(expression, diagnosticExpected, expectedRead);
     }
 
     /// <summary>
@@ -470,13 +547,13 @@ class ClassName
     /// </summary>
     [TestMethod]
     [Timeout(30_000)]
-    [DataRow("\"123456789\"", true)]
-    [DataRow("\"1234567890\"", false)]
-    public void Long_Concatenation_Is_Rendered(string text, bool diagnosticExpected)
+    [DataRow(true, "123456789")]
+    [DataRow(false, "1234567890")]
+    public void Long_Concatenation_Is_Rendered(bool diagnosticExpected, string text)
     {
-        var arguments = text + string.Concat(Enumerable.Repeat(" + input", 10_000));
+        var arguments = $"\"{text}\"" + string.Concat(Enumerable.Repeat(" + input", 10_000));
 
-        VerifyMessage(arguments, diagnosticExpected);
+        VerifyMessage(arguments, diagnosticExpected, expectedRead: text);
     }
 
     /// <summary>
@@ -504,23 +581,27 @@ class ClassName
         StringAssert.Contains(analyzerException.GetMessage(), expectedMessage);
     }
 
+    /// <summary>
+    /// <paramref name="flaggedArgument"/> is where the diagnostic is reported, if the message is too short.
+    /// <paramref name="expectedRead"/> is <see langword="null"/> when there's no message to read.
+    /// </summary>
     [TestMethod]
-    [DataRow("EventId = 1, Level = LogLevel.Information, Message = \"123456789\"", "Message = \"123456789\"", true)]
-    [DataRow("EventId = 1, Level = LogLevel.Information, Message = \"1234567890\"", null, false)]
-    [DataRow("1, LogLevel.Information, \"123456789\"", "\"123456789\"", true)]
-    [DataRow("1, LogLevel.Information, \"1234567890\"", null, false)]
-    [DataRow("LogLevel.Information, \"123456789\"", "\"123456789\"", true)]
-    [DataRow("\"123456789\"", "\"123456789\"", true)]
-    [DataRow("message: \"123456789\", level: LogLevel.Information, eventId: 1", "message: \"123456789\"", true)]
-    [DataRow("Level = LogLevel.Information, Message = \"   12345678   \"", "Message = \"   12345678   \"", true)]
-    [DataRow("Level = LogLevel.Information, Message = ShortMessage", "Message = ShortMessage", true)]
-    [DataRow("Level = LogLevel.Information, Message = \"{OrderId}\"", "Message = \"{OrderId}\"", true)]
-    [DataRow("Level = LogLevel.Information, Message = LongMessage", null, false)]
-    [DataRow("Level = LogLevel.Information, Message = \"Processed {OrderId}\"", "Message = \"Processed {OrderId}\"", true)]
-    [DataRow("Level = LogLevel.Information, Message = \"Processed order {OrderId}\"", null, false)]
-    [DataRow("EventId = 1, Level = LogLevel.Information", null, false)]
-    [DataRow("LogLevel.Information", null, false)]
-    public void LoggerMessage_Attribute_Message_Is_Checked(string attributeArguments, string flaggedArgument, bool diagnosticExpected)
+    [DataRow("EventId = 1, Level = LogLevel.Information, Message = \"123456789\"", "Message = \"123456789\"", true, "123456789")]
+    [DataRow("EventId = 1, Level = LogLevel.Information, Message = \"1234567890\"", null, false, "1234567890")]
+    [DataRow("1, LogLevel.Information, \"123456789\"", "\"123456789\"", true, "123456789")]
+    [DataRow("1, LogLevel.Information, \"1234567890\"", null, false, "1234567890")]
+    [DataRow("LogLevel.Information, \"123456789\"", "\"123456789\"", true, "123456789")]
+    [DataRow("\"123456789\"", "\"123456789\"", true, "123456789")]
+    [DataRow("message: \"123456789\", level: LogLevel.Information, eventId: 1", "message: \"123456789\"", true, "123456789")]
+    [DataRow("Level = LogLevel.Information, Message = \"   12345678   \"", "Message = \"   12345678   \"", true, "12345678")]
+    [DataRow("Level = LogLevel.Information, Message = ShortMessage", "Message = ShortMessage", true, "12345678")]
+    [DataRow("Level = LogLevel.Information, Message = \"{OrderId}\"", "Message = \"{OrderId}\"", true, "")]
+    [DataRow("Level = LogLevel.Information, Message = LongMessage", null, false, "1234567890")]
+    [DataRow("Level = LogLevel.Information, Message = \"Processed {OrderId}\"", "Message = \"Processed {OrderId}\"", true, "Processed")]
+    [DataRow("Level = LogLevel.Information, Message = \"Processed order {OrderId}\"", null, false, "Processed order")]
+    [DataRow("EventId = 1, Level = LogLevel.Information", null, false, null)]
+    [DataRow("LogLevel.Information", null, false, null)]
+    public void LoggerMessage_Attribute_Message_Is_Checked(string attributeArguments, string flaggedArgument, bool diagnosticExpected, string expectedRead)
     {
         var testCode = $$"""
             using Microsoft.Extensions.Logging;
@@ -539,7 +620,7 @@ class ClassName
             }
             """;
 
-        VerifyCodeAt(testCode, flaggedArgument, diagnosticExpected);
+        VerifyCodeAt(testCode, flaggedArgument, diagnosticExpected, expectedRead);
     }
 
     [TestMethod]
@@ -563,21 +644,26 @@ class ClassName
             }
             """;
 
-        VerifyCodeAt(testCode, "Message = \"1234\"", diagnosticExpected: true, minLength: 5);
+        VerifyDiagnostic(testCode, BuildExpectedResultAt(testCode, "Message = \"1234\"", minLength: 5));
+        AssertMessagesRead("1234", "12345");
     }
 
+    /// <summary>
+    /// <paramref name="flaggedArgument"/> is where the diagnostic is reported, if the message is too short.
+    /// <paramref name="expectedRead"/> is <see langword="null"/> when there's no message to read.
+    /// </summary>
     [TestMethod]
-    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"123456789\")", "\"123456789\"", true)]
-    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"1234567890\")", null, false)]
-    [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"{Id}\")", "\"{Id}\"", true)]
-    [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"Processed {Id}\")", "\"Processed {Id}\"", true)]
-    [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"Processed order {Id}\")", null, false)]
-    [DataRow("LoggerMessage.Define(formatString: \"123456789\", eventId: new EventId(1), logLevel: LogLevel.Information)", "formatString: \"123456789\"", true)]
-    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), input)", "input", true)]
-    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"12\" + input)", "\"12\" + input", true)]
-    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"1234567890\" + input)", null, false)]
-    [DataRow("LoggerMessage.DefineScope(\"123456789\")", null, false)]
-    public void LoggerMessage_Define_Format_String_Is_Checked(string expression, string flaggedArgument, bool diagnosticExpected)
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"123456789\")", "\"123456789\"", true, "123456789")]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"1234567890\")", null, false, "1234567890")]
+    [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"{Id}\")", "\"{Id}\"", true, "")]
+    [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"Processed {Id}\")", "\"Processed {Id}\"", true, "Processed")]
+    [DataRow("LoggerMessage.Define<int>(LogLevel.Information, new EventId(1), \"Processed order {Id}\")", null, false, "Processed order")]
+    [DataRow("LoggerMessage.Define(formatString: \"123456789\", eventId: new EventId(1), logLevel: LogLevel.Information)", "formatString: \"123456789\"", true, "123456789")]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), input)", "input", true, "")]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"12\" + input)", "\"12\" + input", true, "12")]
+    [DataRow("LoggerMessage.Define(LogLevel.Information, new EventId(1), \"1234567890\" + input)", null, false, "1234567890")]
+    [DataRow("LoggerMessage.DefineScope(\"123456789\")", null, false, null)]
+    public void LoggerMessage_Define_Format_String_Is_Checked(string expression, string flaggedArgument, bool diagnosticExpected, string expectedRead)
     {
         var testCode = $$"""
             using Microsoft.Extensions.Logging;
@@ -595,27 +681,57 @@ class ClassName
             }
             """;
 
-        VerifyCodeAt(testCode, flaggedArgument, diagnosticExpected);
+        VerifyCodeAt(testCode, flaggedArgument, diagnosticExpected, expectedRead);
     }
 
     /// <summary>
-    /// Verifies a diagnostic is reported at the last occurrence of <paramref name="flaggedArgument"/>, or that none is reported.
+    /// Verifies the analyzer reads <paramref name="expectedRead"/> (or nothing, if it's <see langword="null"/>), and reports a
+    /// diagnostic at the last occurrence of <paramref name="flaggedArgument"/> if <paramref name="diagnosticExpected"/>.
     /// </summary>
-    private void VerifyCodeAt(string testCode, string flaggedArgument, bool diagnosticExpected, int minLength = 10)
+    private void VerifyCodeAt(string testCode, string flaggedArgument, bool diagnosticExpected, string expectedRead,
+        int minLength = DefaultMinLength)
     {
+        AssertTestDataIsConsistent(diagnosticExpected, expectedRead, minLength);
+        string[] expectedReads = expectedRead == null ? [] : [expectedRead];
+
         if (!diagnosticExpected)
         {
-            VerifyNoDiagnostic(testCode);
+            Assert.IsNull(flaggedArgument, "No diagnostic is expected, so no argument should be flagged.");
+            VerifyAndAssertMessagesRead(() => VerifyNoDiagnostic(testCode), expectedReads);
             return;
         }
+
+        var expected = BuildExpectedResultAt(testCode, flaggedArgument, minLength);
+        VerifyAndAssertMessagesRead(() => VerifyDiagnostic(testCode, expected), expectedReads);
+    }
+
+    /// <summary>
+    /// Checks a test's data doesn't contradict itself: a diagnostic should be expected if, and only if, the message expected
+    /// to be read is shorter than the minimum length.
+    /// </summary>
+    private static void AssertTestDataIsConsistent(bool diagnosticExpected, string expectedRead, int minLength)
+    {
+        var tooShort = expectedRead != null && expectedRead.Length < minLength;
+
+        Assert.AreEqual(tooShort, diagnosticExpected,
+            $"Invalid test data: \"{expectedRead}\" has length {expectedRead?.Length}, and the minimum length is {minLength}, " +
+            $"so diagnosticExpected should be {tooShort.ToString().ToLowerInvariant()}.");
+    }
+
+    /// <summary>
+    /// Builds the expected diagnostic at the last occurrence of <paramref name="flaggedArgument"/>.
+    /// </summary>
+    private static DiagnosticResult BuildExpectedResultAt(string testCode, string flaggedArgument, int minLength)
+    {
+        Assert.IsNotNull(flaggedArgument, "The message is too short, so the argument that should be flagged must be given.");
 
         var index = testCode.LastIndexOf(flaggedArgument, System.StringComparison.Ordinal);
         Assert.IsTrue(index >= 0, $"'{flaggedArgument}' was not found in the test code.");
 
         var line = testCode.Take(index).Count(character => character == '\n') + 1;
-        var column = index - testCode.LastIndexOf('\n', index) ;
+        var column = index - testCode.LastIndexOf('\n', index);
 
-        VerifyDiagnostic(testCode, BuildExpectedResult(line, column, minLength));
+        return BuildExpectedResult(line, column, minLength);
     }
 
     private void ConfigureMinimumLength(string setting)
@@ -636,9 +752,15 @@ class ClassName
             new AnalyzerOptions([], provider));
     }
 
-    private void VerifyMessage(string arguments, bool diagnosticExpected, string declaration = "", int minLength = 10,
-        string methodName = "LogInformation", int messageArgumentIndex = 0)
+    /// <summary>
+    /// Verifies the analyzer reads the message passed to the logger as <paramref name="expectedRead"/>, and reports a
+    /// diagnostic if <paramref name="diagnosticExpected"/>.
+    /// </summary>
+    private void VerifyMessage(string arguments, bool diagnosticExpected, string expectedRead, string declaration = "",
+        int minLength = DefaultMinLength, string methodName = "LogInformation", int messageArgumentIndex = 0)
     {
+        AssertTestDataIsConsistent(diagnosticExpected, expectedRead, minLength);
+
         var testCode = $$"""
             using Microsoft.Extensions.Logging;
             namespace ConsoleApplication;
@@ -671,13 +793,48 @@ class ClassName
                 .Single(invocation => invocation.Expression.ToString() == $"logger.{methodName}")
                 .ArgumentList.Arguments[messageArgumentIndex];
             var position = messageArgument.GetLocation().GetLineSpan().StartLinePosition;
+            var expected = BuildExpectedResult(position.Line + 1, position.Character + 1, minLength);
 
-            VerifyDiagnostic(testCode, BuildExpectedResult(position.Line + 1, position.Character + 1, minLength));
+            VerifyAndAssertMessagesRead(() => VerifyDiagnostic(testCode, expected), expectedRead);
         }
         else
         {
-            VerifyNoDiagnostic(testCode);
+            VerifyAndAssertMessagesRead(() => VerifyNoDiagnostic(testCode), expectedRead);
         }
+    }
+
+    /// <summary>
+    /// Runs <paramref name="verify"/>, then checks the messages read. If <paramref name="verify"/> fails, the messages read
+    /// are checked first, as a message read differently than expected is the more useful failure.
+    /// </summary>
+    private void VerifyAndAssertMessagesRead(System.Action verify, params string[] expectedReads)
+    {
+        try
+        {
+            verify();
+        }
+        catch
+        {
+            AssertMessagesRead(expectedReads);
+            throw;
+        }
+
+        AssertMessagesRead(expectedReads);
+    }
+
+    /// <summary>
+    /// Asserts the analyzer read exactly <paramref name="expectedReads"/>, in any order, as each is measured (i.e. trimmed).
+    /// </summary>
+    private void AssertMessagesRead(params string[] expectedReads)
+    {
+        static string Describe(System.Collections.Generic.IEnumerable<string> messages) => string.Join(", ",
+            messages.OrderBy(message => message, System.StringComparer.Ordinal)
+                .Select(message => $"\"{message}\" (length {message.Length})"));
+
+        var expected = Describe(expectedReads);
+        var actual = Describe(_messagesRead.Values);
+
+        Assert.AreEqual(expected, actual, "The analyzer didn't read the messages expected.");
     }
 }
 
