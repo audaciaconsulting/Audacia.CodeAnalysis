@@ -69,7 +69,7 @@ public class TestClass
         VerifyCodeFix(testFileContents, fixedTestFileContents);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("MaxMethodLengthAttribute")]
     [DataRow("MaxParameterCountAttribute")]
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_With_No_Justification(string attributeName)

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Immutable;
-using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Audacia.CodeAnalysis.Analyzers.AspNetCore.Extensions;
@@ -29,8 +27,10 @@ namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.ControllerActionReturn
 
         private const bool IsEnabled = true;
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, Severity, IsEnabled, Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, Severity, IsEnabled, Description, HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
             => ImmutableArray.Create(Rule);

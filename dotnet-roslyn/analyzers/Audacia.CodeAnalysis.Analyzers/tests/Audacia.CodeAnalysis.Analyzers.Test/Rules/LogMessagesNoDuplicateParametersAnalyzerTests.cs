@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = LogMessagesNoDuplicateParametersAnalyzer.Id,
-                Message = $"Log message property '{propertyName}' is duplicated",
+                Message = $"Log message property '{propertyName}' is duplicated. LOG-01.3.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

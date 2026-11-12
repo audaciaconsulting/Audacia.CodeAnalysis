@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Collections.Immutable;
 using System.Reflection;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -451,6 +447,14 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Extensions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Determines whether the specified type symbol is, or implements, an interface with the given name.
+        /// </summary>
+        public static bool IsOrImplementsInterface(this ITypeSymbol typeSymbol, INamedTypeSymbol interfaceName)
+        {
+            return interfaceName != null && typeSymbol.IsOrImplementsInterface(interfaceName.ToDisplayString());
         }
 
         /// <summary>

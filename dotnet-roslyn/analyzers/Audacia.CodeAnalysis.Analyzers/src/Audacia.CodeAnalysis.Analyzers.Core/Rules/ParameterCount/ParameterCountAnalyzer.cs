@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Collections.Immutable;
 using System.Text;
-using System.Threading;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
@@ -18,7 +14,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.ParameterCount
         private const string Title = "Signature contains too many parameters";
 
         private const string MessageFormat =
-            "{0} contains {1} parameters, which exceeds the maximum of {2} parameters";
+            "{0} contains {1} parameters, which exceeds the maximum of {2} parameters. CS-01.21.";
 
         private const string Description = "Don't declare signatures with more than a predefined number of parameters.";
 

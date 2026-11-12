@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = LogMessagesNoExceptionsAsTemplateParametersAnalyzer.Id,
-                Message = $"Log message property '{propertyName}' is an exception",
+                Message = $"Log message property '{propertyName}' is an exception. LOG-01.3.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -38,11 +35,13 @@ namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionRequired
         public const string Id = DiagnosticId.AssertionRequired;
 
         private const string Title = "Test method name '{0}' has no assertions";
-        private const string MessageFormat = "Test methods must contain at least one assertion";
+        private const string MessageFormat = "Test methods must contain at least one assertion. UT-01.1.";
         private const string Description = "When a test method has no assertions, it should be updated to include at least one assertion.";
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Maintainability, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.UnitTesting, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

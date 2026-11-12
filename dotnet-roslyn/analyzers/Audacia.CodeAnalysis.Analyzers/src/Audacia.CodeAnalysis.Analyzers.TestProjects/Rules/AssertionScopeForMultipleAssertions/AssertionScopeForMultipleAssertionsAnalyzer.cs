@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,13 +16,15 @@ namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionScopeForMul
         public const string Id = DiagnosticId.AssertionScopeForMultipleAssertions;
 
         private const string Title = "Test method name '{0}' has multiple assertions outside an assertion scope";
-        private const string MessageFormat = "Use an assertion scope when a test method has more than two assertions";
+        private const string MessageFormat = "Use an assertion scope when a test method has more than two assertions. UT-01.5.";
         private const string Description = "When a test method has more than two assertions, they should be wrapped within an assertion scope to provide a stack of all failures.";
 
         private const int MaxAssertionsOutsideScope = 2;
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Maintainability, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.UnitTesting, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -96,7 +96,7 @@ namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionScopeForMul
                     continue;
                 }
 
-                // Not a known assertion call — check whether it is a helper method call that contains assertions.
+                // Not a known assertion call - check whether it is a helper method call that contains assertions.
                 // If the call site itself is already inside a scope, we treat all assertions inside the helper as scoped.
                 var isCallSiteInsideScope = invocation.GetAssertionScopeFramework() != null;
                 if (isCallSiteInsideScope)

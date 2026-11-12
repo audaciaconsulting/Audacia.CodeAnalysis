@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Immutable;
-using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Microsoft.CodeAnalysis;
@@ -18,7 +16,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.UseRecordTypes
         public const string IncludedSuffixesSetting = "included_suffixes";
 
         private const string Title = "Type should be a record";
-        private const string MessageFormat = "Type '{0}' has suffix '{1}', which should be a record type";
+        private const string MessageFormat = "Type '{0}' has suffix '{1}', which should be a record type. CS-02.10.";
         private const string Description = "Use records for types that encapsulate data rather than behaviour.";
 
         private const string Category = DiagnosticCategory.Usage;

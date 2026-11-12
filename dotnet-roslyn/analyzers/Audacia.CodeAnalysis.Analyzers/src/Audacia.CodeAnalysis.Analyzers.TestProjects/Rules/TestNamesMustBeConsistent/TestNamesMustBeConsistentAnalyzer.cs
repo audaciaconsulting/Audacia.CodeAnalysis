@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
@@ -20,13 +19,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.TestNamesMustBeConsistent
         public const string FormatConfigKey = "test_method_name_format";
 
         private const string Title = "Test method names must be consistent";
-        private const string MessageFormat = "Test method name '{0}' is not consistent with configured format '{1}'";
+        private const string MessageFormat = "Test method name '{0}' is not consistent with configured format '{1}'. UT-01.2.";
         private const string Description = "When a test method name does not follow the configured naming conventions, it should be updated to be consistent.";
 
         private const int RegexTimeoutInMilliseconds = 100;
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.UnitTesting, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         private readonly bool _isSettingsReaderInjected;
         private ISettingsReader _settingsReader;

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount;
@@ -16,6 +17,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Base
@@ -75,7 +77,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         private static readonly MetadataReference FluentAssertionsAssertionScopeReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Execution.AssertionScope).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsAssertionExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.AssertionExtensions).Assembly.Location);
         private static readonly MetadataReference FluentAssertionsStringExtensionsReference = MetadataReference.CreateFromFile(typeof(FluentAssertions.Primitives.StringAssertions).Assembly.Location);
-        private static readonly MetadataReference MoqReference = MetadataReference.CreateFromFile(typeof(Moq.Mock).Assembly.Location);
         private static readonly MetadataReference NSubstituteReference = MetadataReference.CreateFromFile(typeof(NSubstitute.Substitute).Assembly.Location);
 
         internal static readonly CompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(
@@ -86,6 +87,20 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         internal static string CSharpDefaultFileExt = "cs";
         internal static string VisualBasicDefaultExt = "vb";
         internal static string TestProjectName = "TestProject";
+
+        /// <summary>
+        /// Settings reader substitute for analyzers that read settings.
+        /// </summary>
+        /// <remarks>
+        /// <para>Declared in the base so that all settings are defaulted to null (not configured) by the constructor running <see cref="DefaultToNoSettings"/>.</para>
+        /// <para>Otherwise, NSubstitute default everything to an empty string, which gives different results and can lead to unexpected behavior in tests.</para>
+        /// </remarks>
+        protected ISettingsReader SubstituteSettingsReader { get; } = Substitute.For<ISettingsReader>();
+
+        protected DiagnosticVerifier()
+        {
+            DefaultToNoSettings(SubstituteSettingsReader);
+        }
 
         #region To be implemented by Test classes
         /// <summary>
@@ -115,6 +130,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         protected void VerifyNoDiagnostic(string source)
         {
             VerifyDiagnostics(new[] { source }, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer());
+        }
+
+        /// <summary>
+        /// Called to test a C# DiagnosticAnalyzer produces no diagnostics when applied on the inputted strings as a source
+        /// </summary>
+        /// <param name="sources">An array of strings to create source documents from to run the analyzers on</param>
+        protected void VerifyNoDiagnostic(string[] sources)
+        {
+            VerifyDiagnostics(sources, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer());
         }
 
         /// <summary>
@@ -185,8 +209,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 if (expectedCount != actualCount)
                 {
                     string diagnosticsOutput = diagnosticsList.Any() ? FormatDiagnostics(analyzer, diagnosticsList.ToArray()) : "    NONE.";
-    
-                    Assert.IsTrue(false,
+                    Assert.Fail(
                         string.Format("Mismatch between number of diagnostics returned, expected \"{0}\" actual \"{1}\"\r\n\r\nDiagnostics:\r\n{2}\r\n", expectedCount, actualCount, diagnosticsOutput));
                 }
     
@@ -199,7 +222,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                     {
                         if (actual.Location != Location.None)
                         {
-                            Assert.IsTrue(false,
+                            Assert.Fail(
                                 string.Format("Expected:\nA project diagnostic with No location\nActual:\n{0}",
                                 FormatDiagnostics(analyzer, actual)));
                         }
@@ -211,7 +234,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
     
                         if (additionalLocations.Length != expected.Locations.Length - 1)
                         {
-                            Assert.IsTrue(false,
+                            Assert.Fail(
                                 string.Format("Expected {0} additional locations but got {1} for Diagnostic:\r\n    {2}\r\n",
                                     expected.Locations.Length - 1, additionalLocations.Length,
                                     FormatDiagnostics(analyzer, actual)));
@@ -225,21 +248,21 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
     
                     if (actual.Id != expected.Id)
                     {
-                        Assert.IsTrue(false,
+                        Assert.Fail(
                             string.Format("Expected diagnostic id to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                                 expected.Id, actual.Id, FormatDiagnostics(analyzer, actual)));
                     }
     
                     if (actual.Severity != expected.Severity)
                     {
-                        Assert.IsTrue(false,
+                        Assert.Fail(
                             string.Format("Expected diagnostic severity to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                                 expected.Severity, actual.Severity, FormatDiagnostics(analyzer, actual)));
                     }
     
                     if (actual.GetMessage() != expected.Message)
                     {
-                        Assert.IsTrue(false,
+                        Assert.Fail(
                             string.Format("Expected diagnostic message to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                                 expected.Message, actual.GetMessage(), FormatDiagnostics(analyzer, actual)));
                     }
@@ -269,7 +292,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
             {
                 if (actualLinePosition.Line + 1 != expected.Line)
                 {
-                    Assert.IsTrue(false,
+                    Assert.Fail(
                         string.Format("Expected diagnostic to be on line \"{0}\" was actually on line \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.Line, actualLinePosition.Line + 1, FormatDiagnostics(analyzer, diagnostic)));
                 }
@@ -280,7 +303,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
             {
                 if (actualLinePosition.Character + 1 != expected.Column)
                 {
-                    Assert.IsTrue(false,
+                    Assert.Fail(
                         string.Format("Expected diagnostic to start at column \"{0}\" was actually at column \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.Column, actualLinePosition.Character + 1, FormatDiagnostics(analyzer, diagnostic)));
                 }
@@ -421,6 +444,19 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         #endregion
 
         #region Set up compilation and documents
+
+        /// <summary>
+        /// Default all settings to null (not configured), otherwise the substitute uses an empty string, which causes false positives.
+        /// </summary>
+        /// <param name="settingsReader">Settings reader substitute</param>
+        private static void DefaultToNoSettings(ISettingsReader settingsReader)
+        {
+            settingsReader.TryGetValue(
+                    Arg.Any<SyntaxTree>(),
+                    Arg.Any<SettingsKey>())
+                .Returns((string)null);
+        }
+
         /// <summary>
         /// Given an array of strings as sources and a language, turn them into a project and return the documents and spans of it.
         /// </summary>
@@ -463,7 +499,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
         /// <param name="sources">Classes in the form of strings</param>
         /// <param name="language">The language the source code is in</param>
         /// <returns>A Project created out of the Documents created from the source strings</returns>
-        private static Project CreateProject(string[] sources, string language = LanguageNames.CSharp)
+        protected static Project CreateProject(string[] sources, string language = LanguageNames.CSharp)
         {
             string fileNamePrefix = DefaultFilePathPrefix;
             string fileExt = language == LanguageNames.CSharp ? CSharpDefaultFileExt : VisualBasicDefaultExt;
@@ -512,7 +548,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
                 .AddMetadataReference(projectId, FluentAssertionsAssertionScopeReference)
                 .AddMetadataReference(projectId, FluentAssertionsAssertionExtensionsReference)
                 .AddMetadataReference(projectId, FluentAssertionsStringExtensionsReference)
-                .AddMetadataReference(projectId, MoqReference)
                 .AddMetadataReference(projectId, NSubstituteReference);
 
             int count = 0;
@@ -525,6 +560,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Base
             }
             return solution.GetProject(projectId);
         }
+
         #endregion
     }
 }

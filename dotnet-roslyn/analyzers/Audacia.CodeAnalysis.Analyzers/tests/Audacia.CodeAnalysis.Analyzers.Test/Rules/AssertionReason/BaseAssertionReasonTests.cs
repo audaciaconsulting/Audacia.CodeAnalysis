@@ -40,7 +40,7 @@ public class TestClass
             {
                 Id = AssertionReasonMustBeProvidedAnalyzer.Id,
                 Severity = DiagnosticSeverity.Warning,
-                Message = "Assertions must contain a reason",
+                Message = "Assertions must contain a reason. UT-01.1.",
                 Locations =
                     new[]
                     {

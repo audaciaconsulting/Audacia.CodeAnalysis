@@ -32,7 +32,7 @@ Note the second PR is needed as `Audacia.CodeAnalysis.Analyzers` should be consu
 **Important:** The unit test project in this solution will fail to build if the path length of items in the bin folder exceeds 260 characters. (You will see errors similar to `Could not copy Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll`). Therefore, it is recommended to clone this repo into a high-level directory (e.g. C:\Projects).
 
 ## Help link URLs
-If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](./src/Audacia.CodeAnalysis.Analyzers/Common/HelpLinkUrlFactory.cs) is updated to reflect the new titles.
+If the titles of any of the below analyzers change, ensure [HelpLinkUrlFactory](./src/Audacia.CodeAnalysis.Analyzers.Shared/Common/HelpLinkUrlFactory.cs) is updated to reflect the new titles.
 
 ## Testing changes locally
 
@@ -67,7 +67,7 @@ e.g
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-05.2</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-naming#CS-05.2">CS-05.2</a></td>
 </tr>
 </table>
 
@@ -96,11 +96,11 @@ public class MyClass
 <table>
 <tr>
     <td>Category:</td>
-    <td>Usage</td>
+    <td>Maintainability</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.8</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.8">CS-01.8</a></td>
 </tr>
 </table>
 
@@ -217,11 +217,11 @@ var next = previous + 1;
 <table>
 <tr>
     <td>Category:</td>
-    <td>Maintanability</td>
+    <td>Maintainability</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.1</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.1">CS-01.1</a></td>
 </tr>
 </table>
 
@@ -298,11 +298,11 @@ public void MyMethod(string arg)
 <table>
 <tr>
     <td>Category:</td>
-    <td>Maintanability</td>
+    <td>Maintainability</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.21</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.21">CS-01.21</a></td>
 </tr>
 </table>
 
@@ -372,7 +372,7 @@ public static string ExampleExtension(this Person person, int a, int b, int c, i
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-05.1</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-naming#CS-05.1">CS-05.1</a></td>
 </tr>
 </table>
 
@@ -400,23 +400,14 @@ The following is a full list of the abbreviations that are checked for:
 "Ctl", "Tm", "Mgr", "Flt", "Len", "Idx", "Str"
 ```
 
-There are two additional pieces of configuration that can be applied:
-
-- Exclude lambda expression parameters from the check
-- Allow certain characters/abbreviations as a for loop variable
-
 #### Lambda expressions
 
-Single characters are often used as lambda expression parameter names, therefore this can be allowed by using the following setting (which is set in the default configuration):
-
-```
-dotnet_diagnostic.ACL1004.exclude_lambdas = true
-```
-
-With the above setting in place, the following code will not result in a diagnostic.
+Single character lambda expression parameter names are allowed only when the character matches the first letter of the parameter's type, or the first letter of the collection being queried. For example, given `_context.People` is a collection of `Person`:
 
 ```csharp
-var match = list.First(a => a.Name == "Bob");
+_context.People.Where(x => x.Name == "Bob");      // Diagnostic
+_context.People.Where(p => p.Name == "Bob");      // No diagnostic
+_context.People.Where(person => person.Name == "Bob"); // No diagnostic
 ```
 
 #### Loop variables
@@ -438,11 +429,11 @@ for (var i = 0; i < 10; i++)
 <table>
 <tr>
     <td>Category:</td>
-    <td>Style</td>
+    <td>Maintainability</td>
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-06.1</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.15">CS-01.15</a></td>
 </tr>
 </table>
 
@@ -497,7 +488,7 @@ var x = items.OrderBy(f => f.Surname).ThenByDescending(f => f.Name);
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.28</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.28">CS-01.28</a></td>
 </tr>
 </table>
 
@@ -521,7 +512,7 @@ ACL1010 also provides a code fix, which inserts or updates the <Nullable> node i
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.14</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.14">CS-01.14</a></td>
 </tr>
 </table>
 
@@ -574,7 +565,7 @@ Maximum allowed nesting can be configured in `.editorconfig` by setting `dotnet_
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.19">CS-01.19</a></td>
 </tr>
 </table>
 
@@ -615,7 +606,7 @@ Maximum allowed clauses can be configured in `.editorconfig` by setting `dotnet_
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-02.9</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-class-design#CS-02.10">CS-02.10</a></td>
 </tr>
 </table>
 
@@ -665,7 +656,7 @@ Note the following:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-naming#CS-05.3">CS-05.3</a></td>
 </tr>
 </table>
 
@@ -708,6 +699,17 @@ Note the following:
 - These overrides can contain letters. For example, an identifier with '2' in its name would violate this rule.
 
 ### ACL1017 - Avoid signatures that take a bool parameter but exclude positional syntax records
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Maintainability</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.23">CS-01.23</a></td>
+</tr>
+</table>
 
 ACL1017 performs the same analysis as the 'avoid boolean parameter' analyzer rule (AV1564) but excludes positional syntax records, treating them as properties rather than parameters.
 
@@ -809,7 +811,7 @@ public void MyMethod()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.1">LOG-01.1</a></td>
 </tr>
 </table>
 
@@ -856,7 +858,7 @@ Code without diagnostic:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.3">LOG-01.3</a></td>
 </tr>
 </table>
 
@@ -899,7 +901,7 @@ Code without diagnostic:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.3">LOG-01.3</a></td>
 </tr>
 </table>
 
@@ -936,7 +938,7 @@ Code without diagnostic:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.3">LOG-01.3</a></td>
 </tr>
 </table>
 
@@ -968,6 +970,97 @@ Code without diagnostic:
     _logger.LogInformation(template, message);
 ```
 
+### ACL1027 - Record properties should be init-only
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-member-design#CS-03.10">CS-03.10</a></td>
+</tr>
+</table>
+
+The ACL1027 rule checks whether record properties use 'init' instead of 'set' for the setter. It also provides a code fix, which replaces 'set' with 'init' on the property and any overrides.
+
+The rule applies to record classes and record structs, but ignores indexers, static properties, overridden properties and properties implementing an interface with a 'set' - including through a derived record - where 'init' would be invalid.
+
+The rule does not apply to properties generated by positional syntax.
+
+Code with violation:
+
+```csharp
+public record MyRecord
+{
+    public int Number { get; set; }
+}
+```
+
+Code with fix:
+
+```csharp
+public record MyRecord
+{
+    public int Number { get; init; }
+}
+```
+
+### ACL1028 - Application logic should be signposted
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Logging</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-04.6">LOG-04.6</a></td>
+</tr>
+</table>
+
+ACL1028 is designed to nudge developers to signpost application logic with logging so that it is easier to understand what is happening in the application when reading logs. The Audacia logging standard LOG-04.6 states this.
+
+While this rule does not enforce that logging methods are actually used, it will produce a warning if an application logic handler does not have injected `ILogger`, `ILogger<T>`, `ILoggerFactory`, or `ILoggerProvider` instances.
+
+By default, classes with the suffix of `Handler` are analysed under this rule. This can be configured with the following setting:
+
+```
+# Comma-separated list of suffixes
+dotnet_diagnostic.ACL1028.handler_suffix = Handler,Processor,Orchestrator
+```
+
+### ACL1029 - Log messages should be long enough to be meaningful
+
+<table>
+<tr>
+    <td>Category:</td>
+    <td>Usage</td>
+</tr>
+<tr>
+    <td>Audacia coding standard:</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/4-observability/logging#LOG-01.4">LOG-01.4</a></td>
+</tr>
+</table>
+
+ACL1029 checks whether log messages are long enough to be meaningful, and produces a warning if not, to encourage adding descriptive wording. Leading and trailing whitespace is not counted.
+
+The rule checks messages passed to `ILogger` methods (e.g. `LogInformation`), the `Message` of `[LoggerMessage]` source-generated logging methods, and the format string passed to `LoggerMessage.Define`.
+
+The minimum length can be configured in `.editorconfig` by setting `dotnet_diagnostic.ACL1029.log_message_minimum_length`. The default is 10.
+`log_message_minimum_length` must be an integer between 1 and 100.
+
+For `ILogger` templates, string constant argument values are included, e.g. for messages in dedicated files for ease of maintenance/translation.
+Only compile-time constant strings (literals, and `const` fields and locals) are 'read', not `static readonly` fields.
+
+All other arguments (including numeric, boolean and `null` constants) are treated as zero length, e.g. `_logger.LogError("Failed {Id}", id)` is read as `Failed`.
+For `[LoggerMessage]` and `LoggerMessage.Define`, each placeholder is ignored, as values are only known at runtime.
+
+Messages using interpolation, concatenation, join, `string.Format` etc. are treated in the same way: string constants are 'read', but `"Failed: " + ex.Message` is read as `Failed:` (7 characters), and `string.Format("Failed {0}", id)` as `Failed` (6 characters).
+
+If the message/template itself is a variable, but not a string constant, it will also generate a warning.
+
 ## Audacia.CodeAnalysis.Analyzers.AspNetCore
 
 ### ACL1005 - Asynchronous method name is not suffixed with 'Async'
@@ -979,7 +1072,7 @@ Code without diagnostic:
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-05.15</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-naming#CS-05.16">CS-05.16</a></td>
 </tr>
 </table>
 
@@ -1002,6 +1095,7 @@ ACL1005 adds an exclusion for controller actions, as they are often asynchronous
 
 ACL1008 checks if a controller action has at least one `ProducesResponseType` attribute when the return type is not TypedResults and will produce a warning if not.
 This applies to controller actions defined by either an Http attribute (eg. `HttpGet`) or by the parent class inheriting the `ControllerBase` class.
+`ProducesResponseType<T>` is also supported, and will not produce a warning.
 
 Code with diagnostic:
 
@@ -1033,7 +1127,7 @@ public string Get()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>CS-01.20</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/coding-standards/csharp/cs-maintainability#CS-01.20">CS-01.20</a></td>
 </tr>
 </table>
 
@@ -1238,7 +1332,7 @@ public Results<NotFound, Ok<string>> Get()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>N/A</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/5-automated-testing/unit-testing#UT-01.5">UT-01.5</a></td>
 </tr>
 </table>
 
@@ -1328,7 +1422,7 @@ public void FluentAssertionsTestMethod()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>UT-01.1</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/5-automated-testing/unit-testing#UT-01.1">UT-01.1</a></td>
 </tr>
 </table>
 
@@ -1373,7 +1467,7 @@ public void TestMethod()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>UT-01.1</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/5-automated-testing/unit-testing#UT-01.1">UT-01.1</a></td>
 </tr>
 </table>
 
@@ -1423,7 +1517,7 @@ public void TestMethod()
 </tr>
 <tr>
     <td>Audacia coding standard:</td>
-    <td>UT-01.2</td>
+    <td><a href="https://standards.audacia.tech/standards/engineering/engineering-principles/5-automated-testing/unit-testing#UT-01.2">UT-01.2</a></td>
 </tr>
 </table>
 

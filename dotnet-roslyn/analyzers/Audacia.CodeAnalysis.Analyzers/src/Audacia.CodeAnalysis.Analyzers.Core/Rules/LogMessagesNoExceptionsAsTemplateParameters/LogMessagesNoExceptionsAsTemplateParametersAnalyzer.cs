@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Microsoft.CodeAnalysis;
@@ -15,15 +14,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNoExceptionsAsTem
         public const string Id = DiagnosticId.LogMessagesNoExceptionsAsTemplateParameters;
 
         private const string Title = "Log message template format contains an exception";
-        private const string MessageFormat = "Log message property '{0}' is an exception";
+        private const string MessageFormat = "Log message property '{0}' is an exception. LOG-01.3.";
         private const string Description = "Do not use exceptions as log message template parameters. These should use the correct overload of the logging method with an exception parameter.";
 
         private const string LoggerArgsParameterName = "args";
 
         private const string ExceptionTypeName = "System.Exception";
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Usage, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Logging, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

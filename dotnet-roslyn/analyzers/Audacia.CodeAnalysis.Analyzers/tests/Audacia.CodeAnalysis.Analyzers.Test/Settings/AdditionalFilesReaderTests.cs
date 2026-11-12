@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Settings
 {
@@ -10,22 +11,27 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Settings
     {
         private static AdditionalFilesReader SetupReader(SettingsKey key, params (string path, string settingsValue)[] fileSetups)
         {
-            var mockFiles = new List<IAdditionalText>();
+            var substituteFiles = new List<IAdditionalText>();
             foreach (var (path, settingsValue) in fileSetups)
             {
-                var mockFile = new Mock<IAdditionalText>();
-                mockFile.SetupGet(f => f.Path).Returns(path);
+                var substituteFile = Substitute.For<IAdditionalText>();
+                substituteFile.Path.Returns(path);
 
                 if (settingsValue != null)
                 {
                     var setting = $"{key} = {settingsValue}";
-                    mockFile.Setup(f => f.FindRuleSettingValue(key)).Returns(setting);
+                    substituteFile.FindRuleSettingValue(key).Returns(setting);
+                }
+                else
+                {
+                    // Setting not in this file (the substitute would otherwise return an empty string)
+                    substituteFile.FindRuleSettingValue(default).ReturnsNullForAnyArgs();
                 }
 
-                mockFiles.Add(mockFile.Object);
+                substituteFiles.Add(substituteFile);
             }
             
-            return new AdditionalFilesReader(mockFiles);
+            return new AdditionalFilesReader(substituteFiles);
         }
 
         [TestMethod]
@@ -58,18 +64,18 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Settings
             var key = new SettingsKey("abc", "name");
             const string expectedValue = "123";
 
-            var mockFileOne = new Mock<IAdditionalText>();
-            mockFileOne.SetupGet(f => f.Path).Returns("dummy-path");
-            mockFileOne.Setup(f => f.FindRuleSettingValue(key)).Returns($"{key} = {expectedValue}");
+            var substituteFileOne = Substitute.For<IAdditionalText>();
+            substituteFileOne.Path.Returns("dummy-path");
+            substituteFileOne.FindRuleSettingValue(key).Returns($"{key} = {expectedValue}");
 
-            var mockFileTwo = new Mock<IAdditionalText>();
-            mockFileTwo.SetupGet(f => f.Path).Returns("dummy-path-2");
+            var substituteFileTwo = Substitute.For<IAdditionalText>();
+            substituteFileTwo.Path.Returns("dummy-path-2");
 
-            var reader = new AdditionalFilesReader(new[] { mockFileOne.Object, mockFileTwo.Object });
+            var reader = new AdditionalFilesReader(new[] { substituteFileOne, substituteFileTwo });
 
             reader.TryGetValue(key);
 
-            mockFileTwo.Verify(f => f.FindRuleSettingValue(key), Times.Never);
+            substituteFileTwo.DidNotReceive().FindRuleSettingValue(key);
         }
 
         [TestMethod]
@@ -78,11 +84,11 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Settings
             var key = new SettingsKey("abc", "name");
             const string expectedValue = "123";
 
-            var mockFile = new Mock<IAdditionalText>();
-            mockFile.SetupGet(f => f.Path).Returns("dummy-path");
-            mockFile.Setup(f => f.FindRuleSettingValue(key)).Returns($"{key} = {expectedValue}  ");
+            var substituteFile = Substitute.For<IAdditionalText>();
+            substituteFile.Path.Returns("dummy-path");
+            substituteFile.FindRuleSettingValue(key).Returns($"{key} = {expectedValue}  ");
 
-            var reader = new AdditionalFilesReader(new[] { mockFile.Object });
+            var reader = new AdditionalFilesReader(new[] { substituteFile });
 
             var actualValue = reader.TryGetValue(key);
 
@@ -94,12 +100,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Settings
         {
             var key = new SettingsKey("abc", "name");
 
-            var mockFile = new Mock<IAdditionalText>();
-            mockFile.SetupGet(f => f.Path).Returns("dummy-path");
+            var substituteFile = Substitute.For<IAdditionalText>();
+            substituteFile.Path.Returns("dummy-path");
             // Malformed means no '=' sign
-            mockFile.Setup(f => f.FindRuleSettingValue(key)).Returns($"{key}  123");
+            substituteFile.FindRuleSettingValue(key).Returns($"{key}  123");
 
-            var reader = new AdditionalFilesReader(new[] { mockFile.Object });
+            var reader = new AdditionalFilesReader(new[] { substituteFile });
 
             var actualValue = reader.TryGetValue(key);
 

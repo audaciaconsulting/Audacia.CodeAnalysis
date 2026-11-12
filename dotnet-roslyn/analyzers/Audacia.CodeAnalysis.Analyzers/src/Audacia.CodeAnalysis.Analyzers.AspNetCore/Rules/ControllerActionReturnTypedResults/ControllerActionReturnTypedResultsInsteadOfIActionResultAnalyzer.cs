@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.ControllerActionReturnTypedResults
 {
@@ -27,8 +26,10 @@ namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.ControllerActionReturn
 
         private const bool IsEnabled = true;
 
+        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
         private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, Severity, IsEnabled, Description);
+            = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, Severity, IsEnabled, Description, HelpLinkUrl);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
             => ImmutableArray.Create(Rule);

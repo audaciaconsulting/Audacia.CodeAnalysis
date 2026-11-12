@@ -22,7 +22,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             {
                 Id = ParameterCountAnalyzer.Id,
                 Message =
-                    $"{memberName} contains {parameterCount} parameters, which exceeds the maximum of {maxParameterCount} parameters",
+                    $"{memberName} contains {parameterCount} parameters, which exceeds the maximum of {maxParameterCount} parameters. CS-01.21.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

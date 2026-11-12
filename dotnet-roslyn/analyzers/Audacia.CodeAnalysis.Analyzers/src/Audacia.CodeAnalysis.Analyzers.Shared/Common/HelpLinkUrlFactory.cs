@@ -1,5 +1,3 @@
-using System;
-
 namespace Audacia.CodeAnalysis.Analyzers.Shared.Common
 {
     /// <summary>
@@ -58,6 +56,30 @@ namespace Audacia.CodeAnalysis.Analyzers.Shared.Common
                     return $"{helpLinkUrlPrefix}controller-action-should-return-typedresults-instead-of-iactionresults";                
                 case DiagnosticId.SuppressionRequiresJustification:
                     return $"{helpLinkUrlPrefix}code-analysis-suppression-attribute-requires-justification";
+                case DiagnosticId.UseInitForRecordSetters:
+                    return $"{helpLinkUrlPrefix}record-properties-should-be-init-only";
+                case DiagnosticId.AvoidBooleanParameters:
+                    return $"{helpLinkUrlPrefix}avoid-signatures-that-take-a-bool-parameter-but-exclude-positional-syntax-records";
+                case DiagnosticId.AssertionScopeForMultipleAssertions:
+                    return $"{helpLinkUrlPrefix}use-an-assertion-scope-with-more-than-two-assertions-in-a-test-method";
+                case DiagnosticId.AssertionRequired:
+                    return $"{helpLinkUrlPrefix}test-methods-must-contain-at-least-one-assertion";
+                case DiagnosticId.AssertionReasonMustBeProvided:
+                    return $"{helpLinkUrlPrefix}assertions-must-contain-a-reason-where-supported";
+                case DiagnosticId.TestNamesMustBeConsistent:
+                    return $"{helpLinkUrlPrefix}test-method-names-must-be-consistent";
+                case DiagnosticId.LogMessagesNamedPropertiesPascalCase:
+                    return $"{helpLinkUrlPrefix}named-properties-within-log-messages-should-use-pascalcase";
+                case DiagnosticId.LogMessagesNoDuplicateParameters:
+                    return $"{helpLinkUrlPrefix}named-properties-within-log-messages-should-not-be-duplicated";
+                case DiagnosticId.LogMessagesNoExceptionsAsTemplateParameters:
+                    return $"{helpLinkUrlPrefix}exceptions-should-not-be-used-in-log-message-templates";
+                case DiagnosticId.LogMessagesNamedPropertiesMustBeUsed:
+                    return $"{helpLinkUrlPrefix}named-properties-should-be-used-in-logging-messages";
+                case DiagnosticId.ApplicationLogicShouldBeSignposted:
+                    return $"{helpLinkUrlPrefix}application-logic-should-be-signposted";
+                case DiagnosticId.LogMessageMinimumLength:
+                    return $"{helpLinkUrlPrefix}log-messages-should-be-long-enough-to-be-meaningful";
                 default:
                     throw new ArgumentOutOfRangeException(
                         nameof(diagnosticId),
