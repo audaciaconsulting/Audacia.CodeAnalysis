@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## 2.2.0 - 2026-11-12
+
+### Changed
+
+- Updated Audacia.CodeAnalysis.Analyzers to version 2.1.0
+- Enabled warnings as errors, but disabled ACL1010 'enable nullable' (does not affect consuming projects)
+
 ## 2.1.0 - 2026-08-07
 
 ### Added

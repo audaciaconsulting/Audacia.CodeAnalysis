@@ -1,5 +1,7 @@
 <Project>
     <PropertyGroup>
-        <Version>2.1.0</Version>
+        <Version>2.2.0</Version>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn);ACL1010</NoWarn>
     </PropertyGroup>
 </Project>
