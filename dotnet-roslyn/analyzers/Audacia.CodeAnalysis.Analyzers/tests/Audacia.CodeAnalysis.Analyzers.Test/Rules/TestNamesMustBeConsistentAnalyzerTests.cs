@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+using NSubstitute;
 using Audacia.CodeAnalysis.Analyzers.Rules.TestNamesMustBeConsistent;
-using Audacia.CodeAnalysis.Analyzers.Settings;
+using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 
@@ -12,21 +12,17 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
     [TestClass]
     public class TestNamesMustBeConsistentAnalyzerTests : CodeFixVerifier
     {
-
-        private readonly Mock<ISettingsReader> _mockSettingsReader = new();
-
         private void SetupConfiguredFormat(string configuredFormat)
         {
-            _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                It.IsAny<SyntaxTree>(),
-                new SettingsKey(TestNamesMustBeConsistentAnalyzer.Id, TestNamesMustBeConsistentAnalyzer.FormatConfigKey)))
+            SubstituteSettingsReader.TryGetValue(
+                Arg.Any<SyntaxTree>(),
+                new SettingsKey(TestNamesMustBeConsistentAnalyzer.Id, TestNamesMustBeConsistentAnalyzer.FormatConfigKey))
             .Returns(configuredFormat);
         }
 
-
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new TestNamesMustBeConsistentAnalyzer(_mockSettingsReader.Object);
+            return new TestNamesMustBeConsistentAnalyzer(SubstituteSettingsReader);
         }
 
         internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string methodName, string configuredFormat)
@@ -36,7 +32,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             {
                 Id = TestNamesMustBeConsistentAnalyzer.Id,
                 Severity = DiagnosticSeverity.Warning,
-                Message = $"Test method name '{methodName}' is not consistent with configured format '{configuredFormat}'",
+                Message = $"Test method name '{methodName}' is not consistent with configured format '{configuredFormat}'. UT-01.2.",
                 Locations =
                     new[] {
                     new DiagnosticResultLocation("Test0.cs", lineNumber, column)

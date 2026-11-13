@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.AvoidBooleanParameter;
+﻿using Audacia.CodeAnalysis.Analyzers.Core.Rules.AvoidBooleanParameter;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -75,7 +75,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     }
                 }";
 
-            var expectedDiagnostic = BuildExpectedResult("Parameter 'imNotAllowed' is of type 'bool'", 13, 64);
+            var expectedDiagnostic = BuildExpectedResult("Parameter 'imNotAllowed' is of type 'bool'. CS-01.23.", 13, 64);
 
             VerifyDiagnostic(testCode, expectedDiagnostic);
         }

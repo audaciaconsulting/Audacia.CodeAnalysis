@@ -20,7 +20,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = IncludeBracesAnalyzer.Id,
-                Message = "Code block should have braces",
+                Message = "Code block should have braces. CS-01.15.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {

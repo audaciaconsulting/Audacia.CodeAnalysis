@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalCase;
+using Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNamedPropertiesPascalCase;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using System;
@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = LogMessagesNamedPropertiesPascalCaseAnalyzer.Id,
-                Message = $"Log message property '{propertyName}' does not use PascalCase",
+                Message = $"Log message property '{propertyName}' does not use PascalCase. LOG-01.1.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

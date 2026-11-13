@@ -1,4 +1,4 @@
-using Audacia.CodeAnalysis.Analyzers.Rules.AssertionReason;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionReason;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -40,7 +40,7 @@ public class TestClass
             {
                 Id = AssertionReasonMustBeProvidedAnalyzer.Id,
                 Severity = DiagnosticSeverity.Warning,
-                Message = "Assertions must contain a reason",
+                Message = "Assertions must contain a reason. UT-01.1.",
                 Locations =
                     new[]
                     {

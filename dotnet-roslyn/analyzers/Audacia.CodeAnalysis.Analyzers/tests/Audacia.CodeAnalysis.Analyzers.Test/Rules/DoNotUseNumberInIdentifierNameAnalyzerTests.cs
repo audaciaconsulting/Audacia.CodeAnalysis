@@ -1,25 +1,23 @@
-using Audacia.CodeAnalysis.Analyzers.Rules.DoNotUseNumberInIdentifierName;
-using Audacia.CodeAnalysis.Analyzers.Settings;
+using Audacia.CodeAnalysis.Analyzers.Core.Rules.DoNotUseNumberInIdentifierName;
+using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+using NSubstitute;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 
 [TestClass]
 public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
 {
-    private readonly Mock<ISettingsReader> _mockSettingsReader = new();
-
-    private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string kind, string identifierName)
+    private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string kind, string identifierName)
     {
         return new DiagnosticResult
         {
             Id = DoNotUseNumberInIdentifierNameAnalyzer.Id,
-            Message = $"{kind} '{identifierName}' contains one or more digits in its name",
+            Message = $"{kind} '{identifierName}' contains one or more digits in its name. CS-05.3.",
             Severity = DiagnosticSeverity.Warning,
             Locations =
             [
@@ -30,7 +28,7 @@ public class DoNotUseNumberInIdentifierNameAnalyzerTests : DiagnosticVerifier
 
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        return new DoNotUseNumberInIdentifierNameAnalyzer(_mockSettingsReader.Object);
+        return new DoNotUseNumberInIdentifierNameAnalyzer(SubstituteSettingsReader);
     }
 
     [TestMethod]
@@ -218,9 +216,9 @@ struct TypeName1
     [TestMethod]
     public void No_Diagnostic_If_Numbers_Used_And_Word_Is_Allowed()
     {
-        _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                It.IsAny<SyntaxTree>(),
-                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting)))
+        SubstituteSettingsReader.TryGetValue(
+                Arg.Any<SyntaxTree>(),
+                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting))
             .Returns("B2C, 365");
 
         var test = @"
@@ -244,9 +242,9 @@ class TypeNameB2C
     [TestMethod]
     public void No_Diagnostic_If_Numbers_Used_With_Different_Casing_And_Word_Is_Allowed()
     {
-        _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                It.IsAny<SyntaxTree>(),
-                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting)))
+        SubstituteSettingsReader.TryGetValue(
+                Arg.Any<SyntaxTree>(),
+                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting))
             .Returns("ABC123");
 
         var test = @"
@@ -270,9 +268,9 @@ class TypeNameAbc123
     [TestMethod]
     public void Diagnostic_If_Numbers_Used_And_Word_Is_Allowed_When_Identifier_Contains_Additional_Numbers()
     {
-        _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                It.IsAny<SyntaxTree>(),
-                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting)))
+        SubstituteSettingsReader.TryGetValue(
+                Arg.Any<SyntaxTree>(),
+                new SettingsKey(DoNotUseNumberInIdentifierNameAnalyzer.Id, DoNotUseNumberInIdentifierNameAnalyzer.AllowedWordsSetting))
             .Returns("B2C");
 
         var test = @"

@@ -1,4 +1,4 @@
-using Audacia.CodeAnalysis.Analyzers.Rules.AssertionRequired;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionRequired;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

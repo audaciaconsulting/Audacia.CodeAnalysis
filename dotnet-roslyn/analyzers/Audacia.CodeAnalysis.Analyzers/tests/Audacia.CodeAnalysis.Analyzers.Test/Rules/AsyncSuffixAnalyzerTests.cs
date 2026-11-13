@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.AsyncSuffix;
+﻿using Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.AsyncSuffix;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -114,7 +114,7 @@ class TestClass
 }";
 
             const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'";
+                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 13, 5);
 
@@ -142,7 +142,7 @@ interface ITestInterface
 }";
 
             const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'";
+                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 15, 5);
 
@@ -217,7 +217,7 @@ class TestClass
 }";
 
             const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'";
+                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 13, 5);
 
@@ -277,10 +277,10 @@ class TestClass
 }";
 
             const string expectedMessage1
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'";
+                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
 
             const string expectedMessage2
-                = "Asynchronous method name 'TestMethod1' is not suffixed with 'Async'";
+                = "Asynchronous method name 'TestMethod1' is not suffixed with 'Async'. CS-05.16.";
 
             var expectedDiagnostics
                 = new[]
@@ -400,7 +400,7 @@ public class TestController : ControllerBase
 }";
 
             const string expectedMessage
-                = "Asynchronous method name 'Get' is not suffixed with 'Async'";
+                = "Asynchronous method name 'Get' is not suffixed with 'Async'. CS-05.16.";
 
             var expectedDiagnostic = BuildExpectedResult(expectedMessage, 14, 5);
 

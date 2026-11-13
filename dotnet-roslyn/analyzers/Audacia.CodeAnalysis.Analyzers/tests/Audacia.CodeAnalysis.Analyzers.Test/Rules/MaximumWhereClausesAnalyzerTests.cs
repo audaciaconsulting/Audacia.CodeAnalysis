@@ -166,7 +166,7 @@ class Program
     }
 }";
 
-            const string expectedMessage = "Expression contains 4 clauses, which exceeds the maximum of 3 clauses per expression";
+            const string expectedMessage = "Expression contains 4 clauses, which exceeds the maximum of 3 clauses per expression. CS-01.19.";
             var expectedDiagnostics = BuildExpectedResult(expectedMessage, 22, 9);
 
             VerifyDiagnostic(testCode, expectedDiagnostics);

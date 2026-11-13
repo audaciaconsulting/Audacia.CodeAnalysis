@@ -1,13 +1,11 @@
 
-const ids = require('../utils/ids');
+import ids from '../utils/ids.js';
 
-module.exports = {
+export default {
     meta: {
         type: 'suggestion',
         docs: {
             description: 'use data-test attributes for test automation',
-            category: 'Suggestions',
-            recommended: true,
             url: 'https://github.com/audaciaconsulting/Audacia.CodeAnalysis/blob/master/eslint/plugins/audacia-eslint-plugin-angular/docs/rules/data-test-attribute.md'
         },
         fixable: 'code',
@@ -201,7 +199,7 @@ module.exports = {
         }
 
         return {
-            [`Element$1`](element) {
+            Element(element) {
                 let message = '';
                 let loc;
 
@@ -243,7 +241,6 @@ module.exports = {
                 // Don't return node on it's own as the angular ESlint can be aggressive and highligh the whole file.
                 // Return the location instead to highlight only the issue.
                 context.report({
-                    element,
                     message,
                     fix,
                     loc

@@ -1,4 +1,4 @@
-using Audacia.CodeAnalysis.Analyzers.Rules.AssertionRequired;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionRequired;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -42,7 +42,7 @@ public class TestClass
             {
                 Id = AssertionRequiredAnalyzer.Id,
                 Severity = DiagnosticSeverity.Warning,
-                Message = "Test methods must contain at least one assertion",
+                Message = "Test methods must contain at least one assertion. UT-01.1.",
                 Locations =
                     new[]
                     {

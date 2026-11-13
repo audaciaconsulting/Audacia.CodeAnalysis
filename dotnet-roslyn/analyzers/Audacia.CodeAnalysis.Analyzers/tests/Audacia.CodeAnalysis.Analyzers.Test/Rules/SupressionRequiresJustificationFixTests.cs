@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification;
+﻿using Audacia.CodeAnalysis.Analyzers.Core.Rules.SuppressionRequiresJustification;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -69,7 +69,7 @@ public class TestClass
         VerifyCodeFix(testFileContents, fixedTestFileContents);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("MaxMethodLengthAttribute")]
     [DataRow("MaxParameterCountAttribute")]
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_With_No_Justification(string attributeName)

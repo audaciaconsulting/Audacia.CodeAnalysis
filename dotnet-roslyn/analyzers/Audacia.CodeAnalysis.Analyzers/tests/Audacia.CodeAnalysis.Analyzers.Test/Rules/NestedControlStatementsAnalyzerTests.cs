@@ -20,7 +20,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = NestedControlStatementsAnalyzer.Id,
-                Message = $"{memberName} contains {statementCount} nested control flow statements, which exceeds the maximum of {maxStatementCount} nested control flow statements",
+                Message = $"{memberName} contains {statementCount} nested control flow statements, which exceeds the maximum of {maxStatementCount} nested control flow statements. CS-01.14.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

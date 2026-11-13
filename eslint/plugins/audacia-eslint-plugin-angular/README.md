@@ -4,61 +4,97 @@ An ESLint plugin which provides lint rules for angular projects.
 
 ## Installation
 
-You'll first need to install [@angular-eslint/eslint-plugin](https://www.npmjs.com/package/@angular-eslint/template-parser).
-
-If the plugin is going to be used with HTML files, you'll also need [@angular-eslint](https://eslint.org/docs/latest/use/getting-started) and [eslint-plugin-html](https://www.npmjs.com/package/eslint-plugin-html). This is because Angular ESLint doesn't parse HTML files by default.
-
-</br>
+Requires ESLint 10 (flat config) and `@angular-eslint/template-parser` 21.3+ or 22.
 
 Before continuing, make sure you have the [AudaciaPublic](https://dev.azure.com/audacia/Audacia.Public/_artifacts/feed/AudaciaPublic) feed configured.
  You can find more information on how to set this up in the [Audacia wiki](https://dev.azure.com/audacia/Audacia/_wiki/wikis/Audacia.wiki/259/Configuring-a-project-to-access-the-Audacia-NPM-registry).
 
-Next, you can install `@audacia/eslint-plugin-angular`:
+Install the plugin and its peers:
 
 ```sh
-npm install @audacia/eslint-plugin-angular --save-dev
+npm install @audacia/eslint-plugin-angular @angular-eslint/template-parser --save-dev
 ```
-
 
 ## Usage
 
-It is recommended that you install the plugin using the provided config, ensuring all of the rules are enabled. To do so, add `plugin:@audacia/angular/recommended` to the `extends` section of your ESLint configuration.
+The plugin provides the Audacia custom rules only. Combine its `flat/recommended` config with your own Angular configuration in `eslint.config.js`.
 
-```json
-{
-    "extends": [
-        // ... other configs
-        "plugin:@audacia/angular/recommended"
-    ]
-}
+The plugin is an ES module. Use `import` in an ES module config (`eslint.config.mjs`, or `eslint.config.js` with `"type": "module"`). From a CommonJS config, use `require('@audacia/eslint-plugin-angular').default`.
+
+`flat/recommended` applies to `**/*.html`. It sets the `angular-eslint` template parser, registers the plugin as `@audacia/angular` and enables `@audacia/angular/data-test-attribute` (`error`).
+
+For example, with the [`angular-eslint`](https://github.com/angular-eslint/angular-eslint) presets (`ng add angular-eslint` installs them):
+
+```js
+import angular from 'angular-eslint';
+import tseslint from 'typescript-eslint';
+import audaciaAngular from '@audacia/eslint-plugin-angular';
+
+export default tseslint.config(
+    {
+        files: ['**/*.ts'],
+        extends: [...tseslint.configs.recommended, ...angular.configs.tsRecommended],
+        // Extracts inline templates so the template rules, including the Audacia ones, lint them
+        processor: angular.processInlineTemplates,
+    },
+    {
+        files: ['**/*.html'],
+        extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
+    },
+    ...audaciaAngular.configs['flat/recommended'],
+);
 ```
 
-Or, if you wish to manually configure the rules, add `@audacia/angular` to the `plugins` section of your ESLint configuration.
+Inline templates (`template: \`...\``) are only linted when your config includes the `angular-eslint` inline-template processor.
 
-```json
-{
-    "plugins": [ "@audacia/angular" ]
-}
+To change a rule's severity or options, add a later config object:
+
+```js
+export default [
+    ...audaciaAngular.configs['flat/recommended'],
+    {
+        files: ['**/*.html'],
+        rules: { '@audacia/angular/data-test-attribute': 'off' },
+    },
+];
 ```
 
-You can configure and override rules from this plugin by using `@audacia/angular/<rule_name>` in the `rules` section of your ESLint configuration.
+### Custom rules
 
-```json
-{
-    "rules": {
-        "@audacia/angular/example-rule": [ "off" ]
-    }
-}
+To use the rules without `flat/recommended`, register the plugin under the `@audacia/angular` name:
+
+```js
+import templateParser from '@angular-eslint/template-parser';
+import audaciaAngular from '@audacia/eslint-plugin-angular';
+
+export default [
+    {
+        files: ['**/*.html'],
+        languageOptions: { parser: templateParser },
+        plugins: { '@audacia/angular': audaciaAngular },
+        rules: { '@audacia/angular/data-test-attribute': 'error' },
+    },
+];
 ```
+
+## Migrating from 1.x
+
+2.0.0 is a breaking release:
+
+- The legacy eslintrc config is removed (`plugin:@audacia/angular/recommended`, `lib/configs/base.js` and `lib/configs/recommended.js`). ESLint 10 cannot load eslintrc, so use `eslint.config.js` with `flat/recommended`, which has the same scope: the template parser and `data-test-attribute` on `.html` files.
+- ESLint `^10.0.0` is required, with Node `^20.19.0 || ^22.13.0 || >=24`.
+- The plugin is now an ES module. Import it with `import`, or use `require('@audacia/eslint-plugin-angular').default` from CommonJS.
+- `@angular-eslint/template-parser` must be `^21.3.0 || ^22.0.0` and is now a peer dependency. Angular 20 is no longer supported; stay on 1.x or upgrade Angular first.
+- `@angular-eslint/eslint-plugin` is no longer installed by the plugin. Add `angular-eslint` yourself if you use its rules.
+- `data-test-attribute` is still enabled as `error` by `flat/recommended`, until it is replaced by PBI 214236.
 
 ## Supported Rules
 
-- :white_check_mark: Included in the `recommended` config provided with the plugin
 - :wrench: Auto-fix is available with the `--fix` command line option
 
-| Rule | Description |   |   |
-|------|-------------|---|---|
-| [`@audacia/angular/data-test-attribute`](/docs/rules/data-test-attribute.md) | Use data-test attributes for test automation | :white_check_mark: | :wrench: |
+| Rule | Description |   |
+|------|-------------|---|
+| [`@audacia/angular/data-test-attribute`](/docs/rules/data-test-attribute.md) | Use data-test attributes for test automation | :wrench: |
 
 ## Development
 
@@ -67,6 +103,7 @@ To add new rules to this plugin, you will need to install the dependencies with 
 ### Structure Overview
 
 - `docs` - a markdown file per each rule describing what is for, how it is used, how it is configured, etc
+- `tests/fixtures` - compliant and non-compliant templates linted by `tests/lib/configs/fixtures.js`
 - `lib` - the actual code for the plugin, including the custom rules
 - `tests` - a test file per each custom rule
 
@@ -80,9 +117,9 @@ There should be detailed documentation provided in a markdown file for each rule
 
 You should follow the [ESLint Rules Docs](https://eslint.org/docs/latest/developer-guide/working-with-rules) for how to get started on creating rules.
 
-If suitable, the rule should be added to the recommended config that is provided with this plugin, see `lib/configs/recommended.js`.
+If suitable, the rule should be enabled in the `flat/recommended` config, see `lib/configs/flat/recommended.js`.
 
-The rule should also be added to the above table of [Supported Rules](#supported-rules), marking if it is included in the recommended config and if it has an auto-fix.
+The rule should also be added to the above table of [Supported Rules](#supported-rules), marking if it is included in a preset and if it has an auto-fix.
 
 ### Useful Reading
 

@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.OverloadShouldCallOtherOverload;
+﻿using Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.OverloadShouldCallOtherOverload;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -76,7 +76,7 @@ public class TestClass
             var expected = BuildExpectedResult(
                 lineNumber: 6,
                 column: 17,
-                message: "Overloaded method 'TestClass.TestMethod(int, int)' should call another overload");
+                message: "Overloaded method 'TestClass.TestMethod(int, int)' should call another overload. CS-01.20.");
 
             VerifyDiagnostic(test, expected);
         }
@@ -107,7 +107,7 @@ public class TestClass
             var expected = BuildExpectedResult(
                     lineNumber: 11,
                     column: 17,
-                    message: "Method overload with the most parameters should be virtual");
+                    message: "Method overload with the most parameters should be virtual. CS-01.20.");
 
             VerifyDiagnostic(test, expected);
         }
@@ -141,7 +141,7 @@ public class TestClassA : TestClass
             var expected = BuildExpectedResult(
                 lineNumber: 18,
                 column: 17,
-                message: "Parameter order in 'TestClassA.TestMethod(string, int)' does not match with the parameter order of the longest overload");
+                message: "Parameter order in 'TestClassA.TestMethod(string, int)' does not match with the parameter order of the longest overload. CS-01.20.");
 
             VerifyDiagnostic(test, expected);
         }
@@ -178,9 +178,9 @@ public class TestClassA : TestClass
 }";
             var expectedList = new[]
             {
-                BuildExpectedResult(lineNumber: 6, column: 17, message: "Overloaded method 'TestClass.TestMethod(int, int)' should call another overload"),
-                BuildExpectedResult(lineNumber: 11, column: 17, message: "Method overload with the most parameters should be virtual"),
-                BuildExpectedResult(lineNumber: 23, column: 17, message: "Parameter order in 'TestClassA.TestMethod(string, int)' does not match with the parameter order of the longest overload")
+                BuildExpectedResult(lineNumber: 6, column: 17, message: "Overloaded method 'TestClass.TestMethod(int, int)' should call another overload. CS-01.20."),
+                BuildExpectedResult(lineNumber: 11, column: 17, message: "Method overload with the most parameters should be virtual. CS-01.20."),
+                BuildExpectedResult(lineNumber: 23, column: 17, message: "Parameter order in 'TestClassA.TestMethod(string, int)' does not match with the parameter order of the longest overload. CS-01.20.")
             };
 
             VerifyDiagnostic(test, expectedList);

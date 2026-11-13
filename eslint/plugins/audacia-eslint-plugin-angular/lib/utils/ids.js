@@ -1,4 +1,4 @@
-const { customAlphabet } = require('nanoid');
+import { customAlphabet } from 'nanoid';
 
 const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890';
 
@@ -7,6 +7,4 @@ function create(size = 10) {
   return nanoid();
 }
 
-module.exports = {
-  create
-};
+export default { create };

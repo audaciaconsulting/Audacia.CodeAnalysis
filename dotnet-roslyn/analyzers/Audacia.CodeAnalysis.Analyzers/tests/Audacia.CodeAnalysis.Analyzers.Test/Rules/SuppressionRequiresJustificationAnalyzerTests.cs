@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification;
+﻿using Audacia.CodeAnalysis.Analyzers.Core.Rules.SuppressionRequiresJustification;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -18,7 +18,7 @@ public class SuppressionRequiresJustificationAnalyzerTests : DiagnosticVerifier
         return new SuppressionRequiresJustificationAnalyzer();
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("MaxMethodLengthAttribute")]
     [DataRow("MaxParameterCountAttribute")]
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_With_No_Justification(string attributeName)
@@ -255,7 +255,7 @@ public class TestClass
         VerifyDiagnostic(testFileContents, expectedDiagnosticResult);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("MaxMethodLengthAttribute")]
     [DataRow("MaxParameterCountAttribute")]
     public void No_Diagnostics_For_Audacia_Code_Analysis_Attribute_With_Justification(string attributeName)

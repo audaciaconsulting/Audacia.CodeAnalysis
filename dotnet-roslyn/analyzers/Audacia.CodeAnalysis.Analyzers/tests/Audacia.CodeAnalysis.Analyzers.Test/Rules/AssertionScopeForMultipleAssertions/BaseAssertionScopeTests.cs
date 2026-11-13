@@ -1,14 +1,9 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertions;
+﻿using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionScopeForMultipleAssertions;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionScopeForMultipleAssertions
 {
@@ -46,7 +41,7 @@ public class TestClass
             {
                 Id = AssertionScopeForMultipleAssertionsAnalyzer.Id,
                 Severity = DiagnosticSeverity.Warning,
-                Message = "Use an assertion scope when a test method has more than two assertions",
+                Message = "Use an assertion scope when a test method has more than two assertions. UT-01.5.",
                 Locations =
                     new[] {
                     new DiagnosticResultLocation("Test0.cs", lineNumber, column)

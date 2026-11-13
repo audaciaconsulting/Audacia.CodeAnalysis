@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNoDuplicateParameters;
+using Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNoDuplicateParameters;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 
@@ -15,7 +15,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = LogMessagesNoDuplicateParametersAnalyzer.Id,
-                Message = $"Log message property '{propertyName}' is duplicated",
+                Message = $"Log message property '{propertyName}' is duplicated. LOG-01.3.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [

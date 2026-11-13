@@ -17,7 +17,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
             return new DiagnosticResult
             {
                 Id = MagicNumberAnalyzer.Id,
-                Message = $"Variable declaration for '{varName}' should not use a magic number",
+                Message = $"Variable declaration for '{varName}' should not use a magic number. CS-01.8.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {

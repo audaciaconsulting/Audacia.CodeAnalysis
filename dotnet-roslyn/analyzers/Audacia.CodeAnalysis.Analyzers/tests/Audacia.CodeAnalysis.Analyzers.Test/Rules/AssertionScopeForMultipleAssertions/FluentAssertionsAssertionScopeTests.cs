@@ -1,12 +1,7 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.AssertionScopeForMultipleAssertions;
+﻿using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionScopeForMultipleAssertions;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionScopeForMultipleAssertions
 {

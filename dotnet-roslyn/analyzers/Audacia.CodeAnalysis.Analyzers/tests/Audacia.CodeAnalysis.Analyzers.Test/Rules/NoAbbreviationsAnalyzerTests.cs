@@ -1,25 +1,23 @@
 ﻿using Audacia.CodeAnalysis.Analyzers.Rules.NoAbbreviations;
-using Audacia.CodeAnalysis.Analyzers.Settings;
+using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+using NSubstitute;
 
 namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 {
     [TestClass]
     public class NoAbbreviationsAnalyzerTests : DiagnosticVerifier
     {
-        private readonly Mock<ISettingsReader> _mockSettingsReader = new();
-
         private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string kind, string abbreviationUsed)
         {
             return new DiagnosticResult
             {
                 Id = NoAbbreviationsAnalyzer.Id,
-                Message = $"{kind} '{abbreviationUsed}' should have a more descriptive name",
+                Message = $"{kind} '{abbreviationUsed}' should have a more descriptive name. CS-05.1.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                 [
@@ -30,7 +28,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new NoAbbreviationsAnalyzer(_mockSettingsReader.Object);
+            return new NoAbbreviationsAnalyzer(SubstituteSettingsReader);
         }
 
         [TestMethod]
@@ -122,23 +120,18 @@ class TypeName
 {
     static void Main(string[] args)
     {
-        var result = args.Where(s => s.Length == 0);
+        var result = args.Where(x => x.Length == 0);
     }
 }";
 
-            var expected = BuildExpectedResult(10, 33, "Parameter", "s");
+            var expected = BuildExpectedResult(10, 33, "Parameter", "x");
 
             VerifyDiagnostic(test, expected);
         }
 
         [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Lambda_Expression_Variable_Name_Is_Used()
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Type_Name()
         {
-            _mockSettingsReader.Setup(settings => settings.TryGetBool(
-                    It.IsAny<SyntaxTree>(),
-                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.ExcludeLambdasSetting)))
-                .Returns(true);
-
             var test = @"
 using System.Linq;
 
@@ -156,11 +149,264 @@ class TypeName
         }
 
         [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Queried_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments.Where(a => a.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Null_Conditional_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments?.Where(a => a.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Non_Collection_Instance_Receiver_Name()
+        {
+            var test = @"
+namespace ConsoleApplication1;
+
+class Worker
+{
+    public void Execute(System.Func<int, bool> predicate) { }
+
+    static void Main(string[] args)
+    {
+        var processor = new Worker();
+        processor.Execute(p => p > 0);
+    }
+}";
+
+            var expected = BuildExpectedResult(11, 27, "Parameter", "p");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Does_Not_Match_Null_Conditional_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments?.Where(x => x.Length == 0);
+    }
+}";
+
+            var expected = BuildExpectedResult(11, 39, "Parameter", "x");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Extension_Call_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = Enumerable.Where(arguments, a => a.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Class_Name_Instead_Of_Collection()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = Enumerable.Where(arguments, e => e.Length == 0);
+    }
+}";
+
+            var expected = BuildExpectedResult(11, 50, "Parameter", "e");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Anonymous_Method_Parameter_Matches_Collection_Name()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments.Where(delegate(string a) { return a.Length == 0; });
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Anonymous_Method_Parameter_Only_Matches_Outer_Collection_Name()
+        {
+            var test = @"
+using System;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = arguments.Select(argument => (Func<int, bool>)delegate(int a) { return a == 0; });
+    }
+}";
+
+            var expected = BuildExpectedResult(12, 81, "Parameter", "a");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Wrapped_Lambda_Parameter_Matches_Collection_Name()
+        {
+            var test = @"
+using System;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var parenthesized = arguments.Where((a => a.Length == 0));
+        var cast = arguments.Where((Func<string, bool>)(a => a.Length == 0));
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_A_Single_Character_Wrapped_Lambda_Parameter_Does_Not_Match_Collection_Name()
+        {
+            var test = @"
+using System;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var cast = arguments.Where((Func<string, bool>)(x => x.Length == 0));
+    }
+}";
+
+            var expected = BuildExpectedResult(12, 57, "Parameter", "x");
+
+            VerifyDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Non_Extension_Call_Collection_Name()
+        {
+            var test = @"
+using System;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var arguments = args;
+        var result = Array.Find(arguments, a => a.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_A_Longer_Lambda_Parameter_Name_Is_Used()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] args)
+    {
+        var result = args.Where(arg => arg.Length == 0);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
         public void Diagnostic_If_A_Loop_Variable_Abbreviation_Not_In_The_Allowed_List_Is_Used()
         {
-            _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                    It.IsAny<SyntaxTree>(),
-                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting)))
+            SubstituteSettingsReader.TryGetValue(
+                    Arg.Any<SyntaxTree>(),
+                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting))
                 .Returns("i");
 
             var test = @"
@@ -184,9 +430,9 @@ class TypeName
         [TestMethod]
         public void No_Diagnostic_If_An_Allowed_Loop_Variable_Abbreviation_Is_Used()
         {
-            _mockSettingsReader.Setup(settings => settings.TryGetValue(
-                    It.IsAny<SyntaxTree>(),
-                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting)))
+            SubstituteSettingsReader.TryGetValue(
+                    Arg.Any<SyntaxTree>(),
+                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting))
                 .Returns("i,j");
 
             var test = @"
@@ -203,6 +449,106 @@ class TypeName
 }";
 
             VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_Event_Handler_Lambda_Uses_Sender_And_EventArgs_Letters()
+        {
+            var test = @"
+using System;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    public event EventHandler Changed;
+
+    void Subscribe()
+    {
+        Changed += (s, e) => { };
+    }
+
+    static void Main(string[] args)
+    {
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_Lambda_Parameter_Matches_Interface_Type_Name_Without_Prefix_In_Chained_Call()
+        {
+            var test = @"
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+class TypeName
+{
+    static void Main(string[] words)
+    {
+        var result = words.GroupBy(word => word.Length).Select(g => g.Key);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void No_Diagnostic_If_Lambda_Parameter_Matches_Interface_Element_Type_Name_Without_Prefix()
+        {
+            var test = @"
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+interface ICustomer
+{
+    string Name { get; }
+}
+
+class TypeName
+{
+    static IEnumerable<ICustomer> GetCustomers() => new List<ICustomer>();
+
+    static void Main(string[] args)
+    {
+        var result = GetCustomers().Where(c => c.Name == null);
+    }
+}";
+
+            VerifyNoDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void Diagnostic_If_Lambda_Parameter_Matches_Only_Interface_Prefix()
+        {
+            var test = @"
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ConsoleApplication1;
+
+interface ICustomer
+{
+    string Name { get; }
+}
+
+class TypeName
+{
+    static IEnumerable<ICustomer> GetCustomers() => new List<ICustomer>();
+
+    static void Main(string[] args)
+    {
+        var result = GetCustomers().Where(i => i.Name == null);
+    }
+}";
+
+            var expected = BuildExpectedResult(18, 43, "Parameter", "i");
+
+            VerifyDiagnostic(test, expected);
         }
     }
 }

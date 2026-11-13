@@ -1,0 +1,25 @@
+# Normalize line endings: LF in the repository, native line endings on checkout.
+# Native endings keep test source strings consistent with Environment.NewLine
+# used by the Roslyn formatter in code-fix tests.
+* text=auto
+
+*.cs text diff=csharp
+*.csproj text
+*.props text
+*.targets text
+*.json text
+*.md text
+*.yml text
+*.yaml text
+*.editorconfig text
+
+*.sln text eol=crlf
+*.ps1 text eol=crlf
+*.sh text eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.snk binary
+*.dll binary
+*.nupkg binary
