@@ -6,6 +6,9 @@
 is_global = true
 global_level = 4
 
+# Don't use abbreviations *** Suggestion only, as short lambda parameter names (e.g. in mock setups and assertions) are common in tests ***
+dotnet_diagnostic.ACL1004.severity = suggestion
+
 # Methods should not exceed a predefined number of statements.
 dotnet_diagnostic.ACL1002.max_statement_count = 20 # Increase max count for tests, as they may contain complex setup
 

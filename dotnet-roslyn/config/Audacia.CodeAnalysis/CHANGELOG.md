@@ -8,7 +8,8 @@
 - Added `Audacia.CodeAnalysis.Analyzers.TestProjects` to Audacia.CodeAnalysis.TestProjects, to retain test-specific analyzers (ACL1019-ACL1022) that moved from the base `Audacia.CodeAnalysis.Analyzers` package.
 - Added `Audacia.CodeAnalysis.Analyzers.AspNetCore` to Audacia.CodeAnalysis.AspNetCore, to retain ASP.NET Core-specific analyzers (ACL1005, ACL1008, ACL1009, ACL1015, ACL1016) that moved from `Audacia.CodeAnalysis.Analyzers`.
 - Set default severity of new rules to 'warning' in the base package, but suppressed logging rules for test projects.
-- Removed the deprecated `exclude_lambdas` option from config for ACL1004, as it is no longer supported in the latest version of Audacia.CodeAnalysis.Analyzers. That rule now applies to lambda parameter names (unless matching the first letter of the type or collection being queried), so it may generate new warnings where that rule is already in use.
+- Removed the deprecated `exclude_lambdas` option for ACL1004, as it is no longer supported in the latest Audacia.CodeAnalysis.Analyzers. That rule now applies to lambda parameters (unless matching the first letter of the type or collection), so it may generate new warnings where already in use. ACL1004 is now a suggestion only (by default) in test projects.
+- Removed the base package's `none` severities for rules that are no longer in the base `Audacia.CodeAnalysis.Analyzers` package (ACL1005, ACL1008, ACL1009, ACL1019-ACL1022).
 - Enabled warnings as errors, but disabled ACL1010 'enable nullable' and kept NU5104 (prerelease dependencies) as a warning, so packages can still be packed (does not affect consuming projects).
 
 ## 2.1.0 - 2026-08-07
