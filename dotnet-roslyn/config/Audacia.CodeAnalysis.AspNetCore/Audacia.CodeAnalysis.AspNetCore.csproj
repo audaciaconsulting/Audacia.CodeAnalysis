@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Audacia.CodeAnalysis.Analyzers.AspNetCore" Version="2.1.0" />
         <PackageReference Include="AspNetCoreAnalyzers" Version="0.2.0.1-dev" />
     </ItemGroup>
 
