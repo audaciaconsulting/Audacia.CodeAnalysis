@@ -3,5 +3,7 @@
         <Version>2.2.0</Version>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <NoWarn>$(NoWarn);ACL1010</NoWarn>
+        <!-- NU5104: stable package with prerelease dependencies (StyleCop, DocumentationAnalyzers, AspNetCoreAnalyzers). Keep as a warning so packing still succeeds. -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU5104</WarningsNotAsErrors>
     </PropertyGroup>
 </Project>

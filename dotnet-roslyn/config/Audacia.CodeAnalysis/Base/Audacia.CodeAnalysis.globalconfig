@@ -23,7 +23,6 @@ dotnet_diagnostic.ACL1003.severity = warning
 
 # Don't use abbreviations
 dotnet_diagnostic.ACL1004.severity = warning
-dotnet_diagnostic.ACL1004.exclude_lambdas = true
 dotnet_diagnostic.ACL1004.allowed_loop_variables = i,j
 
 # [NAMING] Asynchronous method name should be suffixed with 'Async' *** Suppress as covered by RCS1046; ACL1005 is only used in the AspNetCore ruleset ***
@@ -85,6 +84,17 @@ dotnet_diagnostic.ACL1025.severity = warning
 
 # Positional properties should be avoided in log message parameters
 dotnet_diagnostic.ACL1026.severity = warning
+
+# Record properties should be initonly
+dotnet_diagnostic.ACL1027.severity = warning
+
+# Application logic should be signposted
+dotnet_diagnostic.ACL1028.severity = warning
+dotnet_diagnostic.ACL1028.handler_suffix = Handler
+
+# Log messages should be long enough to be meaningful
+dotnet_diagnostic.ACL1029.severity = warning
+dotnet_diagnostic.ACL1029.log_message_minimum_length = 10
 
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
