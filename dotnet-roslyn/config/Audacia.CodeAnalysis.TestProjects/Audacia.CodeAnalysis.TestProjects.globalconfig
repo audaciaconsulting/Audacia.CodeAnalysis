@@ -6,6 +6,9 @@
 is_global = true
 global_level = 4
 
+# Don't use abbreviations *** Suggestion only, as short lambda parameter names (e.g. in mock setups and assertions) are common in tests ***
+dotnet_diagnostic.ACL1004.severity = suggestion
+
 # Methods should not exceed a predefined number of statements.
 dotnet_diagnostic.ACL1002.max_statement_count = 20 # Increase max count for tests, as they may contain complex setup
 
@@ -21,6 +24,12 @@ dotnet_diagnostic.ACL1021.severity = warning
 # Test names must be consistent
 dotnet_diagnostic.ACL1022.severity = warning
 dotnet_diagnostic.ACL1022.test_method_name_format = ^([A-Z0-9][a-zA-Z0-9]*)?(_[A-Z0-9][a-zA-Z0-9]*)*$
+
+# Application logic should be signposted *** Suggestion only, as logging isn't important in tests unless specifically testing it ***
+dotnet_diagnostic.ACL1028.severity = suggestion
+
+# Log messages should be long enough to be meaningful *** Suggestion only, as logging isn't important in tests unless specifically testing it ***
+dotnet_diagnostic.ACL1029.severity = suggestion
 
 # A property, method or local function should do only one thing *** Suppress as test methods may contain 'And' to make them more descriptive ***
 dotnet_diagnostic.AV1115.severity = none

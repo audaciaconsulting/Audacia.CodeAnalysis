@@ -23,23 +23,13 @@ dotnet_diagnostic.ACL1003.severity = warning
 
 # Don't use abbreviations
 dotnet_diagnostic.ACL1004.severity = warning
-dotnet_diagnostic.ACL1004.exclude_lambdas = true
 dotnet_diagnostic.ACL1004.allowed_loop_variables = i,j
-
-# [NAMING] Asynchronous method name should be suffixed with 'Async' *** Suppress as covered by RCS1046; ACL1005 is only used in the AspNetCore ruleset ***
-dotnet_diagnostic.ACL1005.severity = none
 
 # [STYLE] Code block should have braces, excluding null argument checks
 dotnet_diagnostic.ACL1006.severity = warning
 
 # ACL1007: ThenByDescending follows OrderBy or OrderByDescending.
 dotnet_diagnostic.ACL1007.severity = suggestion
-
-# Controller action should have at least one ProducesResponseType attribute
-dotnet_diagnostic.ACL1008.severity = none
-
-# Method overload should call another overload
-dotnet_diagnostic.ACL1009.severity = none
 
 # [Maintainability] ACL1011: Don't nest too many control statements
 dotnet_diagnostic.ACL1011.severity = warning
@@ -62,18 +52,6 @@ dotnet_diagnostic.ACL1017.severity = warning
 # [Maintainability] ALC1018: Code analysis suppression requires justification.
 dotnet_diagnostic.ACL1018.severity = warning
 
-# Use assertion scope in tests
-dotnet_diagnostic.ACL1019.severity = none
-
-# Tests should contain at least one assertion
-dotnet_diagnostic.ACL1020.severity = none
-
-# Assertion reasons must be provided
-dotnet_diagnostic.ACL1021.severity = none
-
-# Test names must be consistent
-dotnet_diagnostic.ACL1022.severity = none
-
 # Log message properties must be PascalCase
 dotnet_diagnostic.ACL1023.severity = warning
 
@@ -85,6 +63,17 @@ dotnet_diagnostic.ACL1025.severity = warning
 
 # Positional properties should be avoided in log message parameters
 dotnet_diagnostic.ACL1026.severity = warning
+
+# Record properties should be init-only
+dotnet_diagnostic.ACL1027.severity = warning
+
+# Application logic should be signposted
+dotnet_diagnostic.ACL1028.severity = warning
+dotnet_diagnostic.ACL1028.handler_suffix = Handler
+
+# Log messages should be long enough to be meaningful
+dotnet_diagnostic.ACL1029.severity = warning
+dotnet_diagnostic.ACL1029.log_message_minimum_length = 10
 
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
