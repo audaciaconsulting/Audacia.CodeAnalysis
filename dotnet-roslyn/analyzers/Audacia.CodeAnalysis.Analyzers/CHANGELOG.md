@@ -1,5 +1,10 @@
 ﻿# CHANGELOG
 
+## 2.1.1 - 2026-11-16
+
+### Fixed
+- ACL1019, ACL1020 and ACL1021 no longer crash in Visual Studio (AD0001 "SyntaxTree is not part of the compilation") when a test calls a helper method from a referenced project. These helpers are now not inspected, matching command-line builds.
+
 ## 2.1.0 - 2026-11-12
 
 ### Added
