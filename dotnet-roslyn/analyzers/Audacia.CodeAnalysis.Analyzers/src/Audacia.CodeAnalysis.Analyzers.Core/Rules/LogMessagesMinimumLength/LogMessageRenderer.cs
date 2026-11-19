@@ -85,7 +85,7 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
     {
         var result = new StringBuilder(template.Length);
         var position = 0;
-        int index = 0;
+        var index = 0;
 
         while (index < template.Length)
         {

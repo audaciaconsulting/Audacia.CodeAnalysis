@@ -4,6 +4,7 @@
 # Description: CodeAnalysis.ruleset
 
 # Test-project overrides of Audacia.CodeAnalysis.Analyzers.Core.globalconfig (global_level 0).
+# This is a hand-picked subset for this project only.
 # A higher global_level wins when both files set the same key.
 is_global = true
 global_level = 1

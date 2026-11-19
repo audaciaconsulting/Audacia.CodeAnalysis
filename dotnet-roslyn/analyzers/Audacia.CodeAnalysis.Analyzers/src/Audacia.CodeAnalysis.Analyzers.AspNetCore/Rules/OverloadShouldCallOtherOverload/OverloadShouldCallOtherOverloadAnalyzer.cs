@@ -147,7 +147,6 @@ public sealed class OverloadShouldCallOtherOverloadAnalyzer : DiagnosticAnalyzer
 
     private static bool IsRegularMethod(IMethodSymbol method, CancellationToken cancellationToken)
     {
-        _ = method.GetAttributes();
         return RegularMethodKinds.Contains(method.MethodKind) && !method.IsSynthesized() &&
                HasMethodBody(method, cancellationToken) && !method.IsControllerAction();
     }
