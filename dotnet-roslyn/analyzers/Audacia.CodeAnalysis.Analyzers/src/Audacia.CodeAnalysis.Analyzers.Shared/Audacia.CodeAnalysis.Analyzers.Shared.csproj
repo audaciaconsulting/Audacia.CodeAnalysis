@@ -9,4 +9,22 @@
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all" />
     </ItemGroup>
 
+    <!--
+        External analyzers applied when building this project only. PrivateAssets="all" stops them becoming
+        package dependencies or flowing to referencing projects; consumers get them from Audacia.CodeAnalysis.
+        Keep the versions in step with config/Audacia.CodeAnalysis/Audacia.CodeAnalysis.csproj.
+    -->
+    <ItemGroup>
+        <PackageReference Include="CSharpGuidelinesAnalyzer" Version="3.8.5" PrivateAssets="all" />
+        <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59" PrivateAssets="all" />
+        <PackageReference Include="IDisposableAnalyzers" Version="4.0.8" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15" PrivateAssets="all" />
+        <PackageReference Include="Roslynator.Analyzers" Version="4.12.10" PrivateAssets="all" />
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)..\..\src\Audacia.CodeAnalysis.Analyzers.Core\Audacia.CodeAnalysis.Analyzers.Core.globalconfig" />
+    </ItemGroup>
+
 </Project>

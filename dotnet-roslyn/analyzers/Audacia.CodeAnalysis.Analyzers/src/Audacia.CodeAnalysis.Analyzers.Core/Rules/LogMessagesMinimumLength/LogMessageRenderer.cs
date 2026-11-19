@@ -8,6 +8,8 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 
 /// <summary>
 /// Renders a log message as written, so its length can be measured.
+/// </summary>
+/// <remarks>
 /// <para>
 /// Only compile-time constant strings are read: literals, and <c>const</c> fields and locals (so centralised messages, e.g.
 /// for translation, are still checked). Anything else, whether it's the whole message or only part of it, is given a nominal
@@ -17,7 +19,7 @@ namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 /// The same applies to the values substituted into a message template, an interpolated string, or a <c>string.Format</c> call.
 /// The rendered text is only ever measured.
 /// </para>
-/// </summary>
+/// </remarks>
 internal sealed class LogMessageRenderer(SemanticModel semanticModel, CancellationToken cancellationToken)
 {
     /// <summary>
@@ -83,15 +85,16 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
     {
         var result = new StringBuilder(template.Length);
         var position = 0;
+        int index = 0;
 
-        for (var index = 0; index < template.Length; index++)
+        while (index < template.Length)
         {
             var character = template[index];
 
             if ((character == '{' || character == '}') && index + 1 < template.Length && template[index + 1] == character)
             {
                 result.Append(character);
-                index++;
+                index += 2; // escaped brace, so it's rendered as a single brace (skip one position).
                 continue;
             }
 
@@ -100,6 +103,7 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
             if (end < 0)
             {
                 result.Append(character);
+                index++;
                 continue;
             }
 
@@ -110,7 +114,8 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
                 position++,
                 suffixStart < 0 ? placeholder : placeholder.Substring(0, suffixStart),
                 suffixStart < 0 ? string.Empty : placeholder.Substring(suffixStart)));
-            index = end;
+
+            index = end + 1; // skip the closing brace, so the next character is rendered as written.
         }
 
         return result.ToString();
@@ -437,9 +442,9 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
             {
                 values.Add(argument.Value);
             }
-            else if (TryGettingParamsElements(Unwrap(argument.Value), out var elements)) // A collection expression is converted, e.g. to a span.
+            else if (TryGettingParamsElements(Unwrap(argument.Value), out var elements))
             {
-                values.AddRange(positional ? KnownPositions(elements) : elements);
+                values.AddRange(positional ? KnownPositions(elements) : elements); // A collection expression is converted, e.g. to a span.
             }
             else
             {
@@ -497,7 +502,7 @@ internal sealed class LogMessageRenderer(SemanticModel semanticModel, Cancellati
 
     private static bool IsKind(IOperation operation, OperationKind? kind)
     {
-        return kind.HasValue && operation?.Kind == kind.Value;
+        return kind != null && operation?.Kind == kind.Value;
     }
 
     /// <summary>

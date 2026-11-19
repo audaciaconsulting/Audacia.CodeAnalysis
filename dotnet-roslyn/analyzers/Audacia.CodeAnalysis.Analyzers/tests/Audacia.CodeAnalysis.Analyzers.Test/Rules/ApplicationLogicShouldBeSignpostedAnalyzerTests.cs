@@ -7,42 +7,42 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
+
+[TestClass]
+public class ApplicationLogicShouldBeSignpostedAnalyzerTests : DiagnosticVerifier
 {
-    [TestClass]
-    public class ApplicationLogicShouldBeSignpostedAnalyzerTests : DiagnosticVerifier
+    private void SetupHandlerSuffix(string handlerSuffix)
     {
-        private void SetupHandlerSuffix(string handlerSuffix)
-        {
-            SubstituteSettingsReader.TryGetValue(
-                Arg.Any<SyntaxTree>(),
-                new SettingsKey(ApplicationLogicShouldBeSignpostedAnalyzer.Id, ApplicationLogicShouldBeSignpostedAnalyzer.HandlerSuffixConfigKey))
-            .Returns(handlerSuffix);
-        }
+        SubstituteSettingsReader.TryGetValue(
+            Arg.Any<SyntaxTree>(),
+            new SettingsKey(ApplicationLogicShouldBeSignpostedAnalyzer.Id, ApplicationLogicShouldBeSignpostedAnalyzer.HandlerSuffixConfigKey))
+        .Returns(handlerSuffix);
+    }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new ApplicationLogicShouldBeSignpostedAnalyzer(SubstituteSettingsReader);
-        }
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new ApplicationLogicShouldBeSignpostedAnalyzer(SubstituteSettingsReader);
+    }
 
-        private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string handlerName)
+    private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string handlerName)
+    {
+        return new DiagnosticResult
         {
-            return new DiagnosticResult
-            {
-                Id = ApplicationLogicShouldBeSignpostedAnalyzer.Id,
-                Message = $"Application logic handler '{handlerName}' does not inject a logger. LOG-04.6.",
-                Severity = DiagnosticSeverity.Warning,
-                Locations =
-                [
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                ]
-            };
-        }
+            Id = ApplicationLogicShouldBeSignpostedAnalyzer.Id,
+            Message = $"Application logic handler '{handlerName}' does not inject a logger. LOG-04.6.",
+            Severity = DiagnosticSeverity.Warning,
+            Locations =
+            [
+                new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+            ]
+        };
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Non_Handler()
-        {
-            var testCode = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Non_Handler()
+    {
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestClass
@@ -52,16 +52,15 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
+        VerifyNoDiagnostic(testCode);
+    }
 
-        }
+    [TestMethod]
+    public void No_Diagnostic_For_Non_Handler_With_Different_Suffix()
+    {
+        SetupHandlerSuffix("Processor");
 
-        [TestMethod]
-        public void No_Diagnostic_For_Non_Handler_With_Different_Suffix()
-        {
-            SetupHandlerSuffix("Processor");
-
-            var testCode = @"
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestProcessors
@@ -71,18 +70,18 @@ public class TestProcessors
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        [DataRow("ILogger<TestProcessor>")]
-        [DataRow("ILogger")]
-        [DataRow("ILoggerFactory")]
-        [DataRow("ILoggerProvider")]
-        public void No_Diagnostic_For_Handler_With_Logger_Injected(string loggerType)
-        {
-            SetupHandlerSuffix("Processor");
-            var testCode = @"
+    [TestMethod]
+    [DataRow("ILogger<TestProcessor>")]
+    [DataRow("ILogger")]
+    [DataRow("ILoggerFactory")]
+    [DataRow("ILoggerProvider")]
+    public void No_Diagnostic_For_Handler_With_Logger_Injected(string loggerType)
+    {
+        SetupHandlerSuffix("Processor");
+        var testCode = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
 
@@ -100,14 +99,14 @@ public class TestProcessor
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Handler_Without_Constructor_And_No_Logger_Injected()
-        {
-            SetupHandlerSuffix("Processor");
-            var testCode = @"
+    [TestMethod]
+    public void Diagnostic_For_Handler_Without_Constructor_And_No_Logger_Injected()
+    {
+        SetupHandlerSuffix("Processor");
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestProcessor
@@ -117,15 +116,15 @@ public class TestProcessor
     }
 }";
 
-            var expected = BuildExpectedResult(4, 14, "TestProcessor");
-            VerifyDiagnostic(testCode, expected);
-        }
+        var expected = BuildExpectedResult(4, 14, "TestProcessor");
+        VerifyDiagnostic(testCode, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Handler_With_Constructor_And_No_Logger_Injected()
-        {
-            SetupHandlerSuffix("Processor");
-            var testCode = @"
+    [TestMethod]
+    public void Diagnostic_For_Handler_With_Constructor_And_No_Logger_Injected()
+    {
+        SetupHandlerSuffix("Processor");
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestProcessor
@@ -142,19 +141,19 @@ public class TestProcessor
     }
 }";
 
-            var expected = BuildExpectedResult(4, 14, "TestProcessor");
-            VerifyDiagnostic(testCode, expected);
-        }
+        var expected = BuildExpectedResult(4, 14, "TestProcessor");
+        VerifyDiagnostic(testCode, expected);
+    }
 
-        [TestMethod]
-        [DataRow("ILogger<TestProcessor>")]
-        [DataRow("ILogger")]
-        [DataRow("ILoggerFactory")]
-        [DataRow("ILoggerProvider")]
-        public void No_Diagnostic_For_Handler_With_Primary_Constructor_And_Logger_Injected(string loggerType)
-        {
-            SetupHandlerSuffix("Processor");
-            var testCode = @"
+    [TestMethod]
+    [DataRow("ILogger<TestProcessor>")]
+    [DataRow("ILogger")]
+    [DataRow("ILoggerFactory")]
+    [DataRow("ILoggerProvider")]
+    public void No_Diagnostic_For_Handler_With_Primary_Constructor_And_Logger_Injected(string loggerType)
+    {
+        SetupHandlerSuffix("Processor");
+        var testCode = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
 
@@ -165,14 +164,14 @@ public class TestProcessor(" + loggerType + @" logger)
     {
     }
 }";
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Handler_With_Primary_Constructor_And_No_Logger_Injected()
-        {
-            SetupHandlerSuffix("Processor");
-            var testCode = @"
+    [TestMethod]
+    public void Diagnostic_For_Handler_With_Primary_Constructor_And_No_Logger_Injected()
+    {
+        SetupHandlerSuffix("Processor");
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestProcessor(string parameterValue)
@@ -184,19 +183,19 @@ public class TestProcessor(string parameterValue)
     }
 }";
 
-            var expected = BuildExpectedResult(4, 14, "TestProcessor");
-            VerifyDiagnostic(testCode, expected);
-        }
+        var expected = BuildExpectedResult(4, 14, "TestProcessor");
+        VerifyDiagnostic(testCode, expected);
+    }
 
-        [TestMethod]
-        [DataRow("ILogger<TestProcessor>")]
-        [DataRow("ILogger")]
-        [DataRow("ILoggerFactory")]
-        [DataRow("ILoggerProvider")]
-        public void No_Diagnostic_For_Handler_With_Logger_Injected_In_Partial_Class(string typedLogger)
-        {
-            SetupHandlerSuffix("Processor");
-            var declarationCode = @"
+    [TestMethod]
+    [DataRow("ILogger<TestProcessor>")]
+    [DataRow("ILogger")]
+    [DataRow("ILoggerFactory")]
+    [DataRow("ILoggerProvider")]
+    public void No_Diagnostic_For_Handler_With_Logger_Injected_In_Partial_Class(string typedLogger)
+    {
+        SetupHandlerSuffix("Processor");
+        var declarationCode = @"
 namespace ConsoleApplication1;
 
 public partial class TestProcessor
@@ -205,7 +204,7 @@ public partial class TestProcessor
     {
     }
 }";
-            var constructorCode = @"
+        var constructorCode = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
 
@@ -219,14 +218,14 @@ public partial class TestProcessor
     }
 }";
 
-            VerifyNoDiagnostic([declarationCode, constructorCode]);
-        }
+        VerifyNoDiagnostic([declarationCode, constructorCode]);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Handler_With_No_Logger_Injected_In_Partial_Class()
-        {
-            SetupHandlerSuffix("Processor");
-            var declarationCode = @"
+    [TestMethod]
+    public void Diagnostic_For_Handler_With_No_Logger_Injected_In_Partial_Class()
+    {
+        SetupHandlerSuffix("Processor");
+        var declarationCode = @"
 namespace ConsoleApplication1;
 
 public partial class TestProcessor
@@ -235,7 +234,7 @@ public partial class TestProcessor
     {
     }
 }";
-            var constructorCode = @"
+        var constructorCode = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
 
@@ -249,18 +248,17 @@ public partial class TestProcessor
     }
 }";
 
-            var expected = BuildExpectedResult(4, 22, "TestProcessor");
+        var expected = BuildExpectedResult(4, 22, "TestProcessor");
 
-            VerifyDiagnostic([declarationCode, constructorCode], expected);
-        }
+        VerifyDiagnostic([declarationCode, constructorCode], expected);
+    }
 
+    [TestMethod]
+    public void No_Diagnostic_For_Abstract_Handler_With_No_Logger_Injected()
+    {
+        SetupHandlerSuffix("Processor");
 
-        [TestMethod]
-        public void No_Diagnostic_For_Abstract_Handler_With_No_Logger_Injected()
-        {
-            SetupHandlerSuffix("Processor");
-
-            var testCode = @"
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public abstract class TestProcessor
@@ -270,13 +268,13 @@ public abstract class TestProcessor
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Handler_With_Default_Suffix_When_No_Suffix_Configured()
-        {
-            var testCode = @"
+    [TestMethod]
+    public void Diagnostic_For_Handler_With_Default_Suffix_When_No_Suffix_Configured()
+    {
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestHandler
@@ -286,15 +284,15 @@ public class TestHandler
     }
 }";
 
-            var expected = BuildExpectedResult(4, 14, "TestHandler");
-            VerifyDiagnostic(testCode, expected);
-        }
+        var expected = BuildExpectedResult(4, 14, "TestHandler");
+        VerifyDiagnostic(testCode, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Each_Handler_Matching_Multiple_Configured_Suffixes()
-        {
-            SetupHandlerSuffix("Handler, Processor");
-            var testCode = @"
+    [TestMethod]
+    public void Diagnostic_For_Each_Handler_Matching_Multiple_Configured_Suffixes()
+    {
+        SetupHandlerSuffix("Handler, Processor");
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestHandler
@@ -312,16 +310,16 @@ public class TestService
     }
 }";
 
-            var expectedHandler = BuildExpectedResult(4, 14, "TestHandler");
-            var expectedProcessor = BuildExpectedResult(8, 14, "TestProcessor");
-            VerifyDiagnostic(testCode, expectedHandler, expectedProcessor);
-        }
+        var expectedHandler = BuildExpectedResult(4, 14, "TestHandler");
+        var expectedProcessor = BuildExpectedResult(8, 14, "TestProcessor");
+        VerifyDiagnostic(testCode, expectedHandler, expectedProcessor);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Static_Handler()
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Static_Handler()
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public static class TestHandler
@@ -331,18 +329,18 @@ public static class TestHandler
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        [DataRow("public interface TestHandler { }")]
-        [DataRow("public struct TestHandler { }")]
-        [DataRow("public enum TestHandler { None }")]
-        [DataRow("public delegate void TestHandler();")]
-        public void No_Diagnostic_For_Non_Class_Handler(string typeDeclaration)
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    [DataRow("public interface TestHandler { }")]
+    [DataRow("public struct TestHandler { }")]
+    [DataRow("public enum TestHandler { None }")]
+    [DataRow("public delegate void TestHandler();")]
+    public void No_Diagnostic_For_Non_Class_Handler(string typeDeclaration)
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 namespace ConsoleApplication1;
 
 " + typeDeclaration + @"
@@ -354,17 +352,17 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        [DataRow("public record TestHandler(string Value);")]
-        [DataRow("public record class TestHandler(string Value);")]
-        [DataRow("public record struct TestHandler(string Value);")]
-        public void No_Diagnostic_For_Record_Handler(string typeDeclaration)
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    [DataRow("public record TestHandler(string Value);")]
+    [DataRow("public record class TestHandler(string Value);")]
+    [DataRow("public record struct TestHandler(string Value);")]
+    public void No_Diagnostic_For_Record_Handler(string typeDeclaration)
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 namespace ConsoleApplication1;
 
 " + typeDeclaration + @"
@@ -376,14 +374,14 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Handler_With_Multiple_Constructors_And_One_Injecting_Logger()
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Handler_With_Multiple_Constructors_And_One_Injecting_Logger()
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
 
@@ -405,14 +403,14 @@ public class TestHandler
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Handler_With_Logger_Injected_Alongside_Other_Parameters()
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Handler_With_Logger_Injected_Alongside_Other_Parameters()
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
 
@@ -436,14 +434,14 @@ public class TestHandler
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Handler_With_Logger_Of_Different_Generic_Type_Injected()
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Handler_With_Logger_Of_Different_Generic_Type_Injected()
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
 
@@ -465,14 +463,14 @@ public class TestHandler
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Handler_With_Custom_ILogger_Type_From_Different_Namespace_Injected()
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    public void Diagnostic_For_Handler_With_Custom_ILogger_Type_From_Different_Namespace_Injected()
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 namespace CustomLogging
 {
     public interface ILogger
@@ -499,15 +497,15 @@ namespace ConsoleApplication1
     }
 }";
 
-            var expected = BuildExpectedResult(13, 18, "TestHandler");
-            VerifyDiagnostic(testCode, expected);
-        }
+        var expected = BuildExpectedResult(13, 18, "TestHandler");
+        VerifyDiagnostic(testCode, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Handler_With_Custom_Logger_Implementation_Injected()
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Handler_With_Custom_Logger_Implementation_Injected()
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 using System;
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
@@ -533,14 +531,14 @@ public class TestHandler
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Handler_When_Only_Base_Class_Injects_Logger()
-        {
-            SetupHandlerSuffix("Handler");
-            var testCode = @"
+    [TestMethod]
+    public void Diagnostic_For_Handler_When_Only_Base_Class_Injects_Logger()
+    {
+        SetupHandlerSuffix("Handler");
+        var testCode = @"
 using Microsoft.Extensions.Logging;
 namespace ConsoleApplication1;
 
@@ -562,8 +560,7 @@ public class TestHandler : BaseHandler
     }
 }";
 
-            var expected = BuildExpectedResult(12, 14, "TestHandler");
-            VerifyDiagnostic(testCode, expected);
-        }
+        var expected = BuildExpectedResult(12, 14, "TestHandler");
+        VerifyDiagnostic(testCode, expected);
     }
 }

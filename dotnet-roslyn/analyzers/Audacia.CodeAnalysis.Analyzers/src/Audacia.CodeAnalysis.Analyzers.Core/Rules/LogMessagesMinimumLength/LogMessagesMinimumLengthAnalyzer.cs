@@ -201,7 +201,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
     }
 
     /// <summary>
-    /// Gets the message from either the <c>Message</c> property or the constructor's <c>message</c> parameter.
+    /// Gets the message from either the <c>Message</c> property or the constructor's <paramref name="message"/> parameter.
     /// </summary>
     /// <param name="constructorIndex">The index of the constructor's message parameter, or -1 if it was set via the property.</param>
     private static bool TryGetAttributeMessage(AttributeData attribute, out string message, out int constructorIndex)
@@ -291,7 +291,7 @@ public class LogMessagesMinimumLengthAnalyzer : DiagnosticAnalyzer
         var key = new SettingsKey(Id, LogMessageMinimumLengthSetting);
         var minimumLength = settingsReader.TryGetInt(syntaxTree, key);
 
-        if (minimumLength.HasValue)
+        if (minimumLength != null)
         {
             if (minimumLength.Value < MinimumSettingValue)
             {

@@ -7,29 +7,26 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CodeFixVerifier = Audacia.CodeAnalysis.Analyzers.Test.Base.CodeFixVerifier;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
-{
-    [TestClass]
-    public class MagicNumberAnalyzerTests : CodeFixVerifier
-    {
-        private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string varName = "testVar")
-        {
-            return new DiagnosticResult
-            {
-                Id = MagicNumberAnalyzer.Id,
-                Message = $"Variable declaration for '{varName}' should not use a magic number. CS-01.8.",
-                Severity = DiagnosticSeverity.Warning,
-                Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
-            };
-        }
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 
-        [TestMethod]
-        public void No_Diagnostics_For_Empty_Code()
+[TestClass]
+public class MagicNumberAnalyzerTests : CodeFixVerifier
+{
+    private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string varName = "testVar")
+    {
+        return new DiagnosticResult
         {
-            var test = @"
+            Id = MagicNumberAnalyzer.Id,
+            Message = $"Variable declaration for '{varName}' should not use a magic number. CS-01.8.",
+            Severity = DiagnosticSeverity.Warning,
+            Locations = [new DiagnosticResultLocation("Test0.cs", lineNumber, column)]
+        };
+    }
+
+    [TestMethod]
+    public void No_Diagnostics_For_Empty_Code()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 public class TestClass
@@ -39,13 +36,13 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Variable_With_Integer_Magic_Number_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Variable_With_Integer_Magic_Number_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
     
 class TypeName
@@ -60,15 +57,15 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(8, 23);
+        var expected = BuildExpectedResult(8, 23);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Variable_With_Double_Magic_Number_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Variable_With_Double_Magic_Number_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -83,15 +80,15 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(8, 23);
+        var expected = BuildExpectedResult(8, 23);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Variable_With_Decimal_Magic_Number_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Variable_With_Decimal_Magic_Number_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -106,15 +103,15 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(8, 23);
+        var expected = BuildExpectedResult(8, 23);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Variable_With_Float_Magic_Number_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Variable_With_Float_Magic_Number_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -129,15 +126,15 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(8, 23);
+        var expected = BuildExpectedResult(8, 23);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Variable_With_Long_Magic_Number_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Variable_With_Long_Magic_Number_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -152,15 +149,15 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(8, 23);
+        var expected = BuildExpectedResult(8, 23);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Variable_With_Partial_Magic_Number_Assignment_But_Also_Const_Field()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Variable_With_Partial_Magic_Number_Assignment_But_Also_Const_Field()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -177,15 +174,15 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(10, 29);
+        var expected = BuildExpectedResult(10, 29);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Variable_With_Partial_Magic_Number_Assignment_But_Also_Local_Const()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Variable_With_Partial_Magic_Number_Assignment_But_Also_Local_Const()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -201,15 +198,15 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(9, 29);
+        var expected = BuildExpectedResult(9, 29);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Variable_With_Single_Integer_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Variable_With_Single_Integer_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -225,13 +222,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Variable_With_Const_Field_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Variable_With_Const_Field_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -248,13 +245,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Variable_With_Local_Const_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Variable_With_Local_Const_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -270,13 +267,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Variable_With_Hardcoded_String_Assignment()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Variable_With_Hardcoded_String_Assignment()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -286,13 +283,13 @@ class TypeName
         var testVar = ""Hello"";
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Variable_With_Integer_Magic_Number_Assignment_If_The_Magic_Number_Is_1()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Variable_With_Integer_Magic_Number_Assignment_If_The_Magic_Number_Is_1()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -307,13 +304,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Variable_With_Double_Magic_Number_Assignment_Even_If_The_Magic_Number_Is_1()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Variable_With_Double_Magic_Number_Assignment_Even_If_The_Magic_Number_Is_1()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -328,15 +325,15 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(8, 29);
+        var expected = BuildExpectedResult(8, 29);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_0()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_0()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -351,13 +348,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_10()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Variable_With_Magic_Number_Assignment_If_The_Magic_Number_Is_10()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -372,14 +369,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_For_Loop_With_Magic_Number()
-        {
-
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_For_Loop_With_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -398,15 +394,14 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(8, 27);
-            VerifyDiagnostic(test, expected);
-        }
+        var expected = BuildExpectedResult(8, 27);
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_While_Loop_Iterable_With_Magic_Number()
-        {
-
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_While_Loop_Iterable_With_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -427,15 +422,14 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(10, 23, SyntaxKind.WhileStatement.ToString());
-            VerifyDiagnostic(test, expected);
-        }
+        var expected = BuildExpectedResult(10, 23, nameof(SyntaxKind.WhileStatement));
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Multi_Variable_While_Iterable_With_Magic_Number()
-        {
-
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Multi_Variable_While_Iterable_With_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -450,16 +444,15 @@ class TypeName
         }
     }
 }";
-            var expected1 = BuildExpectedResult(10, 23, SyntaxKind.WhileStatement.ToString());
-            var expected2 = BuildExpectedResult(10, 38, SyntaxKind.WhileStatement.ToString());
-            VerifyDiagnostic(test, expected1, expected2);
-        }
+        var expected1 = BuildExpectedResult(10, 23, nameof(SyntaxKind.WhileStatement));
+        var expected2 = BuildExpectedResult(10, 38, nameof(SyntaxKind.WhileStatement));
+        VerifyDiagnostic(test, expected1, expected2);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_If_With_Magic_Number()
-        {
-
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_If_With_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -479,15 +472,14 @@ class TypeName
     {
     }
 }";
-            var expected = BuildExpectedResult(10, 21, SyntaxKind.IfStatement.ToString());
-            VerifyDiagnostic(test, expected);
-        }
+        var expected = BuildExpectedResult(10, 21, nameof(SyntaxKind.IfStatement));
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Multi_Variable_If_With_Magic_Number()
-        {
-
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Multi_Variable_If_With_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -508,16 +500,15 @@ class TypeName
     }
 }";
 
-            var expected1 = BuildExpectedResult(10, 21, SyntaxKind.IfStatement.ToString());
-            var expected2 = BuildExpectedResult(10, 36, SyntaxKind.IfStatement.ToString());
-            VerifyDiagnostic(test, expected1, expected2);
-        }
+        var expected1 = BuildExpectedResult(10, 21, nameof(SyntaxKind.IfStatement));
+        var expected2 = BuildExpectedResult(10, 36, nameof(SyntaxKind.IfStatement));
+        VerifyDiagnostic(test, expected1, expected2);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Case_Switch_Label_With_Magic_Number()
-        {
-
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Case_Switch_Label_With_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -542,16 +533,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(12, 18, SyntaxKind.CaseSwitchLabel.ToString());
+        var expected = BuildExpectedResult(12, 18, nameof(SyntaxKind.CaseSwitchLabel));
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Switch_Statement_With_Magic_Number()
-        {
-
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Switch_Statement_With_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -577,17 +567,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(11, 17, SyntaxKind.SwitchStatement.ToString());
+        var expected = BuildExpectedResult(11, 17, nameof(SyntaxKind.SwitchStatement));
 
-            VerifyDiagnostic(test, expected);
+        VerifyDiagnostic(test, expected);
+    }
 
-
-        }
-
-        [TestMethod]
-        public void No_Diagnostic_For_Switch_Statement_With_No_Magic_Number()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Switch_Statement_With_No_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -612,13 +600,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_While_Statement_With_No_Magic_Number()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_While_Statement_With_No_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -639,13 +627,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_For_Statement_With_No_Magic_Number()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_For_Statement_With_No_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -667,13 +655,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_If_Statement_With_No_Magic_Number()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_If_Statement_With_No_Magic_Number()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -695,13 +683,13 @@ class TypeName
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_For_Statement_With_Redeclared_Variable()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_For_For_Statement_With_Redeclared_Variable()
+    {
+        var test = @"
 using System;
 
 namespace ConsoleApplication1;
@@ -721,18 +709,16 @@ class Program
     {
     }
 }";
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
+    protected override CodeFixProvider GetCSharpCodeFixProvider()
+    {
+        return null;
+    }
 
-        protected override CodeFixProvider GetCSharpCodeFixProvider()
-        {
-            return null;
-        }
-
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new MagicNumberAnalyzer();
-        }
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new MagicNumberAnalyzer();
     }
 }

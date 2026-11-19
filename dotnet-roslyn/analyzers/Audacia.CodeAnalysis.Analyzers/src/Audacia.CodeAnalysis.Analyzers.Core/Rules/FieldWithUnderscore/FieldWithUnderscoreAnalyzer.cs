@@ -3,64 +3,62 @@ using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.FieldWithUnderscore
+namespace Audacia.CodeAnalysis.Analyzers.Rules.FieldWithUnderscore;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class FieldWithUnderscoreAnalyzer : DiagnosticAnalyzer
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class FieldWithUnderscoreAnalyzer : DiagnosticAnalyzer
+    public const string Id = DiagnosticId.FieldWithUnderscore;
+
+    private const string Title = "Private field not prefixed with an underscore";
+    private const string MessageFormat = "Field '{0}' is not prefixed with an underscore. CS-05.2.";
+    private const string Description = "Private fields should be prefixed with an underscore.";
+
+    private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
+    private static readonly DiagnosticDescriptor Rule = new(Id, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+    public override void Initialize(AnalysisContext context)
     {
-        public const string Id = DiagnosticId.FieldWithUnderscore;
+        context.EnableConcurrentExecution();
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
+    }
 
-        private const string Title = "Private field not prefixed with an underscore";
-        private const string MessageFormat = "Field '{0}' is not prefixed with an underscore. CS-05.2.";
-        private const string Description = "Private fields should be prefixed with an underscore.";
-
-        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
-
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Naming, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
-
-        public override void Initialize(AnalysisContext context)
+    private static void AnalyzeField(SymbolAnalysisContext context)
+    {
+        var field = (IFieldSymbol)context.Symbol;
+        if (!ShouldAnalyze(field))
         {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
+            return;
         }
 
-        private static void AnalyzeField(SymbolAnalysisContext context)
+        if (!field.Name.StartsWith("_", StringComparison.Ordinal))
         {
-            var field = (IFieldSymbol)context.Symbol;
-            if (!ShouldAnalyze(field))
-            {
-                return;
-            }
+            var diagnostic = Diagnostic.Create(Rule, field.Locations[0], field.Name);
+            context.ReportDiagnostic(diagnostic);
+        }
+    }
 
-            if (!field.Name.StartsWith("_", StringComparison.Ordinal))
-            {
-                var diagnostic = Diagnostic.Create(Rule, field.Locations[0], field.Name);
-                context.ReportDiagnostic(diagnostic);
-            }
+    private static bool ShouldAnalyze(IFieldSymbol field)
+    {
+        if (field.IsStatic && field.IsReadOnly)
+        {
+            return false;
         }
 
-        private static bool ShouldAnalyze(IFieldSymbol field)
+        if (field.IsConst)
         {
-            if (field.IsStatic && field.IsReadOnly)
-            {
-                return false;
-            }
-
-            if (field.IsConst)
-            {
-                return false;
-            }
-
-            if (field.DeclaredAccessibility == Accessibility.Public ||
-                field.DeclaredAccessibility == Accessibility.Internal)
-            {
-                return false;
-            }
-
-            return true;
+            return false;
         }
+
+        if (field.DeclaredAccessibility is Accessibility.Public or Accessibility.Internal)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

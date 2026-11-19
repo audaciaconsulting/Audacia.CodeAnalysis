@@ -7,34 +7,34 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
+
+[TestClass]
+public class NoAbbreviationsAnalyzerTests : DiagnosticVerifier
 {
-    [TestClass]
-    public class NoAbbreviationsAnalyzerTests : DiagnosticVerifier
+    private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string kind, string abbreviationUsed)
     {
-        private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string kind, string abbreviationUsed)
+        return new DiagnosticResult
         {
-            return new DiagnosticResult
-            {
-                Id = NoAbbreviationsAnalyzer.Id,
-                Message = $"{kind} '{abbreviationUsed}' should have a more descriptive name. CS-05.1.",
-                Severity = DiagnosticSeverity.Warning,
-                Locations =
-                [
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                ]
-            };
-        }
+            Id = NoAbbreviationsAnalyzer.Id,
+            Message = $"{kind} '{abbreviationUsed}' should have a more descriptive name. CS-05.1.",
+            Severity = DiagnosticSeverity.Warning,
+            Locations =
+            [
+                new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+            ]
+        };
+    }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new NoAbbreviationsAnalyzer(SubstituteSettingsReader);
-        }
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new NoAbbreviationsAnalyzer(SubstituteSettingsReader);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_No_Abbreviation_Used()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_No_Abbreviation_Used()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -45,13 +45,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Single_Character_Variable_Name_Is_Used()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Single_Character_Variable_Name_Is_Used()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -62,15 +62,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(8, 13, "Variable", "d");
+        var expected = BuildExpectedResult(8, 13, "Variable", "d");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Disallowed_Abbreviation_Variable_Name_Is_Used()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Disallowed_Abbreviation_Variable_Name_Is_Used()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -81,15 +81,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(8, 13, "Variable", "len");
+        var expected = BuildExpectedResult(8, 13, "Variable", "len");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Single_Character_Method_Parameter_Name_Is_Used()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Single_Character_Method_Parameter_Name_Is_Used()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -103,15 +103,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(6, 36, "Parameter", "s");
+        var expected = BuildExpectedResult(6, 36, "Parameter", "s");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Single_Character_Lambda_Expression_Parameter_Name_Is_Used()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Single_Character_Lambda_Expression_Parameter_Name_Is_Used()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -124,15 +124,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(10, 33, "Parameter", "x");
+        var expected = BuildExpectedResult(10, 33, "Parameter", "x");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Type_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Type_Name()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -145,13 +145,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Queried_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Queried_Collection_Name()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -165,13 +165,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Null_Conditional_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Null_Conditional_Collection_Name()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -185,13 +185,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Non_Collection_Instance_Receiver_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Non_Collection_Instance_Receiver_Name()
+    {
+        var test = @"
 namespace ConsoleApplication1;
 
 class Worker
@@ -205,15 +205,15 @@ class Worker
     }
 }";
 
-            var expected = BuildExpectedResult(11, 27, "Parameter", "p");
+        var expected = BuildExpectedResult(11, 27, "Parameter", "p");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Does_Not_Match_Null_Conditional_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Does_Not_Match_Null_Conditional_Collection_Name()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -227,15 +227,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(11, 39, "Parameter", "x");
+        var expected = BuildExpectedResult(11, 39, "Parameter", "x");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Extension_Call_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Extension_Call_Collection_Name()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -249,13 +249,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Class_Name_Instead_Of_Collection()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Class_Name_Instead_Of_Collection()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -269,15 +269,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(11, 50, "Parameter", "e");
+        var expected = BuildExpectedResult(11, 50, "Parameter", "e");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Anonymous_Method_Parameter_Matches_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_A_Single_Character_Anonymous_Method_Parameter_Matches_Collection_Name()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -291,13 +291,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Single_Character_Anonymous_Method_Parameter_Only_Matches_Outer_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Single_Character_Anonymous_Method_Parameter_Only_Matches_Outer_Collection_Name()
+    {
+        var test = @"
 using System;
 using System.Linq;
 
@@ -312,15 +312,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(12, 81, "Parameter", "a");
+        var expected = BuildExpectedResult(12, 81, "Parameter", "a");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Wrapped_Lambda_Parameter_Matches_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_A_Single_Character_Wrapped_Lambda_Parameter_Matches_Collection_Name()
+    {
+        var test = @"
 using System;
 using System.Linq;
 
@@ -336,13 +336,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Single_Character_Wrapped_Lambda_Parameter_Does_Not_Match_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_A_Single_Character_Wrapped_Lambda_Parameter_Does_Not_Match_Collection_Name()
+    {
+        var test = @"
 using System;
 using System.Linq;
 
@@ -357,15 +357,15 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(12, 57, "Parameter", "x");
+        var expected = BuildExpectedResult(12, 57, "Parameter", "x");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Non_Extension_Call_Collection_Name()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_A_Single_Character_Lambda_Parameter_Matches_Static_Non_Extension_Call_Collection_Name()
+    {
+        var test = @"
 using System;
 
 namespace ConsoleApplication1;
@@ -379,13 +379,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_A_Longer_Lambda_Parameter_Name_Is_Used()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_A_Longer_Lambda_Parameter_Name_Is_Used()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -398,18 +398,18 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_A_Loop_Variable_Abbreviation_Not_In_The_Allowed_List_Is_Used()
-        {
-            SubstituteSettingsReader.TryGetValue(
-                    Arg.Any<SyntaxTree>(),
-                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting))
-                .Returns("i");
+    [TestMethod]
+    public void Diagnostic_If_A_Loop_Variable_Abbreviation_Not_In_The_Allowed_List_Is_Used()
+    {
+        SubstituteSettingsReader.TryGetValue(
+                Arg.Any<SyntaxTree>(),
+                new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting))
+            .Returns("i");
 
-            var test = @"
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -422,20 +422,20 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(8, 18, "Variable", "a");
+        var expected = BuildExpectedResult(8, 18, "Variable", "a");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_An_Allowed_Loop_Variable_Abbreviation_Is_Used()
-        {
-            SubstituteSettingsReader.TryGetValue(
-                    Arg.Any<SyntaxTree>(),
-                    new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting))
-                .Returns("i,j");
+    [TestMethod]
+    public void No_Diagnostic_If_An_Allowed_Loop_Variable_Abbreviation_Is_Used()
+    {
+        SubstituteSettingsReader.TryGetValue(
+                Arg.Any<SyntaxTree>(),
+                new SettingsKey(NoAbbreviationsAnalyzer.Id, NoAbbreviationsAnalyzer.AllowedLoopVariablesSetting))
+            .Returns("i,j");
 
-            var test = @"
+        var test = @"
 namespace ConsoleApplication1;
 
 class TypeName
@@ -448,13 +448,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_Event_Handler_Lambda_Uses_Sender_And_EventArgs_Letters()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_Event_Handler_Lambda_Uses_Sender_And_EventArgs_Letters()
+    {
+        var test = @"
 using System;
 
 namespace ConsoleApplication1;
@@ -473,13 +473,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_Lambda_Parameter_Matches_Interface_Type_Name_Without_Prefix_In_Chained_Call()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_Lambda_Parameter_Matches_Interface_Type_Name_Without_Prefix_In_Chained_Call()
+    {
+        var test = @"
 using System.Linq;
 
 namespace ConsoleApplication1;
@@ -492,13 +492,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_If_Lambda_Parameter_Matches_Interface_Element_Type_Name_Without_Prefix()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostic_If_Lambda_Parameter_Matches_Interface_Element_Type_Name_Without_Prefix()
+    {
+        var test = @"
 using System.Collections.Generic;
 using System.Linq;
 
@@ -519,13 +519,13 @@ class TypeName
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_If_Lambda_Parameter_Matches_Only_Interface_Prefix()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_If_Lambda_Parameter_Matches_Only_Interface_Prefix()
+    {
+        var test = @"
 using System.Collections.Generic;
 using System.Linq;
 
@@ -546,9 +546,8 @@ class TypeName
     }
 }";
 
-            var expected = BuildExpectedResult(18, 43, "Parameter", "i");
+        var expected = BuildExpectedResult(18, 43, "Parameter", "i");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
     }
 }

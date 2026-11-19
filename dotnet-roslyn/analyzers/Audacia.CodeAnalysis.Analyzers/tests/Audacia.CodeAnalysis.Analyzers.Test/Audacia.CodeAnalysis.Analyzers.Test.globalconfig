@@ -1,0 +1,33 @@
+# NOTE: Requires **VS2022**
+
+# Default Rules
+# Description: CodeAnalysis.ruleset
+
+# Test-project overrides of Audacia.CodeAnalysis.Analyzers.Core.globalconfig (global_level 0).
+# A higher global_level wins when both files set the same key.
+is_global = true
+global_level = 1
+
+# Only use optional parameters to replace overloads *** Suppressed as test helpers use optional parameters to keep test code concise ***
+dotnet_diagnostic.AV1553.severity = none
+
+# [NAMING] Identifiers should not contain underscores *** Suppressed as test method names use underscores to separate words ***
+dotnet_diagnostic.CA1707.severity = none
+
+# [PERFORMANCE] Override equals and operator equals on value types *** Suppressed as many tests create value types but don't need the override ***
+dotnet_diagnostic.CA1815.severity = none
+
+# [NAMING] Asynchronous method name should end with 'Async' *** Suppressed as async test methods are named after the scenario they test ***
+dotnet_diagnostic.RCS1046.severity = none
+
+# [GENERAL] Mark local variable as const *** Suppressed as tests declare their source code and expected values as local variables ***
+dotnet_diagnostic.RCS1118.severity = none
+
+# Use raw string literal *** Suppressed as tests embed their source code in verbatim string literals ***
+dotnet_diagnostic.RCS1266.severity = none
+
+# AV1115: Member or local function contains the word 'and', which suggests doing multiple things
+dotnet_diagnostic.AV1115.severity = none
+
+# CA1308: Normalize strings to uppercase
+dotnet_diagnostic.CA1308.severity = suggestion

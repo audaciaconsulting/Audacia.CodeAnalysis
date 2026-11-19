@@ -5,19 +5,21 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionRequired
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionRequired;
+
+[TestClass]
+public class BaseAssertionRequiredTests : CodeFixVerifier
 {
-    [TestClass]
-    public class BaseAssertionRequiredTests : CodeFixVerifier
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new AssertionRequiredAnalyzer();
+        return new AssertionRequiredAnalyzer();
+    }
 
-        internal static string BuildTestCode(string testMethod, string additionalUsings = null)
-        {
-            var usings = string.IsNullOrWhiteSpace(additionalUsings) ? string.Empty : "\n" + additionalUsings;
+    internal static string BuildTestCode(string testMethod, string additionalUsings = null)
+    {
+        var usings = string.IsNullOrWhiteSpace(additionalUsings) ? string.Empty : "\n" + additionalUsings;
 
-            return @"
+        return @"
 using System;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -34,88 +36,87 @@ public class TestClass
 
     " + testMethod + @"
 }";
-        }
+    }
 
-        internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column)
+    internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column)
+    {
+        return new DiagnosticResult
         {
-            return new DiagnosticResult
-            {
-                Id = AssertionRequiredAnalyzer.Id,
-                Severity = DiagnosticSeverity.Warning,
-                Message = "Test methods must contain at least one assertion. UT-01.1.",
-                Locations =
-                    new[]
-                    {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
-            };
-        }
+            Id = AssertionRequiredAnalyzer.Id,
+            Severity = DiagnosticSeverity.Warning,
+            Message = "Test methods must contain at least one assertion. UT-01.1.",
+            Locations =
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
+        };
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Empty_Code()
-        {
-            var testCode = BuildTestCode("");
+    [TestMethod]
+    public void No_Diagnostics_For_Empty_Code()
+    {
+        var testCode = BuildTestCode(string.Empty);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Non_TestMethod()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Non_TestMethod()
+    {
+        const string testMethod = @"
 public void NonTestMethod()
 {
     var foo = ""Foo"";
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        [DataRow("Fact")]
-        [DataRow("Theory")]
-        [DataRow("Xunit.Fact")]
-        [DataRow("Xunit.Theory")]
-        [DataRow("FactAttribute")]
-        [DataRow("TheoryAttribute")]
-        [DataRow("Xunit.FactAttribute")]
-        [DataRow("Xunit.TheoryAttribute")]
-        public void Diagnostics_For_Empty_TestMethod(string attributeName)
-        {
-            var testMethod = @"
+    [TestMethod]
+    [DataRow("Fact")]
+    [DataRow("Theory")]
+    [DataRow("Xunit.Fact")]
+    [DataRow("Xunit.Theory")]
+    [DataRow("FactAttribute")]
+    [DataRow("TheoryAttribute")]
+    [DataRow("Xunit.FactAttribute")]
+    [DataRow("Xunit.TheoryAttribute")]
+    public void Diagnostics_For_Empty_TestMethod(string attributeName)
+    {
+        var testMethod = @"
 [" + attributeName + @"]
 public void TestMethod()
 {
 }";
 
-            var testCode = BuildTestCode(testMethod);
-            var expectedDiagnostic = BuildExpectedResult(18, 13);
+        var testCode = BuildTestCode(testMethod);
+        var expectedDiagnostic = BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Fact_TestMethod_With_No_Assertions()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Fact_TestMethod_With_No_Assertions()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
     var foo = ""Foo"";
 }";
 
-            var testCode = BuildTestCode(testMethod);
-            var expectedDiagnostic = BuildExpectedResult(18, 13);
+        var testCode = BuildTestCode(testMethod);
+        var expectedDiagnostic = BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Theory_TestMethod_With_No_Assertions()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Theory_TestMethod_With_No_Assertions()
+    {
+        const string testMethod = @"
 [Theory]
 [InlineData(""Foo"")]
 public void TestMethod(string foo)
@@ -123,16 +124,16 @@ public void TestMethod(string foo)
     var bar = ""Bar"";
 }";
 
-            var testCode = BuildTestCode(testMethod);
-            var expectedDiagnostic = BuildExpectedResult(19, 13);
+        var testCode = BuildTestCode(testMethod);
+        var expectedDiagnostic = BuildExpectedResult(19, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Fact_TestMethod_With_No_Assertions_In_Separate_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Fact_TestMethod_With_No_Assertions_In_Separate_Method()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -145,16 +146,16 @@ private void NoAssertions(string foo)
     foo = ""Bar"";
 }";
 
-            var testCode = BuildTestCode(testMethod);
-            var expectedDiagnostic = BuildExpectedResult(18, 13);
+        var testCode = BuildTestCode(testMethod);
+        var expectedDiagnostic = BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Theory_TestMethod_With_No_Assertions_In_Separate_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Theory_TestMethod_With_No_Assertions_In_Separate_Method()
+    {
+        const string testMethod = @"
 [Theory]
 [InlineData(""Foo"")]
 public void TestMethod(string foo)
@@ -167,10 +168,9 @@ private void NoAssertions(string foo)
     foo = ""Bar"";
 }";
 
-            var testCode = BuildTestCode(testMethod);
-            var expectedDiagnostic = BuildExpectedResult(19, 13);
+        var testCode = BuildTestCode(testMethod);
+        var expectedDiagnostic = BuildExpectedResult(19, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
     }
 }

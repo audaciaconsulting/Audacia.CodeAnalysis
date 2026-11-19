@@ -5,15 +5,15 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
+
+[TestClass]
+public class AsyncSuffixAnalyzerTests : CodeFixVerifier
 {
-    [TestClass]
-    public class AsyncSuffixAnalyzerTests : CodeFixVerifier
+    [TestMethod]
+    public void No_Diagnostics_For_Empty_Code()
     {
-        [TestMethod]
-        public void No_Diagnostics_For_Empty_Code()
-        {
-            const string testCode = @"
+        const string testCode = @"
 namespace ConsoleApplication1;
 
 public class TestClass
@@ -23,13 +23,13 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Synchronous_Class_Method()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Synchronous_Class_Method()
+    {
+        const string testCode = @"
 using System;
 
 namespace ConsoleApplication1;
@@ -42,13 +42,13 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Synchronous_Interface_Method_Declaration()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Synchronous_Interface_Method_Declaration()
+    {
+        const string testCode = @"
 namespace ConsoleApplication1;
 
 public class TestClass
@@ -63,13 +63,13 @@ interface ITestInterface
     void TestMethod();
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Synchronous_Method_With_Return_Object_Name_Containing_Task()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Synchronous_Method_With_Return_Object_Name_Containing_Task()
+    {
+        const string testCode = @"
 namespace ConsoleApplication1;
 
 class FakeTask
@@ -89,13 +89,13 @@ class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Synchronous_Method_With_Asynchronous_Operation_Return_Type()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Synchronous_Method_With_Asynchronous_Operation_Return_Type()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 
 namespace ConsoleApplication1;
@@ -113,18 +113,18 @@ class TestClass
     }
 }";
 
-            const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
+        const string expectedMessage
+            = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 13, 5);
+        var expectedDiagnostic = BuildExpectedResult(expectedMessage, 13, 5);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostic_And_Code_Fix_For_Interface_Method_With_Asynchronous_Operation_Return_Type_Without_Async_Suffix()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void Diagnostic_And_Code_Fix_For_Interface_Method_With_Asynchronous_Operation_Return_Type_Without_Async_Suffix()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 
 namespace ConsoleApplication1;
@@ -141,14 +141,14 @@ interface ITestInterface
     Task TestMethod();
 }";
 
-            const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
+        const string expectedMessage
+            = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 15, 5);
+        var expectedDiagnostic = BuildExpectedResult(expectedMessage, 15, 5);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
+        VerifyDiagnostic(testCode, expectedDiagnostic);
 
-            const string fixedTestCode = @"
+        const string fixedTestCode = @"
 using System.Threading.Tasks;
 
 namespace ConsoleApplication1;
@@ -164,13 +164,13 @@ interface ITestInterface
 {
     Task TestMethodAsync();
 }";
-            VerifyCodeFix(testCode, fixedTestCode);
-        }
+        VerifyCodeFix(testCode, fixedTestCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Asynchronous_Method_With_Async_Suffix()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Asynchronous_Method_With_Async_Suffix()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 
 namespace ConsoleApplication1;
@@ -190,13 +190,13 @@ class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostic_And_Code_Fix_For_Asynchronous_Method_With_No_Async_Suffix()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void Diagnostic_And_Code_Fix_For_Asynchronous_Method_With_No_Async_Suffix()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 
 namespace ConsoleApplication1;
@@ -216,14 +216,14 @@ class TestClass
     }
 }";
 
-            const string expectedMessage
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
+        const string expectedMessage
+            = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 13, 5);
+        var expectedDiagnostic = BuildExpectedResult(expectedMessage, 13, 5);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
+        VerifyDiagnostic(testCode, expectedDiagnostic);
 
-            const string fixedTestCode = @"
+        const string fixedTestCode = @"
 using System.Threading.Tasks;
 
 namespace ConsoleApplication1;
@@ -242,13 +242,13 @@ class TestClass
         return await task;
     }
 }";
-            VerifyCodeFix(testCode, fixedTestCode);
-        }
+        VerifyCodeFix(testCode, fixedTestCode);
+    }
 
-        [TestMethod]
-        public void Multiple_Diagnostics_For_Multiple_Asynchronous_Methods_With_No_Async_Suffix_In_Class()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void Multiple_Diagnostics_For_Multiple_Asynchronous_Methods_With_No_Async_Suffix_In_Class()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 
 namespace ConsoleApplication1;
@@ -276,26 +276,26 @@ class TestClass
     }
 }";
 
-            const string expectedMessage1
-                = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
+        const string expectedMessage1
+            = "Asynchronous method name 'TestMethod' is not suffixed with 'Async'. CS-05.16.";
 
-            const string expectedMessage2
-                = "Asynchronous method name 'TestMethod1' is not suffixed with 'Async'. CS-05.16.";
+        const string expectedMessage2
+            = "Asynchronous method name 'TestMethod1' is not suffixed with 'Async'. CS-05.16.";
 
-            var expectedDiagnostics
-                = new[]
-                {
-                    BuildExpectedResult(expectedMessage1, 14, 5),
-                    BuildExpectedResult(expectedMessage2, 21, 5)
-                };
+        var expectedDiagnostics
+            = new[]
+            {
+                BuildExpectedResult(expectedMessage1, 14, 5),
+                BuildExpectedResult(expectedMessage2, 21, 5)
+            };
 
-            VerifyDiagnostic(testCode, expectedDiagnostics);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostics);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_Async_Suffix()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_Async_Suffix()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -317,13 +317,13 @@ public class TestController : ControllerBase
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Asynchronous_Controller_Post_Action_Method_Without_Async_Suffix()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Asynchronous_Controller_Post_Action_Method_Without_Async_Suffix()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -345,13 +345,13 @@ public class TestController : ControllerBase
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_HttpGet_Attribute_And_Without_Async_Suffix()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Asynchronous_Controller_Get_Action_Method_Without_HttpGet_Attribute_And_Without_Async_Suffix()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -372,13 +372,13 @@ public class TestController : ControllerBase
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostic_And_Code_Fix_For_Private_Asynchronous_Method_In_Controller_Without_HttpGet_Attribute_And_Without_Async_Suffix()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void Diagnostic_And_Code_Fix_For_Private_Asynchronous_Method_In_Controller_Without_HttpGet_Attribute_And_Without_Async_Suffix()
+    {
+        const string testCode = @"
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -399,14 +399,14 @@ public class TestController : ControllerBase
     }
 }";
 
-            const string expectedMessage
-                = "Asynchronous method name 'Get' is not suffixed with 'Async'. CS-05.16.";
+        const string expectedMessage
+            = "Asynchronous method name 'Get' is not suffixed with 'Async'. CS-05.16.";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 14, 5);
+        var expectedDiagnostic = BuildExpectedResult(expectedMessage, 14, 5);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
+        VerifyDiagnostic(testCode, expectedDiagnostic);
 
-            const string fixedTestCode = @"
+        const string fixedTestCode = @"
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -426,29 +426,30 @@ public class TestController : ControllerBase
         return await testTask;
     }
 }";
-            VerifyCodeFix(testCode, fixedTestCode);
-        }
+        VerifyCodeFix(testCode, fixedTestCode);
+    }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new AsyncSuffixAnalyzer();
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new AsyncSuffixAnalyzer();
+    }
 
-        protected override CodeFixProvider GetCSharpCodeFixProvider()
-            => new AsyncSuffixFixProvider();
+    protected override CodeFixProvider GetCSharpCodeFixProvider()
+    {
+        return new AsyncSuffixFixProvider();
+    }
 
-        private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
+    private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
+    {
+        return new DiagnosticResult
         {
-            var diagnosticResult = new DiagnosticResult
-            {
-                Id = AsyncSuffixAnalyzer.Id,
-                Severity = AsyncSuffixAnalyzer.Severity,
-                Message = message,
-                Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
-            };
-
-            return diagnosticResult;
-        }
+            Id = AsyncSuffixAnalyzer.Id,
+            Severity = AsyncSuffixAnalyzer.Severity,
+            Message = message,
+            Locations =
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
+        };
     }
 }

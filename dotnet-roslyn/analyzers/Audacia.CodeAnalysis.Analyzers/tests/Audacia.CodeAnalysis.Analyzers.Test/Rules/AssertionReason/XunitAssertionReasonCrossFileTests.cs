@@ -3,20 +3,22 @@ using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionReason
-{
-    [TestClass]
-    public class XunitAssertionReasonCrossFileTests : CodeFixVerifier
-    {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new AssertionReasonMustBeProvidedAnalyzer();
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionReason;
 
-        [TestMethod]
-        public void No_Diagnostics_For_Fact_TestMethod_With_Assertion_Reason_In_Separate_File()
+[TestClass]
+public class XunitAssertionReasonCrossFileTests : CodeFixVerifier
+{
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new AssertionReasonMustBeProvidedAnalyzer();
+    }
+
+    [TestMethod]
+    public void No_Diagnostics_For_Fact_TestMethod_With_Assertion_Reason_In_Separate_File()
+    {
+        var sources = new[]
         {
-            var sources = new[]
-            {
-                @"
+            @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -32,9 +34,8 @@ public partial class TestClass
     {
         Assertion(true);
     }
-}"
-                ,
-                @"
+}",
+            @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -46,9 +47,8 @@ public partial class TestClass
         Assert.True(value, ""Reason"");
     }
 }"
-            };
+        };
 
-            VerifyDiagnostic(sources);
-        }
+        VerifyDiagnostic(sources);
     }
 }

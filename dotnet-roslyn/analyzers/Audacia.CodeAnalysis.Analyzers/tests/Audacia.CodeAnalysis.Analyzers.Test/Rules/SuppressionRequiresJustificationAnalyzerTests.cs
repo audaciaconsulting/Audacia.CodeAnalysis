@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Core.Rules.SuppressionRequiresJustification;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.SuppressionRequiresJustification;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -86,13 +86,13 @@ public class TestClass
         "MaxMethodLengthAttribute",
         "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength")]
     [DataRow(
-        "MaxParamSkip", 
+        "MaxParamSkip",
         "MaxParameterCountAttribute",
         "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount")]
     [TestMethod]
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_No_Justification(
-        string alias, 
-        string attributeName, 
+        string alias,
+        string attributeName,
         string attributeNameSpace)
     {
         var testFileContents = $@"
@@ -184,17 +184,17 @@ public class TestClass
     }
 
     [DataRow(
-        "MaxLengthSkip", 
+        "MaxLengthSkip",
         "MaxMethodLengthAttribute",
         "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.MethodLength")]
     [DataRow(
-        "MaxParamSkip", 
+        "MaxParamSkip",
         "MaxParameterCountAttribute",
         "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount")]
     [TestMethod]
     public void Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_Placeholder_Justification(
-        string alias, 
-        string attributeName, 
+        string alias,
+        string attributeName,
         string attributeNameSpace)
     {
         var testFileContents = $@"
@@ -315,8 +315,8 @@ public class TestClass
     [DataRow("MaxParamSkip", "MaxParameterCountAttribute", "Audacia.CodeAnalysis.Analyzers.Test.Helpers.AttributeShadows.ParameterCount")]
     [TestMethod]
     public void No_Diagnostics_For_Audacia_Code_Analysis_Attribute_Alias_With_No_Justification(
-        string alias, 
-        string attributeName, 
+        string alias,
+        string attributeName,
         string attributeNameSpace)
     {
         var testFileContents = $@"

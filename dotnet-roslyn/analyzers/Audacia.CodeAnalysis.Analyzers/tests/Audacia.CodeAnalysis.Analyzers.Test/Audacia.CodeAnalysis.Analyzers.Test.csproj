@@ -2,6 +2,11 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Authors>Audacia</Authors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Required for IDE0005 (remove unnecessary usings) to run on build; test code doesn't need XML docs -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="7.2.2" />
@@ -29,5 +34,23 @@
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+    
+  <!--
+    External analyzers for this project's own code, with the rule configuration a consuming test project gets.
+    Keep the versions in step with config/Audacia.CodeAnalysis/Audacia.CodeAnalysis.csproj.
+  -->
+  <ItemGroup>
+    <PackageReference Include="CSharpGuidelinesAnalyzer" Version="3.8.5" PrivateAssets="all" />
+    <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59" PrivateAssets="all" />
+    <PackageReference Include="IDisposableAnalyzers" Version="4.0.8" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15" PrivateAssets="all" />
+    <PackageReference Include="Roslynator.Analyzers" Version="4.12.10" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
+  </ItemGroup>
+    
+  <ItemGroup>
+      <GlobalAnalyzerConfigFiles Include="Audacia.CodeAnalysis.Analyzers.Test.globalconfig" />
+      <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)..\..\src\Audacia.CodeAnalysis.Analyzers.Core\Audacia.CodeAnalysis.Analyzers.Core.globalconfig" />    
   </ItemGroup>
 </Project>

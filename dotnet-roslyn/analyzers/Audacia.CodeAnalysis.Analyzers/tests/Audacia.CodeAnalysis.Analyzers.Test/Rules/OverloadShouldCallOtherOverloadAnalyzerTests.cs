@@ -5,34 +5,34 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
+
+[TestClass]
+public class OverloadShouldCallOtherOverloadAnalyzerTests : DiagnosticVerifier
 {
-    [TestClass]
-    public class OverloadShouldCallOtherOverloadAnalyzerTests : DiagnosticVerifier
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new OverloadShouldCallOtherOverloadAnalyzer();
-        }
+        return new OverloadShouldCallOtherOverloadAnalyzer();
+    }
 
-        private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string message)
+    private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string message)
+    {
+        return new DiagnosticResult
         {
-            return new DiagnosticResult
-            {
-                Id = OverloadShouldCallOtherOverloadAnalyzer.Id,
-                Message = message,
-                Severity = DiagnosticSeverity.Warning,
-                Locations =
-                [
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                ]
-            };
-        }
+            Id = OverloadShouldCallOtherOverloadAnalyzer.Id,
+            Message = message,
+            Severity = DiagnosticSeverity.Warning,
+            Locations =
+            [
+                new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+            ]
+        };
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_No_Method_To_Overload()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostics_For_No_Method_To_Overload()
+    {
+        var test = @"
 namespace TestNamespace;
 
 public class TestClass
@@ -47,13 +47,13 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Method_Should_Call_Other_Overload()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Method_Should_Call_Other_Overload()
+    {
+        var test = @"
 namespace TestNamespace;
 
 public class TestClass
@@ -73,18 +73,18 @@ public class TestClass
     }
 }";
 
-            var expected = BuildExpectedResult(
-                lineNumber: 6,
-                column: 17,
-                message: "Overloaded method 'TestClass.TestMethod(int, int)' should call another overload. CS-01.20.");
+        var expected = BuildExpectedResult(
+            lineNumber: 6,
+            column: 17,
+            message: "Overloaded method 'TestClass.TestMethod(int, int)' should call another overload. CS-01.20.");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Longer_Method_Should_Be_Virtual()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Longer_Method_Should_Be_Virtual()
+    {
+        var test = @"
 namespace TestNamespace;
 
 public class TestClass
@@ -104,18 +104,18 @@ public class TestClass
     }
 }";
 
-            var expected = BuildExpectedResult(
-                    lineNumber: 11,
-                    column: 17,
-                    message: "Method overload with the most parameters should be virtual. CS-01.20.");
+        var expected = BuildExpectedResult(
+                lineNumber: 11,
+                column: 17,
+                message: "Method overload with the most parameters should be virtual. CS-01.20.");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Method_Does_Not_Match_Parameter_Order_Of_Longest_Overload()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Method_Does_Not_Match_Parameter_Order_Of_Longest_Overload()
+    {
+        var test = @"
 namespace TestNamespace;
 
 public class TestClass
@@ -138,18 +138,18 @@ public class TestClassA : TestClass
     }
 }";
 
-            var expected = BuildExpectedResult(
-                lineNumber: 18,
-                column: 17,
-                message: "Parameter order in 'TestClassA.TestMethod(string, int)' does not match with the parameter order of the longest overload. CS-01.20.");
+        var expected = BuildExpectedResult(
+            lineNumber: 18,
+            column: 17,
+            message: "Parameter order in 'TestClassA.TestMethod(string, int)' does not match with the parameter order of the longest overload. CS-01.20.");
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Method_Failing_All_Three_Rules()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Method_Failing_All_Three_Rules()
+    {
+        var test = @"
 namespace TestNamespace;
 
 public class TestClass
@@ -176,20 +176,20 @@ public class TestClassA : TestClass
         TestMethod(i, s, 0);
     }
 }";
-            var expectedList = new[]
-            {
-                BuildExpectedResult(lineNumber: 6, column: 17, message: "Overloaded method 'TestClass.TestMethod(int, int)' should call another overload. CS-01.20."),
-                BuildExpectedResult(lineNumber: 11, column: 17, message: "Method overload with the most parameters should be virtual. CS-01.20."),
-                BuildExpectedResult(lineNumber: 23, column: 17, message: "Parameter order in 'TestClassA.TestMethod(string, int)' does not match with the parameter order of the longest overload. CS-01.20.")
-            };
-
-            VerifyDiagnostic(test, expectedList);
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_For_Method_Overload_Correctly()
+        var expectedList = new[]
         {
-            var test = @"
+            BuildExpectedResult(lineNumber: 6, column: 17, message: "Overloaded method 'TestClass.TestMethod(int, int)' should call another overload. CS-01.20."),
+            BuildExpectedResult(lineNumber: 11, column: 17, message: "Method overload with the most parameters should be virtual. CS-01.20."),
+            BuildExpectedResult(lineNumber: 23, column: 17, message: "Parameter order in 'TestClassA.TestMethod(string, int)' does not match with the parameter order of the longest overload. CS-01.20.")
+        };
+
+        VerifyDiagnostic(test, expectedList);
+    }
+
+    [TestMethod]
+    public void No_Diagnostics_For_Method_Overload_Correctly()
+    {
+        var test = @"
 namespace TestNamespace;
 
 public class TestClass
@@ -212,13 +212,13 @@ public class TestClassA : TestClass
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Method_Overload_Correctly_Without_Inheritance()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Method_Overload_Correctly_Without_Inheritance()
+    {
+        var test = @"
 namespace TestNamespace;
 
 public class TestClass
@@ -238,13 +238,13 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Controller_Method_Should_Not_Overload_With_Get_Attributes()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Controller_Method_Should_Not_Overload_With_Get_Attributes()
+    {
+        var test = @"
 using Microsoft.AspNetCore.Mvc;
 
 namespace TestNamespace;
@@ -268,13 +268,13 @@ public class TestClassController
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Controller_Method_Should_Not_Overload_With_Put_Attributes()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Controller_Method_Should_Not_Overload_With_Put_Attributes()
+    {
+        var test = @"
 using Microsoft.AspNetCore.Mvc;
 
 namespace TestNamespace;
@@ -298,13 +298,13 @@ public class TestClassController : Controller
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Controller_Method_Should_Not_Overload()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Controller_Method_Should_Not_Overload()
+    {
+        var test = @"
 using Microsoft.AspNetCore.Mvc;
 
 namespace TestNamespace;
@@ -326,7 +326,6 @@ public class TestClassController : Controller
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
     }
 }

@@ -1,39 +1,37 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Core.Rules.AvoidBooleanParameter;
+﻿using Audacia.CodeAnalysis.Analyzers.Rules.AvoidBooleanParameter;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
+
+[TestClass]
+public class AvoidBooleanParametersAnalyzerTests : DiagnosticVerifier
 {
-    [TestClass]
-    public class AvoidBooleanParametersAnalyzerTests : DiagnosticVerifier
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
+        return new AvoidBooleanParameterAnalyzer();
+    }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new AvoidBooleanParameterAnalyzer();
-
-        private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
+    private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
+    {
+        return new DiagnosticResult
         {
-            var diagnosticResult = new DiagnosticResult
-            {
-                Id = AvoidBooleanParameterAnalyzer.Id,
-                Severity = AvoidBooleanParameterAnalyzer.Severity,
-                Message = message,
-                Locations =
-                    new[] {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
-            };
+            Id = AvoidBooleanParameterAnalyzer.Id,
+            Severity = AvoidBooleanParameterAnalyzer.Severity,
+            Message = message,
+            Locations =
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
+        };
+    }
 
-            return diagnosticResult;
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_For_Record_With_Positional_Syntax()
-        {
-
-            const string testCode = @"  
+    [TestMethod]
+    public void No_Diagnostics_For_Record_With_Positional_Syntax()
+    {
+        const string testCode = @"  
     namespace ConsoleApplication
     {
         class TypeName
@@ -49,14 +47,12 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
     }";
 
         VerifyNoDiagnostic(testCode);
-        }
+    }
 
-
-        [TestMethod]
-        public void Diagnostics_For_Method_With_Boolean_Parameters()
-        {
-
-            const string testCode = @"  
+    [TestMethod]
+    public void Diagnostics_For_Method_With_Boolean_Parameters()
+    {
+        const string testCode = @"  
             namespace ConsoleApplication
                 {
 
@@ -75,16 +71,15 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     }
                 }";
 
-            var expectedDiagnostic = BuildExpectedResult("Parameter 'imNotAllowed' is of type 'bool'. CS-01.23.", 13, 64);
+        var expectedDiagnostic = BuildExpectedResult("Parameter 'imNotAllowed' is of type 'bool'. CS-01.23.", 13, 64);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
-        
-        [TestMethod]
-        public void No_Diagnostics_For_Record_With_Multiple_Boolean_Positional_Syntax()
-        {
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-            const string testCode = @"  
+    [TestMethod]
+    public void No_Diagnostics_For_Record_With_Multiple_Boolean_Positional_Syntax()
+    {
+        const string testCode = @"  
     namespace ConsoleApplication
     {
         class TypeName
@@ -99,14 +94,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
     }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Private_Record_With_Boolean_Positional_Syntax()
-        {
-
-            const string testCode = @"  
+    [TestMethod]
+    public void No_Diagnostics_For_Private_Record_With_Boolean_Positional_Syntax()
+    {
+        const string testCode = @"  
     namespace ConsoleApplication
     {
         class TypeName
@@ -121,14 +115,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
     }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Internal_Record_With_Boolean_Positional_Syntax()
-        {
-
-            const string testCode = @"  
+    [TestMethod]
+    public void No_Diagnostics_For_Internal_Record_With_Boolean_Positional_Syntax()
+    {
+        const string testCode = @"  
     namespace ConsoleApplication
     {
         class TypeName
@@ -143,14 +136,13 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
         }
     }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Primary_Constructor_With_Bool_Parameters()
-        {
-
-            const string testCode = @"  
+    [TestMethod]
+    public void No_Diagnostics_For_Primary_Constructor_With_Bool_Parameters()
+    {
+        const string testCode = @"  
             namespace ConsoleApplication
                 {
 
@@ -168,7 +160,6 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
                     }
                 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
     }
 }

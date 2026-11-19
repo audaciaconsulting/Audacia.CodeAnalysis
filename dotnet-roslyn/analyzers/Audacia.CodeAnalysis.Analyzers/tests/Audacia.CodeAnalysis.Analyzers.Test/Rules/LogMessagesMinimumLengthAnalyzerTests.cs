@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Globalization;
 using System.Linq;
 using Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesMinimumLength;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
@@ -27,7 +28,7 @@ public class LogMessagesMinimumLengthAnalyzerTests : CodeFixVerifier
     private const string TenSpaces = "          ";
 
     /// <summary>
-    /// Alignment padding is capped at <see cref="LogMessagesMinimumLengthAnalyzer.MaximumSettingValue"/> (100) characters.
+    /// Alignment padding is capped at <c>LogMessagesMinimumLengthAnalyzer.MaximumSettingValue</c> (100) characters.
     /// </summary>
     private const string CappedPadding =
         TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces + TenSpaces;
@@ -177,7 +178,7 @@ class ClassName
     {
         ConfigureMinimumLength(setting);
 
-        VerifyMessage($"\"{message}\"", diagnosticExpected, expectedRead: message, minLength: int.Parse(setting));
+        VerifyMessage($"\"{message}\"", diagnosticExpected, expectedRead: message, minLength: int.Parse(setting, CultureInfo.InvariantCulture));
     }
 
     [TestMethod]
@@ -187,8 +188,7 @@ class ClassName
     public void Invalid_Minimum_Length_Throws_When_Configuration_Is_Read(string setting)
     {
         ConfigureMinimumLength(setting);
-        var key = new SettingsKey(LogMessagesMinimumLengthAnalyzer.Id,
-            LogMessagesMinimumLengthAnalyzer.LogMessageMinimumLengthSetting);
+        var key = new SettingsKey(LogMessagesMinimumLengthAnalyzer.Id, LogMessagesMinimumLengthAnalyzer.LogMessageMinimumLengthSetting);
 
         AssertAnalyzerThrowsInvalidConfig(
             $"Value for '{key.ToString().ToLowerInvariant()}' in '.editorconfig' must be an integer.");
@@ -198,7 +198,8 @@ class ClassName
     public void Minimum_Length_Less_Than_One_Throws_When_Configuration_Is_Read()
     {
         ConfigureMinimumLength("0");
-        var key = new SettingsKey(LogMessagesMinimumLengthAnalyzer.Id,
+        var key = new SettingsKey(
+            LogMessagesMinimumLengthAnalyzer.Id,
             LogMessagesMinimumLengthAnalyzer.LogMessageMinimumLengthSetting);
 
         AssertAnalyzerThrowsInvalidConfig(
@@ -209,7 +210,8 @@ class ClassName
     public void Minimum_Length_Greater_Than_One_Hundred_Throws_When_Configuration_Is_Read()
     {
         ConfigureMinimumLength("101");
-        var key = new SettingsKey(LogMessagesMinimumLengthAnalyzer.Id,
+        var key = new SettingsKey(
+            LogMessagesMinimumLengthAnalyzer.Id,
             LogMessagesMinimumLengthAnalyzer.LogMessageMinimumLengthSetting);
 
         AssertAnalyzerThrowsInvalidConfig(
@@ -600,8 +602,8 @@ class ClassName
 
         var analyzerException = diagnostics.SingleOrDefault(d => d.Id == "AD0001");
         Assert.IsNotNull(analyzerException, "Expected the analyzer to throw an exception.");
-        StringAssert.Contains(analyzerException.GetMessage(), nameof(InvalidConfigException));
-        StringAssert.Contains(analyzerException.GetMessage(), expectedMessage);
+        StringAssert.Contains(analyzerException.GetMessage(CultureInfo.InvariantCulture), nameof(InvalidConfigException), System.StringComparison.InvariantCulture);
+        StringAssert.Contains(analyzerException.GetMessage(CultureInfo.InvariantCulture), expectedMessage, System.StringComparison.InvariantCulture);
     }
 
     /// <summary>
@@ -735,10 +737,10 @@ class ClassName
     private static void AssertTestDataIsConsistent(bool diagnosticExpected, string expectedRead, int minLength)
     {
         var tooShort = expectedRead != null && expectedRead.Length < minLength;
+        string message = $"Invalid test data: \"{expectedRead}\" has length {expectedRead?.Length}, and the minimum length is {minLength}, " +
+                $"so diagnosticExpected should be {tooShort.ToString().ToLowerInvariant()}.";
 
-        Assert.AreEqual(tooShort, diagnosticExpected,
-            $"Invalid test data: \"{expectedRead}\" has length {expectedRead?.Length}, and the minimum length is {minLength}, " +
-            $"so diagnosticExpected should be {tooShort.ToString().ToLowerInvariant()}.");
+        Assert.AreEqual(tooShort, diagnosticExpected, message);
     }
 
     /// <summary>
@@ -759,7 +761,8 @@ class ClassName
 
     private void ConfigureMinimumLength(string setting)
     {
-        var key = new SettingsKey(LogMessagesMinimumLengthAnalyzer.Id,
+        var key = new SettingsKey(
+            LogMessagesMinimumLengthAnalyzer.Id,
             LogMessagesMinimumLengthAnalyzer.LogMessageMinimumLengthSetting);
         var options = Substitute.For<AnalyzerConfigOptions>();
         options.TryGetValue(key.ToString(), out Arg.Any<string>())
@@ -850,9 +853,13 @@ class ClassName
     /// </summary>
     private void AssertMessagesRead(params string[] expectedReads)
     {
-        static string Describe(System.Collections.Generic.IEnumerable<string> messages) => string.Join(", ",
-            messages.OrderBy(message => message, System.StringComparer.Ordinal)
-                .Select(message => $"\"{message}\" (length {message.Length})"));
+        static string Describe(System.Collections.Generic.IEnumerable<string> messages)
+        {
+            return string.Join(
+                ", ",
+                messages.OrderBy(message => message, System.StringComparer.Ordinal)
+                    .Select(message => $"\"{message}\" (length {message.Length})"));
+        }
 
         var expected = Describe(expectedReads);
         var actual = Describe(_messagesRead.Values);
@@ -860,4 +867,3 @@ class ClassName
         Assert.AreEqual(expected, actual, "The analyzer didn't read the messages expected.");
     }
 }
-

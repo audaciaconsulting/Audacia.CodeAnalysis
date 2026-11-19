@@ -2,50 +2,44 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Audacia.CodeAnalysis.Analyzers.Rules.TestNamesMustBeConsistent;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.TestNamesMustBeConsistent;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
+
+[TestClass]
+public class TestNamesMustBeConsistentAnalyzerTests : CodeFixVerifier
 {
-    [TestClass]
-    public class TestNamesMustBeConsistentAnalyzerTests : CodeFixVerifier
+    private void SetupConfiguredFormat(string configuredFormat)
     {
-        private void SetupConfiguredFormat(string configuredFormat)
+        SubstituteSettingsReader.TryGetValue(
+            Arg.Any<SyntaxTree>(),
+            new SettingsKey(TestNamesMustBeConsistentAnalyzer.Id, TestNamesMustBeConsistentAnalyzer.FormatConfigKey))
+        .Returns(configuredFormat);
+    }
+
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new TestNamesMustBeConsistentAnalyzer(SubstituteSettingsReader);
+    }
+
+    internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string methodName, string configuredFormat)
+    {
+        return new DiagnosticResult
         {
-            SubstituteSettingsReader.TryGetValue(
-                Arg.Any<SyntaxTree>(),
-                new SettingsKey(TestNamesMustBeConsistentAnalyzer.Id, TestNamesMustBeConsistentAnalyzer.FormatConfigKey))
-            .Returns(configuredFormat);
-        }
+            Id = TestNamesMustBeConsistentAnalyzer.Id,
+            Severity = DiagnosticSeverity.Warning,
+            Message = $"Test method name '{methodName}' is not consistent with configured format '{configuredFormat}'. UT-01.2.",
+            Locations = [new DiagnosticResultLocation("Test0.cs", lineNumber, column)]
+        };
+    }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new TestNamesMustBeConsistentAnalyzer(SubstituteSettingsReader);
-        }
-
-        internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string methodName, string configuredFormat)
-        {
-
-            var diagnosticResult = new DiagnosticResult
-            {
-                Id = TestNamesMustBeConsistentAnalyzer.Id,
-                Severity = DiagnosticSeverity.Warning,
-                Message = $"Test method name '{methodName}' is not consistent with configured format '{configuredFormat}'. UT-01.2.",
-                Locations =
-                    new[] {
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
-            };
-
-            return diagnosticResult;
-        }
-
-        [TestMethod]
-        public void No_Diagnostic_For_Empty_Code()
-        {
-            var testCode = @"
+    [TestMethod]
+    public void No_Diagnostic_For_Empty_Code()
+    {
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestClass
@@ -55,16 +49,15 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Non_Test_Method()
-        {
+    [TestMethod]
+    public void No_Diagnostic_For_Non_Test_Method()
+    {
+        SetupConfiguredFormat("/^[0-9]+$/");
 
-            SetupConfiguredFormat("/^[0-9]+$/");
-
-            var testCode = @"
+        var testCode = @"
 namespace ConsoleApplication1;
 
 public class TestClass
@@ -77,19 +70,18 @@ public class TestClass
     {
     }
 }";
-            VerifyNoDiagnostic(testCode);
+        VerifyNoDiagnostic(testCode);
+    }
 
-        }
+    [TestMethod]
+    [DataRow("^[a-zA-Z]+(_[a-zA-Z]+)+$", "Method_Name")]
+    [DataRow("^[a-zA-Z]+(_[a-zA-Z]+)+$", "method_name")]
+    [DataRow("\\d+", "Test12345")]
+    public void No_Diagnostic_For_Test_Method_Name_Consistent_With_Configured_Format(string pattern, string methodName)
+    {
+        SetupConfiguredFormat(pattern);
 
-        [TestMethod]
-        [DataRow("^[a-zA-Z]+(_[a-zA-Z]+)+$", "Method_Name")]
-        [DataRow("^[a-zA-Z]+(_[a-zA-Z]+)+$", "method_name")]
-        [DataRow("\\d+", "Test12345")]
-        public void No_Diagnostic_For_Test_Method_Name_Consistent_With_Configured_Format(string pattern, string methodName)
-        {
-            SetupConfiguredFormat(pattern);
-
-            var testCode = @"
+        var testCode = @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -106,14 +98,13 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
+        VerifyNoDiagnostic(testCode);
+    }
 
-        }
-
-        [TestMethod]
-        public void No_Diagnostic_When_No_Format_Configured()
-        {
-            var testCode = @"
+    [TestMethod]
+    public void No_Diagnostic_When_No_Format_Configured()
+    {
+        var testCode = @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -130,17 +121,17 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        [DataRow("^[a-zA-Z]+(_[a-zA-Z]+)+$", "Method_Name")]
-        [DataRow("\\d+", "Test12345")]
-        public void No_Diagnostic_For_Theory_Method_Name_Consistent_With_Configured_Format(string pattern, string methodName)
-        {
-            SetupConfiguredFormat(pattern);
+    [TestMethod]
+    [DataRow("^[a-zA-Z]+(_[a-zA-Z]+)+$", "Method_Name")]
+    [DataRow("\\d+", "Test12345")]
+    public void No_Diagnostic_For_Theory_Method_Name_Consistent_With_Configured_Format(string pattern, string methodName)
+    {
+        SetupConfiguredFormat(pattern);
 
-            var testCode = @"
+        var testCode = @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -158,15 +149,15 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Non_Xunit_Test_Attribute()
-        {
-            SetupConfiguredFormat("^[a-zA-Z]+(_[a-zA-Z]+)+$");
+    [TestMethod]
+    public void No_Diagnostic_For_Non_Xunit_Test_Attribute()
+    {
+        SetupConfiguredFormat("^[a-zA-Z]+(_[a-zA-Z]+)+$");
 
-            var testCode = @"
+        var testCode = @"
 using System;
 
 namespace ConsoleApplication1;
@@ -186,15 +177,15 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostic_For_Invalid_Regex_Pattern()
-        {
-            SetupConfiguredFormat("^[a-zA-Z]+(_[a-zA-Z]+)+$[");
+    [TestMethod]
+    public void No_Diagnostic_For_Invalid_Regex_Pattern()
+    {
+        SetupConfiguredFormat("^[a-zA-Z]+(_[a-zA-Z]+)+$[");
 
-            var testCode = @"
+        var testCode = @"
 using System;
 using Xunit;
 
@@ -212,19 +203,18 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
+    [TestMethod]
+    [DataRow(" ^ [a-zA-Z]+(_[a-zA-Z]+)+$", "MethodName")]
+    [DataRow("^[a-zA-Z]+(_[a-zA-Z]+)+$", "method_name_")]
+    [DataRow("\\d+", "MethodName")]
+    public void Diagnostic_For_Test_Method_Name_Not_Consistent_With_Configured_Format(string pattern, string methodName)
+    {
+        SetupConfiguredFormat(pattern);
 
-        [TestMethod]
-        [DataRow(" ^ [a-zA-Z]+(_[a-zA-Z]+)+$", "MethodName")]
-        [DataRow("^[a-zA-Z]+(_[a-zA-Z]+)+$", "method_name_")]
-        [DataRow("\\d+", "MethodName")]
-        public void Diagnostic_For_Test_Method_Name_Not_Consistent_With_Configured_Format(string pattern, string methodName)
-        {
-            SetupConfiguredFormat(pattern);
-
-            var testCode = @"
+        var testCode = @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -241,17 +231,17 @@ public class TestClass
     }
 }";
 
-            var expected = BuildExpectedResult(13, 17, methodName, pattern);
-            VerifyDiagnostic(testCode, expected);
-        }        
+        var expected = BuildExpectedResult(13, 17, methodName, pattern);
+        VerifyDiagnostic(testCode, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_Only_For_Non_Compliant_Method_When_Multiple_Test_Methods_Exist()
-        {
-            var pattern = "^[a-zA-Z]+(_[a-zA-Z]+)+$";
-            SetupConfiguredFormat(pattern);
+    [TestMethod]
+    public void Diagnostic_Only_For_Non_Compliant_Method_When_Multiple_Test_Methods_Exist()
+    {
+        var pattern = "^[a-zA-Z]+(_[a-zA-Z]+)+$";
+        SetupConfiguredFormat(pattern);
 
-            var testCode = @"
+        var testCode = @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -273,17 +263,17 @@ public class TestClass
     }
 }";
 
-            var expected = BuildExpectedResult(18, 17, "NonCompliantMethodName", pattern);
-            VerifyDiagnostic(testCode, expected);
-        }
+        var expected = BuildExpectedResult(18, 17, "NonCompliantMethodName", pattern);
+        VerifyDiagnostic(testCode, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_All_Non_Compliant_Methods_When_Multiple_Test_Methods_Exist()
-        {
-            var pattern = "^[a-zA-Z]+(_[a-zA-Z]+)+$";
-            SetupConfiguredFormat(pattern);
+    [TestMethod]
+    public void Diagnostic_For_All_Non_Compliant_Methods_When_Multiple_Test_Methods_Exist()
+    {
+        var pattern = "^[a-zA-Z]+(_[a-zA-Z]+)+$";
+        SetupConfiguredFormat(pattern);
 
-            var testCode = @"
+        var testCode = @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -305,25 +295,25 @@ public class TestClass
     }
 }";
 
-            var expectedOne = BuildExpectedResult(13, 17, "NonCompliantMethodName", pattern);
-            var expectedTwo = BuildExpectedResult(18, 17, "NonCompliantMethodName2", pattern);
-            VerifyDiagnostic(testCode, expectedOne, expectedTwo);
-        }
+        var expectedOne = BuildExpectedResult(13, 17, "NonCompliantMethodName", pattern);
+        var expectedTwo = BuildExpectedResult(18, 17, "NonCompliantMethodName2", pattern);
+        VerifyDiagnostic(testCode, expectedOne, expectedTwo);
+    }
 
-        [TestMethod]
-        [DataRow("Theory")]
-        [DataRow("Xunit.Fact")]
-        [DataRow("Xunit.Theory")]
-        [DataRow("FactAttribute")]
-        [DataRow("TheoryAttribute")]
-        [DataRow("Xunit.FactAttribute")]
-        [DataRow("Xunit.TheoryAttribute")]
-        public void Diagnostic_For_Other_Xunit_Method_Attributes(string attributeName)
-        {
-            var pattern = "^[a-zA-Z]+(_[a-zA-Z]+)+$";
-            SetupConfiguredFormat(pattern);
+    [TestMethod]
+    [DataRow("Theory")]
+    [DataRow("Xunit.Fact")]
+    [DataRow("Xunit.Theory")]
+    [DataRow("FactAttribute")]
+    [DataRow("TheoryAttribute")]
+    [DataRow("Xunit.FactAttribute")]
+    [DataRow("Xunit.TheoryAttribute")]
+    public void Diagnostic_For_Other_Xunit_Method_Attributes(string attributeName)
+    {
+        var pattern = "^[a-zA-Z]+(_[a-zA-Z]+)+$";
+        SetupConfiguredFormat(pattern);
 
-            var testCode = @"
+        var testCode = @"
 using Xunit;
 
 namespace ConsoleApplication1;
@@ -340,8 +330,7 @@ public class TestClass
     }
 }";
 
-            var expectedOne = BuildExpectedResult(13, 17, "NonCompliantMethodName", pattern);
-            VerifyDiagnostic(testCode, expectedOne);
-        }
+        var expectedOne = BuildExpectedResult(13, 17, "NonCompliantMethodName", pattern);
+        VerifyDiagnostic(testCode, expectedOne);
     }
 }

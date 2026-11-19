@@ -3,21 +3,25 @@ using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionRequired
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionRequired;
+
+[TestClass]
+public class MoqAssertionRequiredTests : CodeFixVerifier
 {
-    [TestClass]
-    public class MoqAssertionRequiredTests : CodeFixVerifier
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new AssertionRequiredAnalyzer();
+        return new AssertionRequiredAnalyzer();
+    }
 
-        private static string BuildTestCode(string testMethod)
-            => BaseAssertionRequiredTests.BuildTestCode(testMethod);
+    private static string BuildTestCode(string testMethod)
+    {
+        return BaseAssertionRequiredTests.BuildTestCode(testMethod);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Moq_Verify()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Moq_Verify()
+    {
+        const string testMethod = @"
 private interface IFoo
 {
     void Bar();
@@ -31,15 +35,15 @@ public void TestMethod()
     mock.Verify(foo => foo.Bar(), Moq.Times.Once());
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Moq_VerifyAll()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Moq_VerifyAll()
+    {
+        const string testMethod = @"
 private interface IFoo
 {
     void Bar();
@@ -54,15 +58,15 @@ public void TestMethod()
     mock.VerifyAll();
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Moq_VerifyNoOtherCalls()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Moq_VerifyNoOtherCalls()
+    {
+        const string testMethod = @"
 private interface IFoo
 {
     void Bar();
@@ -77,15 +81,15 @@ public void TestMethod()
     mock.VerifyNoOtherCalls();
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Moq_VerifyGet()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Moq_VerifyGet()
+    {
+        const string testMethod = @"
 private interface IFoo
 {
     string Value { get; }
@@ -99,15 +103,15 @@ public void TestMethod()
     mock.VerifyGet(foo => foo.Value, Moq.Times.Once());
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Moq_VerifySet()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Moq_VerifySet()
+    {
+        const string testMethod = @"
 private interface IFoo
 {
     string Value { get; set; }
@@ -121,15 +125,15 @@ public void TestMethod()
     mock.VerifySet(foo => foo.Value = ""Bar"", Moq.Times.Once());
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Moq_VerifyAdd()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Moq_VerifyAdd()
+    {
+        const string testMethod = @"
 private interface IFoo
 {
     event EventHandler Changed;
@@ -144,15 +148,15 @@ public void TestMethod()
     mock.VerifyAdd(foo => foo.Changed += Moq.It.IsAny<EventHandler>(), Moq.Times.Once());
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Moq_VerifyRemove()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Moq_VerifyRemove()
+    {
+        const string testMethod = @"
 private interface IFoo
 {
     event EventHandler Changed;
@@ -167,15 +171,15 @@ public void TestMethod()
     mock.VerifyRemove(foo => foo.Changed -= Moq.It.IsAny<EventHandler>(), Moq.Times.Once());
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Moq_Verification_In_Helper_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Moq_Verification_In_Helper_Method()
+    {
+        const string testMethod = @"
 private interface IFoo
 {
     void Bar();
@@ -194,15 +198,15 @@ public void TestMethod()
     VerifyInvocation(mock);
 }";
 
-            var testCode = BuildTestCode(testMethod);
+        var testCode = BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Non_Moq_Verify_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Non_Moq_Verify_Method()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -213,10 +217,9 @@ private static void Verify()
 {
 }";
 
-            var testCode = BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionRequiredTests.BuildExpectedResult(18, 13);
+        var testCode = BuildTestCode(testMethod);
+        var expectedDiagnostic = BaseAssertionRequiredTests.BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
     }
 }

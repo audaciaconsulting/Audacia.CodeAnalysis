@@ -3,18 +3,20 @@ using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionScopeForMultipleAssertions
-{
-    [TestClass]
-    public class ShouldlyAssertionScopeTests : CodeFixVerifier
-    {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        => new AssertionScopeForMultipleAssertionsAnalyzer();
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionScopeForMultipleAssertions;
 
-        [TestMethod]
-        public void No_Diagnostics_For_Non_TestMethod()
-        {
-            const string testMethod = @"
+[TestClass]
+public class ShouldlyAssertionScopeTests : CodeFixVerifier
+{
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new AssertionScopeForMultipleAssertionsAnalyzer();
+    }
+
+    [TestMethod]
+    public void No_Diagnostics_For_Non_TestMethod()
+    {
+        const string testMethod = @"
 public void NonTestMethod()
 {
     var foo = ""Foo"";
@@ -23,15 +25,15 @@ public void NonTestMethod()
     foo.ShouldNotBeNullOrEmpty();
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_TestMethod_With_Single_Assertion()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_TestMethod_With_Single_Assertion()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -39,15 +41,15 @@ public void TestMethod()
     foo.ShouldNotBeNullOrEmpty();
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_TestMethod_With_Two_Assertions()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_TestMethod_With_Two_Assertions()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -56,15 +58,15 @@ public void TestMethod()
     foo.ShouldBe<string>(""Foo"");
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_TestMethod_With_AssertionScope()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_TestMethod_With_AssertionScope()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -76,15 +78,15 @@ public void TestMethod()
     );
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_TestMethod_With_Scope_In_Separate_Assertion_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_TestMethod_With_Scope_In_Separate_Assertion_Method()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -100,15 +102,15 @@ private void Assertion(string foo)
         () => foo.ShouldNotBe(""Foo"")
     );
 }";
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_TestMethod_With_Scope_Outside_Separate_Assertion_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_TestMethod_With_Scope_Outside_Separate_Assertion_Method()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -124,15 +126,15 @@ private void Assertion(string foo)
     foo.ShouldBe<string>(""Foo"");
     foo.ShouldNotBe(""Foo"");
 }";
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_TestMethod_With_Shouldly_AssertionScope_With_Xunit_Assertions()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_TestMethod_With_Shouldly_AssertionScope_With_Xunit_Assertions()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -144,16 +146,16 @@ public void TestMethod()
     );
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Multiple_Assertions_Without_AssertionScope()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Multiple_Assertions_Without_AssertionScope()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -164,23 +166,23 @@ public void TestMethod()
     foo.ShouldNotBe(""Foo"");
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        [DataRow("Theory")]
-        [DataRow("Xunit.Fact")]
-        [DataRow("Xunit.Theory")]
-        [DataRow("FactAttribute")]
-        [DataRow("TheoryAttribute")]
-        [DataRow("Xunit.FactAttribute")]
-        [DataRow("Xunit.TheoryAttribute")]
-        public void Diagnostics_For_Other_Xunit_Method_Attributes_Without_AssertionScope(string attributeName)
-        {
-            var testMethod = @"
+    [TestMethod]
+    [DataRow("Theory")]
+    [DataRow("Xunit.Fact")]
+    [DataRow("Xunit.Theory")]
+    [DataRow("FactAttribute")]
+    [DataRow("TheoryAttribute")]
+    [DataRow("Xunit.FactAttribute")]
+    [DataRow("Xunit.TheoryAttribute")]
+    public void Diagnostics_For_Other_Xunit_Method_Attributes_Without_AssertionScope(string attributeName)
+    {
+        var testMethod = @"
 [" + attributeName + @"]
 public void TestMethod()
 {
@@ -190,16 +192,16 @@ public void TestMethod()
     foo.ShouldNotBe(""Foo"");
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Multiple_Assertions_Outside_AssertionScope()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Multiple_Assertions_Outside_AssertionScope()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -215,16 +217,16 @@ public void TestMethod()
     foo.ShouldNotBe(""Foo"");
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Multiple_Conditional_Assertions_Without_AssertionScope()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Multiple_Conditional_Assertions_Without_AssertionScope()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -235,16 +237,16 @@ public void TestMethod()
     foo?.ShouldNotBe(""Foo"");
 }";
 
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_TestMethod_With_Separate_Assertions_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_TestMethod_With_Separate_Assertions_Method()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -258,10 +260,9 @@ private void Assertion(string foo)
     foo.ShouldBe<string>(""Foo"");
     foo.ShouldNotBe(""Foo"");
 }";
-            var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
+        var testCode = BaseAssertionScopeTests.BuildTestCode(testMethod);
+        var expectedDiagnostic = BaseAssertionScopeTests.BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
     }
 }

@@ -4,34 +4,34 @@ using Audacia.CodeAnalysis.Analyzers.Rules.ThenByDescendingAfterOrderBy;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using CodeFixVerifier = Audacia.CodeAnalysis.Analyzers.Test.Base.CodeFixVerifier;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
+
+[TestClass]
+public class ThenByDescendingAfterOrderByTests : CodeFixVerifier
 {
-    [TestClass]
-    public class ThenByDescendingAfterOrderByTests : CodeFixVerifier
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new ThenByDescendingAfterOrderByAnalyzer();
+        return new ThenByDescendingAfterOrderByAnalyzer();
+    }
 
-        private DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
+    private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
+    {
+        return new DiagnosticResult
         {
-            var diagnosticResult = new DiagnosticResult
-            {
-                Id = ThenByDescendingAfterOrderByAnalyzer.Id,
-                Severity = ThenByDescendingAfterOrderByAnalyzer.Severity,
-                Message = message,
-                Locations =
-                [
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                ]
-            };
+            Id = ThenByDescendingAfterOrderByAnalyzer.Id,
+            Severity = ThenByDescendingAfterOrderByAnalyzer.Severity,
+            Message = message,
+            Locations =
+            [
+                new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+            ]
+        };
+    }
 
-            return diagnosticResult;
-        }
-
-        [TestMethod]
-        public void No_Diagnostics_For_Empty_Code()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Empty_Code()
+    {
+        const string testCode = @"
 namespace ConsoleApplication1;
 
 public class TestClass
@@ -41,13 +41,13 @@ public class TestClass
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_ThenByDescending_Following_OrderBy()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_ThenByDescending_Following_OrderBy()
+    {
+        const string testCode = @"
 using System;
 using System.Linq;
 
@@ -72,13 +72,13 @@ class Program
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_ThenByDescending_Following_OrderByDescending()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_ThenByDescending_Following_OrderByDescending()
+    {
+        const string testCode = @"
 using System;
 using System.Linq;
 
@@ -103,13 +103,13 @@ class Program
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_OrderBy_Within_Select_Following_OrderBy()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_OrderBy_Within_Select_Following_OrderBy()
+    {
+        const string testCode = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -135,13 +135,13 @@ class Program
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_OrderBy_Within_Where_Following_OrderBy()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_OrderBy_Within_Where_Following_OrderBy()
+    {
+        const string testCode = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -167,13 +167,13 @@ class Program
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_OrderByDescending_Within_Any_Following_OrderBy()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_OrderByDescending_Within_Any_Following_OrderBy()
+    {
+        const string testCode = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -199,13 +199,13 @@ class Program
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_OrderBy_Within_OrderBy()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void No_Diagnostics_For_OrderBy_Within_OrderBy()
+    {
+        const string testCode = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -231,13 +231,13 @@ class Program
     }
 }";
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostics_If_OrderByDescending_Follows_OrderBy_Within_OrderBy()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void Diagnostics_If_OrderByDescending_Follows_OrderBy_Within_OrderBy()
+    {
+        const string testCode = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -263,23 +263,23 @@ class Program
     }
 }";
 
-            const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
+        const string expectedMessage =
+            "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
-            // this diagnostic gets raised twice for some reason, not sure why but have decided it's not worth fixing
-            var expectedDiagnostics = new[]
-            {
-                BuildExpectedResult(expectedMessage, 23, 54),
-                BuildExpectedResult(expectedMessage, 23, 54),
-            };
-
-            VerifyDiagnostic(testCode, expectedDiagnostics);
-        }
-
-        [TestMethod]
-        public void Diagnostics_If_OrderByDescending_Follows_OrderBy()
+        // this diagnostic gets raised twice for some reason, not sure why but have decided it's not worth fixing
+        var expectedDiagnostics = new[]
         {
-            const string testCode = @"
+            BuildExpectedResult(expectedMessage, 23, 54),
+            BuildExpectedResult(expectedMessage, 23, 54),
+        };
+
+        VerifyDiagnostic(testCode, expectedDiagnostics);
+    }
+
+    [TestMethod]
+    public void Diagnostics_If_OrderByDescending_Follows_OrderBy()
+    {
+        const string testCode = @"
 using System;
 using System.Linq;
 
@@ -304,18 +304,18 @@ class Program
     }
 }";
 
-            const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
+        const string expectedMessage =
+            "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 38);
+        var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 38);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_If_OrderByDescending_Follows_OrderBy_With_Another_Method_Between()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void Diagnostics_If_OrderByDescending_Follows_OrderBy_With_Another_Method_Between()
+    {
+        const string testCode = @"
 using System;
 using System.Linq;
 
@@ -340,18 +340,18 @@ class Program
     }
 }";
 
-            const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
+        const string expectedMessage =
+            "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 63);
+        var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 63);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Diagnostics_If_OrderByDescending_Follows_OrderByDescending()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void Diagnostics_If_OrderByDescending_Follows_OrderByDescending()
+    {
+        const string testCode = @"
 using System;
 using System.Linq;
 
@@ -376,18 +376,18 @@ class Program
     }
 }";
 
-            const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
+        const string expectedMessage =
+            "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
-            var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 48);
+        var expectedDiagnostic = BuildExpectedResult(expectedMessage, 22, 48);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
+    }
 
-        [TestMethod]
-        public void Multiple_Diagnostics_If_Multiple_OrderByDescending_Statements_Follow_OrderBy()
-        {
-            const string testCode = @"
+    [TestMethod]
+    public void Multiple_Diagnostics_If_Multiple_OrderByDescending_Statements_Follow_OrderBy()
+    {
+        const string testCode = @"
 using System;
 using System.Linq;
 
@@ -412,17 +412,16 @@ class Program
     }
 }";
 
-            const string expectedMessage =
-                "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
+        const string expectedMessage =
+            "ThenByDescending statement should replace OrderByDescending when following OrderBy or OrderByDescending statement";
 
-            var expectedDiagnostics
-                = new[]
-                {
-                    BuildExpectedResult(expectedMessage, 22, 38),
-                    BuildExpectedResult(expectedMessage, 22, 71)
-                };
+        var expectedDiagnostics
+            = new[]
+            {
+                BuildExpectedResult(expectedMessage, 22, 38),
+                BuildExpectedResult(expectedMessage, 22, 71)
+            };
 
-            VerifyDiagnostic(testCode, expectedDiagnostics);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostics);
     }
 }

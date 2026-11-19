@@ -10,22 +10,22 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 public class ControllerActionReturnTypedResultsAnalyzerTests : CodeFixVerifier
 {
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        => new ControllerActionReturnTypedResultsAnalyzer();
+    {
+        return new ControllerActionReturnTypedResultsAnalyzer();
+    }
 
     private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
     {
-        var diagnosticResult = new DiagnosticResult
+        return new DiagnosticResult
         {
             Id = ControllerActionReturnTypedResultsAnalyzer.Id,
             Severity = ControllerActionReturnTypedResultsAnalyzer.Severity,
             Message = message,
             Locations =
-                new[] {
+                [
                     new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                }
+                ]
         };
-
-        return diagnosticResult;
     }
 
     [TestMethod]

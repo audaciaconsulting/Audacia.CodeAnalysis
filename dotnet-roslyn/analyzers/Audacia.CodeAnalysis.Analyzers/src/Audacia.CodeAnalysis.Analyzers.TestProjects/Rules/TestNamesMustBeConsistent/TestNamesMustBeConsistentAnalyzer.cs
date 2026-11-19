@@ -5,101 +5,100 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
-using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Audacia.CodeAnalysis.Analyzers.TestProjects.Extensions;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.TestNamesMustBeConsistent
+namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.TestNamesMustBeConsistent;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class TestNamesMustBeConsistentAnalyzer : DiagnosticAnalyzer
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class TestNamesMustBeConsistentAnalyzer : DiagnosticAnalyzer
+    public const string Id = DiagnosticId.TestNamesMustBeConsistent;
+
+    public const string FormatConfigKey = "test_method_name_format";
+
+    private const string Title = "Test method names must be consistent";
+    private const string MessageFormat = "Test method name '{0}' is not consistent with configured format '{1}'. UT-01.2.";
+    private const string Description = "When a test method name does not follow the configured naming conventions, it should be updated to be consistent.";
+
+    private const int RegexTimeoutInMilliseconds = 100;
+
+    private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
+    private static readonly DiagnosticDescriptor Rule
+        = new(Id, Title, MessageFormat, DiagnosticCategory.UnitTesting, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
+
+    private readonly bool _isSettingsReaderInjected;
+    private ISettingsReader _settingsReader;
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+    public TestNamesMustBeConsistentAnalyzer()
     {
-        public const string Id = DiagnosticId.TestNamesMustBeConsistent;
+    }
 
-        public const string FormatConfigKey = "test_method_name_format";
+    public TestNamesMustBeConsistentAnalyzer(ISettingsReader settingsReader)
+    {
+        _settingsReader = settingsReader;
+        _isSettingsReaderInjected = true;
+    }
 
-        private const string Title = "Test method names must be consistent";
-        private const string MessageFormat = "Test method name '{0}' is not consistent with configured format '{1}'. UT-01.2.";
-        private const string Description = "When a test method name does not follow the configured naming conventions, it should be updated to be consistent.";
+    public override void Initialize(AnalysisContext context)
+    {
+        context.EnableConcurrentExecution();
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-        private const int RegexTimeoutInMilliseconds = 100;
+        context.RegisterCompilationStartAction(RegisterCompilationStart);
+    }
 
-        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
-
-        private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.UnitTesting, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
-
-        private readonly bool _isSettingsReaderInjected;
-        private ISettingsReader _settingsReader;
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
-
-        public TestNamesMustBeConsistentAnalyzer()
+    private void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
+    {
+        // We don't want to reinitialize if the ISettingsReader object was injected as that means we're in a unit test
+        if (_settingsReader == null || !_isSettingsReaderInjected)
         {
+            _settingsReader = new EditorConfigSettingsReader(startContext.Options);
         }
 
-        public TestNamesMustBeConsistentAnalyzer(ISettingsReader settingsReader)
+        startContext.RegisterSyntaxNodeAction(actionContext => AnalyzeMethodDeclaration(actionContext, _settingsReader), SyntaxKind.MethodDeclaration);
+    }
+
+    private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext, ISettingsReader settingsReader)
+    {
+        var isTestMethod = nodeAnalysisContext.IsXunitTestMethod();
+        if (!isTestMethod)
         {
-            _settingsReader = settingsReader;
-            _isSettingsReaderInjected = true;
+            return;
         }
 
-        public override void Initialize(AnalysisContext context)
-        {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        var methodNameRegex = settingsReader.TryGetValue(nodeAnalysisContext.Node.SyntaxTree, new SettingsKey(Id, FormatConfigKey));
 
-            context.RegisterCompilationStartAction(RegisterCompilationStart);
+        if (string.IsNullOrEmpty(methodNameRegex))
+        {
+            return;
         }
 
-        private void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
-        {
-            // We don't want to reinitialize if the ISettingsReader object was injected as that means we're in a unit test
-            if (_settingsReader == null || !_isSettingsReaderInjected)
-            {
-                _settingsReader = new EditorConfigSettingsReader(startContext.Options);
-            }
+        var methodDeclaration = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
-            startContext.RegisterSyntaxNodeAction(actionContext => AnalyzeMethodDeclaration(actionContext, _settingsReader), SyntaxKind.MethodDeclaration);
+        bool validMethodName;
+
+        try
+        {
+            validMethodName = Regex.IsMatch(methodDeclaration.Identifier.Text, methodNameRegex, RegexOptions.None, TimeSpan.FromMilliseconds(RegexTimeoutInMilliseconds));
+        }
+        catch (ArgumentException)
+        {
+            // In case the regex pattern is invalid we don't want the analyzer to crash
+            return;
+        }
+        catch (RegexMatchTimeoutException)
+        {
+            return;
         }
 
-        private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext, ISettingsReader settingsReader)
-        {   
-            var isTestMethod = nodeAnalysisContext.IsXunitTestMethod();
-            if (!isTestMethod)
-            {
-                return;
-            }
-
-            var methodNameRegex = settingsReader.TryGetValue(nodeAnalysisContext.Node.SyntaxTree, new SettingsKey(Id, FormatConfigKey));
-
-            if(string.IsNullOrEmpty(methodNameRegex))
-            {
-                return;
-            }
-
-            var methodDeclaration = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
-
-            bool validMethodName = false;
-            try
-            {
-                validMethodName = Regex.IsMatch(methodDeclaration.Identifier.Text, methodNameRegex, RegexOptions.None, TimeSpan.FromMilliseconds(RegexTimeoutInMilliseconds));
-            }
-            catch (ArgumentException)
-            {
-                // In case the regex pattern is invalid we don't want the analyzer to crash
-                return;
-            }
-            catch (RegexMatchTimeoutException)
-            {
-                return;
-            }
-
-            if (!validMethodName)
-            {
-                var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation(), methodDeclaration.Identifier.Text, methodNameRegex);
-                nodeAnalysisContext.ReportDiagnostic(diagnostic);
-            }
+        if (!validMethodName)
+        {
+            var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation(), methodDeclaration.Identifier.Text, methodNameRegex);
+            nodeAnalysisContext.ReportDiagnostic(diagnostic);
         }
     }
 }

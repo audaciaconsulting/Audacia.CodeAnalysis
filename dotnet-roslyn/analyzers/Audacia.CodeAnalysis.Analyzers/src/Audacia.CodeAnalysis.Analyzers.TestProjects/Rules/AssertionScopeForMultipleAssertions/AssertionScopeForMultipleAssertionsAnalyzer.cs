@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -8,118 +9,121 @@ using Audacia.CodeAnalysis.Analyzers.TestProjects.Common.AssertionFrameworks;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
 using Audacia.CodeAnalysis.Analyzers.TestProjects.Extensions;
 
-namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionScopeForMultipleAssertions
+namespace Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionScopeForMultipleAssertions;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class AssertionScopeForMultipleAssertionsAnalyzer : DiagnosticAnalyzer
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class AssertionScopeForMultipleAssertionsAnalyzer : DiagnosticAnalyzer
+    public const string Id = DiagnosticId.AssertionScopeForMultipleAssertions;
+
+    private const string Title = "Test method name '{0}' has multiple assertions outside an assertion scope";
+    private const string MessageFormat = "Use an assertion scope when a test method has more than two assertions. UT-01.5.";
+    private const string Description = "When a test method has more than two assertions, they should be wrapped within an assertion scope to provide a stack of all failures.";
+
+    private const int MaxAssertionsOutsideScope = 2;
+
+    private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
+    private static readonly DiagnosticDescriptor Rule
+        = new(Id, Title, MessageFormat, DiagnosticCategory.UnitTesting, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+    public override void Initialize(AnalysisContext context)
     {
-        public const string Id = DiagnosticId.AssertionScopeForMultipleAssertions;
+        context.EnableConcurrentExecution();
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);
+    }
 
-        private const string Title = "Test method name '{0}' has multiple assertions outside an assertion scope";
-        private const string MessageFormat = "Use an assertion scope when a test method has more than two assertions. UT-01.5.";
-        private const string Description = "When a test method has more than two assertions, they should be wrapped within an assertion scope to provide a stack of all failures.";
+    private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext)
+    {
+        var isTestMethod = nodeAnalysisContext.IsXunitTestMethod();
 
-        private const int MaxAssertionsOutsideScope = 2;
-
-        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
-
-        private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.UnitTesting, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
-
-        public override void Initialize(AnalysisContext context)
+        if (!isTestMethod)
         {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);
+            return;
         }
 
-        private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext)
+        var methodDeclaration = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
+
+        // Count the number of assertions outside of an assertion scope. If there are more than two, report a diagnostic.
+        IAssertionFramework assertionFramework = null;
+
+#pragma warning disable IDE0028 // Simplify collection initialization - collection expression arguments is currently in Preview and unsupported
+        var assertionCount = CountAssertionsOutsideAssertionScopes(
+            methodDeclaration,
+            nodeAnalysisContext.SemanticModel,
+            new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default),
+            ref assertionFramework);
+#pragma warning restore IDE0028 // Simplify collection initialization
+
+        if (assertionCount > MaxAssertionsOutsideScope)
         {
-            var isTestMethod = nodeAnalysisContext.IsXunitTestMethod();
+            var methodName = methodDeclaration.Identifier.ValueText;
+            var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation(), methodName);
+            nodeAnalysisContext.ReportDiagnostic(diagnostic);
+        }
+    }
 
-            if (!isTestMethod)
-            {
-                return;
-            }
+    /// <summary>
+    /// Counts all assertion calls in the method body that are not enclosed by the matching framework's assertion scope.
+    /// Helper method calls are followed recursively, and assertions inside them that have their own scope are not counted.
+    /// </summary>
+    [SuppressMessage("Maintainability", "AV1562:Do not declare a parameter as ref or out", Justification = "The assertion framework detected in one method must carry across the recursive walk of helper methods, including back up to the caller.")]
+    private static int CountAssertionsOutsideAssertionScopes(
+        MethodDeclarationSyntax method,
+        SemanticModel semanticModel,
+        HashSet<IMethodSymbol> visitedMethods,
+        ref IAssertionFramework assertionFramework)
+    {
+        SyntaxNode body = (SyntaxNode)method.Body ?? method.ExpressionBody;
 
-            var methodDeclaration = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
-
-            // Count the number of assertions outside of an assertion scope. If there are more than two, report a diagnostic.
-            IAssertionFramework assertionFramework = null;
-            var assertionCount = CountAssertionsOutsideAssertionScopes(
-                methodDeclaration,
-                nodeAnalysisContext.SemanticModel,
-                new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default),
-                ref assertionFramework);
-
-            if (assertionCount > MaxAssertionsOutsideScope)
-            {
-                var methodName = methodDeclaration.Identifier.ValueText;
-                var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation(), methodName);
-                nodeAnalysisContext.ReportDiagnostic(diagnostic);
-            }
+        if (body == null)
+        {
+            return 0;
         }
 
-        /// <summary>
-        /// Counts all assertion calls in the method body that are not enclosed by the matching framework's assertion scope.
-        /// Helper method calls are followed recursively, and assertions inside them that have their own scope are not counted.
-        /// </summary>
-        private static int CountAssertionsOutsideAssertionScopes(
-            MethodDeclarationSyntax method,
-            SemanticModel semanticModel,
-            HashSet<IMethodSymbol> visitedMethods,
-            ref IAssertionFramework assertionFramework)
+        var allInvocations = body.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
+
+        var count = 0;
+        foreach (var invocation in allInvocations)
         {
-            SyntaxNode body = (SyntaxNode)method.Body ?? method.ExpressionBody;
-
-            if (body == null)
+            if (invocation.IsValidAssertion(ref assertionFramework))
             {
-                return 0;
+                var isInsideScope = invocation.IsInsideAssertionScope(assertionFramework);
+
+                if (!isInsideScope)
+                {
+                    count++;
+                }
+
+                continue;
             }
 
-            var allInvocations = body.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
-
-            var count = 0;
-            foreach (var invocation in allInvocations)
+            // Not a known assertion call - check whether it is a helper method call that contains assertions.
+            // If the call site itself is already inside a scope, we treat all assertions inside the helper as scoped.
+            var isCallSiteInsideScope = invocation.GetAssertionScopeFramework() != null;
+            if (isCallSiteInsideScope)
             {
-                if (invocation.IsValidAssertion(ref assertionFramework))
-                {
-                    var isInsideScope = invocation.IsInsideAssertionScope(assertionFramework);
-
-                    if (!isInsideScope)
-                    {
-                        count++;
-                    }
-
-                    continue;
-                }
-
-                // Not a known assertion call - check whether it is a helper method call that contains assertions.
-                // If the call site itself is already inside a scope, we treat all assertions inside the helper as scoped.
-                var isCallSiteInsideScope = invocation.GetAssertionScopeFramework() != null;
-                if (isCallSiteInsideScope)
-                {
-                    continue;
-                }
-
-                var (helperMethod, helperSemanticModel) = invocation.ResolveHelperMethodDeclarationWithSemanticModel(semanticModel);
-                if (helperMethod == null)
-                {
-                    continue;
-                }
-
-                var methodSymbol = helperSemanticModel.GetDeclaredSymbol(helperMethod);
-                if (methodSymbol == null || !visitedMethods.Add(methodSymbol))
-                {
-                    continue;
-                }
-
-                count += CountAssertionsOutsideAssertionScopes(helperMethod, helperSemanticModel, visitedMethods, ref assertionFramework);
+                continue;
             }
 
-            return count;
+            var (helperMethod, helperSemanticModel) = invocation.ResolveHelperMethodDeclarationWithSemanticModel(semanticModel);
+            if (helperMethod == null)
+            {
+                continue;
+            }
+
+            var methodSymbol = helperSemanticModel.GetDeclaredSymbol(helperMethod);
+            if (methodSymbol == null || !visitedMethods.Add(methodSymbol))
+            {
+                continue;
+            }
+
+            count += CountAssertionsOutsideAssertionScopes(helperMethod, helperSemanticModel, visitedMethods, ref assertionFramework);
         }
+
+        return count;
     }
 }

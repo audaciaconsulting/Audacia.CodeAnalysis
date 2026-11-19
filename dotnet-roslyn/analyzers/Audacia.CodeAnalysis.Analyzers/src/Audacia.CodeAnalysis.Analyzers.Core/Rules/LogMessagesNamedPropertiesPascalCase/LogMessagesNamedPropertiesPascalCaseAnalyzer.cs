@@ -7,72 +7,69 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Core.Rules.LogMessagesNamedPropertiesPascalCase
+namespace Audacia.CodeAnalysis.Analyzers.Rules.LogMessagesNamedPropertiesPascalCase;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class LogMessagesNamedPropertiesPascalCaseAnalyzer : DiagnosticAnalyzer
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class LogMessagesNamedPropertiesPascalCaseAnalyzer : DiagnosticAnalyzer
+    public const string Id = DiagnosticId.LogMessagesNamedPropertiesPascalCase;
+
+    private const string Title = "Log message property is not in PascalCase";
+    private const string MessageFormat = "Log message property '{0}' does not use PascalCase. LOG-01.1.";
+    private const string Description = "When using log message named properties, ensure they are in PascalCase.";
+
+    private const string InvalidNamedPropertyPattern = @"(?<!\{)\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])(?'propertyName'[^{}:]+)[^{}]*\}(?!\})";
+
+    // In interpolated strings, log template placeholders are double-braced in source: {{Name}} => {Name} at runtime.
+    // This pattern matches {{name}} but not {{{{...}}}} (which are escaped literal braces).
+    private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])(?'propertyName'[^{}:]+)[^{}]*\}\}(?!\})";
+    private const string LoggerMessageParameterName = "message";
+
+    private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
+    private static readonly DiagnosticDescriptor Rule
+        = new(Id, Title, MessageFormat, DiagnosticCategory.Logging, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+    public override void Initialize(AnalysisContext context)
     {
-        public const string Id = DiagnosticId.LogMessagesNamedPropertiesPascalCase;
+        context.EnableConcurrentExecution();
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+    }
 
-        private const string Title = "Log message property is not in PascalCase";
-        private const string MessageFormat = "Log message property '{0}' does not use PascalCase. LOG-01.1.";
-        private const string Description = "When using log message named properties, ensure they are in PascalCase.";
+    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext nodeAnalysisContext)
+    {
+        var invocation = (InvocationExpressionSyntax)nodeAnalysisContext.Node;
 
-        private const string InvalidNamedPropertyPattern = @"(?<!\{)\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])(?'propertyName'[^{}:]+)[^{}]*\}(?!\})";
-
-        // In interpolated strings, log template placeholders are double-braced in source: {{Name}} => {Name} at runtime.
-        // This pattern matches {{name}} but not {{{{...}}}} (which are escaped literal braces).
-        private const string InvalidNamedPropertyPatternInterpolated = @"(?<!\{)\{\{(?!\{)(?!(?:\d+|@?[A-Z][a-zA-Z0-9]*)[}:])(?'propertyName'[^{}:]+)[^{}]*\}\}(?!\})";
-        private const string LoggerMessageParameterName = "message";
-
-        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
-
-        private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, DiagnosticCategory.Logging, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUrl);
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
-
-        public override void Initialize(AnalysisContext context)
+        if (!invocation.TryGetLoggerMethodSymbol(nodeAnalysisContext.SemanticModel, out var methodSymbol))
         {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+            return;
         }
 
-        private static void AnalyzeInvocation(SyntaxNodeAnalysisContext nodeAnalysisContext)
+        if (!invocation.TryGetNamedParameterArgument(methodSymbol, LoggerMessageParameterName, out var messageArgument))
         {
-            var invocation = (InvocationExpressionSyntax)nodeAnalysisContext.Node;
+            return;
+        }
 
-            if (!invocation.TryGetLoggerMethodSymbol(nodeAnalysisContext.SemanticModel, out var methodSymbol))
-            {
-                return;
-            }
+        // If the argument is a local variable, try to resolve it back to its initializer string literal.
+        var messageExpression = messageArgument.Expression.TryResolveToStringLiteral(nodeAnalysisContext.SemanticModel, out var resolvedExpression)
+            ? resolvedExpression
+            : messageArgument.Expression;
 
-            if (!invocation.TryGetNamedParameterArgument(methodSymbol, LoggerMessageParameterName, out var messageArgument))
-            {
-                return;
-            }
+        var messageParameterValue = messageExpression.ToString();
+        var pattern = messageExpression is InterpolatedStringExpressionSyntax
+            ? InvalidNamedPropertyPatternInterpolated
+            : InvalidNamedPropertyPattern;
 
-            // If the argument is a local variable, try to resolve it back to its initializer string literal.
-            var messageExpression = messageArgument.Expression.TryResolveToStringLiteral(nodeAnalysisContext.SemanticModel, out var resolvedExpression)
-                ? resolvedExpression
-                : messageArgument.Expression;
-
-            var messageParameterValue = messageExpression.ToString();
-            var pattern = messageExpression is InterpolatedStringExpressionSyntax
-                ? InvalidNamedPropertyPatternInterpolated
-                : InvalidNamedPropertyPattern;
-
-            // Use regex to find all named properties in the message template that do not follow PascalCase
-            var invalidNamedProperties = Regex.Matches(messageParameterValue, pattern);
-
-            foreach (Match namedProperty in invalidNamedProperties)
-            {
-                var propertyName = namedProperty.Groups["propertyName"].Value;
-                var location = messageExpression.CreateMatchLocation(messageExpression.SyntaxTree, namedProperty);
-                var diagnostic = Diagnostic.Create(Rule, location, propertyName);
-                nodeAnalysisContext.ReportDiagnostic(diagnostic);
-            }
+        // Use regex to find all named properties in the message template that do not follow PascalCase
+        foreach (Match namedProperty in Regex.Matches(messageParameterValue, pattern))
+        {
+            var propertyName = namedProperty.Groups["propertyName"].Value;
+            var location = messageExpression.CreateMatchLocation(messageExpression.SyntaxTree, namedProperty);
+            var diagnostic = Diagnostic.Create(Rule, location, propertyName);
+            nodeAnalysisContext.ReportDiagnostic(diagnostic);
         }
     }
 }

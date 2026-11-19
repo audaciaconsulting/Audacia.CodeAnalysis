@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Xml.Linq;
 using Audacia.CodeAnalysis.Analyzers.AspNetCore.Extensions;
 using Audacia.CodeAnalysis.Analyzers.Shared.Common;
 using Audacia.CodeAnalysis.Analyzers.Shared.Extensions;
@@ -8,108 +7,101 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseType
+namespace Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.ControllerActionProducesResponseType;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class ControllerActionProducesResponseTypeAnalyzer : DiagnosticAnalyzer
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ControllerActionProducesResponseTypeAnalyzer : DiagnosticAnalyzer
+    public const string Id = DiagnosticId.ControllerActionProducesResponseType;
+
+    public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
+
+    private const string MessageFormat = "Controller action name '{0}' has no [ProducesResponseType] attribute";
+
+    private const string Title = "Controller action has no [ProducesResponseType] attribute";
+
+    private const string Description = "Controller actions should have at least one [ProducesResponseType] attribute.";
+
+    private const string Category = DiagnosticCategory.Maintainability;
+
+    private const bool IsEnabled = true;
+
+    private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
+
+    private static readonly DiagnosticDescriptor Rule
+        = new(Id, Title, MessageFormat, Category, Severity, IsEnabled, Description, HelpLinkUrl);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        => ImmutableArray.Create(Rule);
+
+    /// <summary>
+    /// A collection of syntax kinds that we want our analyzer to read.
+    /// </summary>
+    private readonly SyntaxKind[] _syntaxKinds =
+    [
+        SyntaxKind.MethodDeclaration
+    ];
+
+    public override void Initialize(AnalysisContext context)
     {
-        public const string Id = DiagnosticId.ControllerActionProducesResponseType;
+        context.EnableConcurrentExecution();
 
-        public const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-        private const string MessageFormat = "Controller action name '{0}' has no [ProducesResponseType] attribute";
-
-        private const string Title = "Controller action has no [ProducesResponseType] attribute";
-
-        private const string Description = "Controller actions should have at least one [ProducesResponseType] attribute.";
-
-        private const string Category = DiagnosticCategory.Maintainability;
-
-        private const bool IsEnabled = true;
-
-        private static readonly string HelpLinkUrl = HelpLinkUrlFactory.Create(Id);
-
-        private static readonly DiagnosticDescriptor Rule
-            = new DiagnosticDescriptor(Id, Title, MessageFormat, Category, Severity, IsEnabled, Description, HelpLinkUrl);
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
-            => ImmutableArray.Create(Rule);
-
-        /// <summary>
-        /// A collection of syntax kinds that we want our analyzer to read.
-        /// </summary>
-        private readonly SyntaxKind[] _syntaxKinds =
-        {
-            SyntaxKind.MethodDeclaration
-        };
-
-        public override void Initialize(AnalysisContext context)
-        {
-            context.EnableConcurrentExecution();
-
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
-            context.RegisterCompilationStartAction(
-                analysisContext =>
-                {
-                    analysisContext.RegisterSyntaxNodeAction(
-                        AnalyzeMethodDeclaration,
-                        _syntaxKinds
-                    );
-                }
-            );
-
-        }
-
-        /// <summary>
-        /// The method declaration analysis includes the following checks:
-        /// 1. determines whether the method is a controller
-        /// 2. determines whether the controller has at least one [ProducesResponseType] attribute when return type is not TypedResults
-        ///
-        /// A diagnostic will be reported if a method is a controller but the method does not have a [ProducesResponseType] attribute when return type is not TypedResults.
-        /// Please note, this ONLY applies to controller actions.
-        /// </summary>
-        private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext)
-        {
-            var isController = nodeAnalysisContext.IsControllerAction();
-
-            if (isController)
+        context.RegisterCompilationStartAction(
+            analysisContext =>
             {
-                var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
+                analysisContext.RegisterSyntaxNodeAction(
+                    AnalyzeMethodDeclaration,
+                    _syntaxKinds);
+            });
+    }
 
-                var returnTypeNamespace = nodeAnalysisContext.SemanticModel.GetTypeInfo(methodDeclarationSyntax.ReturnType).Type.ContainingNamespace;
+    /// <summary>
+    /// The method declaration analysis includes the following checks:
+    /// 1. determines whether the method is a controller
+    /// 2. determines whether the controller has at least one [ProducesResponseType] attribute when return type is not TypedResults
+    ///
+    /// A diagnostic will be reported if a method is a controller but the method does not have a [ProducesResponseType] attribute when return type is not TypedResults.
+    /// Please note, this ONLY applies to controller actions.
+    /// </summary>
+    private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext nodeAnalysisContext)
+    {
+        var isController = nodeAnalysisContext.IsControllerAction();
 
-                var returnType = methodDeclarationSyntax.ReturnType;
+        if (isController)
+        {
+            var methodDeclarationSyntax = (MethodDeclarationSyntax)nodeAnalysisContext.Node;
 
-                var returnTypeSymbol = nodeAnalysisContext.SemanticModel.GetSymbolInfo(returnType).Symbol as INamedTypeSymbol;
+            var returnTypeNamespace = nodeAnalysisContext.SemanticModel.GetTypeInfo(methodDeclarationSyntax.ReturnType).Type.ContainingNamespace;
 
-                if (returnTypeSymbol != null && returnTypeSymbol.IsGenericType)
-                {
-                    var genericTypeArgument = returnTypeSymbol.TypeArguments.FirstOrDefault();
+            var returnType = methodDeclarationSyntax.ReturnType;
 
-                    returnTypeNamespace = genericTypeArgument.ContainingNamespace;
-                }
+            if (nodeAnalysisContext.SemanticModel.GetSymbolInfo(returnType).Symbol is INamedTypeSymbol returnTypeSymbol && returnTypeSymbol.IsGenericType)
+            {
+                var genericTypeArgument = returnTypeSymbol.TypeArguments.FirstOrDefault();
 
-                var methodAttributes = methodDeclarationSyntax.GetMethodAttributes();
+                returnTypeNamespace = genericTypeArgument.ContainingNamespace;
+            }
 
-                var hasProducesResponseType = methodAttributes
-                .Any(
-                    name =>
-                        name.Equals("ProducesResponseType") || name.StartsWith("ProducesResponseType<")
-                );
+            var methodAttributes = methodDeclarationSyntax.GetMethodAttributes();
 
-                if (!hasProducesResponseType && 
-                    !returnType.ToString().Contains("Results") && 
-                    !returnTypeNamespace.ToDisplayString().Contains("Microsoft.AspNetCore.Http"))
-                {
-                    var location = nodeAnalysisContext.Node.GetLocation();
+            var hasProducesResponseType = methodAttributes
+            .Any(
+                name =>
+                    name.Equals("ProducesResponseType") || name.StartsWith("ProducesResponseType<"));
 
-                    var methodName = nodeAnalysisContext.GetMethodName();
+            if (!hasProducesResponseType &&
+                !returnType.ToString().Contains("Results") &&
+                !returnTypeNamespace.ToDisplayString().Contains("Microsoft.AspNetCore.Http"))
+            {
+                var location = nodeAnalysisContext.Node.GetLocation();
 
-                    var diagnostic = Diagnostic.Create(Rule, location, methodName);
+                var methodName = nodeAnalysisContext.GetMethodName();
 
-                    nodeAnalysisContext.ReportDiagnostic(diagnostic);
-                }
+                var diagnostic = Diagnostic.Create(Rule, location, methodName);
+
+                nodeAnalysisContext.ReportDiagnostic(diagnostic);
             }
         }
     }

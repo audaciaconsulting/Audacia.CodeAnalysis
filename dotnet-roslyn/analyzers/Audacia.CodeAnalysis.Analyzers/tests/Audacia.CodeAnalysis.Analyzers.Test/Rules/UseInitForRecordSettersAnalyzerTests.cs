@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Audacia.CodeAnalysis.Analyzers.Core.Rules.UseInitForRecordSetters;
+using Audacia.CodeAnalysis.Analyzers.Rules.UseInitForRecordSetters;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis;
@@ -26,14 +27,18 @@ class Program
 }";
 
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        => new UseInitForRecordSettersAnalyzer();
+    {
+        return new UseInitForRecordSettersAnalyzer();
+    }
 
     protected override CodeFixProvider GetCSharpCodeFixProvider()
-        => new UseInitForRecordSettersFixProvider();
+    {
+        return new UseInitForRecordSettersFixProvider();
+    }
 
     private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column, string filePath = "Test0.cs")
     {
-        var diagnosticResult = new DiagnosticResult
+        return new DiagnosticResult
         {
             Id = UseInitForRecordSettersAnalyzer.Id,
             Severity = UseInitForRecordSettersAnalyzer.Severity,
@@ -43,8 +48,6 @@ class Program
                     new DiagnosticResultLocation(filePath, lineNumber, column)
                 ]
         };
-
-        return diagnosticResult;
     }
 
     [TestMethod]
@@ -92,7 +95,8 @@ record TypeName1
     public string Third { get; set; }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 32),
             BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 5, 33),
             BuildExpectedResult("Record property 'Third' in record type 'TypeName1' should be init-only. CS-03.10.", 6, 32));
@@ -132,7 +136,8 @@ record TypeName1
     public string Fifth { get; init; }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 5, 33),
             BuildExpectedResult("Record property 'Fourth' in record type 'TypeName1' should be init-only. CS-03.10.", 7, 33));
     }
@@ -191,7 +196,8 @@ record TypeName1
 
         Assert.AreEqual(fixedCode, formattedRoot.ToFullString());
 
-        VerifyDiagnostic(formattedRoot.ToFullString(),
+        VerifyDiagnostic(
+            formattedRoot.ToFullString(),
             BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 32),
             BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 5, 33));
     }
@@ -229,7 +235,8 @@ record Asset
     public string Reset(string offset) => asset + offset + ""set"";
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'AssetName' in record type 'Asset' should be init-only. CS-03.10.", 9, 9));
         VerifyCodeFix(testCode, fixedCode);
     }
@@ -243,15 +250,16 @@ record Asset
 record TypeName1
 {
     public string Name { get; ACCESSIBILITY set; }
-}".Replace("ACCESSIBILITY", accessibility) + EntryPoint;
+}".Replace("ACCESSIBILITY", accessibility, StringComparison.Ordinal) + EntryPoint;
 
         var fixedCode = @"
 record TypeName1
 {
     public string Name { get; ACCESSIBILITY init; }
-}".Replace("ACCESSIBILITY", accessibility) + EntryPoint;
+}".Replace("ACCESSIBILITY", accessibility, StringComparison.Ordinal) + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 4, column));
         VerifyCodeFix(testCode, fixedCode);
     }
@@ -291,7 +299,8 @@ record TypeName1
     }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 9, 9));
         VerifyCodeFix(testCode, fixedCode);
     }
@@ -321,7 +330,8 @@ record TypeName1
     }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 8, 9));
 
         VerifyCodeFix(testCode, fixedCode);
@@ -350,11 +360,13 @@ record SecondRecord
     public string Name { get; set; }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'FirstRecord' should be init-only. CS-03.10.", 4, 31),
             BuildExpectedResult("Record property 'Name' in record type 'SecondRecord' should be init-only. CS-03.10.", 8, 31));
         VerifyCodeFix(testCode, fixedCode, codeFixIndex: 0);
-        VerifyDiagnostic(fixedCode,
+        VerifyDiagnostic(
+            fixedCode,
             BuildExpectedResult("Record property 'Name' in record type 'SecondRecord' should be init-only. CS-03.10.", 8, 31));
     }
 
@@ -388,7 +400,8 @@ partial record TypeName1
     public string Second { get; set; }
 }";
 
-        VerifyDiagnostic([firstPart, secondPart],
+        VerifyDiagnostic(
+            [firstPart, secondPart],
             BuildExpectedResult("Record property 'First' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 32),
             BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 33, "Test1.cs"));
     }
@@ -408,7 +421,8 @@ record struct TypeName1
     public string Name { get; init; }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 31));
         VerifyCodeFix(testCode, fixedCode);
     }
@@ -431,7 +445,8 @@ record TypeName1(string First)
     public string Second { get; set; }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Second' in record type 'TypeName1' should be init-only. CS-03.10.", 4, 33));
     }
 
@@ -480,7 +495,8 @@ record TypeName1 : INamed
     public string Name { get; set; }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'TypeName1' should be init-only. CS-03.10.", 8, 31));
     }
 
@@ -552,7 +568,8 @@ record DerivedRecord : BaseRecord, INamed
 {
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only. CS-03.10.", 8, 31));
         VerifyCodeFix(testCode, fixedCode);
     }
@@ -625,7 +642,7 @@ readonly record struct TypeName1(string Name);" + EntryPoint;
 RECORD_DECLARATION TypeName1
 {
     public static string Name { get; set; }
-}".Replace("RECORD_DECLARATION", recordDeclaration) + EntryPoint;
+}".Replace("RECORD_DECLARATION", recordDeclaration, StringComparison.Ordinal) + EntryPoint;
 
         VerifyNoDiagnostic(testCode);
     }
@@ -653,7 +670,8 @@ record DerivedRecord : BaseRecord
     public override string Name { get; init; }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only. CS-03.10.", 4, 40));
         VerifyCodeFix(testCode, fixedCode);
     }
@@ -713,7 +731,8 @@ record DerivedRecord : GetterOnlyRecord
     public override string Name { get; init; }
 }" + EntryPoint;
 
-        VerifyDiagnostic(testCode,
+        VerifyDiagnostic(
+            testCode,
             BuildExpectedResult("Record property 'Name' in record type 'BaseRecord' should be init-only. CS-03.10.", 4, 39));
         VerifyCodeFix(testCode, fixedCode);
     }
@@ -741,7 +760,7 @@ record DerivedRecord : BaseRecord
 
         var project = CreateProject([baseFile, derivedFile]);
         var baseDocument = project.Documents.First();
-        var diagnostics = GetSortedDiagnosticsFromDocuments(GetCSharpDiagnosticAnalyzer(), project.Documents.ToArray());
+        var diagnostics = GetSortedDiagnosticsFromDocuments(GetCSharpDiagnosticAnalyzer(), [.. project.Documents]);
         Assert.HasCount(1, diagnostics);
 
         var actions = new List<CodeAction>();
@@ -755,6 +774,6 @@ record DerivedRecord : BaseRecord
         var compilation = await changedProject.GetCompilationAsync(CancellationToken.None);
 
         Assert.AreEqual(expectedDerivedFile, (await changedDerivedDocument.GetTextAsync(CancellationToken.None)).ToString());
-        Assert.IsEmpty(compilation.GetDiagnostics().Where(d => d.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error));
+        Assert.IsEmpty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
     }
 }

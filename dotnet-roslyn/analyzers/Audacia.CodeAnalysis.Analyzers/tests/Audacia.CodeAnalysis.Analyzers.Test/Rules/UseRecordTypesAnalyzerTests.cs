@@ -1,4 +1,4 @@
-using Audacia.CodeAnalysis.Analyzers.Core.Rules.UseRecordTypes;
+using Audacia.CodeAnalysis.Analyzers.Rules.UseRecordTypes;
 using Audacia.CodeAnalysis.Analyzers.Shared.Settings;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
@@ -31,7 +31,7 @@ public class UseRecordTypesAnalyzerTests : CodeFixVerifier
         ParseOptions = CSharpParseOptions.Default;
     }
 
-    private DiagnosticResult BuildExpectedResult(int lineNumber, int column, string typeName, string suffix)
+    private static DiagnosticResult BuildExpectedResult(int lineNumber, int column, string typeName, string suffix)
     {
         return new DiagnosticResult
         {

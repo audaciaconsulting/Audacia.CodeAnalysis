@@ -5,17 +5,19 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionScopeForMultipleAssertions
-{
-    [TestClass]
-    public class BaseAssertionScopeTests : CodeFixVerifier
-    {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        => new AssertionScopeForMultipleAssertionsAnalyzer();
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionScopeForMultipleAssertions;
 
-        internal static string BuildTestCode(string testMethod)
-        {
-            return @"
+[TestClass]
+public class BaseAssertionScopeTests : CodeFixVerifier
+{
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new AssertionScopeForMultipleAssertionsAnalyzer();
+    }
+
+    internal static string BuildTestCode(string testMethod)
+    {
+        return @"
 using System;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -32,31 +34,27 @@ public class TestClass
 
     " + testMethod + @"
 }";
-        }
+    }
 
-        internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column)
+    internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column)
+    {
+        return new DiagnosticResult
         {
-
-            var diagnosticResult = new DiagnosticResult
-            {
-                Id = AssertionScopeForMultipleAssertionsAnalyzer.Id,
-                Severity = DiagnosticSeverity.Warning,
-                Message = "Use an assertion scope when a test method has more than two assertions. UT-01.5.",
-                Locations =
-                    new[] {
+            Id = AssertionScopeForMultipleAssertionsAnalyzer.Id,
+            Severity = DiagnosticSeverity.Warning,
+            Message = "Use an assertion scope when a test method has more than two assertions. UT-01.5.",
+            Locations =
+                [
                     new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
-            };
+                ]
+        };
+    }
 
-            return diagnosticResult;
-        }
+    [TestMethod]
+    public void No_Diagnostics_For_Empty_Code()
+    {
+        var testCode = BuildTestCode(string.Empty);
 
-        [TestMethod]
-        public void No_Diagnostics_For_Empty_Code()
-        {
-            var testCode = BuildTestCode("");
-
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
     }
 }

@@ -4,112 +4,111 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Settings
+namespace Audacia.CodeAnalysis.Analyzers.Test.Settings;
+
+[TestClass]
+public class AdditionalFilesReaderTests
 {
-    [TestClass]
-    public class AdditionalFilesReaderTests
+    private static AdditionalFilesReader SetupReader(SettingsKey key, params (string Path, string SettingsValue)[] fileSetups)
     {
-        private static AdditionalFilesReader SetupReader(SettingsKey key, params (string path, string settingsValue)[] fileSetups)
+        var substituteFiles = new List<IAdditionalText>();
+        foreach (var (path, settingsValue) in fileSetups)
         {
-            var substituteFiles = new List<IAdditionalText>();
-            foreach (var (path, settingsValue) in fileSetups)
+            var substituteFile = Substitute.For<IAdditionalText>();
+            substituteFile.Path.Returns(path);
+
+            if (settingsValue != null)
             {
-                var substituteFile = Substitute.For<IAdditionalText>();
-                substituteFile.Path.Returns(path);
-
-                if (settingsValue != null)
-                {
-                    var setting = $"{key} = {settingsValue}";
-                    substituteFile.FindRuleSettingValue(key).Returns(setting);
-                }
-                else
-                {
-                    // Setting not in this file (the substitute would otherwise return an empty string)
-                    substituteFile.FindRuleSettingValue(default).ReturnsNullForAnyArgs();
-                }
-
-                substituteFiles.Add(substituteFile);
+                var setting = $"{key} = {settingsValue}";
+                substituteFile.FindRuleSettingValue(key).Returns(setting);
             }
-            
-            return new AdditionalFilesReader(substituteFiles);
+            else
+            {
+                // Setting not in this file (the substitute would otherwise return an empty string)
+                substituteFile.FindRuleSettingValue(default).ReturnsNullForAnyArgs();
+            }
+
+            substituteFiles.Add(substituteFile);
         }
 
-        [TestMethod]
-        public void Value_found_when_present_in_single_file()
-        {
-            var key = new SettingsKey("abc", "name");
-            const string expectedValue = "123";
-            var reader = SetupReader(key, ("dummy-path", expectedValue));
+        return new AdditionalFilesReader(substituteFiles);
+    }
 
-            var actualValue = reader.TryGetValue(key);
+    [TestMethod]
+    public void Value_found_when_present_in_single_file()
+    {
+        var key = new SettingsKey("abc", "name");
+        const string expectedValue = "123";
+        var reader = SetupReader(key, ("dummy-path", expectedValue));
 
-            Assert.AreEqual(expectedValue, actualValue);
-        }
+        var actualValue = reader.TryGetValue(key);
 
-        [TestMethod]
-        public void Value_found_when_present_in_second_file()
-        {
-            var key = new SettingsKey("abc", "name");
-            const string expectedValue = "123";
-            var reader = SetupReader(key, ("dummy-path", null), ("dummy-path-2", expectedValue));
+        Assert.AreEqual(expectedValue, actualValue);
+    }
 
-            var actualValue = reader.TryGetValue(key);
+    [TestMethod]
+    public void Value_found_when_present_in_second_file()
+    {
+        var key = new SettingsKey("abc", "name");
+        const string expectedValue = "123";
+        var reader = SetupReader(key, ("dummy-path", null), ("dummy-path-2", expectedValue));
 
-            Assert.AreEqual(expectedValue, actualValue);
-        }
+        var actualValue = reader.TryGetValue(key);
 
-        [TestMethod]
-        public void Value_not_searched_for_in_second_file_if_found_in_first()
-        {
-            var key = new SettingsKey("abc", "name");
-            const string expectedValue = "123";
+        Assert.AreEqual(expectedValue, actualValue);
+    }
 
-            var substituteFileOne = Substitute.For<IAdditionalText>();
-            substituteFileOne.Path.Returns("dummy-path");
-            substituteFileOne.FindRuleSettingValue(key).Returns($"{key} = {expectedValue}");
+    [TestMethod]
+    public void Value_not_searched_for_in_second_file_if_found_in_first()
+    {
+        var key = new SettingsKey("abc", "name");
+        const string expectedValue = "123";
 
-            var substituteFileTwo = Substitute.For<IAdditionalText>();
-            substituteFileTwo.Path.Returns("dummy-path-2");
+        var substituteFileOne = Substitute.For<IAdditionalText>();
+        substituteFileOne.Path.Returns("dummy-path");
+        substituteFileOne.FindRuleSettingValue(key).Returns($"{key} = {expectedValue}");
 
-            var reader = new AdditionalFilesReader(new[] { substituteFileOne, substituteFileTwo });
+        var substituteFileTwo = Substitute.For<IAdditionalText>();
+        substituteFileTwo.Path.Returns("dummy-path-2");
 
-            reader.TryGetValue(key);
+        var reader = new AdditionalFilesReader([substituteFileOne, substituteFileTwo]);
 
-            substituteFileTwo.DidNotReceive().FindRuleSettingValue(key);
-        }
+        reader.TryGetValue(key);
 
-        [TestMethod]
-        public void Whitespace_excluded_from_value_returned()
-        {
-            var key = new SettingsKey("abc", "name");
-            const string expectedValue = "123";
+        substituteFileTwo.DidNotReceive().FindRuleSettingValue(key);
+    }
 
-            var substituteFile = Substitute.For<IAdditionalText>();
-            substituteFile.Path.Returns("dummy-path");
-            substituteFile.FindRuleSettingValue(key).Returns($"{key} = {expectedValue}  ");
+    [TestMethod]
+    public void Whitespace_excluded_from_value_returned()
+    {
+        var key = new SettingsKey("abc", "name");
+        const string expectedValue = "123";
 
-            var reader = new AdditionalFilesReader(new[] { substituteFile });
+        var substituteFile = Substitute.For<IAdditionalText>();
+        substituteFile.Path.Returns("dummy-path");
+        substituteFile.FindRuleSettingValue(key).Returns($"{key} = {expectedValue}  ");
 
-            var actualValue = reader.TryGetValue(key);
+        var reader = new AdditionalFilesReader([substituteFile]);
 
-            Assert.AreEqual(expectedValue, actualValue);
-        }
+        var actualValue = reader.TryGetValue(key);
 
-        [TestMethod]
-        public void Null_value_returned_if_setting_malformed()
-        {
-            var key = new SettingsKey("abc", "name");
+        Assert.AreEqual(expectedValue, actualValue);
+    }
 
-            var substituteFile = Substitute.For<IAdditionalText>();
-            substituteFile.Path.Returns("dummy-path");
-            // Malformed means no '=' sign
-            substituteFile.FindRuleSettingValue(key).Returns($"{key}  123");
+    [TestMethod]
+    public void Null_value_returned_if_setting_malformed()
+    {
+        var key = new SettingsKey("abc", "name");
 
-            var reader = new AdditionalFilesReader(new[] { substituteFile });
+        var substituteFile = Substitute.For<IAdditionalText>();
+        substituteFile.Path.Returns("dummy-path");
+        // Malformed means no '=' sign
+        substituteFile.FindRuleSettingValue(key).Returns($"{key}  123");
 
-            var actualValue = reader.TryGetValue(key);
+        var reader = new AdditionalFilesReader([substituteFile]);
 
-            Assert.IsNull(actualValue);
-        }
+        var actualValue = reader.TryGetValue(key);
+
+        Assert.IsNull(actualValue);
     }
 }

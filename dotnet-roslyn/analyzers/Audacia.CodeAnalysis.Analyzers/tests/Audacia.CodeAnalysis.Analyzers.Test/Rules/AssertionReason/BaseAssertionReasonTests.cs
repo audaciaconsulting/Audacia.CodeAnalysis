@@ -1,21 +1,23 @@
-using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionReason;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
+using Audacia.CodeAnalysis.Analyzers.TestProjects.Rules.AssertionReason;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionReason
-{
-    [TestClass]
-    public class BaseAssertionReasonTests : CodeFixVerifier
-    {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new AssertionReasonMustBeProvidedAnalyzer();
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionReason;
 
-        internal static string BuildTestCode(string testMethod)
-        {
-            return @"
+[TestClass]
+public class BaseAssertionReasonTests : CodeFixVerifier
+{
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+    {
+        return new AssertionReasonMustBeProvidedAnalyzer();
+    }
+
+    internal static string BuildTestCode(string testMethod)
+    {
+        return @"
 using System;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -32,29 +34,27 @@ public class TestClass
 
     " + testMethod + @"
 }";
-        }
+    }
 
-        internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column)
+    internal static DiagnosticResult BuildExpectedResult(int lineNumber, int column)
+    {
+        return new DiagnosticResult
         {
-            return new DiagnosticResult
-            {
-                Id = AssertionReasonMustBeProvidedAnalyzer.Id,
-                Severity = DiagnosticSeverity.Warning,
-                Message = "Assertions must contain a reason. UT-01.1.",
-                Locations =
-                    new[]
-                    {
-                        new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                    }
-            };
-        }
+            Id = AssertionReasonMustBeProvidedAnalyzer.Id,
+            Severity = DiagnosticSeverity.Warning,
+            Message = "Assertions must contain a reason. UT-01.1.",
+            Locations =
+                [
+                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+                ]
+        };
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Empty_Code()
-        {
-            var testCode = BuildTestCode("");
+    [TestMethod]
+    public void No_Diagnostics_For_Empty_Code()
+    {
+        var testCode = BuildTestCode(string.Empty);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
     }
 }

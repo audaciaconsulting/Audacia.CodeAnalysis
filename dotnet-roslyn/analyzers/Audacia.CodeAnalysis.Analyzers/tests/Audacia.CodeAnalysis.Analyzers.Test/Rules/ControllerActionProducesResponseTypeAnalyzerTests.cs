@@ -1,4 +1,4 @@
-﻿using Audacia.CodeAnalysis.Analyzers.Rules.ControllerActionProducesResponseType;
+﻿using Audacia.CodeAnalysis.Analyzers.AspNetCore.Rules.ControllerActionProducesResponseType;
 using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Audacia.CodeAnalysis.Analyzers.Test.Helpers;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -10,22 +10,22 @@ namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
 public class ControllerActionProducesResponseTypeAnalyzerTests : CodeFixVerifier
 {
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        => new ControllerActionProducesResponseTypeAnalyzer();
+    {
+        return new ControllerActionProducesResponseTypeAnalyzer();
+    }
 
     private static DiagnosticResult BuildExpectedResult(string message, int lineNumber, int column)
     {
-        var diagnosticResult = new DiagnosticResult
+        return new DiagnosticResult
         {
             Id = ControllerActionProducesResponseTypeAnalyzer.Id,
             Severity = ControllerActionProducesResponseTypeAnalyzer.Severity,
             Message = message,
             Locations =
-                new[] {
+                [
                     new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                }
+                ]
         };
-
-        return diagnosticResult;
     }
 
     [TestMethod]

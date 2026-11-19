@@ -3,18 +3,20 @@ using Audacia.CodeAnalysis.Analyzers.Test.Base;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionRequired
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules.AssertionRequired;
+
+[TestClass]
+public class XunitAssertionRequiredTests : CodeFixVerifier
 {
-    [TestClass]
-    public class XunitAssertionRequiredTests : CodeFixVerifier
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-            => new AssertionRequiredAnalyzer();
+        return new AssertionRequiredAnalyzer();
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Fact_TestMethod_With_Assertion()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Fact_TestMethod_With_Assertion()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -22,15 +24,15 @@ public void TestMethod()
     Assert.NotEmpty(foo);
 }";
 
-            var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Theory_TestMethod_With_Assertion()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Theory_TestMethod_With_Assertion()
+    {
+        const string testMethod = @"
 [Theory]
 [InlineData(""Foo"")]
 public void TestMethod(string foo)
@@ -38,15 +40,15 @@ public void TestMethod(string foo)
     Assert.NotEmpty(foo);
 }";
 
-            var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Fact_TestMethod_With_Assertion_In_Separate_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Fact_TestMethod_With_Assertion_In_Separate_Method()
+    {
+        const string testMethod = @"
 private void Assertion(string foo)
 {
     Assert.NotEmpty(foo);
@@ -60,15 +62,15 @@ public void TestMethod()
     Assertion(foo);
 }";
 
-            var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Theory_TestMethod_With_Assertion_In_Separate_Method()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Theory_TestMethod_With_Assertion_In_Separate_Method()
+    {
+        const string testMethod = @"
 private void Assertion(string foo)
 {
     Assert.NotEmpty(foo);
@@ -82,15 +84,15 @@ public void TestMethod(string foo)
     Assertion(foo);
 }";
 
-            var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Assertion_Inside_Xunit_Assertion_Scope()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Assertion_Inside_Xunit_Assertion_Scope()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -100,15 +102,15 @@ public void TestMethod()
     });
 }";
 
-            var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
+        var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
 
-            VerifyNoDiagnostic(testCode);
-        }
+        VerifyNoDiagnostic(testCode);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Assertion_Scope_Without_Assertion()
-        {
-            const string testMethod = @"
+    [TestMethod]
+    public void Diagnostics_For_Assertion_Scope_Without_Assertion()
+    {
+        const string testMethod = @"
 [Fact]
 public void TestMethod()
 {
@@ -118,10 +120,9 @@ public void TestMethod()
     });
 }";
 
-            var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
-            var expectedDiagnostic = BaseAssertionRequiredTests.BuildExpectedResult(18, 13);
+        var testCode = BaseAssertionRequiredTests.BuildTestCode(testMethod);
+        var expectedDiagnostic = BaseAssertionRequiredTests.BuildExpectedResult(18, 13);
 
-            VerifyDiagnostic(testCode, expectedDiagnostic);
-        }
+        VerifyDiagnostic(testCode, expectedDiagnostic);
     }
 }

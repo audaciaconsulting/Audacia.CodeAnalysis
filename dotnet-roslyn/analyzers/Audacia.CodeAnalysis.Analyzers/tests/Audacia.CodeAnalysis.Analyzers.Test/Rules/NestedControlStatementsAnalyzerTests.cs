@@ -5,34 +5,34 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Audacia.CodeAnalysis.Analyzers.Test.Rules
+namespace Audacia.CodeAnalysis.Analyzers.Test.Rules;
+
+[TestClass]
+public class NestedControlStatementsAnalyzerTests : DiagnosticVerifier
 {
-    [TestClass]
-    public class NestedControlStatementsAnalyzerTests : DiagnosticVerifier
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
     {
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new NestedControlStatementsAnalyzer();
-        }
+        return new NestedControlStatementsAnalyzer();
+    }
 
-        private DiagnosticResult BuildExpectedResult(string memberName, int lineNumber, int column, int statementCount, int maxStatementCount = NestedControlStatementsAnalyzer.DefaultMaximumDepth)
+    private static DiagnosticResult BuildExpectedResult(string memberName, int lineNumber, int column, int statementCount, int maxStatementCount = NestedControlStatementsAnalyzer.DefaultMaximumDepth)
+    {
+        return new DiagnosticResult
         {
-            return new DiagnosticResult
-            {
-                Id = NestedControlStatementsAnalyzer.Id,
-                Message = $"{memberName} contains {statementCount} nested control flow statements, which exceeds the maximum of {maxStatementCount} nested control flow statements. CS-01.14.",
-                Severity = DiagnosticSeverity.Warning,
-                Locations =
-                [
-                    new DiagnosticResultLocation("Test0.cs", lineNumber, column)
-                ]
-            };
-        }
+            Id = NestedControlStatementsAnalyzer.Id,
+            Message = $"{memberName} contains {statementCount} nested control flow statements, which exceeds the maximum of {maxStatementCount} nested control flow statements. CS-01.14.",
+            Severity = DiagnosticSeverity.Warning,
+            Locations =
+            [
+                new DiagnosticResultLocation("Test0.cs", lineNumber, column)
+            ]
+        };
+    }
 
-        [TestMethod]
-        public void No_Diagnostics_For_Method_Body_Less_Than_Max_Allowed_Statements()
-        {
-            var test = @"
+    [TestMethod]
+    public void No_Diagnostics_For_Method_Body_Less_Than_Max_Allowed_Statements()
+    {
+        var test = @"
 namespace TestApp;
 
 class Program
@@ -48,13 +48,13 @@ class Program
     }
 }";
 
-            VerifyNoDiagnostic(test);
-        }
+        VerifyNoDiagnostic(test);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_While_Statements()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_While_Statements()
+    {
+        var test = @"
 namespace TestApp;
 
 class Program
@@ -75,18 +75,19 @@ class Program
         }
     }
 }";
-            var expected = new[] {
-                BuildExpectedResult("WhileStatement", 12, 17, 3),
-                BuildExpectedResult("WhileStatement", 14, 21, 4),
-            };
-
-            VerifyDiagnostic(test, expected);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_While_With_Multiple_Statement_In_Block_Statements()
+        var expected = new[]
         {
-            var test = @"
+            BuildExpectedResult("WhileStatement", 12, 17, 3),
+            BuildExpectedResult("WhileStatement", 14, 21, 4),
+        };
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_While_With_Multiple_Statement_In_Block_Statements()
+    {
+        var test = @"
 namespace TestApp;
 
 class Program
@@ -111,20 +112,20 @@ class Program
         }
     }
 }";
-            var expected = new[] {
-                BuildExpectedResult("WhileStatement", 12, 17, 3),
-                BuildExpectedResult("WhileStatement", 14, 21, 4),
-                BuildExpectedResult("WhileStatement", 18, 21, 4),
-            };
-
-            VerifyDiagnostic(test, expected);
-        }
-
-
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Do_Statements()
+        var expected = new[]
         {
-            var test = @"
+            BuildExpectedResult("WhileStatement", 12, 17, 3),
+            BuildExpectedResult("WhileStatement", 14, 21, 4),
+            BuildExpectedResult("WhileStatement", 18, 21, 4),
+        };
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Do_Statements()
+    {
+        var test = @"
 namespace TestApp;
 
 class Program
@@ -145,18 +146,19 @@ class Program
         } while (true);
     }
 }";
-            var expected = new[] {
-                BuildExpectedResult("DoStatement", 12, 17, 3),
-                BuildExpectedResult("DoStatement", 14, 21, 4),
-            };
-
-            VerifyDiagnostic(test, expected);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_If_Statements()
+        var expected = new[]
         {
-            var test = @"
+            BuildExpectedResult("DoStatement", 12, 17, 3),
+            BuildExpectedResult("DoStatement", 14, 21, 4),
+        };
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_If_Statements()
+    {
+        var test = @"
 namespace TestApp;
 
 class Program
@@ -177,18 +179,19 @@ class Program
         }
     }
 }";
-            var expected = new[] {
-                BuildExpectedResult("IfStatement", 12, 17, 3),
-                BuildExpectedResult("IfStatement", 14, 21, 4),
-            };
-
-            VerifyDiagnostic(test, expected);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_If_Statements_With_Else_Clause()
+        var expected = new[]
         {
-            var test = @"
+            BuildExpectedResult("IfStatement", 12, 17, 3),
+            BuildExpectedResult("IfStatement", 14, 21, 4),
+        };
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_If_Statements_With_Else_Clause()
+    {
+        var test = @"
 namespace TestApp;
 
 class Program
@@ -212,19 +215,20 @@ class Program
         }
     }
 }";
-            var expected = new[] {
-                BuildExpectedResult("IfStatement", 12, 17, 3),
-                BuildExpectedResult("IfStatement", 15, 22, 3),
-                BuildExpectedResult("ElseClause", 18, 17, 3)
-            };
-
-            VerifyDiagnostic(test, expected);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Statements_Within_Else_Clause()
+        var expected = new[]
         {
-            var test = @"
+            BuildExpectedResult("IfStatement", 12, 17, 3),
+            BuildExpectedResult("IfStatement", 15, 22, 3),
+            BuildExpectedResult("ElseClause", 18, 17, 3)
+        };
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Statements_Within_Else_Clause()
+    {
+        var test = @"
 namespace TestApp;
 
 class Program
@@ -245,17 +249,18 @@ class Program
         }
     }
 }";
-            var expected = new[] {
-                BuildExpectedResult("IfStatement", 15, 17, 3)
-            };
-
-            VerifyDiagnostic(test, expected);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_For_Loops()
+        var expected = new[]
         {
-            var test = @"
+            BuildExpectedResult("IfStatement", 15, 17, 3)
+        };
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_For_Loops()
+    {
+        var test = @"
 namespace TestApp;
 
 class Program
@@ -276,18 +281,19 @@ class Program
         }
     }
 }";
-            var expected = new[] {
-                BuildExpectedResult("ForStatement", 12, 17, 3),
-                BuildExpectedResult("ForStatement", 14, 21, 4),
-            };
-
-            VerifyDiagnostic(test, expected);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_ForEach_Loops()
+        var expected = new[]
         {
-            var test = @"
+            BuildExpectedResult("ForStatement", 12, 17, 3),
+            BuildExpectedResult("ForStatement", 14, 21, 4),
+        };
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_ForEach_Loops()
+    {
+        var test = @"
 using System.Linq;
 
 namespace TestApp;
@@ -310,18 +316,19 @@ class Program
         }
     }
 }";
-            var expected = new[] {
-                BuildExpectedResult("ForEachStatement", 14, 17, 3),
-                BuildExpectedResult("ForEachStatement", 16, 21, 4),
-            };
-
-            VerifyDiagnostic(test, expected);
-        }
-
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Switch_Statement()
+        var expected = new[]
         {
-            var test = @"
+            BuildExpectedResult("ForEachStatement", 14, 17, 3),
+            BuildExpectedResult("ForEachStatement", 16, 21, 4),
+        };
+
+        VerifyDiagnostic(test, expected);
+    }
+
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Switch_Statement()
+    {
+        var test = @"
 namespace TestApp
 {
     class Program
@@ -347,15 +354,15 @@ namespace TestApp
     }
 }";
 
-            var expected = BuildExpectedResult("SwitchStatement", 14, 29, 3);
+        var expected = BuildExpectedResult("SwitchStatement", 14, 29, 3);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostic_For_Method_Body_With_More_Than_Max_Allowed_Switch_Expressions()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostic_For_Method_Body_With_More_Than_Max_Allowed_Switch_Expressions()
+    {
+        var test = @"
 namespace TestApp
 {
     class Program
@@ -378,15 +385,15 @@ namespace TestApp
     }
 }";
 
-            var expected = BuildExpectedResult("SwitchExpression", 12, 26, 3);
+        var expected = BuildExpectedResult("SwitchExpression", 12, 26, 3);
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
+    }
 
-        [TestMethod]
-        public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Switch_Expressions()
-        {
-            var test = @"
+    [TestMethod]
+    public void Diagnostics_For_Method_Body_With_More_Than_Max_Allowed_Switch_Expressions()
+    {
+        var test = @"
 namespace TestApp
 {
     class Program
@@ -413,13 +420,12 @@ namespace TestApp
     }
 }";
 
-            var expected = new[]
-            {
-                BuildExpectedResult("SwitchExpression", 12, 26, 3),
-                BuildExpectedResult("SwitchExpression", 14, 30, 4),
-            };
+        var expected = new[]
+        {
+            BuildExpectedResult("SwitchExpression", 12, 26, 3),
+            BuildExpectedResult("SwitchExpression", 14, 30, 4),
+        };
 
-            VerifyDiagnostic(test, expected);
-        }
+        VerifyDiagnostic(test, expected);
     }
 }
