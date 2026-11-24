@@ -180,6 +180,22 @@ public abstract class DiagnosticVerifier
     }
 
     /// <summary>
+    /// Called to test a C# DiagnosticAnalyzer when applied on <paramref name="sources"/> in a project that has a project reference
+    /// to a second project built from <paramref name="referencedSources"/>. Only diagnostics in <paramref name="sources"/> are verified.
+    /// Note: input a DiagnosticResult for each Diagnostic expected
+    /// </summary>
+    /// <param name="sources">An array of strings to create source documents from to run the analyzers on</param>
+    /// <param name="referencedSources">An array of strings to create source documents in the referenced project from</param>
+    /// <param name="expected">DiagnosticResults that should appear after the analyzer is run on the sources</param>
+    protected void VerifyDiagnosticWithProjectReference(string[] sources, string[] referencedSources, params DiagnosticResult[] expected)
+    {
+        var analyzer = GetCSharpDiagnosticAnalyzer();
+        var documents = CreateProjectWithProjectReference(sources, referencedSources).Documents.ToArray();
+        var diagnostics = GetSortedDiagnosticsFromDocuments(analyzer, documents);
+        VerifyDiagnosticResults(diagnostics, analyzer, expected);
+    }
+
+    /// <summary>
     /// General method that gets a collection of actual diagnostics found in the source after the analyzer is run,
     /// then verifies each of them.
     /// </summary>
@@ -536,14 +552,46 @@ public abstract class DiagnosticVerifier
     [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP004:Don't ignore created IDisposable", Justification = "IDisposable only lasts for the duration of the test")]
     protected static Project CreateProject(string[] sources, string language = LanguageNames.CSharp)
     {
-        string fileNamePrefix = DefaultFilePathPrefix;
+        var solution = new AdhocWorkspace().CurrentSolution;
+        solution = AddProject(solution, TestProjectName, DefaultFilePathPrefix, sources, language, out var projectId);
+        return solution.GetProject(projectId);
+    }
+
+    /// <summary>
+    /// Create a project using <paramref name="sources"/> that has a project reference to a second project built from <paramref name="referencedSources"/>,
+    /// where symbols from the referenced project still expose their syntax via <see cref="ISymbol.DeclaringSyntaxReferences"/> but are not part of the referencing compilation.
+    /// </summary>
+    /// <param name="sources">Classes for the referencing project, in the form of strings</param>
+    /// <param name="referencedSources">Classes for the referenced project, in the form of strings</param>
+    /// <param name="language">The language the source code is in</param>
+    /// <returns>The referencing project</returns>
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP004:Don't ignore created IDisposable", Justification = "IDisposable only lasts for the duration of the test")]
+    protected static Project CreateProjectWithProjectReference(string[] sources, string[] referencedSources, string language = LanguageNames.CSharp)
+    {
+        const string referencedProjectName = "ReferencedProject";
+
+        var solution = new AdhocWorkspace().CurrentSolution;
+        solution = AddProject(solution, referencedProjectName, "Referenced", referencedSources, language, out var referencedProjectId);
+
+        solution = solution.WithProjectCompilationOptions(
+            referencedProjectId,
+            solution.GetProject(referencedProjectId).CompilationOptions.WithOutputKind(OutputKind.DynamicallyLinkedLibrary));
+
+        solution = AddProject(solution, TestProjectName, DefaultFilePathPrefix, sources, language, out var projectId);
+        solution = solution.AddProjectReference(projectId, new ProjectReference(referencedProjectId));
+
+        return solution.GetProject(projectId);
+    }
+
+    [SuppressMessage("Maintainability", "AV1562:Do not declare a parameter as ref or out", Justification = "In this case it's clearer to use an out param")]
+    private static Solution AddProject(Solution solution, string projectName, string fileNamePrefix, string[] sources, string language, out ProjectId projectId)
+    {
         string fileExt = language == LanguageNames.CSharp ? CSharpDefaultFileExt : VisualBasicDefaultExt;
 
-        var projectId = ProjectId.CreateNewId(debugName: TestProjectName);
+        projectId = ProjectId.CreateNewId(debugName: projectName);
 
-        var solution = new AdhocWorkspace()
-            .CurrentSolution
-            .AddProject(projectId, TestProjectName, TestProjectName, language)
+        solution = solution
+            .AddProject(projectId, projectName, projectName, language)
             .WithProjectCompilationOptions(projectId, CompilationOptions)
             .WithProjectParseOptions(projectId, ParseOptions)
             .AddMetadataReference(projectId, CorLib)
@@ -595,7 +643,7 @@ public abstract class DiagnosticVerifier
             count++;
         }
 
-        return solution.GetProject(projectId);
+        return solution;
     }
 
     #endregion

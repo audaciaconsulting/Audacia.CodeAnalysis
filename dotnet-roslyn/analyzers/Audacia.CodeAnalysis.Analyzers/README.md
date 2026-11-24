@@ -1341,7 +1341,7 @@ This is because assertion scopes provide better diagnostics when multiple assert
 
 This applies to `Xunit`, `FluentAssertions`, and `Shouldly` assertions/assertion scopes.  The assertions must be contained within the scope construct from the same framework, and each test method must only use a single framework for its assertions, as mixing frameworks is not supported/a code smell and will produce a warning.
 
-:warning: This analyzer is not guaranteed to work with `FluentAssertions` versions 8.0.0 and above.
+:warning: This analyzer is not guaranteed to work with `FluentAssertions` versions 8.0.0 and above. Also, helper methods from other projects are not inspected, as their source isn't available to command-line builds.
 
 Code with diagnostic:
 
@@ -1431,7 +1431,7 @@ This is because test methods without assertions do not validate any behavior and
 
 This applies to `Xunit`, `FluentAssertions`, and `Shouldly` assertions, as well as mock verification assertions using `Moq` (`Verify`, `VerifyAll`, `VerifyGet`, `VerifySet`, `VerifyAdd`, `VerifyRemove`, `VerifyNoOtherCalls`) and `NSubstitute` (`Received*`, `DidNotReceive*`, `InOrder`).
 
-:warning: This analyzer is not guaranteed to work with `FluentAssertions` versions 8.0.0 and above.
+:warning: This analyzer is not guaranteed to work with `FluentAssertions` versions 8.0.0 and above. Also, helper methods from other projects are not inspected (their source isn't available to command-line builds), so a test whose only assertions are in such a helper will be reported.
 
 Code with diagnostic:
 
@@ -1476,7 +1476,7 @@ This is because providing a reason in assertions provides better diagnostics whe
 
 This applies to `Xunit` v3, `FluentAssertions` v7, and `Shouldly` v4 assertions.
 
-:warning: Other major versions of these frameworks may not be supported.
+:warning: Other major versions of these frameworks may not be supported. Also, helper methods from other projects are not inspected, as their source isn't available to command-line builds.
 
 Code with diagnostic:
 

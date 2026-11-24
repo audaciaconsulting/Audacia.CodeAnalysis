@@ -352,6 +352,13 @@ public static class SyntaxExtensions
             return (null, null);
         }
 
+        // When the helper is declared in another project, the IDE can still surface its source syntax, but its
+        // syntax tree is not part of the current compilation, so GetSemanticModel would throw.
+        if (!semanticModel.Compilation.ContainsSyntaxTree(methodDeclaration.SyntaxTree))
+        {
+            return (null, null);
+        }
+
         var helperSemanticModel = semanticModel.Compilation.GetSemanticModel(methodDeclaration.SyntaxTree);
         return (methodDeclaration, helperSemanticModel);
     }

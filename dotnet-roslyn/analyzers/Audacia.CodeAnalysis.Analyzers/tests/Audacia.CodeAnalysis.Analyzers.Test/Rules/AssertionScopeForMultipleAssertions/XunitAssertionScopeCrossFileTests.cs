@@ -56,4 +56,55 @@ public partial class TestClass
 
         VerifyDiagnostic(sources);
     }
+
+    [TestMethod]
+    public void No_Crash_For_Fact_TestMethod_Calling_Helper_In_Referenced_Project()
+    {
+        var sources = new[]
+        {
+                @"
+using Helpers;
+using Xunit;
+
+namespace ConsoleApplication1;
+
+public class TestClass
+{
+    static void Main(string[] args)
+    {
+    }
+
+    [Fact]
+    public void TestMethod()
+    {
+        AssertionHelpers.Assertion();
+    }
+}"
+            };
+
+        // The helper lives in a referenced project, so its syntax tree is not part of the test project's compilation.
+        // This previously threw "SyntaxTree is not part of the compilation" in the IDE.
+        var referencedSources = new[]
+        {
+                @"
+using Xunit;
+
+namespace Helpers;
+
+public static class AssertionHelpers
+{
+    public static void Assertion()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.True(true);
+            Assert.True(true);
+            Assert.True(true);
+        });
+    }
+}"
+            };
+
+        VerifyDiagnosticWithProjectReference(sources, referencedSources);
+    }
 }

@@ -392,7 +392,9 @@ public static class SymbolExtensions
     {
         SyntaxNode bodySyntax = TryGetBodySyntaxForMethod(method, cancellationToken);
 
-        if (bodySyntax != null)
+        // The body may be declared in another project (visible via a project reference in the IDE), in which case
+        // its syntax tree is not part of this compilation and GetSemanticModel would throw.
+        if (bodySyntax != null && compilation.ContainsSyntaxTree(bodySyntax.SyntaxTree))
         {
             SemanticModel model = compilation.GetSemanticModel(bodySyntax.SyntaxTree);
             IOperation operation = model.GetOperation(bodySyntax);
