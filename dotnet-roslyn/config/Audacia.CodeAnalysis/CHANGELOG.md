@@ -1,5 +1,13 @@
 ﻿# Changelog
 
+## 2.2.1 - 2026-11-24
+
+### Changed
+
+- Updated Audacia.CodeAnalysis.Analyzers to version 2.1.1.
+- Updated Audacia.CodeAnalysis.Analyzers.AspNetCore to version 2.1.1.
+- Updated Audacia.CodeAnalysis.Analyzers.TestProjects to version 2.1.1.
+
 ## 2.2.0 - 2026-11-13
 
 ### Changed
